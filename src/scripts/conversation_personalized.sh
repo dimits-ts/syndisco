@@ -1,1 +1,7 @@
-bash /home/dimits/Documents/university/research/llm_moderation/experiments/scripts/conversation_execute_all.sh --python_script_path  /home/dimits/Documents/university/research/llm_moderation/experiments/create_synthetic.py --input_dir /home/dimits/Documents/university/research/llm_moderation/experiments/data/conversations --output_dir /home/dimits/Documents/university/research/llm_moderation/experiments/output/conversations/game_improved --model_path /home/dimits/Documents/university/research/llm_moderation/experiments/models/llama-2-13b-chat.Q5_K_M.gguf
+#!/bin/bash
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+SRC_DIR="$(dirname "$SCRIPT_DIR")"
+PROJECT_ROOT_DIR="$(dirname "$SRC_DIR")"
+
+bash "$SCRIPT_DIR/conversation_execute_all.sh" --python_script_path  "$SCRIPT_DIR/sdf_create_annotations.py" --input_dir "$PROJECT_ROOT_DIR/data/generated_discussions_input" --output_dir "$PROJECT_ROOT_DIR/data/generated_discussions_output" --model_path "$SRC_DIR/models/llama-3-8B.gguf"
