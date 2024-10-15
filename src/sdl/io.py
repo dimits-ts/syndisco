@@ -1,5 +1,5 @@
 from sdl import actors
-from sdl import util
+from sdl import turn_manager
 from sdl import models
 from sdl import conversation
 
@@ -12,10 +12,13 @@ class LLMConvData:
     """
     A dataclass responsible for serializing and deserializing data needed to construct a :class:`Conversation`.
     """
+
     context: str
     user_names: list[str]
     user_attributes: list[list[str]]
     user_instructions: str
+    turn_manager_type: str
+    turn_manager_config: dict[str, float] = dataclasses.field(default_factory=dict)
     conv_len: int = 4
     history_ctx_len: int = 4
     moderator_name: str | None = None
@@ -62,11 +65,12 @@ class LLMConvGenerator:
     and a model (:class:`models.LlamaModel`).
     """
 
-    def __init__(self,
-                 data: LLMConvData,
-                 user_model: models.LlamaModel,
-                 moderator_model: models.LlamaModel | None,
-                 ):
+    def __init__(
+        self,
+        data: LLMConvData,
+        user_model: models.LlamaModel,
+        moderator_model: models.LlamaModel | None,
+    ):
         """
         Initialize the generator.
 
@@ -78,11 +82,15 @@ class LLMConvGenerator:
         :type moderator_model: tasks.models.LlamaModel | None
         """
         assert user_model is not None, "User model cannot be None"
-        assert not (moderator_model is None and data.moderator_name is not None), ("Moderator agent was not given a "
-                                                                                   "model.")
+        assert not (moderator_model is None and data.moderator_name is not None), (
+            "Moderator agent was not given a " "model."
+        )
         self.user_model = user_model
         self.moderator_model = moderator_model
         self.data = data
+        self.next_turn_manager = turn_manager.turn_manager_factory(
+            data.turn_manager_type, data.user_names
+        )
 
     def produce_conversation(self) -> conversation.Conversation:
         """
@@ -94,24 +102,38 @@ class LLMConvGenerator:
         user_list = []
 
         for i in range(len(self.data.user_names)):
-            user_list.append(actors.LLMUser(model=self.user_model,
-                                                name=self.data.user_names[i],
-                                                role="chat user",
-                                                attributes=self.data.user_attributes[i],
-                                                context=self.data.context,
-                                                instructions=self.data.user_instructions))
-        if self.data.moderator_name is not None:
-            moderator = actors.LLMUser(model=self.moderator_model,
-                                           name=self.data.moderator_name,
-                                           role="chat moderator",
-                                           attributes=self.data.moderator_attributes,
-                                           context=self.data.context,
-                                           instructions=self.data.moderator_instructions)
+            user_list.append(
+                actors.LLMUser(
+                    model=self.user_model,
+                    name=self.data.user_names[i],
+                    role="chat user",
+                    attributes=self.data.user_attributes[i],
+                    context=self.data.context,
+                    instructions=self.data.user_instructions,
+                )
+            )
+        if (
+            self.data.moderator_name is not None
+            and self.moderator_model is not None
+            and self.data.moderator_attributes is not None
+            and self.data.moderator_instructions is not None
+        ):
+            moderator = actors.LLMUser(
+                model=self.moderator_model,
+                name=self.data.moderator_name,
+                role="chat moderator",
+                attributes=self.data.moderator_attributes,
+                context=self.data.context,
+                instructions=self.data.moderator_instructions,
+            )
         else:
             moderator = None
 
-        generated_conv = conversation.Conversation(users=user_list,
-                                    moderator=moderator,
-                                    history_context_len=self.data.history_ctx_len,
-                                    conv_len=self.data.conv_len)
+        generated_conv = conversation.Conversation(
+            turn_manager=self.next_turn_manager,
+            users=user_list,
+            moderator=moderator,
+            history_context_len=self.data.history_ctx_len,
+            conv_len=self.data.conv_len,
+        )
         return generated_conv

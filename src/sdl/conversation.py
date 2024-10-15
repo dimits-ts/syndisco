@@ -7,6 +7,7 @@ from typing import Any
 
 from sdl import actors
 from sdl import util
+from sdl import turn_manager
 
 
 class Conversation:
@@ -17,6 +18,7 @@ class Conversation:
 
     def __init__(
             self,
+            turn_manager: turn_manager.TurnManager,
             users: list[actors.IActor],
             moderator: actors.IActor | None = None,
             history_context_len: int = 5,
@@ -25,6 +27,8 @@ class Conversation:
         """
         Construct the framework for a conversation to take place.
 
+        :param turn_manager: an object handling the speaker priority of the users
+        :type turn_manager: turn_manager.TurnManager
         :param users: A list of discussion participants
         :type users: list[actors.Actor]
         :param moderator: An actor tasked with moderation if not None, can speak at any point in the conversation,
@@ -36,7 +40,9 @@ class Conversation:
          defaults to 5
         :type conv_len: int, optional
         """
-        self.users = users
+        # just to satisfy the type checker
+        self.next_turn_manager = turn_manager
+        self.users = {user.get_name(): user for user in users}
         self.moderator = moderator
         self.conv_len = conv_len
         # unique id for each conversation, generated for persistence purposes
@@ -60,18 +66,15 @@ class Conversation:
             )
 
         for _ in range(self.conv_len):
-            for user in self.users:
-                self._actor_turn(user, verbose)
+            speaker_name = self.next_turn_manager.next_turn_username()
+            res = self._actor_turn(self.users[speaker_name])
+            self._archive_response(speaker_name, res, verbose)
 
-                # TODO: refactor for more than 2 users
-                # if one of the two users stop speaking
-                if len(self.conv_logs[-1][1].strip()) == 0:
-                    return
+            if len(res.strip()) != 0 and self.moderator is not None:
+                res = self._actor_turn(self.moderator)
+                self._archive_response(self.moderator.get_name(), res, verbose)
 
-                if self.moderator is not None:
-                    self._actor_turn(self.moderator, verbose)
-
-    def _actor_turn(self, actor: actors.IActor, verbose: bool) -> None:
+    def _actor_turn(self, actor: actors.IActor) -> str:
         """
         Prompt the actor to speak and record his response accordingly.
 
@@ -82,12 +85,14 @@ class Conversation:
         """
         res = actor.speak(list(self.ctx_history))
         formatted_res = util.format_chat_message(actor.get_name(), res)
+        return formatted_res
+
+    def _archive_response(self, username: str, response: str, verbose: bool) -> None:
+        self.ctx_history.append(response)
+        self.conv_logs.append((username, response))
 
         if verbose:
-            print(formatted_res)
-
-        self.ctx_history.append(formatted_res)
-        self.conv_logs.append((actor.get_name(), res))
+            print(response)
 
     def to_dict(self, timestamp_format: str = "%y-%m-%d-%H-%M") -> dict[str, Any]:
         """
@@ -101,7 +106,7 @@ class Conversation:
         return {
             "id": str(self.id),
             "timestamp": datetime.datetime.now().strftime(timestamp_format),
-            "users": [user.get_name() for user in self.users],
+            "users": [user.get_name() for user in self.users.values()],
             "user_types": [type(user).__name__ for user in self.users],
             "moderator": (
                 self.moderator.get_name() if self.moderator is not None else None
@@ -109,7 +114,7 @@ class Conversation:
             "moderator_type": (
                 type(self.moderator).__name__ if self.moderator is not None else None
             ),
-            "user_prompts": [user.describe() for user in self.users],
+            "user_prompts": [user.describe() for user in self.users.values()],
             "moderator_prompt": (
                 self.moderator.describe() if self.moderator is not None else None
             ),

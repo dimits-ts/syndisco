@@ -13,5 +13,5 @@ bash "$SCRIPT_DIR/conversation_execute_all.sh" \
     --input_dir "$PROJECT_ROOT_DIR/data/generated_discussions_input" \
     --output_dir "$PROJECT_ROOT_DIR/data/generated_discussions_output" \
     --model_path "$SRC_DIR/models/llama-3-8B-instruct.gguf" \
-    --ctx_width_tokens 4048 \
-    --gpu_layers 13
+    --ctx_width_tokens 3000 \
+    --gpu_layers 10
