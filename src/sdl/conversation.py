@@ -5,21 +5,21 @@ import json
 import uuid
 from typing import Any
 
-import lib.actors
-import lib.models
-import lib.util
+from sdl import actors
+from sdl import models
+from sdl import util
 
 
 class Conversation:
     """
-    A class conducting a conversation between different actors (:class:`lib.actors.Actor`).
+    A class conducting a conversation between different actors (:class:`actors.Actor`).
     Only one object should be used for a given conversation.
     """
 
     def __init__(
             self,
-            users: list[lib.actors.IActor],
-            moderator: lib.actors.IActor | None = None,
+            users: list[actors.IActor],
+            moderator: actors.IActor | None = None,
             history_context_len: int = 5,
             conv_len: int = 5,
     ) -> None:
@@ -27,10 +27,10 @@ class Conversation:
         Construct the framework for a conversation to take place.
 
         :param users: A list of discussion participants
-        :type users: list[lib.actors.Actor]
+        :type users: list[actors.Actor]
         :param moderator: An actor tasked with moderation if not None, can speak at any point in the conversation,
          defaults to None
-        :type moderator: lib.actors.Actor | None, optional
+        :type moderator: actors.Actor | None, optional
         :param history_context_len: How many prior messages are included to the LLMs prompt as context, defaults to 5
         :type history_context_len: int, optional
         :param conv_len: The total length of the conversation (how many times each actor will be prompted),
@@ -72,17 +72,17 @@ class Conversation:
                 if self.moderator is not None:
                     self._actor_turn(self.moderator, verbose)
 
-    def _actor_turn(self, actor: lib.actors.IActor, verbose: bool) -> None:
+    def _actor_turn(self, actor: actors.IActor, verbose: bool) -> None:
         """
         Prompt the actor to speak and record his response accordingly.
 
         :param actor: the actor to speak, can be both a user and a moderator
-        :type actor: lib.actors.Actor
+        :type actor: actors.Actor
         :param verbose: whether to also print the message on the screen
         :type verbose: bool
         """
         res = actor.speak(list(self.ctx_history))
-        formatted_res = lib.util.format_chat_message(actor.get_name(), res)
+        formatted_res = util.format_chat_message(actor.get_name(), res)
 
         if verbose:
             print(formatted_res)
@@ -126,7 +126,7 @@ class Conversation:
         :param output_path: the path for the exported file
         :type output_path: str
         """
-        lib.util.ensure_parent_directories_exist(output_path)
+        util.ensure_parent_directories_exist(output_path)
 
         with open(output_path, "w", encoding="utf8") as fout:
             json.dump(self.to_dict(), fout, indent=4)
@@ -187,13 +187,13 @@ class LLMConvData:
 class LLMConvGenerator:
     """
     A class responsible for creating a :class:`Conversation` from the conversation data (:class:`LLMConvData`)
-    and a model (:class:`lib.models.LlamaModel`).
+    and a model (:class:`models.LlamaModel`).
     """
 
     def __init__(self,
                  data: LLMConvData,
-                 user_model: lib.models.LlamaModel,
-                 moderator_model: lib.models.LlamaModel | None,
+                 user_model: models.LlamaModel,
+                 moderator_model: models.LlamaModel | None,
                  ):
         """
         Initialize the generator.
@@ -222,14 +222,14 @@ class LLMConvGenerator:
         user_list = []
 
         for i in range(len(self.data.user_names)):
-            user_list.append(lib.actors.LLMUser(model=self.user_model,
+            user_list.append(actors.LLMUser(model=self.user_model,
                                                 name=self.data.user_names[i],
                                                 role="chat user",
                                                 attributes=self.data.user_attributes[i],
                                                 context=self.data.context,
                                                 instructions=self.data.user_instructions))
         if self.data.moderator_name is not None:
-            moderator = lib.actors.LLMUser(model=self.moderator_model,
+            moderator = actors.LLMUser(model=self.moderator_model,
                                            name=self.data.moderator_name,
                                            role="chat moderator",
                                            attributes=self.data.moderator_attributes,

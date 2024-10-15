@@ -1,7 +1,7 @@
+from sdl import conversation
+from sdl import util
+from sdl import models
 import llama_cpp
-import lib.conversation
-import lib.models
-import lib.util
 import argparse
 
 
@@ -42,14 +42,14 @@ def main():
     )
     print("Model loaded.")
 
-    model = lib.models.LlamaModel(llm, max_out_tokens=max_tokens, seed=random_seed)
-    data = lib.conversation.LLMConvData.from_json_file(input_file_path)
-    generator = lib.conversation.LLMConvGenerator(data=data, user_model=model, moderator_model=model)
+    model = models.LlamaModel(llm, max_out_tokens=max_tokens, seed=random_seed)
+    data = conversation.LLMConvData.from_json_file(input_file_path)
+    generator = conversation.LLMConvGenerator(data=data, user_model=model, moderator_model=model)
     conv = generator.produce_conversation()
 
     print("Beginning conversation...")
     conv.begin_conversation(verbose=True)
-    output_path = lib.util.generate_datetime_filename(output_dir=output_dir, file_ending=".json")
+    output_path = util.generate_datetime_filename(output_dir=output_dir, file_ending=".json")
     conv.to_json_file(output_path)
     print("Conversation saved to ", output_path)
 
