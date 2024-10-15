@@ -1,6 +1,8 @@
 from sdl import conversation
 from sdl import util
 from sdl import models
+from sdl import io
+
 import llama_cpp
 import argparse
 
@@ -43,8 +45,8 @@ def main():
     print("Model loaded.")
 
     model = models.LlamaModel(llm, max_out_tokens=max_tokens, seed=random_seed)
-    data = conversation.LLMConvData.from_json_file(input_file_path)
-    generator = conversation.LLMConvGenerator(data=data, user_model=model, moderator_model=model)
+    data = io.LLMConvData.from_json_file(input_file_path)
+    generator = io.LLMConvGenerator(data=data, user_model=model, moderator_model=model)
     conv = generator.produce_conversation()
 
     print("Beginning conversation...")
