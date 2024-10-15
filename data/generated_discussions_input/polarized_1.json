@@ -28,5 +28,6 @@
         "understanding"
     ],
     "moderator_instructions": "You are a moderator. Oversee the conversation. Be neutral. Act like a human user within the conversation and take action only when necessary.",
-    "turn_manager_type": "round_robbin"
+    "turn_manager_type": "random_weighted",
+    "turn_manager_config" : {"respond_probability": 0.3}
 }
