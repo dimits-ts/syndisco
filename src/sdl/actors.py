@@ -85,7 +85,7 @@ class ALlmActor(IActor, abc.ABC):
         self.instructions = instructions
 
     def _system_prompt(self) -> dict:
-        prompt = f"You are {self.name} a {", ".join(self.attributes)} {self.role}. {self.context} {self.instructions}."
+        prompt = f"You are {self.name} a {", ".join(self.attributes)} as a {self.role}. {self.context} {self.instructions}."
         return {"role": "system", "content": prompt}
 
     @abc.abstractmethod

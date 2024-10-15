@@ -12,4 +12,6 @@ bash "$SCRIPT_DIR/conversation_execute_all.sh" \
     --python_script_path  "$SRC_DIR/sdf_create_conversations.py" \
     --input_dir "$PROJECT_ROOT_DIR/data/generated_discussions_input" \
     --output_dir "$PROJECT_ROOT_DIR/data/generated_discussions_output" \
-    --model_path "$SRC_DIR/models/llama-3-8B.gguf"
+    --model_path "$SRC_DIR/models/llama-3-8B-instruct.gguf" \
+    --ctx_width_tokens 4048 \
+    --gpu_layers 13
