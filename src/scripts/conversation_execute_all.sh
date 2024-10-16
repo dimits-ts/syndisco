@@ -12,6 +12,8 @@ while [[ "$#" -gt 0 ]]; do
     --input_dir) input_dir="$2"; shift ;;
     --output_dir) output_dir="$2"; shift ;;
     --model_path) model_path="$2"; shift ;;
+    --ctx_width_tokens) ctx_width_tokens="$2"; shift ;; 
+    --gpu_layers) gpu_layers="$2"; shift ;; 
     *) echo "Unknown parameter passed: $1"; usage ;;
   esac
   shift
@@ -39,12 +41,17 @@ if [[ ! -f "$model_path" ]]; then
   exit 1
 fi
 
+
 for input_file in "$input_dir"/*; do
   if [[ -f "$input_file" ]]; then
     echo "Processing file: $input_file"
-    python -u "$python_script_path" --output "$output_dir" --model_path "$model_path" --input_file="$input_file"
+    python -u "$python_script_path" \
+          --output "$output_dir" \
+          --model_path "$model_path" \
+          --input_file="$input_file" \
+          --ctx_width_tokens="$ctx_width_tokens" \
+          --gpu_layers="$gpu_layers" 
   else
     echo "Skipping non-file entry: $input_file"
   fi
 done
-

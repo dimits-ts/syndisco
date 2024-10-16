@@ -1,16 +1,14 @@
+from sdl import util
+from sdl import models
+from sdl import conversation_io
+
 import llama_cpp
-
-import lib.models
-import lib.annotation
-import lib.util
-
 import argparse
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Annotate conversation via Llama conversation model.")
-    parser.add_argument('--prompt_input_path', required=True, help="Judge prompt file path.")
-    parser.add_argument('--conv_path', required=True, help="Serialized conversation file path.")
+    parser = argparse.ArgumentParser(description="Run synthetic dialogue via Llama conversation model.")
+    parser.add_argument('--input_file', required=True, help="Input conversation file path.")
     parser.add_argument('--output_dir', required=True, help="Output directory path.")
     parser.add_argument('--model_path', required=True, help="Model file path.")
     parser.add_argument('--max_tokens', type=int, default=512, help="Maximum number of tokens.")
@@ -22,8 +20,7 @@ def main():
 
     args = parser.parse_args()
 
-    prompt_input_path = args.prompt_input_path
-    conv_path = args.conv_path
+    input_file_path = args.input_file
     output_dir = args.output_dir
     max_tokens = args.max_tokens
     ctx_width_tokens = args.ctx_width_tokens
@@ -46,13 +43,14 @@ def main():
     )
     print("Model loaded.")
 
-    model = lib.models.LlamaModel(llm, max_out_tokens=max_tokens, seed=random_seed)
-    data = lib.annotation.LLMAnnotatorData.from_json_file(prompt_input_path)
-    gen = lib.annotation.LLMAnnotationGenerator(data, model, conv_logs_path=conv_path)
-    conv = gen.produce_conversation()
+    model = models.LlamaModel(llm, max_out_tokens=max_tokens, seed=random_seed)
+    data = conversation_io.LLMConvData.from_json_file(input_file_path)
+    generator = conversation_io.LLMConvGenerator(data=data, user_model=model, moderator_model=model)
+    conv = generator.produce_conversation()
 
-    conv.begin_annotation(verbose=True)
-    output_path = lib.util.generate_datetime_filename(output_dir=output_dir, file_ending=".json")
+    print("Beginning conversation...")
+    conv.begin_conversation(verbose=True)
+    output_path = util.generate_datetime_filename(output_dir=output_dir, file_ending=".json")
     conv.to_json_file(output_path)
     print("Conversation saved to ", output_path)
 

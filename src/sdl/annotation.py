@@ -5,9 +5,9 @@ import datetime
 import textwrap
 from typing import Any
 
-import lib.actors
-import lib.models
-import lib.util
+from sdl import actors
+from sdl import util
+from sdl import models
 
 
 # "...but if you look at conversations.py, this whole file violates DRY"
@@ -20,7 +20,7 @@ class AnnotationConv:
     An annotation job modelled as a conversation between the messages of a finished dialogue, and the LLM Annotator.
     """
 
-    def __init__(self, annotator: lib.actors.IActor, conv_logs_path: str, history_ctx_len: int = 4):
+    def __init__(self, annotator: actors.IActor, conv_logs_path: str, history_ctx_len: int = 4):
         self.annotator = annotator
         self.history_ctx_len = history_ctx_len
         self.annotation_logs = []
@@ -38,7 +38,7 @@ class AnnotationConv:
         ctx_history = collections.deque(maxlen=self.history_ctx_len)
 
         for username, message in self.conv_data_dict["logs"]:
-            formatted_message = lib.util.format_chat_message(username, message)
+            formatted_message = util.format_chat_message(username, message)
             ctx_history.append(formatted_message)
             annotation = self.annotator.speak(list(ctx_history))
             self.annotation_logs.append((message, annotation))
@@ -73,84 +73,10 @@ class AnnotationConv:
         :param output_path: the path for the exported file
         :type output_path: str
         """
-        lib.util.ensure_parent_directories_exist(output_path)
+        util.ensure_parent_directories_exist(output_path)
 
         with open(output_path, "w", encoding="utf8") as fout:
             json.dump(self.to_dict(), fout, indent=4)
 
     def __str__(self) -> str:
         return json.dumps(self.to_dict(), indent=4)
-
-
-@dataclasses.dataclass
-class LLMAnnotatorData:
-    """
-    A dataclass responsible for serializing and deserializing data needed to construct a
-    :class:`AnnotationConv`.
-    """
-    attributes: list[str]
-    instructions: str
-    history_ctx_len: int = 4
-
-    @staticmethod
-    def from_json_file(input_file_path: str):
-        """
-        Construct a LLMAnnotatorData instance according to a serialized .json file.
-
-        :param input_file_path: The path to the serialized .json file
-        :type input_file_path: str
-        :return: A LLMConvData instance containing the information from the file
-        :rtype: LLMConvData
-        """
-        with open(input_file_path, "r", encoding="utf8") as fin:
-            data_dict = json.load(fin)
-
-        # code from https://stackoverflow.com/questions/68417319/initialize-python-dataclass-from-dictionary
-        field_set = {f.name for f in dataclasses.fields(LLMAnnotatorData) if f.init}
-        filtered_arg_dict = {k: v for k, v in data_dict.items() if k in field_set}
-        return LLMAnnotatorData(**filtered_arg_dict)
-
-    def to_json_file(self, output_path: str) -> None:
-        """
-        Serialize the data to a .json file.
-
-        :param output_path: The path of the new file
-        :type output_path: str
-        """
-        with open(output_path, "w", encoding="utf8") as fout:
-            json.dump(dataclasses.asdict(self), fout, indent=4)
-
-
-class LLMAnnotationGenerator:
-    """
-    A class responsible for creating a :class:`AnnotationConv` from the conversation data
-    (:class:`LLMAnnotatorData`) and a model (:class:`lib.models.LlamaModel`).
-    """
-
-    def __init__(self,
-                 data: LLMAnnotatorData,
-                 llm: lib.models.LlamaModel,
-                 conv_logs_path: str
-                 ):
-        self.data = data
-        self.llm = llm
-        self.conv_logs_path = conv_logs_path
-
-    def produce_conversation(self) -> AnnotationConv:
-        """
-        Generate the synthetic annotations.
-
-        :return: An initialized AnnotationConv instance.
-        :rtype: AnnotationConv
-        """
-        annotator = lib.actors.LLMAnnotator(model=self.llm,
-                                            name="",
-                                            role="expert annotator",
-                                            attributes=self.data.attributes,
-                                            context="",
-                                            instructions=self.data.instructions)
-
-        conversation = AnnotationConv(annotator=annotator,
-                                      conv_logs_path=self.conv_logs_path,
-                                      history_ctx_len=self.data.history_ctx_len)
-        return conversation

@@ -1,0 +1,17 @@
+ {
+  "username": "GoldenYears66",
+  "age": 66,
+  "sex": "male",
+  "education_level": "High School",
+  "sexual_orientation": "Heterosexual",
+  "demographic_group": "African American",
+  "current_employment": "Part-time Volunteer",
+  "intent": "Supportive",
+  "personality_characteristics": [
+    "kind",
+    "generous",
+    "patient",
+    "sociable"
+  ]
+}
+

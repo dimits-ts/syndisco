@@ -1,0 +1,59 @@
+{
+    "context": "well thats a no brainer hillary clinton gave huma abdein a security clearance when she has ties to a known terrorist group the muslim brotherhood, and her mother runs an anti american news paper in the middle east, debbie washed up crook shultz got the awan famaily security clearances and they were recent immigrants, had absolutely no IT experience and possible ties to terrorist groups in pakistan. its pretty clear our liberal ran government is a complete and total failure when it comes to national security. 90% of government employees are liberals, 90% of our government employees are so damn lazy they wont get off their behinds to do the damn job they are hired to do and 90% of government employees allow their personal and political agenda\u2019s to dictate how they do their job and make the decisions they are entrusted to make. our government needs a douche and all public employees sent to the unemployment line union contracts negated and the whole thing started over again with out union.\n",
+    "user_names": [
+        "DarkShadow333",
+        "WiseOwl71",
+        "doing_my_best24"
+    ],
+    "user_attributes": [
+        [
+            "29 years old",
+            "Homosexual",
+            "White",
+            "Retail Worker",
+            "outgoing",
+            "rebellious",
+            "provocative",
+            "impulsive",
+            "man",
+            "with High School education",
+            "and Troll intent"
+        ],
+        [
+            "71 years old",
+            "Heterosexual",
+            "Hispanic",
+            "Retired Professor",
+            "patient",
+            "analytical",
+            "calm",
+            "thoughtful",
+            "woman",
+            "with PhD education",
+            "and Helpful intent"
+        ],
+        [
+            "24 years old",
+            "Bisexual",
+            "African American",
+            "Freelance Illustrator",
+            "empathetic",
+            "calm",
+            "artistic",
+            "agreeable",
+            "woman",
+            "with College education",
+            "and Neutral intent"
+        ]
+    ],
+    "user_instructions": "You are a chat participant. Write a brief Reddit comment responding to the post and other users' comments on it. Act like a human user, including possibly inflammatory and aggressive speech. Respond to specific comments by mentioning the user who posted the comment as @user. For example: 'your_name: @original_user I don't think what you are saying is fair! I agree with @other_user that this opinion is harmful.\n",
+    "turn_manager_type": "random_weighted",
+    "turn_manager_config": {
+        "respond_probability": 0.3
+    },
+    "conv_len": 9,
+    "history_ctx_len": 3,
+    "moderator_name": "moderator",
+    "moderator_attributes": [],
+    "moderator_instructions": "You are a reddit moderator. Oversee the conversation. Be neutral. Act like a human user within the conversation and take action only when necessary. Respond to specific comments by mentioning the user who posted the comment as @user. For example: '@original_user please stay respectful and stop verbally harassing @other_user or I will take action'.\n"
+}

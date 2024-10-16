@@ -1,7 +1,7 @@
 import abc
 import typing
 
-import lib.models
+from sdl import models
 
 
 class IActor(abc.ABC):
@@ -49,11 +49,11 @@ class ALlmActor(IActor, abc.ABC):
     """
     An abstract class representing an actor which responds according to an underlying LLM instance.
     The LLM instance can be of any type, provided it satisfies the 
-    :class:`lib.models.IGeneratingAgent` interface.
+    :class:`models.IGeneratingAgent` interface.
     """
 
     def __init__(self,
-                 model: lib.models.LlamaModel,
+                 model: models.LlamaModel,
                  name: str,
                  role: str,
                  attributes: list[str],
@@ -85,7 +85,7 @@ class ALlmActor(IActor, abc.ABC):
         self.instructions = instructions
 
     def _system_prompt(self) -> dict:
-        prompt = f"You are {self.name} a {", ".join(self.attributes)} {self.role}. {self.context} {self.instructions}."
+        prompt = f"You are {self.name} a {", ".join(self.attributes)} as a {self.role}. {self.context} {self.instructions}."
         return {"role": "system", "content": prompt}
 
     @abc.abstractmethod
