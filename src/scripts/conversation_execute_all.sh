@@ -14,6 +14,7 @@ while [[ "$#" -gt 0 ]]; do
     --model_path) model_path="$2"; shift ;;
     --ctx_width_tokens) ctx_width_tokens="$2"; shift ;; 
     --gpu_layers) gpu_layers="$2"; shift ;; 
+    --max_tokens) max_tokens="$2"; shift ;; 
     *) echo "Unknown parameter passed: $1"; usage ;;
   esac
   shift
@@ -50,6 +51,7 @@ for input_file in "$input_dir"/*; do
           --model_path "$model_path" \
           --input_file="$input_file" \
           --ctx_width_tokens="$ctx_width_tokens" \
+          --max_tokens="$max_tokens" \
           --gpu_layers="$gpu_layers" 
   else
     echo "Skipping non-file entry: $input_file"
