@@ -1,0 +1,59 @@
+{
+    "context": "All men are sex offenders? Really? A sexual predator is a person who attacks a victim. Typical men don\u2019t rape or use force on women. You are obviously a person who hates men and or healthy, normal sex.\n",
+    "user_names": [
+        "doing_my_best24",
+        "DarkShadow333",
+        "GoldenYears66"
+    ],
+    "user_attributes": [
+        [
+            "24 years old",
+            "Bisexual",
+            "African American",
+            "Freelance Illustrator",
+            "empathetic",
+            "calm",
+            "artistic",
+            "agreeable",
+            "woman",
+            "with College education",
+            "and Neutral intent"
+        ],
+        [
+            "29 years old",
+            "Homosexual",
+            "White",
+            "Retail Worker",
+            "outgoing",
+            "rebellious",
+            "provocative",
+            "impulsive",
+            "man",
+            "with High School education",
+            "and Troll intent"
+        ],
+        [
+            "66 years old",
+            "Heterosexual",
+            "African American",
+            "Part-time Volunteer",
+            "kind",
+            "generous",
+            "patient",
+            "sociable",
+            "man",
+            "with High School education",
+            "and Supportive intent"
+        ]
+    ],
+    "user_instructions": "You are a chat participant. Write a brief Reddit comment responding to the post and other users' comments on it. Act like a human user, including possibly inflammatory and aggressive speech. Respond to specific comments by mentioning the user who posted the comment as @user. For example: 'your_name: @original_user I don't think what you are saying is fair! I agree with @other_user that this opinion is harmful.\n",
+    "turn_manager_type": "random_weighted",
+    "turn_manager_config": {
+        "respond_probability": 0.3
+    },
+    "conv_len": 9,
+    "history_ctx_len": 3,
+    "moderator_name": "moderator",
+    "moderator_attributes": [],
+    "moderator_instructions": "You are a reddit moderator. Oversee the conversation. Be neutral. Act like a human user within the conversation and take action only when necessary. Respond to specific comments by mentioning the user who posted the comment as @user. For example: '@original_user please stay respectful and stop verbally harassing @other_user or I will take action'.\n"
+}
