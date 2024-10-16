@@ -10,7 +10,7 @@ PROJECT_ROOT_DIR="$(dirname "$SRC_DIR")"
 
 bash "$SCRIPT_DIR/conversation_execute_all.sh" \
     --python_script_path  "$SRC_DIR/sdf_create_conversations.py" \
-    --input_dir "$PROJECT_ROOT_DIR/data/generated_discussions_input" \
+    --input_dir "$PROJECT_ROOT_DIR/data/generated_discussions_input/conv_data" \
     --output_dir "$PROJECT_ROOT_DIR/data/generated_discussions_output" \
     --model_path "$SRC_DIR/models/llama-3-8B-instruct.gguf" \
     --ctx_width_tokens 3000 \
