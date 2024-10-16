@@ -81,7 +81,7 @@ class ALlmActor(IActor, abc.ABC):
         self.instructions = instructions
 
     def _system_prompt(self) -> dict:
-        prompt = f"You are {self.name} a {", ".join(self.attributes)}. {self.context} {self.instructions}."
+        prompt = f"You are {self.name} {", ".join(self.attributes)}. Context: {self.context}. Your instructions: {self.instructions}."
         return {"role": "system", "content": prompt}
 
     @abc.abstractmethod
@@ -110,7 +110,7 @@ class LLMUser(ALlmActor):
     def _message_prompt(self, history: list[str]) -> dict:
         return {
             "role": "user",
-            "content": "\n".join(history) + f"\n{self.get_name()}:"
+            "content": "\n".join(history) + f"\nUser {self.get_name()} posted:"
         }
 
 class LLMAnnotator(ALlmActor):

@@ -8,7 +8,7 @@ import random
 from typing import Any
 
 
-CTX_PREFACE = ""
+CTX_PREFACE = "You are a human participating in an online chatroom. You see the following post on a social media site: "
 DEFAULT_MODERATOR_ATTRIBUTES = ["just", "strict", "understanding"]
 
 
@@ -61,7 +61,7 @@ def generate_conv_config(
     user_attributes = [format_persona_attributes(persona) for persona in rand_personas]
 
     data = conversation_io.LLMConvData(
-        context=CTX_PREFACE + topic,
+        context=f"{CTX_PREFACE} '{topic}'",
         user_names=user_names,
         user_attributes=user_attributes,
         user_instructions=user_instructions,
