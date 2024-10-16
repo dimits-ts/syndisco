@@ -69,7 +69,6 @@ class LLMAnnotationGenerator:
         """
         annotator = actors.LLMAnnotator(model=self.llm,
                                             name="",
-                                            role="expert annotator",
                                             attributes=self.data.attributes,
                                             context="",
                                             instructions=self.data.instructions)

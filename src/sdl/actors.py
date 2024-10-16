@@ -55,7 +55,6 @@ class ALlmActor(IActor, abc.ABC):
     def __init__(self,
                  model: models.LlamaModel,
                  name: str,
-                 role: str,
                  attributes: list[str],
                  context: str,
                  instructions: str) -> None:
@@ -66,8 +65,6 @@ class ALlmActor(IActor, abc.ABC):
         :type model: tasks.models.LlamaModel
         :param name: The name given to the in-conversation actor.
         :type name: str
-        :param role: The role of the actor within the conversation 
-        (e.g. "chat user", "chat moderator").
         :type role: str
         :param attributes: A list of attributes which characterize the actor
          (e.g. "middle-class", "LGBTQ", "well-mannered").
@@ -79,13 +76,12 @@ class ALlmActor(IActor, abc.ABC):
         """
         self.model = model
         self.name = name
-        self.role = role
         self.attributes = attributes
         self.context = context
         self.instructions = instructions
 
     def _system_prompt(self) -> dict:
-        prompt = f"You are {self.name} a {", ".join(self.attributes)} as a {self.role}. {self.context} {self.instructions}."
+        prompt = f"You are {self.name} a {", ".join(self.attributes)}. {self.context} {self.instructions}."
         return {"role": "system", "content": prompt}
 
     @abc.abstractmethod
