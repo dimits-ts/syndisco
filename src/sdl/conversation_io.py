@@ -55,7 +55,7 @@ class LLMConvData:
         :param output_path: The path of the new file
         :type output_path: str
         """
-        with open(output_path, "w", encoding="utf8") as fout:
+        with open(output_path, "w+", encoding="utf8") as fout:
             json.dump(dataclasses.asdict(self), fout, indent=4)
 
 
