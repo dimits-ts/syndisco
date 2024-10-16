@@ -1,6 +1,6 @@
 import llama_cpp
 
-from sdl import annotation
+from sdl import annotation_io
 from sdl import util
 from sdl import models
 
@@ -47,8 +47,8 @@ def main():
     print("Model loaded.")
 
     model = models.LlamaModel(llm, max_out_tokens=max_tokens, seed=random_seed)
-    data = annotation.LLMAnnotatorData.from_json_file(prompt_input_path)
-    gen = annotation.LLMAnnotationGenerator(data, model, conv_logs_path=conv_path)
+    data = annotation_io.LLMAnnotatorData.from_json_file(prompt_input_path)
+    gen = annotation_io.LLMAnnotationGenerator(data, model, conv_logs_path=conv_path)
     conv = gen.produce_conversation()
 
     conv.begin_annotation(verbose=True)
