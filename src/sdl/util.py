@@ -19,7 +19,7 @@ def ensure_parent_directories_exist(output_path: str) -> None:
 
 
 def generate_datetime_filename(
-        output_dir: str = None, timestamp_format: str = "%y-%m-%d-%H-%M", file_ending: str = ""
+        output_dir: str|None = None, timestamp_format: str = "%y-%m-%d-%H-%M", file_ending: str = ""
 ) -> str:
     """
     Generate a filename based on the current date and time.
@@ -59,9 +59,10 @@ def format_chat_message(username: str, message: str) -> str:
         wrapped_res = textwrap.fill(message, 70)
         formatted_res = f"User {username} posted:\n{wrapped_res}"
     else:
-        formatted_res = f"<{username} said nothing>"
+        formatted_res = ""
 
     return formatted_res
+
 
 def save_plot(filename: str, dir_name: str = "output") -> None:
     """

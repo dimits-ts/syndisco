@@ -9,5 +9,6 @@ bash "$SCRIPT_DIR/conversation_execute_all.sh" \
     --input_dir "$PROJECT_ROOT_DIR/data/generated_discussions_input/conv_data" \
     --output_dir "$PROJECT_ROOT_DIR/data/generated_discussions_output" \
     --model_path "$SRC_DIR/models/llama-3-8B-instruct.gguf" \
-    --ctx_width_tokens 3000 \
+    --max_tokens 500 \
+    --ctx_width_tokens 2048 \
     --gpu_layers 10

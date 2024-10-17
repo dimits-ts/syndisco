@@ -68,11 +68,15 @@ class Conversation:
         for _ in range(self.conv_len):
             speaker_name = self.next_turn_manager.next_turn_username()
             res = self._actor_turn(self.users[speaker_name])
-            self._archive_response(speaker_name, res, verbose)
+            
+            # if nothing was said, do not include it in history
+            if len(res.strip()) != 0:
+                self._archive_response(speaker_name, res, verbose)
 
-            if len(res.strip()) != 0 and self.moderator is not None:
-                res = self._actor_turn(self.moderator)
-                self._archive_response(self.moderator.get_name(), res, verbose)
+                #if something was said and there is a moderator, prompt him
+                if self.moderator is not None:
+                    res = self._actor_turn(self.moderator)
+                    self._archive_response(self.moderator.get_name(), res, verbose)
 
     def _actor_turn(self, actor: actors.IActor) -> str:
         """

@@ -55,7 +55,6 @@ class ALlmActor(IActor, abc.ABC):
     def __init__(self,
                  model: models.LlamaModel,
                  name: str,
-                 role: str,
                  attributes: list[str],
                  context: str,
                  instructions: str) -> None:
@@ -66,8 +65,6 @@ class ALlmActor(IActor, abc.ABC):
         :type model: tasks.models.LlamaModel
         :param name: The name given to the in-conversation actor.
         :type name: str
-        :param role: The role of the actor within the conversation 
-        (e.g. "chat user", "chat moderator").
         :type role: str
         :param attributes: A list of attributes which characterize the actor
          (e.g. "middle-class", "LGBTQ", "well-mannered").
@@ -79,13 +76,12 @@ class ALlmActor(IActor, abc.ABC):
         """
         self.model = model
         self.name = name
-        self.role = role
         self.attributes = attributes
         self.context = context
         self.instructions = instructions
 
     def _system_prompt(self) -> dict:
-        prompt = f"You are {self.name} a {", ".join(self.attributes)} as a {self.role}. {self.context} {self.instructions}."
+        prompt = f"You are {self.name} {", ".join(self.attributes)}. Context: {self.context}. Your instructions: {self.instructions}."
         return {"role": "system", "content": prompt}
 
     @abc.abstractmethod
@@ -114,7 +110,7 @@ class LLMUser(ALlmActor):
     def _message_prompt(self, history: list[str]) -> dict:
         return {
             "role": "user",
-            "content": "\n".join(history) + f"\n{self.get_name()}:"
+            "content": "\n".join(history) + f"\nUser {self.get_name()} posted:"
         }
 
 class LLMAnnotator(ALlmActor):
