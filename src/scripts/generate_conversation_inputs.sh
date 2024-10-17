@@ -12,6 +12,6 @@ python -u "$SRC_DIR/generate_conv_configs.py" \
           --configs_path "$INPUT_DIR/other_configs/standard_multi_user.json" \
           --user_instruction_path "$INPUT_DIR/user_instructions/vanilla.txt" \
           --mod_instruction_path "$INPUT_DIR/mod_instructions/no_instructions.txt" \
-          --num_generated_files 50 \
-          --num_users 3 \
+          --num_generated_files 30 \
+          --num_users 5 \
           --include_mod True
