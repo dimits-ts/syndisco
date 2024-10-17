@@ -59,7 +59,7 @@ def format_chat_message(username: str, message: str) -> str:
         wrapped_res = textwrap.fill(message, 70)
         formatted_res = f"User {username} posted:\n{wrapped_res}"
     else:
-        formatted_res = f"<{username} said nothing>"
+        formatted_res = ""
 
     return formatted_res
 
