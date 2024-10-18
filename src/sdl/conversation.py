@@ -69,7 +69,8 @@ class Conversation:
 
         for _ in range(self.conv_len):
             speaker_name = self.next_turn_manager.next_turn_username()
-            res = self._actor_turn(self.users[speaker_name])
+            actor = self.users[speaker_name]
+            res = actor.speak(list(self.ctx_history))
             
             # if nothing was said, do not include it in history
             if len(res.strip()) != 0:
@@ -77,28 +78,17 @@ class Conversation:
 
                 #if something was said and there is a moderator, prompt him
                 if self.moderator is not None:
-                    res = self._actor_turn(self.moderator)
+                    res = self.moderator.speak(list(self.ctx_history))
                     self._archive_response(self.moderator.get_name(), res, verbose)
 
-    def _actor_turn(self, actor: actors.IActor) -> str:
-        """
-        Prompt the actor to speak and record his response accordingly.
-
-        :param actor: the actor to speak, can be both a user and a moderator
-        :type actor: actors.Actor
-        :param verbose: whether to also print the message on the screen
-        :type verbose: bool
-        """
-        res = actor.speak(list(self.ctx_history))
-        formatted_res = util.format_chat_message(actor.get_name(), res)
-        return formatted_res
 
     def _archive_response(self, username: str, response: str, verbose: bool) -> None:
-        self.ctx_history.append(response)
         self.conv_logs.append((username, response))
 
+        formatted_res = util.format_chat_message(username, response)
+        self.ctx_history.append(formatted_res)
         if verbose:
-            print(response)
+            print(formatted_res)
 
     def to_dict(self, timestamp_format: str = "%y-%m-%d-%H-%M") -> dict[str, Any]:
         """
