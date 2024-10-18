@@ -1,5 +1,5 @@
 # don't include generated conversation input files
-conv_data/generated/
+generated/
 # don't include output from script invokations
 logs/
 # don't include LLM weights
