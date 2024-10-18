@@ -89,7 +89,7 @@ class ALlmActor(IActor, abc.ABC):
         return {}
 
     def describe(self):
-        return f"Model: {type(self.model).__name__}. Prompt: {self._system_prompt()["content"]}"
+        return f"{self._system_prompt()["content"]}"
 
     @typing.final
     def speak(self, history: list[str]) -> str:
