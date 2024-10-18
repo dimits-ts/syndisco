@@ -3,7 +3,7 @@
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 SRC_DIR="$(dirname "$SCRIPT_DIR")"
 PROJECT_ROOT_DIR="$(dirname "$SRC_DIR")"
-INPUT_DIR="$PROJECT_ROOT_DIR/data/generated_discussions_input"
+INPUT_DIR="$PROJECT_ROOT_DIR/data/generated_discussions_input/modular_configurations"
 OUTPUT_DIR="$PROJECT_ROOT_DIR/data/generated_discussions_input/conv_data/generated"
 
 mkdir -p "$OUTPUT_DIR"
