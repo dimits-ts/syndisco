@@ -12,11 +12,16 @@ CTX_PREFACE = "You are a human participating in an online chatroom. You see the 
 DEFAULT_MODERATOR_ATTRIBUTES = ["just", "strict", "understanding"]
 
 
-def read_files_from_directory(directory: str, file_extension: str) -> list[str | dict]:
-    """
-    Reads all files with the specified extension from a given directory.
+def read_files_from_directory(directory: str) -> list[str | dict]:
+    """Reads all files with the specified extension from a given directory.
     Supports .json and .txt files.
-    Returns a list of parsed file content.
+
+    :param directory: the root directory from which to load files (NOT recursively!)
+    :type directory: str
+
+    :raises ValueError: if the directory does not exist
+    :return: Returns a list of parsed file content.
+    :rtype: list[str | dict]
     """
     files_list = []
 
@@ -27,16 +32,22 @@ def read_files_from_directory(directory: str, file_extension: str) -> list[str |
     # Loop through all files in the directory
     for filename in os.listdir(directory):
         file_path = os.path.join(directory, filename)
-        if file_path.endswith(file_extension):
-            data = read_file(file_path, file_extension)
-            files_list.append(data)
+        data = read_file(file_path)
+        files_list.append(data)
 
     return files_list
 
 
-def read_file(path: str, file_extension: str) -> str | dict[str, Any]:
+def read_file(path: str) -> str | dict[str, Any]:
+    """Read a plain text or JSON file depending on its extension
+
+    :param path: the path of the file
+    :type path: str
+    :return: the file's contents
+    :rtype: str | dict[str, Any]
+    """
     with open(path, "r", encoding="utf-8") as file:
-        if file_extension == ".json":
+        if path.endswith(".json"):
             return json.load(file)
         else:
             return file.read()
@@ -51,6 +62,26 @@ def generate_conv_config(
     num_users: int,
     mod_exists: bool,
 ) -> conversation_io.LLMConvData:
+    """Generate a conversation configuration object from provided attributes.
+    The object can then be used for IO operations or directly as input for a conversation.
+
+    :param personas: a list of all personas in JSON/dict format, from which a random subset will be selected depending on num_users
+    :type personas: list[dict[str, Any]]
+    :param topics: a list of all topics, from which one will be randomly selected
+    :type topics: list[str]
+    :param user_instructions: the user instructions
+    :type user_instructions: str
+    :param mod_instructions: the moderator instructions, if he exists
+    :type mod_instructions: str
+    :param config: a dictrionary containing other configurations such as turn_manager_type and conversation length
+    :type config: dict[str, Any]
+    :param num_users: the number of users who will participate in the conversation
+    :type num_users: int
+    :param mod_exists: whether a moderator will be present in the conversation
+    :type mod_exists: bool
+    :return: An IO conversation configuration object which can be used for persistence, or as input for a conversation
+    :rtype: conversation_io.LLMConvData
+    """
     assert num_users <= len(
         personas
     ), "Number of users must be less or equal to the number of provided personas"
@@ -77,12 +108,19 @@ def generate_conv_config(
 
 
 def format_persona_attributes(persona: dict[str, Any]) -> list[str]:
+    """Turn the various attributes of a persona into a cohesive list of attributes to be used in the model prompt.
+
+    :param persona: a JSON/dict object containing information about a persona
+    :type persona: dict[str, Any]
+    :return: a list of attributes to be given as input for a model prompt
+    :rtype: list[str]
+    """
     attributes = []
     attributes.append(f"{persona["age"]} years old")
     attributes.append(persona["sexual_orientation"])
     attributes.append(persona["demographic_group"])
     attributes.append(persona["current_employment"])
-    
+
     for characteristic in persona["personality_characteristics"]:
         attributes.append(characteristic)
 
@@ -94,6 +132,7 @@ def format_persona_attributes(persona: dict[str, Any]) -> list[str]:
 
 
 def sex_parse(sex: str) -> str:
+    """Helper function which transforms the sex attribute of a persona into a prompt-friendly equivalent."""
     match sex.lower():
         case "male":
             return "man"
@@ -101,6 +140,7 @@ def sex_parse(sex: str) -> str:
             return "woman"
         case _:
             return "non-binary"
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -170,20 +210,23 @@ def main():
     discussion_io_objects = []
     for _ in range(args.num_generated_files):
         conv_file = generate_conv_config(
-                personas=personas,
-                topics=topics,
-                user_instructions=user_instructions,
-                mod_instructions=mod_instructions,
-                config=config,
-                num_users=args.num_users,
-                mod_exists=args.include_mod,
-            )
+            personas=personas,
+            topics=topics,
+            user_instructions=user_instructions,
+            mod_instructions=mod_instructions,
+            config=config,
+            num_users=args.num_users,
+            mod_exists=args.include_mod,
+        )
         discussion_io_objects.append(conv_file)
-    
+
     print("Writing new conversation input files...")
     for io_object in discussion_io_objects:
-        io_object.to_json_file(os.path.join(args.output_dir, str(uuid.uuid4())+".json"))
+        io_object.to_json_file(
+            os.path.join(args.output_dir, str(uuid.uuid4()) + ".json")
+        )
     print("Files exported to " + args.output_dir)
+
 
 if __name__ == "__main__":
     main()
