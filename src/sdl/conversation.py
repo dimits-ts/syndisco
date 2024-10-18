@@ -43,6 +43,8 @@ class Conversation:
         # just to satisfy the type checker
         self.next_turn_manager = turn_manager
         self.users = {user.get_name(): user for user in users}
+        # used during export, in order to keep information about the underlying models
+        self.user_types = [type(user).__name__ for user in self.users]
         self.moderator = moderator
         self.conv_len = conv_len
         # unique id for each conversation, generated for persistence purposes
@@ -111,7 +113,7 @@ class Conversation:
             "id": str(self.id),
             "timestamp": datetime.datetime.now().strftime(timestamp_format),
             "users": [user.get_name() for user in self.users.values()],
-            "user_types": [type(user).__name__ for user in self.users],
+            "user_types": self.user_types,
             "moderator": (
                 self.moderator.get_name() if self.moderator is not None else None
             ),
