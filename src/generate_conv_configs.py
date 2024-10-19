@@ -98,7 +98,7 @@ def generate_conv_config(
         user_instructions=user_instructions,
         moderator_name="moderator" if mod_exists else None,
         moderator_instructions=mod_instructions if mod_exists else None,
-        moderator_attributes=[] if mod_exists else None,
+        moderator_attributes=DEFAULT_MODERATOR_ATTRIBUTES if mod_exists else None,
         turn_manager_type=config["turn_manager_type"],
         turn_manager_config=config["turn_manager_config"],
         conv_len=config["conv_len"],
@@ -191,7 +191,7 @@ def main():
     )
     parser.add_argument(
         "--include_mod",
-        type=bool,
+        action=argparse.BooleanOptionalAction,
         default=True,
         help="Whether a moderator exists in the discussion",
     )
