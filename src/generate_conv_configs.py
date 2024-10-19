@@ -200,11 +200,11 @@ def main():
 
     print("Reading input files...")
     # Read files from the provided directories
-    personas = read_files_from_directory(args.persona_dir, ".json")
-    topics = read_files_from_directory(args.topics_dir, ".txt")
-    user_instructions = read_file(args.user_instruction_path, ".txt")
-    mod_instructions = read_file(args.mod_instruction_path, ".txt")
-    config = read_file(args.configs_path, ".json")
+    personas = read_files_from_directory(args.persona_dir)
+    topics = read_files_from_directory(args.topics_dir)
+    user_instructions = read_file(args.user_instruction_path)
+    mod_instructions = read_file(args.mod_instruction_path)
+    config = read_file(args.configs_path)
 
     print("Processing...")
     discussion_io_objects = []

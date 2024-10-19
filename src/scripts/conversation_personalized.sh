@@ -15,5 +15,6 @@ bash "$SCRIPT_DIR/conversation_execute_all.sh" \
     --model_path "$SRC_DIR/models/llama-3-8B-instruct.gguf" \
     --max_tokens 500 \
     --ctx_width_tokens 2048 \
+    --inference_threads 8 \
     --gpu_layers 10  \
     2>&1 | tee -a "$LOG_DIR/$CURRENT_DATE.txt"
