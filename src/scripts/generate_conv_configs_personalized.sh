@@ -6,7 +6,9 @@ PROJECT_ROOT_DIR="$(dirname "$SRC_DIR")"
 INPUT_DIR="$PROJECT_ROOT_DIR/data/generated_discussions_input/modular_configurations"
 OUTPUT_DIR="$PROJECT_ROOT_DIR/data/generated_discussions_input/conv_data/generated"
 
+echo "Removing old generated files..."
 mkdir -p "$OUTPUT_DIR"
+rm "$OUTPUT_DIR"/* # scary
 
 python -u "$SRC_DIR/generate_conv_configs.py" \
           --output_dir  "$OUTPUT_DIR"\
