@@ -19,4 +19,4 @@ python -u "$SRC_DIR/generate_conv_configs.py" \
           --mod_instruction_path "$INPUT_DIR/mod_instructions/no_instructions.txt" \
           --num_generated_files 30 \
           --num_users 5 \
-          --no-include_mod
+          --include_mod
