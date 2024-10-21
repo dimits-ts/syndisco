@@ -8,13 +8,14 @@ usage() {
 
 while [[ "$#" -gt 0 ]]; do
   case $1 in
-    --python_script_path) python_script_path="$2"; shift;;
+    --python_script_path) python_script_path="$2"; shift ;;
     --input_dir) input_dir="$2"; shift ;;
     --output_dir) output_dir="$2"; shift ;;
     --model_path) model_path="$2"; shift ;;
     --ctx_width_tokens) ctx_width_tokens="$2"; shift ;; 
     --gpu_layers) gpu_layers="$2"; shift ;; 
     --max_tokens) max_tokens="$2"; shift ;; 
+    --inference_threads) inference_threads="$2"; shift ;;
     *) echo "Unknown parameter passed: $1"; usage ;;
   esac
   shift
@@ -52,7 +53,8 @@ for input_file in "$input_dir"/*; do
           --input_file="$input_file" \
           --ctx_width_tokens="$ctx_width_tokens" \
           --max_tokens="$max_tokens" \
-          --gpu_layers="$gpu_layers" 
+          --gpu_layers="$gpu_layers" \
+          --inference_threads="$inference_threads"
   else
     echo "Skipping non-file entry: $input_file"
   fi
