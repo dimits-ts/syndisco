@@ -1,7 +1,0 @@
- 
-{
-    "conv_len": 14,
-    "history_ctx_len": 2,
-    "turn_manager_type": "random_weighted",
-    "turn_manager_config" : {"respond_probability": 0.4}
-}
