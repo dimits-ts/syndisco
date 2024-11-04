@@ -7,6 +7,8 @@ import argparse
 import random
 from typing import Any
 
+from synthetic_discussion_framework.src.sdl.persona import LlmPersona
+
 
 CTX_PREFACE = "You are a human participating in an online chatroom. You see the following post on a social media site: "
 DEFAULT_MODERATOR_ATTRIBUTES = ["just", "strict", "understanding"]
@@ -54,7 +56,7 @@ def read_file(path: str) -> str | dict[str, Any]:
 
 
 def generate_conv_config(
-    personas: list[dict[str, Any]],
+    personas: list[LlmPersona],
     topics: list[str],
     user_instructions: str,
     mod_instructions: str,
@@ -66,7 +68,7 @@ def generate_conv_config(
     The object can then be used for IO operations or directly as input for a conversation.
 
     :param personas: a list of all personas in JSON/dict format, from which a random subset will be selected depending on num_users
-    :type personas: list[dict[str, Any]]
+    :type personas: list[LlmPersona]
     :param topics: a list of all topics, from which one will be randomly selected
     :type topics: list[str]
     :param user_instructions: the user instructions
@@ -88,8 +90,8 @@ def generate_conv_config(
     rand_personas = random.sample(personas, k=num_users)
     topic = random.choice(topics)
 
-    user_names = [persona["username"] for persona in rand_personas]
-    user_attributes = [format_persona_attributes(persona) for persona in rand_personas]
+    user_names = [persona.name for persona in rand_personas]
+    user_attributes = [persona.to_attribute_list() for persona in rand_personas]
 
     data = conversation_io.LLMConvData(
         context=f"{CTX_PREFACE} '{topic}'",
@@ -105,41 +107,6 @@ def generate_conv_config(
         history_ctx_len=config["history_ctx_len"],
     )
     return data
-
-
-def format_persona_attributes(persona: dict[str, Any]) -> list[str]:
-    """Turn the various attributes of a persona into a cohesive list of attributes to be used in the model prompt.
-
-    :param persona: a JSON/dict object containing information about a persona
-    :type persona: dict[str, Any]
-    :return: a list of attributes to be given as input for a model prompt
-    :rtype: list[str]
-    """
-    attributes = []
-    attributes.append(f"{persona["age"]} years old")
-    attributes.append(persona["sexual_orientation"])
-    attributes.append(persona["demographic_group"])
-    attributes.append(persona["current_employment"])
-
-    for characteristic in persona["personality_characteristics"]:
-        attributes.append(characteristic)
-
-    attributes.append(sex_parse(persona["sex"]))
-    attributes.append(f"with {persona["education_level"]} education")
-    attributes.append(f"and {persona["intent"]} intent")
-
-    return attributes
-
-
-def sex_parse(sex: str) -> str:
-    """Helper function which transforms the sex attribute of a persona into a prompt-friendly equivalent."""
-    match sex.lower():
-        case "male":
-            return "man"
-        case "female":
-            return "woman"
-        case _:
-            return "non-binary"
 
 
 def main():
@@ -158,49 +125,23 @@ def main():
         help="Directory containing JSON files for LLM user personas",
     )
     parser.add_argument(
-        "--topics_dir",
-        required=True,
-        help="Directory containing .txt files for conversation starting comments",
-    )
-    parser.add_argument(
         "--configs_path",
         required=True,
         help="Path to JSON file containg conversation configs (such as conversation length)",
     )
     parser.add_argument(
-        "--user_instruction_path",
+        "--instruction_path",
         required=True,
         help="Path to .txt file containing user instructions",
     )
-    parser.add_argument(
-        "--mod_instruction_path",
-        required=True,
-        help="Path to .txt file containing moderator instructions",
-    )
-    parser.add_argument(
-        "--num_generated_files",
-        type=int,
-        default=20,
-        help="How many conversation files will be generated",
-    )
-    parser.add_argument(
-        "--num_users",
-        type=int,
-        default=4,
-        help="Number of users participating in the generated discussion",
-    )
-    parser.add_argument(
-        "--include_mod",
-        action=argparse.BooleanOptionalAction,
-        default=True,
-        help="Whether a moderator exists in the discussion",
-    )
-
     args = parser.parse_args()
 
     print("Reading input files...")
-    # Read files from the provided directories
-    personas = read_files_from_directory(args.persona_dir)
+    persona_files = os.listdir(args.persona_dir)
+    personas = [
+        LlmPersona.from_json_file(persona_file) for persona_file in persona_files
+    ]
+
     topics = read_files_from_directory(args.topics_dir)
     user_instructions = read_file(args.user_instruction_path)
     mod_instructions = read_file(args.mod_instruction_path)
