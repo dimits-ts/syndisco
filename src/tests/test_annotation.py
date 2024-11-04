@@ -1,6 +1,9 @@
-from unittest import TestCase
+import unittest
+import sys 
+sys.path.append("..") 
 
-from lib.annotation import LLMAnnotatorData, LLMAnnotationGenerator
+from sdl.annotation_io import LLMAnnotatorData
+
 
 
 instructions = """
@@ -48,7 +51,7 @@ Toxicity: 4
 """
 
 
-class TestAnnotationConv(TestCase):
+class TestAnnotationConv(unittest.TestCase):
 
     def test_json_file(self):
         data = LLMAnnotatorData(attributes=["expert"],
@@ -58,3 +61,7 @@ class TestAnnotationConv(TestCase):
         data = LLMAnnotatorData.from_json_file("output/annot_test1.json")
         assert len(data.instructions) != 0
         print(data)
+
+
+if __name__ == '__main__':
+    unittest.main()
