@@ -1,6 +1,7 @@
 import os
 import json
 from typing import Any
+import datetime
 
 
 def read_files_from_directory(directory: str) -> list[str]:
@@ -40,7 +41,7 @@ def read_file(path: str) -> str:
         return file.read()
 
 
-def read_json_file(path: str):
+def read_json_file(path: str) -> dict[str, Any]:
     """Read a JSON file
     :param path: the path of the file
     :type path: str
@@ -65,7 +66,9 @@ def ensure_parent_directories_exist(output_path: str) -> None:
 
 
 def generate_datetime_filename(
-        output_dir: str|None = None, timestamp_format: str = "%y-%m-%d-%H-%M", file_ending: str = ""
+    output_dir: str | None = None,
+    timestamp_format: str = "%y-%m-%d-%H-%M",
+    file_ending: str = "",
 ) -> str:
     """
     Generate a filename based on the current date and time.

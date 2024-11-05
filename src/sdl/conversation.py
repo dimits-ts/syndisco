@@ -5,8 +5,9 @@ import json
 import uuid
 from typing import Any
 
+from . import file_util
 from . import actors
-from . import util
+from . import output_util
 from . import turn_manager
 
 
@@ -85,7 +86,7 @@ class Conversation:
     def _archive_response(self, username: str, response: str, verbose: bool) -> None:
         self.conv_logs.append((username, response))
 
-        formatted_res = util.format_chat_message(username, response)
+        formatted_res = output_util.format_chat_message(username, response)
         self.ctx_history.append(formatted_res)
         if verbose:
             print(formatted_res)
@@ -126,7 +127,7 @@ class Conversation:
         :param output_path: the path for the exported file
         :type output_path: str
         """
-        util.ensure_parent_directories_exist(output_path)
+        file_util.ensure_parent_directories_exist(output_path)
 
         with open(output_path, "w", encoding="utf8") as fout:
             json.dump(self.to_dict(), fout, indent=4)

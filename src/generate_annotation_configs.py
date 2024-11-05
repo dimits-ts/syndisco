@@ -4,7 +4,7 @@ import argparse
 
 from sdl import annotation_io
 from sdl.persona import LlmPersona
-from sdl.file_utils import read_file
+from sdl.file_util import read_file
 
 
 def generate_annotator_file(

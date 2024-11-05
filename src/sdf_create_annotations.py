@@ -1,24 +1,45 @@
 import llama_cpp
 
 from sdl import annotation_io
-from sdl import util
+from sdl import file_util
 from sdl import models
 
 import argparse
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Annotate conversation via Llama conversation model.")
-    parser.add_argument('--prompt_input_path', required=True, help="Judge prompt file path.")
-    parser.add_argument('--conv_path', required=True, help="Serialized conversation file path.")
-    parser.add_argument('--output_dir', required=True, help="Output directory path.")
-    parser.add_argument('--model_path', required=True, help="Model file path.")
-    parser.add_argument('--max_tokens', type=int, default=512, help="Maximum number of tokens.")
-    parser.add_argument('--ctx_width_tokens', type=int, default=1024, help="Context width in tokens.")
-    parser.add_argument('--random_seed', type=int, default=42, help="Random seed for reproducibility.")
-    parser.add_argument('--inference_threads', type=int, default=4, help="Number of threads for inference.")
-    parser.add_argument('--gpu_layers', type=int, default=12, help="Number of layers offloaded to the GPU (requires "
-                                                                   "CUDA).")
+    parser = argparse.ArgumentParser(
+        description="Annotate conversation via Llama conversation model."
+    )
+    parser.add_argument(
+        "--prompt_input_path", required=True, help="Judge prompt file path."
+    )
+    parser.add_argument(
+        "--conv_path", required=True, help="Serialized conversation file path."
+    )
+    parser.add_argument("--output_dir", required=True, help="Output directory path.")
+    parser.add_argument("--model_path", required=True, help="Model file path.")
+    parser.add_argument(
+        "--max_tokens", type=int, default=512, help="Maximum number of tokens."
+    )
+    parser.add_argument(
+        "--ctx_width_tokens", type=int, default=1024, help="Context width in tokens."
+    )
+    parser.add_argument(
+        "--random_seed", type=int, default=42, help="Random seed for reproducibility."
+    )
+    parser.add_argument(
+        "--inference_threads",
+        type=int,
+        default=4,
+        help="Number of threads for inference.",
+    )
+    parser.add_argument(
+        "--gpu_layers",
+        type=int,
+        default=12,
+        help="Number of layers offloaded to the GPU (requires " "CUDA).",
+    )
 
     args = parser.parse_args()
 
@@ -52,7 +73,9 @@ def main():
     conv = gen.produce_conversation()
 
     conv.begin_annotation(verbose=True)
-    output_path = util.generate_datetime_filename(output_dir=output_dir, file_ending=".json")
+    output_path = file_util.generate_datetime_filename(
+        output_dir=output_dir, file_ending=".json"
+    )
     conv.to_json_file(output_path)
     print("Conversation saved to ", output_path)
 

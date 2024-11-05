@@ -1,9 +1,9 @@
 import llama_cpp
 import argparse
 
-from sdl import util
 from sdl import models
 from sdl import conversation_io
+from sdl import file_util
 
 
 def main():
@@ -50,7 +50,7 @@ def main():
 
     print("Beginning conversation...")
     conv.begin_conversation(verbose=True)
-    output_path = util.generate_datetime_filename(output_dir=output_dir, file_ending=".json")
+    output_path = file_util.generate_datetime_filename(output_dir=output_dir, file_ending=".json")
     conv.to_json_file(output_path)
     print("Conversation saved to ", output_path)
 
