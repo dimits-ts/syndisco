@@ -116,12 +116,12 @@ def turn_manager_factory(
     :rtype: TurnManager
     """
     match turn_manager_type.lower():
-        case "round_robbin":
+        case "round_robin":
             return RoundRobbin(usernames=usernames)
         case "random_weighted":
             return RandomWeighted(usernames=usernames, config=config)
         case _:
             raise ValueError(
-                f"There is no turn manager option called {turn_manager_type}"
-                + "Valid values: round_robbin, random_weighted"
+                f"There is no turn manager option called {turn_manager_type}\n"
+                + "Valid values: round_robin, random_weighted"
             )
