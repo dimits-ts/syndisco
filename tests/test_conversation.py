@@ -1,7 +1,8 @@
 import unittest
 import sys 
+
 sys.path.append("..") 
-from sdl.conversation_io import LLMConvData
+from src.sdl.conversation_io import LLMConvData
 
 
 class TestLLMConvData(unittest.TestCase):

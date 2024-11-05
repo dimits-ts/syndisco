@@ -5,7 +5,8 @@ import os
 
 import sys 
 sys.path.append("..") 
-from sdl.persona import LlmPersona
+
+from src.sdl.persona import LlmPersona
 
 
 

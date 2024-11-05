@@ -1,8 +1,9 @@
 import unittest
+
 import sys 
 sys.path.append("..") 
 
-from sdl.annotation_io import LLMAnnotatorData
+from src.sdl.annotation_io import LLMAnnotatorData
 
 
 
