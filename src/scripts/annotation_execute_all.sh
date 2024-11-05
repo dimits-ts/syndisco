@@ -22,7 +22,7 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 # Check if all required arguments are provided
-if [[-z "$conv_input_dir" || -z "$prompt_path" || -z "$output_dir" || -z "$model_path" ]]; then
+if [[ -z "$conv_input_dir" || -z "$prompt_path" || -z "$output_dir" || -z "$model_path" ]]; then
   echo "Error: Missing required arguments."
   usage
 fi
