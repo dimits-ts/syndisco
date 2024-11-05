@@ -8,7 +8,7 @@ from sdl.file_util import read_file
 
 
 def generate_annotator_file(
-    annotator_personas: list[LlmPersona], instructions: str, history_ctx_len: int
+    annotator_persona: LlmPersona, instructions: str, history_ctx_len: int
 ) -> annotation_io.LlmAnnotationData:
     """Generate an annotation configuration object from provided attributes.
     The object can then be used for IO operations or directly as input for a conversation.
@@ -19,12 +19,8 @@ def generate_annotator_file(
     :return: An IO conversation configuration object which can be used for persistence, or as input for a conversation
     :rtype: conversation_io.LLMConvData
     """
-    flattened_annotator_attributes = [
-        " ".join(persona.to_attribute_list()) for persona in annotator_personas
-    ]
-
     data = annotation_io.LlmAnnotationData(
-        attributes=flattened_annotator_attributes,
+        attributes=annotator_persona.to_attribute_list(),
         instructions=instructions,
         history_ctx_len=history_ctx_len,
     )
@@ -68,17 +64,16 @@ def main():
     instructions = read_file(args.instruction_path)
 
     print("Processing...")
-    annotation_config_file = generate_annotator_file(
-        annotator_personas=personas,
-        instructions=instructions,
-        history_ctx_len=args.history_ctx_len,
-    )
-
-    print("Writing new annotation config file...")
-    annotation_config_file.to_json_file(
-        os.path.join(args.output_dir, str(uuid.uuid4()) + ".json")
-    )
-    print("File exported to " + args.output_dir)
+    for persona in personas:
+        annotation_config_file = generate_annotator_file(
+            annotator_persona=persona,
+            instructions=instructions,
+            history_ctx_len=args.history_ctx_len,
+        )
+        annotation_config_file.to_json_file(
+            os.path.join(args.output_dir, str(uuid.uuid4()) + ".json")
+        )
+    print("Files exported to " + args.output_dir)
 
 
 if __name__ == "__main__":
