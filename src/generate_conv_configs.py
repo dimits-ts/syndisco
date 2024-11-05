@@ -125,14 +125,42 @@ def main():
         help="Directory containing JSON files for LLM user personas",
     )
     parser.add_argument(
+        "--topics_dir",
+        required=True,
+        help="Directory containing .txt files for conversation starting comments",
+    )
+    parser.add_argument(
         "--configs_path",
         required=True,
         help="Path to JSON file containg conversation configs (such as conversation length)",
     )
     parser.add_argument(
-        "--instruction_path",
+        "--user_instruction_path",
         required=True,
         help="Path to .txt file containing user instructions",
+    )
+    parser.add_argument(
+        "--mod_instruction_path",
+        required=True,
+        help="Path to .txt file containing moderator instructions",
+    )
+    parser.add_argument(
+        "--num_generated_files",
+        type=int,
+        default=20,
+        help="How many conversation files will be generated",
+    )
+    parser.add_argument(
+        "--num_users",
+        type=int,
+        default=4,
+        help="Number of users participating in the generated discussion",
+    )
+    parser.add_argument(
+        "--include_mod",
+        type=bool,
+        default=True,
+        help="Whether a moderator exists in the discussion",
     )
     args = parser.parse_args()
 
@@ -152,9 +180,9 @@ def main():
     for _ in range(args.num_generated_files):
         conv_file = generate_conv_config(
             personas=personas,
-            topics=topics, #type: ignore
-            user_instructions=user_instructions, #type: ignore
-            mod_instructions=mod_instructions, #type: ignore
+            topics=topics,  # type: ignore
+            user_instructions=user_instructions,  # type: ignore
+            mod_instructions=mod_instructions,  # type: ignore
             config=config,
             num_users=args.num_users,
             mod_exists=args.include_mod,
