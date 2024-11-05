@@ -5,7 +5,7 @@ import json
 @dataclasses.dataclass
 class LlmPersona:
 
-    name: str
+    username: str
     age: int
     sex: str
     sexual_orientation: str
