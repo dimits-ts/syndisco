@@ -1,58 +1,17 @@
 from sdl import conversation_io
 
-import json
 import uuid
 import os
 import argparse
 import random
 from typing import Any
 
-from .sdl.persona import LlmPersona
+from sdl.persona import LlmPersona
+from file_utils import read_files_from_directory, read_file, read_json_file
 
 
 CTX_PREFACE = "You are a human participating in an online chatroom. You see the following post on a social media site: "
 DEFAULT_MODERATOR_ATTRIBUTES = ["just", "strict", "understanding"]
-
-
-def read_files_from_directory(directory: str) -> list[str | dict]:
-    """Reads all files with the specified extension from a given directory.
-    Supports .json and .txt files.
-
-    :param directory: the root directory from which to load files (NOT recursively!)
-    :type directory: str
-
-    :raises ValueError: if the directory does not exist
-    :return: Returns a list of parsed file content.
-    :rtype: list[str | dict]
-    """
-    files_list = []
-
-    # Check if directory exists
-    if not os.path.isdir(directory):
-        raise ValueError(f"Directory {directory} does not exist.")
-
-    # Loop through all files in the directory
-    for filename in os.listdir(directory):
-        file_path = os.path.join(directory, filename)
-        data = read_file(file_path)
-        files_list.append(data)
-
-    return files_list
-
-
-def read_file(path: str) -> str | dict[str, Any]:
-    """Read a plain text or JSON file depending on its extension
-
-    :param path: the path of the file
-    :type path: str
-    :return: the file's contents
-    :rtype: str | dict[str, Any]
-    """
-    with open(path, "r", encoding="utf-8") as file:
-        if path.endswith(".json"):
-            return json.load(file)
-        else:
-            return file.read()
 
 
 def generate_conv_config(
@@ -90,7 +49,7 @@ def generate_conv_config(
     rand_personas = random.sample(personas, k=num_users)
     topic = random.choice(topics)
 
-    user_names = [persona.name for persona in rand_personas]
+    user_names = [persona.username for persona in rand_personas]
     user_attributes = [persona.to_attribute_list() for persona in rand_personas]
 
     data = conversation_io.LLMConvData(
@@ -173,16 +132,16 @@ def main():
     topics = read_files_from_directory(args.topics_dir)
     user_instructions = read_file(args.user_instruction_path)
     mod_instructions = read_file(args.mod_instruction_path)
-    config = read_file(args.configs_path)
+    config = read_json_file(args.configs_path)
 
     print("Processing...")
     discussion_io_objects = []
     for _ in range(args.num_generated_files):
         conv_file = generate_conv_config(
             personas=personas,
-            topics=topics,  # type: ignore
-            user_instructions=user_instructions,  # type: ignore
-            mod_instructions=mod_instructions,  # type: ignore
+            topics=topics,
+            user_instructions=user_instructions,
+            mod_instructions=mod_instructions,
             config=config,
             num_users=args.num_users,
             mod_exists=args.include_mod,

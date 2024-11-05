@@ -6,47 +6,7 @@ from typing import Any
 
 from sdl.persona import LlmPersona
 from sdl import annotation_io
-
-
-def read_files_from_directory(directory: str) -> list[str | dict]:
-    """Reads all files with the specified extension from a given directory.
-    Supports .json and .txt files.
-
-    :param directory: the root directory from which to load files (NOT recursively!)
-    :type directory: str
-
-    :raises ValueError: if the directory does not exist
-    :return: Returns a list of parsed file content.
-    :rtype: list[str | dict]
-    """
-    files_list = []
-
-    # Check if directory exists
-    if not os.path.isdir(directory):
-        raise ValueError(f"Directory {directory} does not exist.")
-
-    # Loop through all files in the directory
-    for filename in os.listdir(directory):
-        file_path = os.path.join(directory, filename)
-        data = read_file(file_path)
-        files_list.append(data)
-
-    return files_list
-
-
-def read_file(path: str) -> str | dict[str, Any]:
-    """Read a plain text or JSON file depending on its extension
-
-    :param path: the path of the file
-    :type path: str
-    :return: the file's contents
-    :rtype: str | dict[str, Any]
-    """
-    with open(path, "r", encoding="utf-8") as file:
-        if path.endswith(".json"):
-            return json.load(file)
-        else:
-            return file.read()
+from file_utils import read_file
 
 
 def generate_annotator_file(
