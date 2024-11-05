@@ -1,12 +1,10 @@
-import json
 import uuid
 import os
 import argparse
-from typing import Any
 
-from sdl.persona import LlmPersona
 from sdl import annotation_io
-from file_utils import read_file
+from sdl.persona import LlmPersona
+from sdl.file_utils import read_file
 
 
 def generate_annotator_file(

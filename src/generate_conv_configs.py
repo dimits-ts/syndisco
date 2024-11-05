@@ -1,5 +1,3 @@
-from sdl import conversation_io
-
 import uuid
 import os
 import argparse
@@ -7,7 +5,8 @@ import random
 from typing import Any
 
 from sdl.persona import LlmPersona
-from file_utils import read_files_from_directory, read_file, read_json_file
+from sdl import conversation_io
+from sdl.file_utils import read_files_from_directory, read_file, read_json_file
 
 
 CTX_PREFACE = "You are a human participating in an online chatroom. You see the following post on a social media site: "

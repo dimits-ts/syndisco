@@ -1,8 +1,8 @@
 import llama_cpp
 
-from .sdl import annotation_io
-from .sdl import util
-from .sdl import models
+from sdl import annotation_io
+from sdl import util
+from sdl import models
 
 import argparse
 
