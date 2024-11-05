@@ -1,7 +1,7 @@
-from sdl import actors
-from sdl import turn_manager
-from sdl import models
-from sdl import conversation
+from . import actors
+from . import turn_manager
+from . import models
+from . import conversation
 
 import dataclasses
 import json

@@ -1,7 +1,7 @@
 import abc
 import typing
 
-from sdl import models
+from . import models
 
 
 class IActor(abc.ABC):

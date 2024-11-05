@@ -5,9 +5,9 @@ import json
 import uuid
 from typing import Any
 
-from sdl import actors
-from sdl import util
-from sdl import turn_manager
+from . import actors
+from . import util
+from . import turn_manager
 
 
 class Conversation:

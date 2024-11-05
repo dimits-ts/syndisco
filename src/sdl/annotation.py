@@ -1,13 +1,11 @@
-import dataclasses
 import json
 import collections
 import datetime
 import textwrap
 from typing import Any
 
-from sdl import actors
-from sdl import util
-from sdl import models
+from . import actors
+from . import util
 
 
 # "...but if you look at conversations.py, this whole file violates DRY"

@@ -1,6 +1,6 @@
-from sdl import annotation
-from sdl import models
-from sdl import actors
+from . import annotation
+from . import models
+from . import actors
 
 import dataclasses
 import json
