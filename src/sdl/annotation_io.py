@@ -56,6 +56,7 @@ class LLMAnnotationGenerator:
                  llm: models.LlamaModel,
                  conv_logs_path: str
                  ):
+        assert data is not None and llm is not None and conv_logs_path is not None
         self.data = data
         self.llm = llm
         self.conv_logs_path = conv_logs_path
