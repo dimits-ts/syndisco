@@ -95,7 +95,7 @@ class ALlmActor(IActor, abc.ABC):
     def speak(self, history: list[str]) -> str:
         system_prompt = self._system_prompt()
         message_prompt = self._message_prompt(history)
-        response = self.model.prompt([system_prompt, message_prompt], stop_list=["User"])
+        response = self.model.prompt([system_prompt, message_prompt], stop_list=["User"]) #type: ignore
         return response
 
     @typing.final
