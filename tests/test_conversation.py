@@ -1,10 +1,16 @@
 import unittest
+from unittest.mock import MagicMock, patch
 import sys
 import json
 import os
 
 sys.path.append("..") 
 from src.sdl.conversation_io import LLMConvData
+from src.sdl.actors import LLMUser
+from src.sdl.models import LlamaModel
+from src.sdl.conversation import Conversation
+from src.sdl.turn_manager import turn_manager_factory
+from src.sdl.conversation_io import LLMConvData, LLMConvGenerator
 
 
 class TestLLMConvData(unittest.TestCase):
@@ -124,6 +130,105 @@ class TestLLMConvData(unittest.TestCase):
 
         # Clean up
         os.remove("output/test_incomplete.json")
+
+
+
+class TestLLMConvGenerator(unittest.TestCase):
+
+    def setUp(self):
+        # Sample data for LLMConvData
+        self.data = LLMConvData(
+            context="This is the conversation context.",
+            user_names=["Alice", "Bob"],
+            user_attributes=[["Analytical"], ["Creative"]],
+            user_instructions="Focus on engaging dialogue.",
+            turn_manager_type="round_robin",
+            turn_manager_config={"some_config": 1.0},
+            conv_len=4,
+            history_ctx_len=3,
+            moderator_name="Moderator",
+            moderator_attributes=["Impartial"],
+            moderator_instructions="Ensure fair conversation."
+        )
+
+        # Mock models
+        self.mock_user_model = MagicMock(spec=LlamaModel)
+        self.mock_moderator_model = MagicMock(spec=LlamaModel)
+
+    def test_initialization_with_moderator(self):
+        # Initialize generator with moderator
+        generator = LLMConvGenerator(self.data, self.mock_user_model, self.mock_moderator_model)
+        self.assertEqual(generator.data, self.data)
+        self.assertEqual(generator.user_model, self.mock_user_model)
+        self.assertEqual(generator.moderator_model, self.mock_moderator_model)
+
+    def test_initialization_without_moderator(self):
+        # Modify data to exclude moderator and initialize
+        self.data.moderator_name = None
+        self.data.moderator_attributes = None
+        self.data.moderator_instructions = None
+
+        generator = LLMConvGenerator(self.data, self.mock_user_model, None)
+        self.assertEqual(generator.moderator_model, None)
+
+    def test_error_on_missing_user_model(self):
+        # Check that initialization fails if the user model is None
+        with self.assertRaises(AssertionError):
+            LLMConvGenerator(self.data, None, self.mock_moderator_model) # type: ignore
+
+    def test_error_on_missing_moderator_model_with_moderator_name(self):
+        # Check that initialization fails if moderator model is missing but moderator data exists
+        with self.assertRaises(AssertionError):
+            LLMConvGenerator(self.data, self.mock_user_model, None)
+
+    @patch('sdl.turn_manager.turn_manager_factory')
+    def test_produce_conversation(self, mock_turn_manager_factory):
+        # Mock the turn manager factory
+        mock_turn_manager = MagicMock()
+        mock_turn_manager_factory.return_value = mock_turn_manager
+
+        generator = LLMConvGenerator(self.data, self.mock_user_model, self.mock_moderator_model)
+
+        # Generate conversation
+        generated_conv = generator.produce_conversation()
+
+        # Verify that a Conversation instance was created with expected properties
+        self.assertIsInstance(generated_conv, Conversation)
+        self.assertEqual(generated_conv.ctx_history.maxlen, self.data.history_ctx_len)
+        self.assertEqual(generated_conv.conv_len, self.data.conv_len)
+        self.assertEqual(generated_conv.next_turn_manager, mock_turn_manager)
+
+        # Check users
+        self.assertEqual(len(generated_conv.users), len(self.data.user_names))
+        for i, user_obj in enumerate(generated_conv.users.values()):
+            # TODO: maybe remove IActor at this point
+            self.assertIsInstance(user_obj, LLMUser)
+            self.assertEqual(user_obj.name, self.data.user_names[i]) # type: ignore
+            self.assertEqual(user_obj.attributes, self.data.user_attributes[i]) # type: ignore
+            self.assertEqual(user_obj.instructions, self.data.user_instructions) # type: ignore
+            self.assertEqual(user_obj.context, self.data.context) # type: ignore
+
+        # Check moderator
+        self.assertIsInstance(generated_conv.moderator, LLMUser)
+        self.assertEqual(generated_conv.moderator.name, self.data.moderator_name) # type: ignore
+        self.assertEqual(generated_conv.moderator.attributes, self.data.moderator_attributes) # type: ignore
+        self.assertEqual(generated_conv.moderator.instructions, self.data.moderator_instructions) # type: ignore
+
+    @patch('sdl.turn_manager.turn_manager_factory')
+    def test_produce_conversation_without_moderator(self, mock_turn_manager_factory):
+        # Modify data to exclude moderator
+        self.data.moderator_name = None
+        self.data.moderator_attributes = None
+        self.data.moderator_instructions = None
+
+        generator = LLMConvGenerator(self.data, self.mock_user_model, None)
+
+        # Generate conversation
+        generated_conv = generator.produce_conversation()
+
+        # Verify that a Conversation instance was created without a moderator
+        self.assertIsInstance(generated_conv, Conversation)
+        self.assertIsNone(generated_conv.moderator)
 
 
 if __name__ == "__main__":

@@ -1,9 +1,11 @@
 import unittest
 import unittest.mock
 import json
+import sys
 import os
 from unittest.mock import MagicMock
 
+sys.path.append("..") 
 from src.sdl.models import LlamaModel
 from src.sdl.annotation_io import LLMAnnotatorData, LLMAnnotationGenerator
 
