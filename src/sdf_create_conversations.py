@@ -1,9 +1,9 @@
-from sdl import util
-from sdl import models
-from sdl import conversation_io
-
 import llama_cpp
 import argparse
+
+from .sdl import util
+from .sdl import models
+from .sdl import conversation_io
 
 
 def main():

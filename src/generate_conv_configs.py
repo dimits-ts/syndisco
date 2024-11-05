@@ -7,7 +7,7 @@ import argparse
 import random
 from typing import Any
 
-from synthetic_discussion_framework.src.sdl.persona import LlmPersona
+from .sdl.persona import LlmPersona
 
 
 CTX_PREFACE = "You are a human participating in an online chatroom. You see the following post on a social media site: "
@@ -152,9 +152,9 @@ def main():
     for _ in range(args.num_generated_files):
         conv_file = generate_conv_config(
             personas=personas,
-            topics=topics,
-            user_instructions=user_instructions,
-            mod_instructions=mod_instructions,
+            topics=topics, #type: ignore
+            user_instructions=user_instructions, #type: ignore
+            mod_instructions=mod_instructions, #type: ignore
             config=config,
             num_users=args.num_users,
             mod_exists=args.include_mod,
