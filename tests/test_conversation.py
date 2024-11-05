@@ -1,8 +1,10 @@
 import unittest
 from unittest.mock import MagicMock, patch
+
 import sys
 import json
 import os
+import tempfile
 
 sys.path.append("..") 
 from src.sdl.conversation_io import LLMConvData
@@ -65,6 +67,8 @@ class TestLLMConvData(unittest.TestCase):
         self.assertIsNone(data_without_moderator.moderator_attributes)
 
     def test_from_json_file(self):
+        temp = tempfile.NamedTemporaryFile()
+
         # Create a sample JSON file to test deserialization
         sample_data = {
             "context": "Test context",
@@ -73,18 +77,17 @@ class TestLLMConvData(unittest.TestCase):
             "user_instructions": "Test instructions",
             "turn_manager_type": "round robin"
         }
-        with open("output/test.json", "w") as f:
+        with open(temp.name, "w") as f:
             json.dump(sample_data, f)
 
         # Test loading the JSON file
-        data = LLMConvData.from_json_file("output/test.json")
+        data = LLMConvData.from_json_file(temp.name)
         self.assertEqual(data.context, sample_data["context"])
         self.assertEqual(data.user_names, sample_data["user_names"])
-        
-        # Clean up
-        os.remove("output/test.json")
 
-    def test_to_json_file(self):
+    def test_json_file(self):
+        temp = tempfile.NamedTemporaryFile()
+
         # Create an LLMConvData instance and serialize it
         data = LLMConvData(
             context="Test context for serialization",
@@ -93,43 +96,44 @@ class TestLLMConvData(unittest.TestCase):
             user_instructions="User instructions",
             turn_manager_type="round robin"
         )
-        data.to_json_file("output/test_to_json.json")
+        data.to_json_file(temp.name)
 
         # Reload the JSON file and check the content
-        with open("output/test_to_json.json", "r") as f:
+        with open(temp.name, "r") as f:
             loaded_data = json.load(f)
         self.assertEqual(loaded_data["context"], data.context)
         self.assertEqual(loaded_data["user_names"], data.user_names)
 
-        # Clean up
-        os.remove("output/test_to_json.json")
+        # Test loading the JSON file
+        read_data = LLMConvData.from_json_file(temp.name)
+        self.assertEqual(data.context, read_data.context)
+        self.assertEqual(data.user_names, read_data.user_names)
+
 
     def test_invalid_json_structure(self):
         # Create an invalid JSON file to test error handling
-        with open("output/test_invalid.json", "w") as f:
+        temp = tempfile.NamedTemporaryFile(mode='w+t')
+        with open(temp.name, "w") as f:
             f.write("{invalid_json: true}")
 
-        with self.assertRaises(json.JSONDecodeError):
-            LLMConvData.from_json_file("output/test_invalid.json")
+            with self.assertRaises(json.JSONDecodeError):
+                LLMConvData.from_json_file(temp.name)
 
-        # Clean up
-        os.remove("output/test_invalid.json")
+
 
     def test_missing_required_fields(self):
+        temp = tempfile.NamedTemporaryFile()
         # Test case with missing required fields in JSON data
         incomplete_data = {
             "context": "Incomplete data",
             "user_names": ["User1"],
             # Missing 'user_attributes' and 'user_instructions'
         }
-        with open("output/test_incomplete.json", "w") as f:
+        with open(temp.name, "w") as f:
             json.dump(incomplete_data, f)
 
         with self.assertRaises(TypeError):
-            LLMConvData.from_json_file("output/test_incomplete.json")
-
-        # Clean up
-        os.remove("output/test_incomplete.json")
+            LLMConvData.from_json_file(temp.name)
 
 
 
@@ -181,7 +185,7 @@ class TestLLMConvGenerator(unittest.TestCase):
         with self.assertRaises(AssertionError):
             LLMConvGenerator(self.data, self.mock_user_model, None)
 
-    @patch('sdl.turn_manager.turn_manager_factory')
+    @patch('src.sdl.turn_manager.turn_manager_factory')
     def test_produce_conversation(self, mock_turn_manager_factory):
         # Mock the turn manager factory
         mock_turn_manager = MagicMock()
@@ -214,7 +218,7 @@ class TestLLMConvGenerator(unittest.TestCase):
         self.assertEqual(generated_conv.moderator.attributes, self.data.moderator_attributes) # type: ignore
         self.assertEqual(generated_conv.moderator.instructions, self.data.moderator_instructions) # type: ignore
 
-    @patch('sdl.turn_manager.turn_manager_factory')
+    @patch('src.sdl.turn_manager.turn_manager_factory')
     def test_produce_conversation_without_moderator(self, mock_turn_manager_factory):
         # Modify data to exclude moderator
         self.data.moderator_name = None
