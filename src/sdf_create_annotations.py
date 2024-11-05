@@ -47,7 +47,7 @@ def main():
     print("Model loaded.")
 
     model = models.LlamaModel(llm, max_out_tokens=max_tokens, seed=random_seed)
-    data = annotation_io.LLMAnnotatorData.from_json_file(prompt_input_path)
+    data = annotation_io.LlmAnnotationData.from_json_file(prompt_input_path)
     gen = annotation_io.LLMAnnotationGenerator(data, model, conv_logs_path=conv_path)
     conv = gen.produce_conversation()
 

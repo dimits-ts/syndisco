@@ -7,7 +7,7 @@ import json
 
 
 @dataclasses.dataclass
-class LLMAnnotatorData:
+class LlmAnnotationData:
     """
     A dataclass responsible for serializing and deserializing data needed to construct a
     :class:`AnnotationConv`.
@@ -30,9 +30,9 @@ class LLMAnnotatorData:
             data_dict = json.load(fin)
 
         # code from https://stackoverflow.com/questions/68417319/initialize-python-dataclass-from-dictionary
-        field_set = {f.name for f in dataclasses.fields(LLMAnnotatorData) if f.init}
+        field_set = {f.name for f in dataclasses.fields(LlmAnnotationData) if f.init}
         filtered_arg_dict = {k: v for k, v in data_dict.items() if k in field_set}
-        return LLMAnnotatorData(**filtered_arg_dict)
+        return LlmAnnotationData(**filtered_arg_dict)
 
     def to_json_file(self, output_path: str) -> None:
         """
@@ -52,7 +52,7 @@ class LLMAnnotationGenerator:
     """
 
     def __init__(self,
-                 data: LLMAnnotatorData,
+                 data: LlmAnnotationData,
                  llm: models.LlamaModel,
                  conv_logs_path: str
                  ):

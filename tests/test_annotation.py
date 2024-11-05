@@ -8,7 +8,7 @@ from unittest.mock import MagicMock
 
 sys.path.append("..") 
 from src.sdl.models import LlamaModel
-from src.sdl.annotation_io import LLMAnnotatorData, LLMAnnotationGenerator
+from src.sdl.annotation_io import LlmAnnotationData, LLMAnnotationGenerator
 
 
 class TestLLMAnnotatorData(unittest.TestCase):
@@ -17,7 +17,7 @@ class TestLLMAnnotatorData(unittest.TestCase):
 
     def test_constructor(self):
         # Test valid creation
-        data = LLMAnnotatorData(
+        data = LlmAnnotationData(
             attributes=["Thoughtful", "Detail-oriented"],
             instructions="Annotate with a focus on clarity and completeness.",
             history_ctx_len=5,
@@ -36,7 +36,7 @@ class TestLLMAnnotatorData(unittest.TestCase):
             json.dump(sample_data, f)
 
         # Load the data and verify the contents
-        data = LLMAnnotatorData.from_json_file(tmp.name)
+        data = LlmAnnotationData.from_json_file(tmp.name)
         self.assertEqual(data.attributes, sample_data["attributes"])
         self.assertEqual(data.instructions, sample_data["instructions"])
         self.assertEqual(data.history_ctx_len, sample_data["history_ctx_len"])
@@ -44,7 +44,7 @@ class TestLLMAnnotatorData(unittest.TestCase):
     def test_to_json_file(self):
         tmp = tempfile.NamedTemporaryFile()
         # Test serialization to JSON
-        data = LLMAnnotatorData(
+        data = LlmAnnotationData(
             attributes=["Observant", "Critical"],
             instructions="Provide feedback on argument strength and clarity.",
             history_ctx_len=3,
@@ -69,7 +69,7 @@ class TestLLMAnnotatorData(unittest.TestCase):
             json.dump(incomplete_data, f)
 
         with self.assertRaises(TypeError):
-            LLMAnnotatorData.from_json_file(tmp.name)
+            LlmAnnotationData.from_json_file(tmp.name)
 
     def test_invalid_json_structure(self):
         tmp = tempfile.NamedTemporaryFile()
@@ -78,7 +78,7 @@ class TestLLMAnnotatorData(unittest.TestCase):
             f.write("{invalid_json: true}")
 
         with self.assertRaises(json.JSONDecodeError):
-            LLMAnnotatorData.from_json_file(tmp.name)
+            LlmAnnotationData.from_json_file(tmp.name)
 
 
 class TestLLMAnnotationGenerator(unittest.TestCase):
@@ -88,7 +88,7 @@ class TestLLMAnnotationGenerator(unittest.TestCase):
         self.mock_llm = MagicMock(spec=LlamaModel)
 
         # Create sample LLMAnnotatorData for tests
-        self.data = LLMAnnotatorData(
+        self.data = LlmAnnotationData(
             attributes=["Insightful", "Direct"],
             instructions="Annotate with focus on logical structure.",
             history_ctx_len=4,
