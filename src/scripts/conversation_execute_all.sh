@@ -25,7 +25,7 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 # Check if all required arguments are provided
-if [[ || -z "$input_dir" || -z "$output_dir" || -z "$model_path" ]]; then
+if [[ -z "$input_dir" || -z "$output_dir" || -z "$model_path" ]]; then
   echo "Error: Missing required arguments."
   usage
 fi
