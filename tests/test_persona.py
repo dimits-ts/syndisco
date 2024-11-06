@@ -17,7 +17,7 @@ class TestLlmPersona(unittest.TestCase):
     def setUp(self):
         """Set up a sample LlmPersona instance for testing."""
         self.persona_data = {
-            "name": "Alex",
+            "username": "Alex",
             "age": 30,
             "sex": "Male",
             "sexual_orientation": "Heterosexual",

@@ -63,9 +63,9 @@ class LLMAnnotationGenerator:
 
     def produce_conversation(self) -> annotation.AnnotationConv:
         """
-        Generate the synthetic annotations.
+        Generate and return the setup for the synthetic annotation.
 
-        :return: An initialized AnnotationConv instance.
+        :return: An initialized AnnotationConv instance which can generate the annotations.
         :rtype: AnnotationConv
         """
         annotator = actors.LLMAnnotator(

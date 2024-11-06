@@ -57,16 +57,18 @@ class AnnotationConv:
         ctx_history = collections.deque(maxlen=self.history_ctx_len)
 
         for username, message in self.conv_data_dict["logs"]:
-           # do not include moderator comments in annotation context if told so by user 
-            if not self.include_moderator_comments and "moderator" in username:
-                formatted_message = output_util.format_chat_message(username, message)
-                ctx_history.append(formatted_message)
-                annotation = self.annotator.speak(list(ctx_history))
-                self.annotation_logs.append((message, annotation))
+           # do not include moderator comments in annotation context if told so 
+            if "moderator" in username:
+                if not self.include_moderator_comments:
+                    continue
+            formatted_message = output_util.format_chat_message(username, message)
+            ctx_history.append(formatted_message)
+            annotation = self.annotator.speak(list(ctx_history))
+            self.annotation_logs.append((message, annotation))
 
-                if verbose:
-                    print(textwrap.fill(formatted_message))
-                    print(annotation)
+            if verbose:
+                print(textwrap.fill(formatted_message))
+                print(annotation)
 
     def to_dict(self, timestamp_format: str = "%y-%m-%d-%H-%M") -> dict[str, Any]:
         """
