@@ -116,7 +116,7 @@ def main():
     )
     parser.add_argument(
         "--include_mod",
-        type=bool,
+        action=argparse.BooleanOptionalAction,
         default=True,
         help="Whether a moderator exists in the discussion",
     )
