@@ -1,10 +1,9 @@
 import unittest
 from unittest.mock import MagicMock, patch
+import tempfile
 
 import sys
 import json
-import os
-import tempfile
 
 sys.path.append("..") 
 from src.sdl.conversation_io import LLMConvData
