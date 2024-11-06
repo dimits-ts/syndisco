@@ -12,8 +12,10 @@ class LlmAnnotationData:
     A dataclass responsible for serializing and deserializing data needed to construct a
     :class:`AnnotationConv`.
     """
+
     attributes: list[str]
     instructions: str
+    include_moderator_comments: bool
     history_ctx_len: int = 4
 
     @staticmethod
@@ -51,11 +53,9 @@ class LLMAnnotationGenerator:
     (:class:`LLMAnnotatorData`) and a model (:class:`models.LlamaModel`).
     """
 
-    def __init__(self,
-                 data: LlmAnnotationData,
-                 llm: models.LlamaModel,
-                 conv_logs_path: str
-                 ):
+    def __init__(
+        self, data: LlmAnnotationData, llm: models.LlamaModel, conv_logs_path: str
+    ):
         assert data is not None and llm is not None and conv_logs_path is not None
         self.data = data
         self.llm = llm
@@ -68,13 +68,18 @@ class LLMAnnotationGenerator:
         :return: An initialized AnnotationConv instance.
         :rtype: AnnotationConv
         """
-        annotator = actors.LLMAnnotator(model=self.llm,
-                                            name="",
-                                            attributes=self.data.attributes,
-                                            context="",
-                                            instructions=self.data.instructions)
+        annotator = actors.LLMAnnotator(
+            model=self.llm,
+            name="",
+            attributes=self.data.attributes,
+            context="",
+            instructions=self.data.instructions,
+        )
 
-        conversation = annotation.AnnotationConv(annotator=annotator,
-                                      conv_logs_path=self.conv_logs_path,
-                                      history_ctx_len=self.data.history_ctx_len)
+        conversation = annotation.AnnotationConv(
+            annotator=annotator,
+            conv_logs_path=self.conv_logs_path,
+            history_ctx_len=self.data.history_ctx_len,
+            include_moderator_comments=self.data.include_moderator_comments,
+        )
         return conversation

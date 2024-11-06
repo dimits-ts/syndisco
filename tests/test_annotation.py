@@ -21,6 +21,7 @@ class TestLLMAnnotatorData(unittest.TestCase):
             attributes=["Thoughtful", "Detail-oriented"],
             instructions="Annotate with a focus on clarity and completeness.",
             history_ctx_len=5,
+            include_moderator_comments=True
         )
         self.assertEqual(data.history_ctx_len, 5)
 
@@ -48,6 +49,7 @@ class TestLLMAnnotatorData(unittest.TestCase):
             attributes=["Observant", "Critical"],
             instructions="Provide feedback on argument strength and clarity.",
             history_ctx_len=3,
+            include_moderator_comments=True
         )
         data.to_json_file(tmp.name)
 
@@ -92,6 +94,7 @@ class TestLLMAnnotationGenerator(unittest.TestCase):
             attributes=["Insightful", "Direct"],
             instructions="Annotate with focus on logical structure.",
             history_ctx_len=4,
+            include_moderator_comments=True
         )
         self.conv_logs_path = "output/conv_logs"
 
@@ -107,6 +110,7 @@ class TestLLMAnnotationGenerator(unittest.TestCase):
     def test_produce_conversation(self):
         # Mock the AnnotationConv class to isolate `produce_conversation` behavior
         with unittest.mock.patch("src.sdl.annotation.AnnotationConv") as MockAnnotationConv:
+            #TODO: investigate this test
             generator = LLMAnnotationGenerator(
                 self.data, self.mock_llm, self.conv_logs_path
             )
