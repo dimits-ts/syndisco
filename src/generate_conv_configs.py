@@ -125,7 +125,8 @@ def main():
     print("Reading input files...")
     persona_files = os.listdir(args.persona_dir)
     personas = [
-        LlmPersona.from_json_file(persona_file) for persona_file in persona_files
+        LlmPersona.from_json_file(os.path.join(args.persona_dir, persona_file))
+        for persona_file in persona_files
     ]
 
     topics = read_files_from_directory(args.topics_dir)
