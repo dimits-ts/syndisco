@@ -8,7 +8,10 @@ from sdl.file_util import read_file
 
 
 def generate_annotator_file(
-    annotator_persona: LlmPersona, instructions: str, history_ctx_len: int
+    annotator_persona: LlmPersona,
+    instructions: str,
+    history_ctx_len: int,
+    include_moderator_comments: bool,
 ) -> annotation_io.LlmAnnotationData:
     """Generate an annotation configuration object from provided attributes.
     The object can then be used for IO operations or directly as input for a conversation.
@@ -23,6 +26,7 @@ def generate_annotator_file(
         attributes=annotator_persona.to_attribute_list(),
         instructions=instructions,
         history_ctx_len=history_ctx_len,
+        include_moderator_comments=include_moderator_comments,
     )
     return data
 
@@ -53,6 +57,14 @@ def main():
         default=4,
         help="How many previous comments the annotator will remember.",
     )
+    parser.add_argument(
+        "--include_mod_comments",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="Whether to include moderator comments in the annotations and the conversational context. "
+        "Setting this flag to false will also impact user annotations, since it changes which previous "
+        "comments the annotator can see.",
+    )
     args = parser.parse_args()
 
     print("Reading input files...")
@@ -69,6 +81,7 @@ def main():
             annotator_persona=persona,
             instructions=instructions,
             history_ctx_len=args.history_ctx_len,
+            include_moderator_comments=args.include_mod_comments
         )
         annotation_config_file.to_json_file(
             os.path.join(args.output_dir, str(uuid.uuid4()) + ".json")

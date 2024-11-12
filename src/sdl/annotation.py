@@ -14,14 +14,34 @@ from . import output_util
 # uses the same functionality. You can replace the implementation here entirely
 # without impacting conversations.py at all
 
+
 class AnnotationConv:
     """
     An annotation job modelled as a conversation between the messages of a finished dialogue, and the LLM Annotator.
     """
 
-    def __init__(self, annotator: actors.IActor, conv_logs_path: str, history_ctx_len: int = 4):
+    def __init__(
+        self,
+        annotator: actors.IActor,
+        conv_logs_path: str,
+        include_moderator_comments: bool,
+        history_ctx_len: int = 4,
+    ):
+        """Create an annotation job. 
+        The annotation is modelled as a conversation between the system and the annotator.
+
+        :param annotator: The annotator
+        :type annotator: actors.IActor
+        :param conv_logs_path: The path to the file containing the conversation logs in JSON format
+        :type conv_logs_path: str
+        :param include_moderator_comments: Whether to annotate moderator comments, and include them in conversational context when annotating user responses.
+        :type include_moderator_comments: bool
+        :param history_ctx_len: How many previous comments the annotator will remember, defaults to 4
+        :type history_ctx_len: int, optional
+        """
         self.annotator = annotator
         self.history_ctx_len = history_ctx_len
+        self.include_moderator_comments = include_moderator_comments
         self.annotation_logs = []
 
         with open(conv_logs_path, "r", encoding="utf8") as fin:
@@ -37,6 +57,10 @@ class AnnotationConv:
         ctx_history = collections.deque(maxlen=self.history_ctx_len)
 
         for username, message in self.conv_data_dict["logs"]:
+           # do not include moderator comments in annotation context if told so 
+            if "moderator" in username:
+                if not self.include_moderator_comments:
+                    continue
             formatted_message = output_util.format_chat_message(username, message)
             ctx_history.append(formatted_message)
             annotation = self.annotator.speak(list(ctx_history))

@@ -12,7 +12,7 @@ class LlmPersona:
     demographic_group: str
     current_employment: str
     education_level: str
-    intent: str
+    special_instructions: str
     personality_characteristics: list[str]
 
     @staticmethod
@@ -52,8 +52,8 @@ class LlmPersona:
             attributes.append(characteristic)
 
         attributes.append(LlmPersona._sex_parse(self.sex))
-        attributes.append(f"with {self.education_level} education")
-        attributes.append(f"and {self.intent} intent")
+        attributes.append(f"with {self.education_level} education.")
+        attributes.append(self.special_instructions)
 
         return attributes
 
