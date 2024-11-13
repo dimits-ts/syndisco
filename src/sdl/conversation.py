@@ -20,8 +20,8 @@ class Conversation:
     def __init__(
             self,
             turn_manager: turn_manager.TurnManager,
-            users: list[actors.IActor],
-            moderator: actors.IActor | None = None,
+            users: list[actors.LLMUser],
+            moderator: actors.LLMUser | None = None,
             history_context_len: int = 5,
             conv_len: int = 5,
     ) -> None:
