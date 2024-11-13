@@ -4,48 +4,7 @@ import typing
 from . import models
 
 
-class IActor(abc.ABC):
-    """
-    An interface denoting an actor within a conversation.
-    Designed to be as general as possible, in order to support LLM, human and
-    IR/random selection models.
-    """
-
-    @abc.abstractmethod
-    def get_name(self) -> str:
-        """
-        Get the actor's assigned name within the conversation.
-
-        :return: The name of the actor.
-        :rtype: str
-        """
-        return ""
-
-    @abc.abstractmethod
-    def speak(self, history: list[str]) -> str:
-        """
-        Prompt the actor to speak, given a history of previous messages
-        in the conversation.
-
-        :param history: A list of previous messages.
-        :type history: list[str]
-        :return: The actor's new message
-        :rtype: str
-        """
-        return ""
-
-    @abc.abstractmethod
-    def describe(self) -> str:
-        """
-        Get a description of the actor's internals.
-
-        :return: A brief description of the actor
-        :rtype: str
-        """
-        return ""
-
-
-class ALlmActor(IActor, abc.ABC):
+class LlmActor(abc.ABC):
     """
     An abstract class representing an actor which responds according to an underlying LLM instance.
     The LLM instance can be of any type, provided it satisfies the 
@@ -88,22 +47,43 @@ class ALlmActor(IActor, abc.ABC):
     def _message_prompt(self, history: list[str]) -> dict:
         return {}
 
-    def describe(self):
-        return f"{self._system_prompt()["content"]}"
-
     @typing.final
     def speak(self, history: list[str]) -> str:
+        """
+        Prompt the actor to speak, given a history of previous messages
+        in the conversation.
+
+        :param history: A list of previous messages.
+        :type history: list[str]
+        :return: The actor's new message
+        :rtype: str
+        """
         system_prompt = self._system_prompt()
         message_prompt = self._message_prompt(history)
         response = self.model.prompt([system_prompt, message_prompt], stop_list=["User"]) #type: ignore
         return response
 
+    def describe(self):
+        """
+        Get a description of the actor's internals.
+
+        :return: A brief description of the actor
+        :rtype: str
+        """
+        return f"{self._system_prompt()["content"]}"
+
     @typing.final
     def get_name(self) -> str:
+        """
+        Get the actor's assigned name within the conversation.
+
+        :return: The name of the actor.
+        :rtype: str
+        """
         return self.name
 
 
-class LLMUser(ALlmActor):
+class LLMUser(LlmActor):
     """
     A LLM actor with a modified message prompt to facilitate a conversation.
     """
@@ -113,7 +93,7 @@ class LLMUser(ALlmActor):
             "content": "\n".join(history) + f"\nUser {self.get_name()} posted:"
         }
 
-class LLMAnnotator(ALlmActor):
+class LLMAnnotator(LlmActor):
     """
     A LLM actor with a modified message prompt to facilitate an annotation job.
     """

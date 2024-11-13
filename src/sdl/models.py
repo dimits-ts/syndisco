@@ -1,29 +1,7 @@
-import abc
-from typing import Any
 import llama_cpp
 
 
-class IGeneratingAgent(abc.ABC):
-    """
-    Abstract class encapsulating any agent that can generate text,
-    (be it a human, an LLM, a retrieval system ...) to be used in the 
-    simulated convesational framework.
-    """
-
-    @abc.abstractmethod
-    def prompt(self, prompt: Any) -> str:
-        """
-        Prompt the LLM and get its response.
-
-        :param prompt: The prompt to the LLM.
-        :type prompt: Any
-        :return: The LLM's response.
-        :rtype: str
-        """
-        return ""
-
-
-class LlamaModel(IGeneratingAgent):
+class LlamaModel:
 
     @staticmethod
     def _get_response_from_output(json_output) -> str:

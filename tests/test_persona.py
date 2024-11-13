@@ -24,7 +24,7 @@ class TestLlmPersona(unittest.TestCase):
             "demographic_group": "Urban resident",
             "current_employment": "Software Developer",
             "education_level": "Bachelor's degree",
-            "intent": "Collaborative",
+            "special_instructions": "You have Collaborative intent",
             "personality_characteristics": ["Curious", "Analytical"]
         }
         self.persona = LlmPersona(**self.persona_data)
@@ -62,8 +62,8 @@ class TestLlmPersona(unittest.TestCase):
             "Curious",
             "Analytical",
             "man",
-            "with Bachelor's degree education",
-            "and Collaborative intent"
+            "with Bachelor's degree education.",
+            "You have Collaborative intent"
         ]
         self.assertEqual(self.persona.to_attribute_list(), expected_attributes)
 
