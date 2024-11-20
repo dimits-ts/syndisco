@@ -34,27 +34,13 @@ class LlmPersona:
         """
         with open(output_path, "w+", encoding="utf8") as fout:
             json.dump(dataclasses.asdict(self), fout, indent=4)
-   
 
     def to_attribute_list(self) -> list[str]:
-        """Turn the various attributes of a persona into a cohesive list of attributes to be used in the model prompt.
-
-        :return: a list of attributes to be given as input for a model prompt
-        :rtype: list[str]
-        """
-        attributes = []
-        attributes.append(f"{self.age} years old")
-        attributes.append(self.sexual_orientation)
-        attributes.append(self.demographic_group)
-        attributes.append(self.current_employment)
-
-        for characteristic in self.personality_characteristics:
-            attributes.append(characteristic)
-
+        """Turn the various attributes of a persona into a cohesive list of attributes."""
+        attributes = [
+            f"{field}: {getattr(self, field)}" for field in dataclasses.asdict(self)
+        ]
         attributes.append(LlmPersona._sex_parse(self.sex))
-        attributes.append(f"with {self.education_level} education.")
-        attributes.append(self.special_instructions)
-
         return attributes
 
     @staticmethod
