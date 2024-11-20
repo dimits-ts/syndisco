@@ -43,7 +43,7 @@ def main():
     )
     print("Model loaded.")
 
-    model = models.LlamaModel(llm, max_out_tokens=max_tokens, seed=random_seed)
+    model = models.LlamaModel(llm, max_out_tokens=max_tokens, seed=random_seed, remove_string_list=["```"])
     data = conversation_io.LLMConvData.from_json_file(input_file_path)
     generator = conversation_io.LLMConvGenerator(data=data, user_model=model, moderator_model=model)
     conv = generator.produce_conversation()
