@@ -2,16 +2,14 @@ import unittest
 from unittest.mock import MagicMock, patch
 import tempfile
 
-import sys
 import json
 
-sys.path.append("..") 
-from src.sdl.conversation_io import LLMConvData
-from src.sdl.actors import LLMUser
-from src.sdl.models import LlamaModel
-from src.sdl.conversation import Conversation
-from src.sdl.turn_manager import turn_manager_factory
-from src.sdl.conversation_io import LLMConvData, LLMConvGenerator
+from ..src.sdl.conversation_io import LLMConvData
+from ..src.sdl.actors import LLMUser
+from ..src.sdl.models import LlamaModel
+from ..src.sdl.conversation import Conversation
+from ..src.sdl import turn_manager
+from ..src.sdl.conversation_io import LLMConvData, LLMConvGenerator
 
 
 class TestLLMConvData(unittest.TestCase):
@@ -184,7 +182,7 @@ class TestLLMConvGenerator(unittest.TestCase):
         with self.assertRaises(AssertionError):
             LLMConvGenerator(self.data, self.mock_user_model, None)
 
-    @patch('src.sdl.turn_manager.turn_manager_factory')
+    @patch(turn_manager.__name__ + '.turn_manager_factory')
     def test_produce_conversation(self, mock_turn_manager_factory):
         # Mock the turn manager factory
         mock_turn_manager = MagicMock()
@@ -217,7 +215,7 @@ class TestLLMConvGenerator(unittest.TestCase):
         self.assertEqual(generated_conv.moderator.attributes, self.data.moderator_attributes) # type: ignore
         self.assertEqual(generated_conv.moderator.instructions, self.data.moderator_instructions) # type: ignore
 
-    @patch('src.sdl.turn_manager.turn_manager_factory')
+    @patch(turn_manager.__name__ + '.turn_manager_factory')
     def test_produce_conversation_without_moderator(self, mock_turn_manager_factory):
         # Modify data to exclude moderator
         self.data.moderator_name = None

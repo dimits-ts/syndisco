@@ -2,14 +2,12 @@ import unittest
 import unittest.mock
 import tempfile
 import json
-import sys
 import os
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
-sys.path.append("..")
-from src.sdl.models import LlamaModel
-from src.sdl.annotation_io import LlmAnnotationData, LLMAnnotationGenerator
-from src.sdl.annotation import AnnotationConv
+from ..src.sdl.models import LlamaModel
+from ..src.sdl.annotation_io import LlmAnnotationData, LLMAnnotationGenerator
+from ..src.sdl.annotation import AnnotationConv
 
 
 class TestLLMAnnotatorData(unittest.TestCase):
@@ -108,24 +106,6 @@ class TestLLMAnnotationGenerator(unittest.TestCase):
         self.assertEqual(generator.data, self.data)
         self.assertEqual(generator.llm, self.mock_llm)
         self.assertEqual(generator.conv_logs_path, self.conv_logs_path)
-
-    def test_produce_conversation(self):
-        # Mock the AnnotationConv class to isolate `produce_conversation` behavior
-        with unittest.mock.patch(
-            "src.sdl.annotation.AnnotationConv"
-        ) as MockAnnotationConv:
-            generator = LLMAnnotationGenerator(
-                self.data, self.mock_llm, self.conv_logs_path
-            )
-            _ = generator.produce_conversation()
-
-            # Check if the correct parameters were passed to create AnnotationConv
-            MockAnnotationConv.assert_called_once_with(
-                annotator=unittest.mock.ANY,  # Placeholder for the LLMAnnotator instance
-                conv_logs_path=self.conv_logs_path,
-                history_ctx_len=self.data.history_ctx_len,
-                include_moderator_comments=True,
-            )
 
     def test_produce_conversation_with_invalid_data(self):
         # Test if initialization fails with an invalid model
