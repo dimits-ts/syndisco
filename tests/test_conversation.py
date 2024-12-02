@@ -9,6 +9,7 @@ from ..src.sdl.actors import LLMUser
 from ..src.sdl.models import LlamaModel
 from ..src.sdl.conversation import Conversation
 from ..src.sdl import turn_manager
+from ..src.sdl import output_util
 from ..src.sdl.conversation_io import LLMConvData, LLMConvGenerator
 
 
@@ -230,6 +231,127 @@ class TestLLMConvGenerator(unittest.TestCase):
         # Verify that a Conversation instance was created without a moderator
         self.assertIsInstance(generated_conv, Conversation)
         self.assertIsNone(generated_conv.moderator)
+
+
+class TestConversationSeedOpinions(unittest.TestCase):
+    def setUp(self):
+        # Mock turn manager
+        self.mock_turn_manager = MagicMock()
+        self.mock_turn_manager.next_turn_username.side_effect = ["User1", "User2", "User1", "User2"]
+
+        # Mock users
+        self.user1 = MagicMock()
+        self.user1.get_name.return_value = "User1"
+        self.user1.speak.return_value = "User1's message"
+
+        self.user2 = MagicMock()
+        self.user2.get_name.return_value = "User2"
+        self.user2.speak.return_value = "User2's message"
+
+        self.moderator = MagicMock()
+        self.moderator.get_name.return_value = "Moderator"
+        self.moderator.speak.return_value = "Moderator's comment"
+
+    def test_correct_archival_of_seed_opinions(self):
+        seed_opinions = ["Seed message 1", "Seed message 2"]
+        seed_users = ["SeedUser1", "SeedUser2"]
+        conversation = Conversation(
+            turn_manager=self.mock_turn_manager,
+            users=[self.user1, self.user2],
+            moderator=self.moderator,
+            seed_opinions=seed_opinions,
+            seed_opinion_users=seed_users,
+            conv_len=2,
+            history_context_len=10
+        )
+
+        conversation.begin_conversation(verbose=False)
+
+        # Verify seed opinions are archived correctly
+        
+        self.assertEqual(conversation.conv_logs[0], ("SeedUser1", "Seed message 1"))
+        self.assertEqual(conversation.conv_logs[1], ("SeedUser2", "Seed message 2"))
+
+        # Verify conversation history includes seed opinions
+        self.assertEqual(conversation.ctx_history[0], output_util.format_chat_message("SeedUser1", "Seed message 1"))
+        self.assertEqual(conversation.ctx_history[1], output_util.format_chat_message("SeedUser2", "Seed message 2"))
+
+    def test_validation_of_seed_opinions_length(self):
+        # Mismatched lengths
+        with self.assertRaises(ValueError):
+            Conversation(
+                turn_manager=self.mock_turn_manager,
+                users=[self.user1, self.user2],
+                seed_opinions=["Seed message 1"],
+                seed_opinion_users=["User1", "User2"],
+                conv_len=2,
+            )
+
+        # Exceeding history context length
+        with self.assertRaises(ValueError):
+            Conversation(
+                turn_manager=self.mock_turn_manager,
+                users=[self.user1, self.user2],
+                seed_opinions=["Seed message 1", "Seed message 2", "Seed message 3"],
+                seed_opinion_users=["User1", "User2", "User1"],
+                history_context_len=2,
+                conv_len=2,
+            )
+
+    def test_empty_seed_opinions(self):
+        conversation = Conversation(
+            turn_manager=self.mock_turn_manager,
+            users=[self.user1, self.user2],
+            conv_len=2,
+        )
+
+        conversation.begin_conversation(verbose=False)
+
+        # Verify no seed opinions are added
+        self.assertEqual(len(conversation.conv_logs), 2)  # 2 rounds, 1 user per round
+        self.assertEqual(conversation.ctx_history.maxlen, 5)  # Default context length
+
+    def test_seed_opinions_with_moderator(self):
+        seed_opinions = ["Seed message 1", "Seed message 2"]
+        seed_users = ["User1", "User2"]
+        conversation = Conversation(
+            turn_manager=self.mock_turn_manager,
+            users=[self.user1, self.user2],
+            moderator=self.moderator,
+            seed_opinions=seed_opinions,
+            seed_opinion_users=seed_users,
+            conv_len=2,
+        )
+
+        conversation.begin_conversation(verbose=False)
+
+        # Verify moderator responds after seed opinions
+        expected_logs = [
+            ("User1", "Seed message 1"),
+            ("User2", "Seed message 2")
+        ]
+        self.assertListEqual(conversation.conv_logs[:2], expected_logs)
+
+    def test_seed_opinions_integration_with_conversation_flow(self):
+        seed_opinions = ["Seed message 1"]
+        seed_users = ["User1"]
+        conversation = Conversation(
+            turn_manager=self.mock_turn_manager,
+            users=[self.user1, self.user2],
+            seed_opinions=seed_opinions,
+            seed_opinion_users=seed_users,
+            conv_len=2,
+        )
+
+        conversation.begin_conversation(verbose=False)
+
+        # Verify the conversation continues seamlessly after seed opinions
+        expected_logs = [
+            ("User1", "Seed message 1"),
+            ("User1", "User1's message"),
+            ("User2", "User2's message"),
+        ]
+        self.assertEqual(conversation.conv_logs[:3], expected_logs)
 
 
 if __name__ == "__main__":
