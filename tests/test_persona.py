@@ -3,11 +3,7 @@ import unittest
 import json
 import os
 
-import sys 
-sys.path.append("..") 
-
-from src.sdl.persona import LlmPersona
-
+from ..src.sdl.persona import LlmPersona
 
 
 class TestLlmPersona(unittest.TestCase):
