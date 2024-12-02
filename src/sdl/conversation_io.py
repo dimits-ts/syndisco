@@ -24,6 +24,8 @@ class LLMConvData:
     moderator_name: str | None = None
     moderator_attributes: list[str] | None = None
     moderator_instructions: str | None = None
+    seed_opinions: list[str] = dataclasses.field(default_factory=list)
+    seed_opinion_usernames: list[str] = dataclasses.field(default_factory=list)
 
     def __post_init__(self):
         assert len(self.user_names) == len(

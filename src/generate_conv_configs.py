@@ -11,13 +11,15 @@ from sdl.file_util import read_files_from_directory, read_file, read_json_file
 
 CTX_PREFACE = "You are a human participating in an online chatroom. You see the following post on a social media site: "
 DEFAULT_MODERATOR_ATTRIBUTES = ["just", "strict", "understanding"]
+SEED_USERNAMES = ["FirstUser"]
 
 
 def generate_conv_config(
     personas: list[LlmPersona],
-    topics: list[str],
     user_instructions: str,
     mod_instructions: str,
+    seed_opinions: list[str],
+    seed_opinion_usernames: list[str],
     config: dict[str, Any],
     num_users: int,
     mod_exists: bool,
@@ -27,8 +29,6 @@ def generate_conv_config(
 
     :param personas: a list of all personas in JSON/dict format, from which a random subset will be selected depending on num_users
     :type personas: list[LlmPersona]
-    :param topics: a list of all topics, from which one will be randomly selected
-    :type topics: list[str]
     :param user_instructions: the user instructions
     :type user_instructions: str
     :param mod_instructions: the moderator instructions, if he exists
@@ -39,6 +39,10 @@ def generate_conv_config(
     :type num_users: int
     :param mod_exists: whether a moderator will be present in the conversation
     :type mod_exists: bool
+    :param seed_opinions: a list of all topics, from which one will be randomly selected
+    :type seed_opinions: list[str]
+    :param seed_opinion_usernames: a list of all topics, from which one will be randomly selected
+    :type seed_opinions: list[str]
     :return: An IO conversation configuration object which can be used for persistence, or as input for a conversation
     :rtype: conversation_io.LLMConvData
     """
@@ -46,7 +50,8 @@ def generate_conv_config(
         personas
     ), "Number of users must be less or equal to the number of provided personas"
     rand_personas = random.sample(personas, k=num_users)
-    topic = random.choice(topics)
+    topic = random.choice(seed_opinions)
+    seed_username = random.choice(seed_opinion_usernames)
 
     user_names = [persona.username for persona in rand_personas]
     user_attributes = [persona.to_attribute_list() for persona in rand_personas]
@@ -63,6 +68,8 @@ def generate_conv_config(
         turn_manager_config=config["turn_manager_config"],
         conv_len=config["conv_len"],
         history_ctx_len=config["history_ctx_len"],
+        seed_opinions=[topic], # only one seed opinion for our experiments
+        seed_opinion_usernames=[seed_username] # only one seed opinion for our experiments
     )
     return data
 
@@ -139,12 +146,13 @@ def main():
     for _ in range(args.num_generated_files):
         conv_file = generate_conv_config(
             personas=personas,
-            topics=topics,
             user_instructions=user_instructions,
             mod_instructions=mod_instructions,
             config=config,
             num_users=args.num_users,
             mod_exists=args.include_mod,
+            seed_opinions=topics,
+            seed_opinion_usernames=SEED_USERNAMES
         )
         discussion_io_objects.append(conv_file)
 
