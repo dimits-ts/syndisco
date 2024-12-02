@@ -9,7 +9,7 @@ from sdl import conversation_io
 from sdl.file_util import read_files_from_directory, read_file, read_json_file
 
 
-CTX_PREFACE = "You are a human participating in an online chatroom. You see the following post on a social media site: "
+CONTEXT = "You are a human participating in an online chatroom."
 DEFAULT_MODERATOR_ATTRIBUTES = ["just", "strict", "understanding"]
 SEED_USERNAMES = ["FirstUser"]
 
@@ -57,7 +57,7 @@ def generate_conv_config(
     user_attributes = [persona.to_attribute_list() for persona in rand_personas]
 
     data = conversation_io.LLMConvData(
-        context=f"{CTX_PREFACE} '{topic}'",
+        context=CONTEXT,
         user_names=user_names,
         user_attributes=user_attributes,
         user_instructions=user_instructions,
