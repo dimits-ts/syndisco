@@ -40,7 +40,6 @@ class LlmPersona:
         attributes = [
             f"{field}: {getattr(self, field)}" for field in dataclasses.asdict(self)
         ]
-        attributes.append(LlmPersona._sex_parse(self.sex))
         return attributes
 
     @staticmethod
