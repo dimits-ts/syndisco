@@ -2,8 +2,8 @@ import uuid
 import os
 import argparse
 
-from src.sdl.serialization import annotation_io, persona
-from src.sdl.util.file_util import read_file
+from sdl.serialization import annotation_io, persona
+from sdl.util.file_util import read_file
 
 
 def generate_annotator_file(
