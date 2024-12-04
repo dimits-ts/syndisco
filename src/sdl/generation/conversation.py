@@ -5,10 +5,8 @@ import json
 import uuid
 from typing import Any
 
-from . import file_util
-from . import actors
-from . import output_util
-from . import turn_manager
+from ..backend import actors, turn_manager
+from ..util import output_util, file_util
 
 
 class Conversation:

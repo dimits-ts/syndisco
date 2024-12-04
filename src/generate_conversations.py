@@ -1,9 +1,9 @@
 import llama_cpp
 import argparse
 
-from sdl import models
-from sdl import conversation_io
-from sdl import file_util
+from experiments.synthetic_discussion_framework.src.sdl.backend import models
+from experiments.synthetic_discussion_framework.src.sdl.serialization import conversation_io
+from experiments.synthetic_discussion_framework.src.sdl.util import file_util
 
 
 def main():

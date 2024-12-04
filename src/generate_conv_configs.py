@@ -4,9 +4,9 @@ import argparse
 import random
 from typing import Any
 
-from sdl.persona import LlmPersona
-from sdl import conversation_io
-from sdl.file_util import read_files_from_directory, read_file, read_json_file
+from experiments.synthetic_discussion_framework.src.sdl.backend.persona import LlmPersona
+from experiments.synthetic_discussion_framework.src.sdl.serialization import conversation_io
+from experiments.synthetic_discussion_framework.src.sdl.util.file_util import read_files_from_directory, read_file, read_json_file
 
 
 CONTEXT = "You are a human participating in an online chatroom."

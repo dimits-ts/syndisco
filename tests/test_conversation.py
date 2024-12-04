@@ -4,13 +4,12 @@ import tempfile
 
 import json
 
-from ..src.sdl.conversation_io import LLMConvData
-from ..src.sdl.actors import LLMUser
-from ..src.sdl.models import LlamaModel
-from ..src.sdl.conversation import Conversation
-from ..src.sdl import turn_manager
-from ..src.sdl import output_util
-from ..src.sdl.conversation_io import LLMConvData, LLMConvGenerator
+from ..src.sdl.backend.actors import LLMUser
+from ..src.sdl.backend.models import LlamaModel
+from ..src.sdl.generation.conversation import Conversation
+from ..src.sdl.backend import turn_manager
+from ..src.sdl.util import output_util
+from ..src.sdl.serialization.conversation_io import LLMConvData, LLMConvGenerator
 
 
 class TestLLMConvData(unittest.TestCase):

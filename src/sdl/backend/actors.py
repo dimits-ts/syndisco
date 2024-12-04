@@ -1,7 +1,7 @@
 import abc
 import typing
 
-from . import models
+from ..backend import models
 
 
 class LlmActor(abc.ABC):

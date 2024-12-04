@@ -1,8 +1,8 @@
 import llama_cpp
 
-from sdl import annotation_io
-from sdl import file_util
-from sdl import models
+from experiments.synthetic_discussion_framework.src.sdl.serialization import annotation_io
+from experiments.synthetic_discussion_framework.src.sdl.util import file_util
+from experiments.synthetic_discussion_framework.src.sdl.backend import models
 
 import argparse
 

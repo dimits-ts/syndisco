@@ -30,7 +30,7 @@ class TurnManager(abc.ABC):
         :return: the next speaker's username
         :rtype: str
         """
-        raise NotImplemented()
+        raise NotImplemented
 
 
 class RoundRobbin(TurnManager):

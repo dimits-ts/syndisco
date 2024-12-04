@@ -1,6 +1,5 @@
-from . import annotation
-from . import models
-from . import actors
+from ..generation import annotation
+from ..backend import actors, models
 
 import dataclasses
 import json

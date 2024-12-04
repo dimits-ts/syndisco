@@ -2,9 +2,9 @@ import uuid
 import os
 import argparse
 
-from sdl import annotation_io
-from sdl.persona import LlmPersona
-from sdl.file_util import read_file
+from experiments.synthetic_discussion_framework.src.sdl.serialization import annotation_io
+from experiments.synthetic_discussion_framework.src.sdl.backend.persona import LlmPersona
+from experiments.synthetic_discussion_framework.src.sdl.util.file_util import read_file
 
 
 def generate_annotator_file(

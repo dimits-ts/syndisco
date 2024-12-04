@@ -1,7 +1,5 @@
-from . import actors
-from . import turn_manager
-from . import models
-from . import conversation
+from ..backend import actors, models, turn_manager
+from ..generation import conversation
 
 import dataclasses
 import json
