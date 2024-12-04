@@ -7,8 +7,7 @@ from ..backend import models
 class LlmActor(abc.ABC):
     """
     An abstract class representing an actor which responds according to an underlying LLM instance.
-    The LLM instance can be of any type, provided it satisfies the 
-    :class:`models.IGeneratingAgent` interface.
+    The LLM instance can be of any type.
     """
 
     def __init__(self,
@@ -61,9 +60,9 @@ class LlmActor(abc.ABC):
         system_prompt = self._system_prompt()
         message_prompt = self._message_prompt(history)
         # debug
-        print("System prompt: ", system_prompt)
-        print("Message prompt: ", message_prompt)
-        print("Response:")
+        #print("System prompt: ", system_prompt)
+        #print("Message prompt: ", message_prompt)
+        #print("Response:")
         response = self.model.prompt([system_prompt, message_prompt], stop_list=["User"]) #type: ignore
         return response
 
