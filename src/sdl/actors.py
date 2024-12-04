@@ -40,7 +40,7 @@ class LlmActor(abc.ABC):
         self.instructions = instructions
 
     def _system_prompt(self) -> dict:
-        prompt = f"You are {self.name} {", ".join(self.attributes)}. Context: {self.context}. Your instructions: {self.instructions}."
+        prompt = f"{self.context} Your name is {self.name}. Your traits: {", ".join(self.attributes)} Your instructions: {self.instructions}"
         return {"role": "system", "content": prompt}
 
     @abc.abstractmethod
@@ -60,6 +60,10 @@ class LlmActor(abc.ABC):
         """
         system_prompt = self._system_prompt()
         message_prompt = self._message_prompt(history)
+        # debug
+        print("System prompt: ", system_prompt)
+        print("Message prompt: ", message_prompt)
+        print("Response:")
         response = self.model.prompt([system_prompt, message_prompt], stop_list=["User"]) #type: ignore
         return response
 
