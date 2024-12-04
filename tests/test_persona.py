@@ -3,7 +3,7 @@ import unittest
 import json
 import os
 
-from ..src.sdl.backend.persona import LlmPersona
+from ..src.sdl.serialization.persona import LlmPersona
 
 
 class TestLlmPersona(unittest.TestCase):
