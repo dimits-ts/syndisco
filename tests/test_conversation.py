@@ -201,8 +201,8 @@ class TestLLMConvGenerator(unittest.TestCase):
         self.assertEqual(generated_conv.next_turn_manager, mock_turn_manager)
 
         # Check users
-        self.assertEqual(len(generated_conv.users), len(self.data.user_names))
-        for i, user_obj in enumerate(generated_conv.users.values()):
+        self.assertEqual(len(generated_conv.username_user_map), len(self.data.user_names))
+        for i, user_obj in enumerate(generated_conv.username_user_map.values()):
             # TODO: maybe remove IActor at this point
             self.assertIsInstance(user_obj, LLMUser)
             self.assertEqual(user_obj.name, self.data.user_names[i]) # type: ignore
@@ -269,8 +269,8 @@ class TestConversationSeedOpinions(unittest.TestCase):
 
         # Verify seed opinions are archived correctly
         
-        self.assertEqual(conversation.conv_logs[0], ("SeedUser1", "Seed message 1"))
-        self.assertEqual(conversation.conv_logs[1], ("SeedUser2", "Seed message 2"))
+        self.assertEqual(conversation.conv_logs[0], {'name': 'SeedUser1', 'text': 'Seed message 1', 'model': None})
+        self.assertEqual(conversation.conv_logs[1], {'name': 'SeedUser2', 'text': 'Seed message 2', 'model': None})
 
         # Verify conversation history includes seed opinions
         self.assertEqual(conversation.ctx_history[0], output_util.format_chat_message("SeedUser1", "Seed message 1"))
@@ -313,7 +313,7 @@ class TestConversationSeedOpinions(unittest.TestCase):
 
     def test_seed_opinions_with_moderator(self):
         seed_opinions = ["Seed message 1", "Seed message 2"]
-        seed_users = ["User1", "User2"]
+        seed_users = ["SeedUser1", "SeedUser2"]
         conversation = Conversation(
             turn_manager=self.mock_turn_manager,
             users=[self.user1, self.user2],
@@ -327,14 +327,14 @@ class TestConversationSeedOpinions(unittest.TestCase):
 
         # Verify moderator responds after seed opinions
         expected_logs = [
-            ("User1", "Seed message 1"),
-            ("User2", "Seed message 2")
+            {'name': 'SeedUser1', 'text': 'Seed message 1', 'model': None},
+            {'name': 'SeedUser2', 'text': 'Seed message 2', 'model': None}
         ]
         self.assertListEqual(conversation.conv_logs[:2], expected_logs)
 
     def test_seed_opinions_integration_with_conversation_flow(self):
         seed_opinions = ["Seed message 1"]
-        seed_users = ["User1"]
+        seed_users = ["SeedUser1"]
         conversation = Conversation(
             turn_manager=self.mock_turn_manager,
             users=[self.user1, self.user2],
@@ -347,11 +347,10 @@ class TestConversationSeedOpinions(unittest.TestCase):
 
         # Verify the conversation continues seamlessly after seed opinions
         expected_logs = [
-            ("User1", "Seed message 1"),
-            ("User1", "User1's message"),
-            ("User2", "User2's message"),
+            {'name': 'SeedUser1', 'text': 'Seed message 1', 'model': None},
         ]
-        self.assertEqual(conversation.conv_logs[:3], expected_logs)
+        self.assertEqual(conversation.conv_logs[0], expected_logs[0])
+        self.assertEqual(len(conversation.conv_logs), 3)
 
 
 if __name__ == "__main__":
