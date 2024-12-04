@@ -13,6 +13,7 @@ class LlamaModel:
     def __init__(
         self,
         model: llama_cpp.Llama,
+        name: str,
         max_out_tokens: int,
         seed: int,
         remove_string_list=[],
@@ -22,6 +23,8 @@ class LlamaModel:
 
         :param model: the LLM to be used
         :type model: llama_cpp.Llama
+        :param name: a shorthand name for the model used
+        :type name: str
         :param max_out_tokens: the maximum number of tokens in the response
         :type max_out_tokens: int
         :param seed: random seed
@@ -34,6 +37,7 @@ class LlamaModel:
         self.max_out_tokens = max_out_tokens
         self.seed = seed
         self.remove_string_list = remove_string_list
+        self.name = name
 
     def prompt(
         self,

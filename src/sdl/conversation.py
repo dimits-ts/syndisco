@@ -49,6 +49,9 @@ class Conversation:
         :raises ValueError: if the number of seed opinions and seed opinion users are different, or
         if the number of seed opinions exceeds history_context_len
         """
+        # assume one model for all participants
+        self.model_name = users[0].model.name
+        
         # just to satisfy the type checker
         self.next_turn_manager = turn_manager
         self.users = {user.get_name(): user for user in users}
@@ -127,12 +130,8 @@ class Conversation:
             "id": str(self.id),
             "timestamp": datetime.datetime.now().strftime(timestamp_format),
             "users": [user.get_name() for user in self.users.values()],
-            "user_types": self.user_types,
             "moderator": (
                 self.moderator.get_name() if self.moderator is not None else None
-            ),
-            "moderator_type": (
-                type(self.moderator).__name__ if self.moderator is not None else None
             ),
             "user_prompts": [user.describe() for user in self.users.values()],
             "moderator_prompt": (
@@ -140,6 +139,7 @@ class Conversation:
             ),
             "ctx_length": len(self.ctx_history),
             "logs": self.conv_logs,
+            "model": self.model_name
         }
 
     def to_json_file(self, output_path: str):
