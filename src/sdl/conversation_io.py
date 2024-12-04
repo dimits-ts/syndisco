@@ -127,6 +127,7 @@ class LLMConvGenerator:
                 instructions=self.data.moderator_instructions,
             )
         else:
+            print("Warning: Generating conversation without moderator")
             moderator = None
 
         generated_conv = conversation.Conversation(
@@ -135,5 +136,7 @@ class LLMConvGenerator:
             moderator=moderator,
             history_context_len=self.data.history_ctx_len,
             conv_len=self.data.conv_len,
+            seed_opinion_users=self.data.seed_opinion_usernames,
+            seed_opinions=self.data.seed_opinions
         )
         return generated_conv
