@@ -6,22 +6,26 @@ import llama_cpp
 
 class Model(abc.ABC):
 
+    def __init__(self, stop_list: list[str] = []):
+        self.stop_list = stop_list
+
     @typing.final
     def prompt(
         self,
         json_prompt: list[llama_cpp.ChatCompletionRequestMessage],
-        stop_list: list[str],
+        stop_words: list[str]
     ) -> str:
-        response = self.generate_response(json_prompt)
+        response = self.generate_response(json_prompt, stop_words)
         # avoid model collapse attributed to certain strings
-        for remove_word in stop_list:
+        for remove_word in self.stop_list:
             response = response.replace(remove_word, "")
 
         return response
 
     @abc.abstractmethod
     def generate_response(self,
-        json_prompt: list[llama_cpp.ChatCompletionRequestMessage]) -> str:
+        json_prompt: list[llama_cpp.ChatCompletionRequestMessage],
+        stop_words) -> str:
         raise NotImplementedError
         
     @staticmethod
@@ -40,7 +44,7 @@ class LlamaModel(Model):
         name: str,
         max_out_tokens: int,
         seed: int,
-        remove_string_list=[],
+        remove_string_list: list[str] = []
     ):
         """
         Initialize a new LLM wrapper.
@@ -57,21 +61,22 @@ class LlamaModel(Model):
         Used to prevent model-specific conversational collapse, defaults to []
         :type remove_string_list: list, optional
         """
+        super().__init__(remove_string_list)
         self.model = model
         self.max_out_tokens = max_out_tokens
         self.seed = seed
-        self.remove_string_list = remove_string_list
         self.name = name
 
     def generate_response(
         self,
-        json_prompt: list[llama_cpp.ChatCompletionRequestMessage]
+        json_prompt: list[llama_cpp.ChatCompletionRequestMessage],
+        stop_words: list[str]
     ) -> str:
         output = self.model.create_chat_completion(
             messages=json_prompt,
             max_tokens=self.max_out_tokens,
             seed=self.seed,
-            stop=["###", "\n\n"],
+            stop=stop_words,
         )  # prevent model from generating the next actor's response
 
         response = self._get_response_from_output(output)
@@ -82,7 +87,6 @@ class LlamaModel(Model):
 class TransformersModel(Model):
     def __init__(
         self,
-        model: llama_cpp.Llama,
         name: str,
         max_out_tokens: int,
         seed: int,
@@ -103,14 +107,16 @@ class TransformersModel(Model):
         Used to prevent model-specific conversational collapse, defaults to []
         :type remove_string_list: list, optional
         """
-        self.model = model
+        super().__init__(remove_string_list)
         self.max_out_tokens = max_out_tokens
         self.seed = seed
         self.remove_string_list = remove_string_list
         self.name = name
+        
 
     def generate_response(
         self,
         json_prompt: list[llama_cpp.ChatCompletionRequestMessage],
+        stop_words: list[str]
     ) -> str:
         return ""
