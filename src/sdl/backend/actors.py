@@ -65,7 +65,9 @@ class LlmActor(abc.ABC):
         # print("System prompt: ", system_prompt)
         # print("Message prompt: ", message_prompt)
         # print("Response:")
-        response = self.model.prompt([system_prompt, message_prompt], stop_list=["###", "\n\n", "User"])  # type: ignore
+        response = self.model.prompt(
+            (system_prompt, message_prompt), stop_words=["###", "\n\n", "User"]
+        )
         return response
 
     def describe(self):
