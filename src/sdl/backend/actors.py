@@ -41,7 +41,7 @@ class LlmActor(abc.ABC):
         self.instructions = instructions
 
     def _system_prompt(self) -> dict:
-        prompt = f"{self.context} Your name is {self.name}. Your traits: {", ".join(self.attributes)} Your instructions: {self.instructions}"
+        prompt = f"{self.context} Your name is {self.name}. Your traits: {', '.join(self.attributes)} Your instructions: {self.instructions}"
         return {"role": "system", "content": prompt}
 
     @abc.abstractmethod
@@ -77,7 +77,7 @@ class LlmActor(abc.ABC):
         :return: A brief description of the actor
         :rtype: str
         """
-        return f"{self._system_prompt()["content"]}"
+        return f"{self._system_prompt()['content']}"
 
     @typing.final
     def get_name(self) -> str:
