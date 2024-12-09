@@ -27,7 +27,7 @@ class Model(abc.ABC):
     def generate_response(self,
         json_prompt: tuple[typing.Any, typing.Any],
         stop_words) -> str:
-        raise NotImplementedError
+        raise NotImplementedError("Abstract class call")
         
     @staticmethod
     def _get_response_from_output(json_output) -> str:
@@ -92,6 +92,7 @@ class TransformersModel(Model):
         name: str,
         max_out_tokens: int,
         remove_string_list=[],
+        device: int = -1
     ):
         """
         Initialize a new LLM wrapper.
@@ -112,7 +113,7 @@ class TransformersModel(Model):
         self.name = name
         
         model = transformers.AutoModelForCausalLM.from_pretrained(name, gguf_file=model_path)
-        self.generator = transformers.pipeline("text-generation", model=model)
+        self.generator = transformers.pipeline("text-generation", model=model, device=device)
         
 
     def generate_response(
