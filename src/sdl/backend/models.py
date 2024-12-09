@@ -1,7 +1,19 @@
+import abc
 import llama_cpp
 
 
-class LlamaModel:
+class Model(abc.ABC):
+
+    @abc.abstractmethod
+    def prompt(
+        self,
+        json_prompt: list[llama_cpp.ChatCompletionRequestMessage],
+        stop_list: list[str],
+    ) -> str:
+        raise NotImplementedError
+
+
+class LlamaModel(Model):
 
     @staticmethod
     def _get_response_from_output(json_output) -> str:

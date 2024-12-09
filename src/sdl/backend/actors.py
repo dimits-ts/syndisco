@@ -11,7 +11,7 @@ class LlmActor(abc.ABC):
     """
 
     def __init__(self,
-                 model: models.LlamaModel,
+                 model: models.Model,
                  name: str,
                  attributes: list[str],
                  context: str,

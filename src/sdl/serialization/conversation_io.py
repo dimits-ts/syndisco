@@ -68,8 +68,8 @@ class LLMConvGenerator:
     def __init__(
         self,
         data: LLMConvData,
-        user_model: models.LlamaModel,
-        moderator_model: models.LlamaModel | None,
+        user_model: models.Model,
+        moderator_model: models.Model | None,
     ):
         """
         Initialize the generator.
