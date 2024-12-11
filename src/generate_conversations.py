@@ -59,32 +59,34 @@ def main():
 
     print("Loading LLM...")
 
-    # Model selection dictionary
-    model_switch = {
-        "llama": load_llama_cpp_model,
-        "transformers": load_transformers_model,
-    }
+    model = None
+    if model_type == "llama":
+        from sdl.backend.cpp_model import LlamaModel
 
-    if model_type not in model_switch:
+        model = LlamaModel(
+            model_path=model_path,
+            name=model_name,
+            max_out_tokens=max_tokens,
+            seed=random_seed,
+            remove_string_list=REMOVE_STR_LIST,
+            ctx_width_tokens=ctx_width_tokens,
+            inference_threads=inference_threads,
+            gpu_layers=gpu_layers,
+        )
+    elif model_type == "transformers":
+        from sdl.backend.trans_model import TransformersModel
+
+        model = TransformersModel(
+            model_path=model_path,
+            name=model_name,
+            max_out_tokens=max_tokens,
+            remove_string_list=REMOVE_STR_LIST,
+        )
+    else:
         raise NotImplementedError(
             f"Unknown model type: {model_type}. Supported types: llama, transformers"
         )
 
-    # Load the selected model
-    model = model_switch[model_type](
-        model_name=model_name,
-        max_tokens=max_tokens,
-        model_path=model_path,
-        random_seed=random_seed,
-        ctx_width_tokens=ctx_width_tokens,
-        inference_threads=inference_threads,
-        gpu_layers=gpu_layers,
-        remove_string_list=REMOVE_STR_LIST,
-    )
-    print("Model loaded.")
-
-    # Load the selected model
-    model = model_switch[model_type]()
     print("Model loaded.")
 
     # Load data and start conversation
@@ -101,43 +103,6 @@ def main():
     )
     conv.to_json_file(output_path)
     print("Conversation saved to ", output_path)
-
-
-def load_llama_cpp_model(
-    model_name: str,
-    max_tokens: int,
-    model_path: str,
-    random_seed: int,
-    ctx_width_tokens: int,
-    inference_threads: int,
-    gpu_layers: int,
-    remove_string_list: list[str],
-):
-    from sdl.backend.cpp_model import LlamaModel
-
-    return LlamaModel(
-        model_path=model_path,
-        name=model_name,
-        max_out_tokens=max_tokens,
-        seed=random_seed,
-        remove_string_list=remove_string_list,
-        ctx_width_tokens=ctx_width_tokens,
-        inference_threads=inference_threads,
-        gpu_layers=gpu_layers
-    )
-
-
-def load_transformers_model(
-    model_name: str, model_path: str, max_tokens: int, remove_string_list: list[str]
-):
-    from sdl.backend.trans_model import TransformersModel
-
-    return TransformersModel(
-        model_path=model_path,
-        name=model_name,
-        max_out_tokens=max_tokens,
-        remove_string_list=remove_string_list,
-    )
 
 
 if __name__ == "__main__":
