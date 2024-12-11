@@ -1,6 +1,6 @@
 import os
 import json
-from typing import Any
+from typing import Any, Optional
 import datetime
 
 
@@ -66,7 +66,7 @@ def ensure_parent_directories_exist(output_path: str) -> None:
 
 
 def generate_datetime_filename(
-    output_dir: str | None = None,
+    output_dir: Optional[str] = None,
     timestamp_format: str = "%y-%m-%d-%H-%M",
     file_ending: str = "",
 ) -> str:

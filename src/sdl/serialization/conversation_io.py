@@ -3,6 +3,7 @@ from ..generation import conversation
 
 import dataclasses
 import json
+from typing import Optional
 
 
 @dataclasses.dataclass
@@ -19,9 +20,9 @@ class LLMConvData:
     turn_manager_config: dict[str, float] = dataclasses.field(default_factory=dict)
     conv_len: int = 4
     history_ctx_len: int = 4
-    moderator_name: str | None = None
-    moderator_attributes: list[str] | None = None
-    moderator_instructions: str | None = None
+    moderator_name: Optional[str] = None
+    moderator_attributes: Optional[list[str]] = None
+    moderator_instructions: Optional[str] = None
     seed_opinions: list[str] = dataclasses.field(default_factory=list)
     seed_opinion_usernames: list[str] = dataclasses.field(default_factory=list)
 
@@ -69,7 +70,7 @@ class LLMConvGenerator:
         self,
         data: LLMConvData,
         user_model: model.Model,
-        moderator_model: model.Model | None,
+        moderator_model: Optional[model.Model],
     ):
         """
         Initialize the generator.

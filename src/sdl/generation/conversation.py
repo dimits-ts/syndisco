@@ -1,9 +1,8 @@
 import collections
-
 import datetime
 import json
 import uuid
-from typing import Any
+from typing import Any, Optional
 
 from ..backend import actors, turn_manager
 from ..util import output_util, file_util
@@ -19,7 +18,7 @@ class Conversation:
         self,
         turn_manager: turn_manager.TurnManager,
         users: list[actors.LLMUser],
-        moderator: actors.LLMUser | None = None,
+        moderator: Optional[actors.LLMUser] = None,
         history_context_len: int = 5,
         conv_len: int = 5,
         seed_opinions: list[str] = [],
