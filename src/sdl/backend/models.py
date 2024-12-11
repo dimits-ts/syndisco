@@ -47,12 +47,6 @@ class Model(abc.ABC):
         """
         raise NotImplementedError("Abstract class call")
         
-    @staticmethod
-    def _get_response_from_output(json_output) -> str:
-        """
-        Extracts the model's response from the raw output as a string.
-        """
-        return json_output["choices"][0]["message"]["content"]
 
 
 class LlamaModel(Model):
@@ -101,6 +95,13 @@ class LlamaModel(Model):
         response = self._get_response_from_output(output)
 
         return response
+
+    @staticmethod
+    def _get_response_from_output(json_output) -> str:
+        """
+        Extracts the model's response from the raw output as a string.
+        """
+        return json_output["choices"][0]["message"]["content"]
 
 
 class TransformersModel(Model):
