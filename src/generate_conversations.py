@@ -1,4 +1,3 @@
-import llama_cpp
 import argparse
 
 from sdl.serialization import conversation_io
@@ -117,21 +116,14 @@ def load_llama_cpp_model(
     from sdl.backend.cpp_model import LlamaModel
 
     return LlamaModel(
-        llama_cpp.Llama(
-            model_path=model_path,
-            seed=random_seed,
-            n_ctx=ctx_width_tokens,
-            n_threads=inference_threads,
-            n_gpu_layers=gpu_layers,
-            use_mmap=True,
-            chat_format="alpaca",
-            mlock=True,
-            verbose=False,
-        ),
+        model_path=model_path,
         name=model_name,
         max_out_tokens=max_tokens,
         seed=random_seed,
         remove_string_list=remove_string_list,
+        ctx_width_tokens=ctx_width_tokens,
+        inference_threads=inference_threads,
+        gpu_layers=gpu_layers
     )
 
 
