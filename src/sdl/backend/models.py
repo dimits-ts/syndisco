@@ -130,8 +130,8 @@ class TransformersModel(Model):
         self.remove_string_list = remove_string_list
         self.name = name
         
-        model = transformers.AutoModelForCausalLM.from_pretrained(name, gguf_file=model_path)
-        self.generator = transformers.pipeline("text-generation", model=model, device=device)
+        model = transformers.AutoModelForCausalLM.from_pretrained(name, gguf_file=model_path, device_map = 'auto')
+        self.generator = transformers.pipeline("text-generation", model=model)
         
 
     def generate_response(
