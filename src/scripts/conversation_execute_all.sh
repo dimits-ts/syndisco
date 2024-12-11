@@ -37,11 +37,6 @@ if [[ ! -d "$input_dir" ]]; then
   exit 1
 fi
 
-if [[ ! -f "$model_path" ]]; then
-  echo "Error: Model file path '$model_path' does not exist."
-  exit 1
-fi
-
 # Process each input file
 for input_file in "$input_dir"/*; do
   if [[ -f "$input_file" ]]; then
