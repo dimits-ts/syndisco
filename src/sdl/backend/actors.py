@@ -1,7 +1,7 @@
 import abc
 import typing
 
-from ..backend import models
+from ..backend import model
 
 
 class LlmActor(abc.ABC):
@@ -12,7 +12,7 @@ class LlmActor(abc.ABC):
 
     def __init__(
         self,
-        model: models.Model,
+        model: model.Model,
         name: str,
         attributes: list[str],
         context: str,
@@ -22,7 +22,7 @@ class LlmActor(abc.ABC):
         Create a new actor based on an LLM instance.
 
         :param model: A model or wrapper encapsulating a promptable LLM instance.
-        :type model: tasks.models.LlamaModel
+        :type model: tasks.cpp_model.LlamaModel
         :param name: The name given to the in-conversation actor.
         :type name: str
         :type role: str

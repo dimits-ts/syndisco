@@ -4,7 +4,7 @@ import json
 import os
 from unittest.mock import MagicMock
 
-from ..src.sdl.backend.models import LlamaModel
+from ..src.sdl.backend.cpp_model import LlamaModel
 from ..src.sdl.serialization.annotation_io import LlmAnnotationData, LLMAnnotationGenerator
 from ..src.sdl.generation.annotation import AnnotationConv
 

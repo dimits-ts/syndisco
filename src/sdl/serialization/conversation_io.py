@@ -1,4 +1,4 @@
-from ..backend import actors, models, turn_manager
+from ..backend import actors, model, turn_manager
 from ..generation import conversation
 
 import dataclasses
@@ -68,8 +68,8 @@ class LLMConvGenerator:
     def __init__(
         self,
         data: LLMConvData,
-        user_model: models.Model,
-        moderator_model: models.Model | None,
+        user_model: model.Model,
+        moderator_model: model.Model | None,
     ):
         """
         Initialize the generator.
@@ -77,9 +77,9 @@ class LLMConvGenerator:
         :param data: The deserialized conversation input data
         :type data: LLMConvData
         :param user_model: The model used for the users to talk
-        :type user_model: tasks.models.LlamaModel
+        :type user_model: tasks.cpp_model.LlamaModel
         :param moderator_model: The model used for the moderator to talk, if he exists
-        :type moderator_model: tasks.models.LlamaModel | None
+        :type moderator_model: tasks.cpp_model.LlamaModel | None
         """
         assert user_model is not None, "User model cannot be None"
         assert not (moderator_model is None and data.moderator_name is not None), (
