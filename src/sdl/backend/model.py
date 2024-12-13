@@ -4,7 +4,9 @@ import typing
 
 class Model(abc.ABC):
 
-    def __init__(self, stop_list: list[str] = []):
+    def __init__(self, name: str, max_out_tokens: int, stop_list: list[str] = []):
+        self.name = name
+        self.max_out_tokens = max_out_tokens
         self.stop_list = stop_list
 
     @typing.final

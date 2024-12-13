@@ -38,7 +38,7 @@ class LlamaModel(model.Model):
         Used to prevent model-specific conversational collapse, defaults to []
         :type remove_string_list: list, optional
         """
-        super().__init__(remove_string_list)
+        super().__init__(name, max_out_tokens, remove_string_list)
 
         self.model = llama_cpp.Llama(
             model_path=model_path,
@@ -53,7 +53,6 @@ class LlamaModel(model.Model):
         )
         self.max_out_tokens = max_out_tokens
         self.seed = seed
-        self.name = name
 
     def generate_response(
         self, json_prompt: tuple[typing.Any, typing.Any], stop_words: list[str]

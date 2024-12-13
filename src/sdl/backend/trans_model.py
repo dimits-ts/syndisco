@@ -1,5 +1,4 @@
 import transformers
-import torch
 
 import typing
 
@@ -18,9 +17,9 @@ class TransformersModel(model.Model):
         """
         Initialize a new LLM wrapper.
 
-        :param model_path: the path to the GGUF model file
+        :param model_path: the full path to the GGUF model file e.g. 'openai-community/gpt2'
         :type model: str
-        :param name: the transformers name of the model e.g.'openai-community/gpt2'
+        :param name: your own name for the model e.g. 'GPT-2'
         :type name: str
         :param max_out_tokens: the maximum number of tokens in the response
         :type max_out_tokens: int
@@ -28,13 +27,10 @@ class TransformersModel(model.Model):
         Used to prevent model-specific conversational collapse, defaults to []
         :type remove_string_list: list, optional
         """
-        super().__init__(remove_string_list)
-        self.max_out_tokens = max_out_tokens
-        self.remove_string_list = remove_string_list
-        self.name = name
+        super().__init__(name, max_out_tokens, remove_string_list)
 
         model = transformers.AutoModelForCausalLM.from_pretrained(
-            model_path, load_in_4bit=True, torch_dtype=torch.float32
+            model_path
         )
         tokenizer = transformers.AutoTokenizer.from_pretrained(model_path)
 
