@@ -12,7 +12,6 @@ class TransformersModel(model.Model):
         name: str,
         max_out_tokens: int,
         remove_string_list=[],
-        device: int = -1,
     ):
         """
         Initialize a new LLM wrapper.
