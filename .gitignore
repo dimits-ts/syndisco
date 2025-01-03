@@ -1,6 +1,6 @@
 # don't include generated conversation input files
 generated/
-# don't include output from script invokations
+# don't include output from script invocations
 logs/
 # don't include LLM weights
 models/
