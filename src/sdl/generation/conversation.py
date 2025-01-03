@@ -122,7 +122,8 @@ class Conversation:
         self._add_comment_to_history(user, response, verbose)
 
     def _log_comment(self, user: actors.LlmActor, comment: str) -> None:
-        artifact = {"name": user.name, "text": comment, "model": user.model}
+        model_name = user.model.name if user.model is not None else "hardcoded" 
+        artifact = {"name": user.name, "text": comment, "model": model_name}
         self.conv_logs.append(artifact)
 
     def _add_comment_to_history(
