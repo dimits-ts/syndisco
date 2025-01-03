@@ -1,8 +1,9 @@
-from ..backend import actors, models, turn_manager
+from ..backend import actors, model, turn_manager
 from ..generation import conversation
 
 import dataclasses
 import json
+from typing import Optional
 
 
 @dataclasses.dataclass
@@ -19,9 +20,9 @@ class LLMConvData:
     turn_manager_config: dict[str, float] = dataclasses.field(default_factory=dict)
     conv_len: int = 4
     history_ctx_len: int = 4
-    moderator_name: str | None = None
-    moderator_attributes: list[str] | None = None
-    moderator_instructions: str | None = None
+    moderator_name: Optional[str] = None
+    moderator_attributes: Optional[list[str]] = None
+    moderator_instructions: Optional[str] = None
     seed_opinions: list[str] = dataclasses.field(default_factory=list)
     seed_opinion_usernames: list[str] = dataclasses.field(default_factory=list)
 
@@ -68,8 +69,8 @@ class LLMConvGenerator:
     def __init__(
         self,
         data: LLMConvData,
-        user_model: models.LlamaModel,
-        moderator_model: models.LlamaModel | None,
+        user_model: model.Model,
+        moderator_model: Optional[model.Model],
     ):
         """
         Initialize the generator.
@@ -77,9 +78,9 @@ class LLMConvGenerator:
         :param data: The deserialized conversation input data
         :type data: LLMConvData
         :param user_model: The model used for the users to talk
-        :type user_model: tasks.models.LlamaModel
+        :type user_model: tasks.cpp_model.LlamaModel
         :param moderator_model: The model used for the moderator to talk, if he exists
-        :type moderator_model: tasks.models.LlamaModel | None
+        :type moderator_model: tasks.cpp_model.LlamaModel | None
         """
         assert user_model is not None, "User model cannot be None"
         assert not (moderator_model is None and data.moderator_name is not None), (

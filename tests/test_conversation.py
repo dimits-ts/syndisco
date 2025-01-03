@@ -5,7 +5,7 @@ import tempfile
 import json
 
 from ..src.sdl.backend.actors import LLMUser
-from ..src.sdl.backend.models import LlamaModel
+from ..src.sdl.backend.cpp_model import LlamaModel
 from ..src.sdl.generation.conversation import Conversation
 from ..src.sdl.backend import turn_manager
 from ..src.sdl.util import output_util

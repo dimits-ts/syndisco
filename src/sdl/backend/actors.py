@@ -1,7 +1,7 @@
 import abc
 import typing
 
-from ..backend import models
+from ..backend import model
 
 
 class LlmActor(abc.ABC):
@@ -10,17 +10,19 @@ class LlmActor(abc.ABC):
     The LLM instance can be of any type.
     """
 
-    def __init__(self,
-                 model: models.LlamaModel,
-                 name: str,
-                 attributes: list[str],
-                 context: str,
-                 instructions: str) -> None:
+    def __init__(
+        self,
+        model: model.Model,
+        name: str,
+        attributes: list[str],
+        context: str,
+        instructions: str,
+    ) -> None:
         """
         Create a new actor based on an LLM instance.
 
         :param model: A model or wrapper encapsulating a promptable LLM instance.
-        :type model: tasks.models.LlamaModel
+        :type model: tasks.cpp_model.LlamaModel
         :param name: The name given to the in-conversation actor.
         :type name: str
         :type role: str
@@ -39,7 +41,7 @@ class LlmActor(abc.ABC):
         self.instructions = instructions
 
     def _system_prompt(self) -> dict:
-        prompt = f"{self.context} Your name is {self.name}. Your traits: {", ".join(self.attributes)} Your instructions: {self.instructions}"
+        prompt = f"{self.context} Your name is {self.name}. Your traits: {', '.join(self.attributes)} Your instructions: {self.instructions}"
         return {"role": "system", "content": prompt}
 
     @abc.abstractmethod
@@ -60,10 +62,12 @@ class LlmActor(abc.ABC):
         system_prompt = self._system_prompt()
         message_prompt = self._message_prompt(history)
         # debug
-        #print("System prompt: ", system_prompt)
-        #print("Message prompt: ", message_prompt)
-        #print("Response:")
-        response = self.model.prompt([system_prompt, message_prompt], stop_list=["User"]) #type: ignore
+        # print("System prompt: ", system_prompt)
+        # print("Message prompt: ", message_prompt)
+        # print("Response:")
+        response = self.model.prompt(
+            (system_prompt, message_prompt), stop_words=["###", "\n\n", "User"]
+        )
         return response
 
     def describe(self):
@@ -73,7 +77,7 @@ class LlmActor(abc.ABC):
         :return: A brief description of the actor
         :rtype: str
         """
-        return f"{self._system_prompt()["content"]}"
+        return f"{self._system_prompt()['content']}"
 
     @typing.final
     def get_name(self) -> str:
@@ -90,11 +94,13 @@ class LLMUser(LlmActor):
     """
     A LLM actor with a modified message prompt to facilitate a conversation.
     """
+
     def _message_prompt(self, history: list[str]) -> dict:
         return {
             "role": "user",
-            "content": "\n".join(history) + f"\nUser {self.get_name()} posted:"
+            "content": "\n".join(history) + f"\nUser {self.get_name()} posted:",
         }
+
 
 class LLMAnnotator(LlmActor):
     """
@@ -106,5 +112,5 @@ class LLMAnnotator(LlmActor):
         # by modifying this protected method, we instead prompt it to write the annotation
         return {
             "role": "user",
-            "content": "Conversation so far:\n\n" + "\n".join(history) + "\nOutput:"
+            "content": "Conversation so far:\n\n" + "\n".join(history) + "\nOutput:",
         }

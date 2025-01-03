@@ -48,56 +48,56 @@ class RoundRobbin(TurnManager):
 
 
 class RandomWeighted(TurnManager):
-	"""
-	Enable a participant to reply with a set probability, else randomly select other participant.
-	"""
+    """
+    Enable a participant to reply with a set probability, else randomly select other participant.
+    """
 
-	DEFAULT_RESPOND_PROBABILITY = 0.5
+    DEFAULT_RESPOND_PROBABILITY = 0.5
 
-	def __init__(self, usernames: list[str], config: dict[str, float] = {}):
-		super().__init__(usernames, config)
+    def __init__(self, usernames: list[str], config: dict[str, float] = {}):
+        super().__init__(usernames, config)
 
-		if config.get("respond_probability") is None:
-			self.chance_to_respond = RandomWeighted.DEFAULT_RESPOND_PROBABILITY
-		else:
-			warnings.warn(
-				"Warning: No respond_probability set in RandomWeighted TurnManager instance, " +
-				f"defaulting to {RandomWeighted.DEFAULT_RESPOND_PROBABILITY}"
-			)
-			self.chance_to_respond = config["respond_probability"]
-			assert 0 < self.chance_to_respond < 1
+        if config.get("respond_probability") is None:
+            self.chance_to_respond = RandomWeighted.DEFAULT_RESPOND_PROBABILITY
+        else:
+            warnings.warn(
+                "Warning: No respond_probability set in RandomWeighted TurnManager instance, "
+                + f"defaulting to {RandomWeighted.DEFAULT_RESPOND_PROBABILITY}"
+            )
+            self.chance_to_respond = config["respond_probability"]
+            assert 0 < self.chance_to_respond < 1
 
-		self.second_to_last_speaker = None
-		self.last_speaker = None
+        self.second_to_last_speaker = None
+        self.last_speaker = None
 
-	def next_turn_username(self) -> str:
-		# If first time asking for a speaker, return random speaker
-		if self.second_to_last_speaker is None:
-			next_speaker = self._select_other_random_speaker()
-			self.last_speaker = next_speaker
-			return next_speaker
+    def next_turn_username(self) -> str:
+        # If first time asking for a speaker, return random speaker
+        if self.second_to_last_speaker is None:
+            next_speaker = self._select_other_random_speaker()
+            self.last_speaker = next_speaker
+            return next_speaker
 
-		# Check if the last speaker will respond based on the weighted coin flip
-		if self._weighted_coin_flip():
-			next_speaker = self.last_speaker
-		else:
-			next_speaker = self._select_other_random_speaker()
+        # Check if the last speaker will respond based on the weighted coin flip
+        if self._weighted_coin_flip():
+            next_speaker = self.last_speaker
+        else:
+            next_speaker = self._select_other_random_speaker()
 
-		# Update the speaker history
-		self.second_to_last_speaker = self.last_speaker
-		self.last_speaker = next_speaker
+        # Update the speaker history
+        self.second_to_last_speaker = self.last_speaker
+        self.last_speaker = next_speaker
 
-		assert next_speaker is not None
-		return next_speaker
+        assert next_speaker is not None
+        return next_speaker
 
-	def _weighted_coin_flip(self) -> bool:
-		return self.chance_to_respond > random.uniform(0, 1)
+    def _weighted_coin_flip(self) -> bool:
+        return self.chance_to_respond > random.uniform(0, 1)
 
-	def _select_other_random_speaker(self) -> str:
-		other_usernames = [
-			username for username in self.usernames if username != self.last_speaker
-		]
-		return random.choice(other_usernames)
+    def _select_other_random_speaker(self) -> str:
+        other_usernames = [
+            username for username in self.usernames if username != self.last_speaker
+        ]
+        return random.choice(other_usernames)
 
 
 def turn_manager_factory(
@@ -115,13 +115,13 @@ def turn_manager_factory(
     :return: the instansiated TurnManager of the specified type
     :rtype: TurnManager
     """
-    match turn_manager_type.lower():
-        case "round_robin":
-            return RoundRobbin(usernames=usernames)
-        case "random_weighted":
-            return RandomWeighted(usernames=usernames, config=config)
-        case _:
-            raise ValueError(
-                f"There is no turn manager option called {turn_manager_type}\n"
-                + "Valid values: round_robin, random_weighted"
-            )
+    turn_manager_type = turn_manager_type.lower()
+    if turn_manager_type == "round_robin":
+        return RoundRobbin(usernames=usernames)
+    elif turn_manager_type == "random_weighted":
+        return RandomWeighted(usernames=usernames, config=config)
+    else:
+        raise ValueError(
+            f"There is no turn manager option called {turn_manager_type}\n"
+            + "Valid values: round_robin, random_weighted"
+        )

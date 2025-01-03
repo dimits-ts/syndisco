@@ -1,9 +1,8 @@
 import collections
-
 import datetime
 import json
 import uuid
-from typing import Any
+from typing import Any, Optional
 
 from ..backend import actors, turn_manager
 from ..util import output_util, file_util
@@ -19,7 +18,7 @@ class Conversation:
         self,
         turn_manager: turn_manager.TurnManager,
         users: list[actors.LLMUser],
-        moderator: actors.LLMUser | None = None,
+        moderator: Optional[actors.LLMUser] = None,
         history_context_len: int = 5,
         conv_len: int = 5,
         seed_opinions: list[str] = [],
@@ -123,7 +122,8 @@ class Conversation:
         self._add_comment_to_history(user, response, verbose)
 
     def _log_comment(self, user: actors.LlmActor, comment: str) -> None:
-        artifact = {"name": user.name, "text": comment, "model": user.model}
+        model_name = user.model.name if user.model is not None else "hardcoded" 
+        artifact = {"name": user.name, "text": comment, "model": model_name}
         self.conv_logs.append(artifact)
 
     def _add_comment_to_history(
