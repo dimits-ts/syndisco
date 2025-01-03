@@ -2,13 +2,12 @@ import uuid
 import os
 import argparse
 
-from sdl import annotation_io
-from sdl.persona import LlmPersona
-from sdl.file_util import read_file
+from sdl.serialization import annotation_io, persona
+from sdl.util.file_util import read_file
 
 
 def generate_annotator_file(
-    annotator_persona: LlmPersona,
+    annotator_persona: persona.LlmPersona,
     instructions: str,
     history_ctx_len: int,
     include_moderator_comments: bool,
@@ -70,15 +69,15 @@ def main():
     print("Reading input files...")
     persona_files = os.listdir(args.persona_dir)
     personas = [
-        LlmPersona.from_json_file(os.path.join(args.persona_dir, persona_file))
+        persona.LlmPersona.from_json_file(os.path.join(args.persona_dir, persona_file))
         for persona_file in persona_files
     ]
     instructions = read_file(args.instruction_path)
 
     print("Processing...")
-    for persona in personas:
+    for llm_persona in personas:
         annotation_config_file = generate_annotator_file(
-            annotator_persona=persona,
+            annotator_persona=llm_persona,
             instructions=instructions,
             history_ctx_len=args.history_ctx_len,
             include_moderator_comments=args.include_mod_comments

@@ -40,16 +40,15 @@ class LlmPersona:
         attributes = [
             f"{field}: {getattr(self, field)}" for field in dataclasses.asdict(self)
         ]
-        attributes.append(LlmPersona._sex_parse(self.sex))
         return attributes
 
     @staticmethod
     def _sex_parse(sex: str) -> str:
         """Helper function which transforms the sex attribute of a persona into a prompt-friendly equivalent."""
-        match sex.lower():
-            case "male":
-                return "man"
-            case "female":
-                return "woman"
-            case _:
-                return "non-binary"
+        sex = sex.lower()
+        if sex == "male":
+            return "man"
+        elif sex == "female":
+            return "woman"
+        else:
+            return "non-binary"

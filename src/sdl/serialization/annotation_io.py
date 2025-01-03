@@ -1,6 +1,5 @@
-from . import annotation
-from . import models
-from . import actors
+from ..generation import annotation
+from ..backend import actors, model
 
 import dataclasses
 import json
@@ -54,7 +53,7 @@ class LLMAnnotationGenerator:
     """
 
     def __init__(
-        self, data: LlmAnnotationData, llm: models.LlamaModel, conv_logs_path: str
+        self, data: LlmAnnotationData, llm: model.Model, conv_logs_path: str
     ):
         assert data is not None and llm is not None and conv_logs_path is not None
         self.data = data

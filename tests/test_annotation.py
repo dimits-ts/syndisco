@@ -1,13 +1,12 @@
-import unittest
 import unittest.mock
 import tempfile
 import json
 import os
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
-from ..src.sdl.models import LlamaModel
-from ..src.sdl.annotation_io import LlmAnnotationData, LLMAnnotationGenerator
-from ..src.sdl.annotation import AnnotationConv
+from ..src.sdl.backend.cpp_model import LlamaModel
+from ..src.sdl.serialization.annotation_io import LlmAnnotationData, LLMAnnotationGenerator
+from ..src.sdl.generation.annotation import AnnotationConv
 
 
 class TestLLMAnnotatorData(unittest.TestCase):
