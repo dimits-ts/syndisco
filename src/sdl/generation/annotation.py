@@ -9,7 +9,7 @@ from ..backend import actors
 from ..util import output_util, file_util
 
 
-# Compared to conversations.py one may think that this violates DRY 
+# Compared to conversations.py one may think that this violates DRY
 # HOwever, for the most part the API is the same by convention, not because it
 # uses the same functionality. You can replace the implementation here entirely
 # without impacting conversations.py at all
@@ -25,9 +25,9 @@ class AnnotationConv:
         annotator: actors.LLMAnnotator,
         conv_logs_path: str | Path,
         include_moderator_comments: bool,
-        history_ctx_len: int = 4,
+        history_ctx_len: int = 2, #TODO: Make this configurable
     ):
-        """Create an annotation job. 
+        """Create an annotation job.
         The annotation is modelled as a conversation between the system and the annotator.
 
         :param annotator: The annotator
@@ -56,8 +56,11 @@ class AnnotationConv:
         """
         ctx_history = collections.deque(maxlen=self.history_ctx_len)
 
-        for username, message in self.conv_data_dict["logs"]:
-           # do not include moderator comments in annotation context if told so 
+        for message_data in self.conv_data_dict["logs"]:
+            username = message_data["name"]
+            message = message_data["text"]
+
+            # do not include moderator comments in annotation context if told so
             if "moderator" in username:
                 if not self.include_moderator_comments:
                     continue
