@@ -1,86 +1,134 @@
-import llama_cpp
+import argparse
+import os
+import yaml
+from pathlib import Path
 
 from sdl.serialization import annotation_io
 from sdl.util import file_util
-from sdl.backend import models
-
-import argparse
+from sdl.backend import model
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description="Annotate conversation via Llama conversation model."
-    )
-    parser.add_argument(
-        "--prompt_input_path", required=True, help="Judge prompt file path."
-    )
-    parser.add_argument(
-        "--conv_path", required=True, help="Serialized conversation file path."
-    )
-    parser.add_argument("--output_dir", required=True, help="Output directory path.")
-    parser.add_argument("--model_path", required=True, help="Model file path.")
-    parser.add_argument(
-        "--max_tokens", type=int, default=512, help="Maximum number of tokens."
-    )
-    parser.add_argument(
-        "--ctx_width_tokens", type=int, default=1024, help="Context width in tokens."
-    )
-    parser.add_argument(
-        "--random_seed", type=int, default=42, help="Random seed for reproducibility."
-    )
-    parser.add_argument(
-        "--inference_threads",
-        type=int,
-        default=4,
-        help="Number of threads for inference.",
-    )
-    parser.add_argument(
-        "--gpu_layers",
-        type=int,
-        default=12,
-        help="Number of layers offloaded to the GPU (requires " "CUDA).",
-    )
+REMOVE_STR_LIST = ["```"]
 
-    args = parser.parse_args()
 
-    prompt_input_path = args.prompt_input_path
-    conv_path = args.conv_path
-    output_dir = args.output_dir
-    max_tokens = args.max_tokens
-    ctx_width_tokens = args.ctx_width_tokens
-    model_path = args.model_path
-    random_seed = args.random_seed
-    inference_threads = args.inference_threads
-    gpu_layers = args.gpu_layers
+def process_file(
+    annotation_config_input_file: str | Path,
+    output_dir: str | Path,
+    model: model.Model,
+    conv_logs_path: str | Path,
+) -> None:
+    print(f"Processing file: {annotation_config_input_file}")
 
-    print("Loading LLM...")
-    llm = llama_cpp.Llama(
-        model_path=model_path,
-        seed=random_seed,
-        n_ctx=ctx_width_tokens,
-        n_threads=inference_threads,
-        n_gpu_layers=gpu_layers,  # will vary from machine to machine
-        use_mmap=True,  # if ran on Linux, model size does not matter since the model uses mmap for lazy loading
-        chat_format="alpaca",  # using llama-2 leads to well-known model collapse
-        mlock=True,  # keep memcached model files in RAM if possible
-        verbose=False,
+    # Load data and start conversation
+    data = annotation_io.LlmAnnotationData.from_json_file(annotation_config_input_file)
+    generator = annotation_io.LLMAnnotationGenerator(
+        data=data, llm=model, conv_logs_path=conv_logs_path
     )
-    print("Model loaded.")
+    conv = generator.produce_conversation()
 
-    model_name = model_path.split("/")[-1]
-    model = models.LlamaModel(
-        llm, max_out_tokens=max_tokens, seed=random_seed, name=model_name
-    )
-    data = annotation_io.LlmAnnotationData.from_json_file(prompt_input_path)
-    gen = annotation_io.LLMAnnotationGenerator(data, model, conv_logs_path=conv_path)
-    conv = gen.produce_conversation()
-
+    print("Beginning conversation...")
     conv.begin_annotation(verbose=True)
     output_path = file_util.generate_datetime_filename(
         output_dir=output_dir, file_ending=".json"
     )
     conv.to_json_file(output_path)
     print("Conversation saved to ", output_path)
+
+
+def main():
+    # Set up argument parser for config file path
+    parser = argparse.ArgumentParser(description="Generate synthetic annotations")
+    parser.add_argument(
+        "--config_file",
+        required=True,
+        help="Path to the YAML configuration file",
+    )
+    args = parser.parse_args()
+
+    # Load configuration from YAML file
+    with open(args.config_file, "r") as file:
+        config_data = yaml.safe_load(file)
+
+    paths = config_data["generate_annotations"]["paths"]
+    model_params = config_data["generate_annotations"]["model_parameters"]
+
+    # Extract values from the config
+    input_dir = Path(paths["input_dir"])
+    output_dir = Path(paths["output_dir"])
+    prompt_path = Path(paths["instruction_path"])
+    model_path = paths["model_path"]
+    convs_dir = Path(paths["conv_logs_dir"])
+    library_type = paths["library_type"]
+    model_name = paths["model_name"]
+
+    max_tokens = model_params["general"]["max_tokens"]
+    ctx_width_tokens = model_params["general"]["ctx_width_tokens"]
+    inference_threads = model_params["llama_cpp"]["inference_threads"]
+    gpu_layers = model_params["llama_cpp"]["gpu_layers"]
+
+    # Ensure output directory exists
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Check if input directory exists
+    if not input_dir.is_dir():
+        print(f"Error: Input directory '{input_dir}' does not exist.")
+        exit(1)
+
+    # Check if prompt file exists
+    if not prompt_path.is_file():
+        print(f"Error: Prompt file '{prompt_path}' does not exist.")
+        exit(1)
+
+    if not convs_dir.is_dir():
+        print(f"Error: Convs directory '{convs_dir}' does not exist.")
+        exit(1)
+
+    # Load model based on type
+    print("Loading LLM model...")
+
+    model = None
+    if library_type == "llama_cpp":
+        # dynamically load library to avoid dependency hell
+        from sdl.backend.cpp_model import LlamaModel 
+
+        model = LlamaModel(
+            model_path=model_path,
+            name=model_name,
+            max_out_tokens=max_tokens,
+            seed=42,  # Random seed (this can be adjusted)
+            remove_string_list=REMOVE_STR_LIST,
+            ctx_width_tokens=ctx_width_tokens,
+            inference_threads=inference_threads,
+            gpu_layers=gpu_layers,
+        )
+    elif library_type == "transformers":
+        # dynamically load library to avoid dependency hell
+        from sdl.backend.trans_model import TransformersModel
+
+        model = TransformersModel(
+            model_path=model_path,
+            name=model_name,
+            max_out_tokens=max_tokens,
+            remove_string_list=REMOVE_STR_LIST,
+        )
+    else:
+        raise NotImplementedError(
+            f"Unknown model type: {library_type}. Supported types: llama_cpp, transformers"
+        )
+
+    print("Model loaded.")
+
+    # Process the files in the input directory
+    print(f"Starting annotation generation...")
+
+    for completed_discussion_path in convs_dir.iterdir():
+        for persona_input_file in input_dir.glob("*.json"):
+            if persona_input_file.is_file():
+                process_file(persona_input_file, output_dir, model, completed_discussion_path)
+            else:
+                print(f"Skipping non-file entry: {persona_input_file}")
+
+    print(f"Finished annotation generation.")
 
 
 if __name__ == "__main__":

@@ -1,8 +1,9 @@
-from ..generation import annotation
-from ..backend import actors, model
-
 import dataclasses
 import json
+from pathlib import Path
+
+from ..generation import annotation
+from ..backend import actors, model
 
 
 @dataclasses.dataclass
@@ -18,12 +19,12 @@ class LlmAnnotationData:
     history_ctx_len: int = 4
 
     @staticmethod
-    def from_json_file(input_file_path: str):
+    def from_json_file(input_file_path: str | Path):
         """
         Construct a LLMAnnotatorData instance according to a serialized .json file.
 
         :param input_file_path: The path to the serialized .json file
-        :type input_file_path: str
+        :type input_file_path: str | Path
         :return: A LLMConvData instance containing the information from the file
         :rtype: LLMConvData
         """
@@ -35,12 +36,12 @@ class LlmAnnotationData:
         filtered_arg_dict = {k: v for k, v in data_dict.items() if k in field_set}
         return LlmAnnotationData(**filtered_arg_dict)
 
-    def to_json_file(self, output_path: str) -> None:
+    def to_json_file(self, output_path: str | Path) -> None:
         """
         Serialize the data to a .json file.
 
         :param output_path: The path of the new file
-        :type output_path: str
+        :type output_path: str | Path
         """
         with open(output_path, "w", encoding="utf8") as fout:
             json.dump(dataclasses.asdict(self), fout, indent=4)
@@ -53,7 +54,7 @@ class LLMAnnotationGenerator:
     """
 
     def __init__(
-        self, data: LlmAnnotationData, llm: model.Model, conv_logs_path: str
+        self, data: LlmAnnotationData, llm: model.Model, conv_logs_path: str | Path
     ):
         assert data is not None and llm is not None and conv_logs_path is not None
         self.data = data
