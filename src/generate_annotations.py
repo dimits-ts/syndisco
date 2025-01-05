@@ -26,13 +26,16 @@ def process_file(
     )
     conv = generator.produce_conversation()
 
-    print("Beginning conversation...")
-    conv.begin_annotation(verbose=True)
-    output_path = file_util.generate_datetime_filename(
-        output_dir=output_dir, file_ending=".json"
-    )
-    conv.to_json_file(output_path)
-    print("Conversation saved to ", output_path)
+    try:
+        print("Beginning conversation...")
+        conv.begin_annotation(verbose=True)
+        output_path = file_util.generate_datetime_filename(
+            output_dir=output_dir, file_ending=".json"
+        )
+        conv.to_json_file(output_path)
+        print("Conversation saved to ", output_path)
+    except Exception as e:
+        print("Experiment aborted due to error: \n", e)
 
 
 def main():
@@ -53,14 +56,13 @@ def main():
     model_params = config_data["generate_annotations"]["model_parameters"]
 
     # Extract values from the config
-    input_dir = Path(paths["input_dir"])
+    annotator_input_dir = Path(paths["annotator_input_dir"])
     output_dir = Path(paths["output_dir"])
-    prompt_path = Path(paths["instruction_path"])
     model_path = paths["model_path"]
     convs_dir = Path(paths["conv_logs_dir"])
 
-    library_type = model_params["library_type"]
-    model_name = model_params["model_name"]
+    library_type = model_params["general"]["library_type"]
+    model_name = model_params["general"]["model_name"]
     max_tokens = model_params["general"]["max_tokens"]
     ctx_width_tokens = model_params["general"]["ctx_width_tokens"]
     inference_threads = model_params["llama_cpp"]["inference_threads"]
@@ -70,13 +72,8 @@ def main():
     os.makedirs(output_dir, exist_ok=True)
 
     # Check if input directory exists
-    if not input_dir.is_dir():
-        print(f"Error: Input directory '{input_dir}' does not exist.")
-        exit(1)
-
-    # Check if prompt file exists
-    if not prompt_path.is_file():
-        print(f"Error: Prompt file '{prompt_path}' does not exist.")
+    if not annotator_input_dir.is_dir():
+        print(f"Error: Input directory '{annotator_input_dir}' does not exist.")
         exit(1)
 
     if not convs_dir.is_dir():
@@ -89,7 +86,7 @@ def main():
     model = None
     if library_type == "llama_cpp":
         # dynamically load library to avoid dependency hell
-        from sdl.backend.cpp_model import LlamaModel 
+        from sdl.backend.cpp_model import LlamaModel
 
         model = LlamaModel(
             model_path=model_path,
@@ -122,11 +119,16 @@ def main():
     print(f"Starting annotation generation...")
 
     for completed_discussion_path in convs_dir.iterdir():
-        for persona_input_file in input_dir.glob("*.json"):
-            if persona_input_file.is_file():
-                process_file(persona_input_file, output_dir, model, completed_discussion_path)
+        for annotator_input_file in annotator_input_dir.glob("*.json"):
+            if annotator_input_file.is_file():
+                process_file(
+                    annotation_config_input_file=annotator_input_file,
+                    output_dir=output_dir,
+                    model=model,
+                    conv_logs_path=completed_discussion_path,
+                )
             else:
-                print(f"Skipping non-file entry: {persona_input_file}")
+                print(f"Skipping non-file entry: {annotator_input_file}")
 
     print(f"Finished annotation generation.")
 

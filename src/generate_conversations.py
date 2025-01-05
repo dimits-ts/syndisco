@@ -20,13 +20,16 @@ def process_file(input_file, output_dir, model):
     )
     conv = generator.produce_conversation()
 
-    print("Beginning conversation...")
-    conv.begin_conversation(verbose=True)
-    output_path = file_util.generate_datetime_filename(
-        output_dir=output_dir, file_ending=".json"
-    )
-    conv.to_json_file(output_path)
-    print("Conversation saved to ", output_path)
+    try:
+        print("Beginning conversation...")
+        conv.begin_conversation(verbose=True)
+        output_path = file_util.generate_datetime_filename(
+            output_dir=output_dir, file_ending=".json"
+        )
+        conv.to_json_file(output_path)
+        print("Conversation saved to ", output_path)
+    except Exception as e:
+        print("Experiment aborted due to error: \n", e)
 
 
 def main():
@@ -51,8 +54,8 @@ def main():
     output_dir = Path(paths["output_dir"])
     model_path = paths["model_path"]
 
-    model_name = model_params["model_name"]
-    library_type = model_params["library_type"]
+    model_name = model_params["general"]["model_name"]
+    library_type = model_params["general"]["library_type"]
     max_tokens = model_params["general"]["max_tokens"]
     ctx_width_tokens = model_params["general"]["ctx_width_tokens"]
     inference_threads = model_params["llama_cpp"]["inference_threads"]
