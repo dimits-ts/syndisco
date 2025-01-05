@@ -1,6 +1,7 @@
 import argparse
 import os
 import yaml
+import traceback
 from pathlib import Path
 
 from sdl.serialization import annotation_io
@@ -17,16 +18,16 @@ def process_file(
     model: model.Model,
     conv_logs_path: str | Path,
 ) -> None:
-    print(f"Processing file: {annotation_config_input_file}")
-
-    # Load data and start conversation
-    data = annotation_io.LlmAnnotationData.from_json_file(annotation_config_input_file)
-    generator = annotation_io.LLMAnnotationGenerator(
-        data=data, llm=model, conv_logs_path=conv_logs_path
-    )
-    conv = generator.produce_conversation()
-
     try:
+        print(f"Processing file: {annotation_config_input_file}")
+
+        # Load data and start conversation
+        data = annotation_io.LlmAnnotationData.from_json_file(annotation_config_input_file)
+        generator = annotation_io.LLMAnnotationGenerator(
+            data=data, llm=model, conv_logs_path=conv_logs_path
+        )
+        conv = generator.produce_conversation()
+    
         print("Beginning conversation...")
         conv.begin_annotation(verbose=True)
         output_path = file_util.generate_datetime_filename(
@@ -34,8 +35,9 @@ def process_file(
         )
         conv.to_json_file(output_path)
         print("Conversation saved to ", output_path)
-    except Exception as e:
-        print("Experiment aborted due to error: \n", e)
+    except Exception:
+        print("Experiment aborted due to error:")
+        print(traceback.format_exc())
 
 
 def main():
@@ -81,7 +83,7 @@ def main():
         exit(1)
 
     # Load model based on type
-    print("Loading LLM model...")
+    print("Loading LLM...")
 
     model = None
     if library_type == "llama_cpp":

@@ -1,6 +1,7 @@
 import argparse
 import os
 import yaml
+import traceback
 from pathlib import Path
 
 from sdl.serialization import conversation_io
@@ -11,16 +12,15 @@ REMOVE_STR_LIST = ["```"]
 
 
 def process_file(input_file, output_dir, model):
-    print(f"Processing file: {input_file}")
-
-    # Load data and start conversation
-    data = conversation_io.LLMConvData.from_json_file(input_file)
-    generator = conversation_io.LLMConvGenerator(
-        data=data, user_model=model, moderator_model=model
-    )
-    conv = generator.produce_conversation()
-
     try:
+        print(f"Processing file: {input_file}")
+        # Load data and start conversation
+        data = conversation_io.LLMConvData.from_json_file(input_file)
+        generator = conversation_io.LLMConvGenerator(
+            data=data, user_model=model, moderator_model=model
+        )
+        conv = generator.produce_conversation()
+
         print("Beginning conversation...")
         conv.begin_conversation(verbose=True)
         output_path = file_util.generate_datetime_filename(
@@ -28,8 +28,9 @@ def process_file(input_file, output_dir, model):
         )
         conv.to_json_file(output_path)
         print("Conversation saved to ", output_path)
-    except Exception as e:
-        print("Experiment aborted due to error: \n", e)
+    except Exception:
+        print("Experiment aborted due to error:")
+        print(traceback.format_exc())
 
 
 def main():
@@ -70,7 +71,7 @@ def main():
         exit(1)
 
     # Load model based on type
-    print("Loading LLM model...")
+    print("Loading LLM...")
 
     model = None
     if library_type == "llama_cpp":
