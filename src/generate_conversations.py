@@ -50,9 +50,9 @@ def main():
     input_dir = Path(paths["input_dir"])
     output_dir = Path(paths["output_dir"])
     model_path = paths["model_path"]
-    model_name = paths["model_name"]
-    library_type = paths["library_type"]
 
+    model_name = model_params["model_name"]
+    library_type = model_params["library_type"]
     max_tokens = model_params["general"]["max_tokens"]
     ctx_width_tokens = model_params["general"]["ctx_width_tokens"]
     inference_threads = model_params["llama_cpp"]["inference_threads"]
