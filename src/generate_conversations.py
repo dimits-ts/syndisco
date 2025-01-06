@@ -8,7 +8,7 @@ from sdl.serialization import conversation_io
 from sdl.util import file_util
 
 
-REMOVE_STR_LIST = ["```"]
+REMOVE_STR_LIST = ["```", "\""]
 
 
 def process_file(input_file, output_dir, model):
