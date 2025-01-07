@@ -31,7 +31,6 @@ class LlmAnnotationData:
         with open(input_file_path, "r", encoding="utf8") as fin:
             data_dict = json.load(fin)
         
-        data_dict["history_ctx_len"] = 2 #TODO
         # code from https://stackoverflow.com/questions/68417319/initialize-python-dataclass-from-dictionary
         field_set = {f.name for f in dataclasses.fields(LlmAnnotationData) if f.init}
         filtered_arg_dict = {k: v for k, v in data_dict.items() if k in field_set}

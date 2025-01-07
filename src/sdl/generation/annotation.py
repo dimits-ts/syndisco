@@ -25,7 +25,7 @@ class AnnotationConv:
         annotator: actors.LLMAnnotator,
         conv_logs_path: str | Path,
         include_moderator_comments: bool,
-        history_ctx_len: int = 2, #TODO: Make this configurable
+        history_ctx_len: int = 2
     ):
         """Create an annotation job.
         The annotation is modelled as a conversation between the system and the annotator.
