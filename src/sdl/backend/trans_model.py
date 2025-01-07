@@ -30,7 +30,7 @@ class TransformersModel(model.Model):
 
         model = transformers.AutoModelForCausalLM.from_pretrained(model_path, device_map="auto")
 
-        print("Model memory footprint: ", model.get_memory_footprint())
+        print(f"Model memory footprint:  {model.get_memory_footprint()/2**20:.2f} MBs")
 
         tokenizer = transformers.AutoTokenizer.from_pretrained(model_path)
         

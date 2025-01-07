@@ -3,13 +3,14 @@ import collections
 import datetime
 import textwrap
 from typing import Any
+from pathlib import Path
 
 from ..backend import actors
 from ..util import output_util, file_util
 
 
-# "...but if you look at conversations.py, this whole file violates DRY"
-# Not really, for the most part the API is the same by convention, not because it
+# Compared to conversations.py one may think that this violates DRY
+# HOwever, for the most part the API is the same by convention, not because it
 # uses the same functionality. You can replace the implementation here entirely
 # without impacting conversations.py at all
 
@@ -22,17 +23,17 @@ class AnnotationConv:
     def __init__(
         self,
         annotator: actors.LLMAnnotator,
-        conv_logs_path: str,
+        conv_logs_path: str | Path,
         include_moderator_comments: bool,
-        history_ctx_len: int = 4,
+        history_ctx_len: int = 2, #TODO: Make this configurable
     ):
-        """Create an annotation job. 
+        """Create an annotation job.
         The annotation is modelled as a conversation between the system and the annotator.
 
         :param annotator: The annotator
         :type annotator: actors.IActor
         :param conv_logs_path: The path to the file containing the conversation logs in JSON format
-        :type conv_logs_path: str
+        :type conv_logs_path: str | Path
         :param include_moderator_comments: Whether to annotate moderator comments, and include them in conversational context when annotating user responses.
         :type include_moderator_comments: bool
         :param history_ctx_len: How many previous comments the annotator will remember, defaults to 4
@@ -55,8 +56,11 @@ class AnnotationConv:
         """
         ctx_history = collections.deque(maxlen=self.history_ctx_len)
 
-        for username, message in self.conv_data_dict["logs"]:
-           # do not include moderator comments in annotation context if told so 
+        for message_data in self.conv_data_dict["logs"]:
+            username = message_data["name"]
+            message = message_data["text"]
+
+            # do not include moderator comments in annotation context if told so
             if "moderator" in username:
                 if not self.include_moderator_comments:
                     continue

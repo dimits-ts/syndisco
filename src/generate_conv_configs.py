@@ -1,20 +1,19 @@
 import uuid
 import os
-import argparse
 import random
+import yaml
+import argparse
 from typing import Any
+from pathlib import Path
 
 from sdl.serialization.persona import LlmPersona
 from sdl.serialization import conversation_io
-from sdl.util.file_util import read_files_from_directory, read_file, read_json_file
-
-
-CONTEXT = "You are a human participating in an online chatroom."
-DEFAULT_MODERATOR_ATTRIBUTES = ["just", "strict", "understanding"]
-SEED_USERNAMES = ["FirstUser"]
+from sdl.util.file_util import read_files_from_directory, read_file, wipe_directory
 
 
 def generate_conv_config(
+    context_prompt: str,
+    moderator_attributes: list[str],
     personas: list[LlmPersona],
     user_instructions: str,
     mod_instructions: str,
@@ -24,144 +23,126 @@ def generate_conv_config(
     num_users: int,
     mod_exists: bool,
 ) -> conversation_io.LLMConvData:
-    """Generate a conversation configuration object from provided attributes.
-    The object can then be used for IO operations or directly as input for a conversation.
-
-    :param personas: a list of all personas in JSON/dict format, from which a random subset will be selected depending on num_users
-    :type personas: list[LlmPersona]
-    :param user_instructions: the user instructions
-    :type user_instructions: str
-    :param mod_instructions: the moderator instructions, if he exists
-    :type mod_instructions: str
-    :param config: a dictrionary containing other configurations such as turn_manager_type and conversation length
-    :type config: dict[str, Any]
-    :param num_users: the number of users who will participate in the conversation
-    :type num_users: int
-    :param mod_exists: whether a moderator will be present in the conversation
-    :type mod_exists: bool
-    :param seed_opinions: a list of all topics, from which one will be randomly selected
-    :type seed_opinions: list[str]
-    :param seed_opinion_usernames: a list of all topics, from which one will be randomly selected
-    :type seed_opinions: list[str]
-    :return: An IO conversation configuration object which can be used for persistence, or as input for a conversation
-    :rtype: conversation_io.LLMConvData
-    """
+    """Generate a conversation configuration object from provided attributes."""
     assert num_users <= len(
         personas
     ), "Number of users must be less or equal to the number of provided personas"
     rand_personas = random.sample(personas, k=num_users)
     topic = random.choice(seed_opinions)
-    seed_username = random.choice(seed_opinion_usernames)
 
     user_names = [persona.username for persona in rand_personas]
     user_attributes = [persona.to_attribute_list() for persona in rand_personas]
 
     data = conversation_io.LLMConvData(
-        context=CONTEXT,
+        context=context_prompt,
         user_names=user_names,
         user_attributes=user_attributes,
         user_instructions=user_instructions,
         moderator_name="moderator" if mod_exists else None,
         moderator_instructions=mod_instructions if mod_exists else None,
-        moderator_attributes=DEFAULT_MODERATOR_ATTRIBUTES if mod_exists else None,
+        moderator_attributes=moderator_attributes if mod_exists else None,
         turn_manager_type=config["turn_manager_type"],
         turn_manager_config=config["turn_manager_config"],
         conv_len=config["conv_len"],
         history_ctx_len=config["history_ctx_len"],
-        seed_opinions=[topic], # only one seed opinion for our experiments
-        seed_opinion_usernames=[seed_username] # only one seed opinion for our experiments
+        seed_opinions=[topic],  # only one seed opinion for our experiments
+        seed_opinion_usernames=seed_opinion_usernames
     )
     return data
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Generate conversation configs using modular configuration files"
-    )
-
+    # Set up argument parsing for the YAML config file
+    parser = argparse.ArgumentParser(description="Generate conversation configurations")
     parser.add_argument(
-        "--output_dir",
+        "--config_file",
         required=True,
-        help="Output directory for generated conversation config files",
+        help="Path to the YAML configuration file",
     )
     parser.add_argument(
-        "--persona_dir",
-        required=True,
-        help="Directory containing JSON files for LLM user personas",
-    )
-    parser.add_argument(
-        "--topics_dir",
-        required=True,
-        help="Directory containing .txt files for conversation starting comments",
-    )
-    parser.add_argument(
-        "--configs_path",
-        required=True,
-        help="Path to JSON file containg conversation configs (such as conversation length)",
-    )
-    parser.add_argument(
-        "--user_instruction_path",
-        required=True,
-        help="Path to .txt file containing user instructions",
-    )
-    parser.add_argument(
-        "--mod_instruction_path",
-        required=True,
-        help="Path to .txt file containing moderator instructions",
-    )
-    parser.add_argument(
-        "--num_generated_files",
-        type=int,
-        default=20,
-        help="How many conversation files will be generated",
-    )
-    parser.add_argument(
-        "--num_users",
-        type=int,
-        default=4,
-        help="Number of users participating in the generated discussion",
-    )
-    parser.add_argument(
-        "--include_mod",
-        action=argparse.BooleanOptionalAction,
-        default=True,
-        help="Whether a moderator exists in the discussion",
+        "-y",
+        "--yes",
+        action="store_true",
+        help="Bypass the confirmation prompt and proceed with wiping files",
     )
     args = parser.parse_args()
 
+    # Load the provided YAML configuration file
+    with open(args.config_file, "r") as file:
+        config_data = yaml.safe_load(file)
+
+    # Extract yaml configs
+    paths = config_data["generate_conv_configs"]["paths"]
+    turn_taking_config = config_data["generate_conv_configs"]["turn_taking"]
+    experiment_variables = config_data["generate_conv_configs"]["experiment_variables"]
+
+    # Paths for various required files and directories
+    topics_dir = paths["topics_dir"]
+    persona_dir = paths["persona_dir"]
+    user_instruction_path = paths["user_instructions_path"]
+    mod_instruction_path = paths["mod_instructions_path"]
+    data_output_dir = Path(paths["experiment_export_dir"])
+
+    # Experiment variables
+    num_generated_files = experiment_variables["num_generated_files"]
+    num_users = experiment_variables["num_users"]
+    include_mod = experiment_variables["include_mod"]
+
+   # Ensure output directory exists or ask to wipe it
+    if data_output_dir.is_dir():
+        wipe_directory(data_output_dir, args.yes)
+    else:
+        os.makedirs(data_output_dir, exist_ok=True)
+
     print("Reading input files...")
-    persona_files = os.listdir(args.persona_dir)
+    persona_files = os.listdir(persona_dir)
     personas = [
-        LlmPersona.from_json_file(os.path.join(args.persona_dir, persona_file))
+        LlmPersona.from_json_file(os.path.join(persona_dir, persona_file))
         for persona_file in persona_files
     ]
 
-    topics = read_files_from_directory(args.topics_dir)
-    user_instructions = read_file(args.user_instruction_path)
-    mod_instructions = read_file(args.mod_instruction_path)
-    config = read_json_file(args.configs_path)
+    topics = read_files_from_directory(topics_dir)
+    user_instructions = read_file(user_instruction_path)
+    mod_instructions = read_file(mod_instruction_path)
+
+    turn_taking_dict = {
+        "conv_len": turn_taking_config["conv_len"],
+        "history_ctx_len": turn_taking_config["history_ctx_len"],
+        "turn_manager_type": turn_taking_config["turn_manager_type"],
+        "turn_manager_config": {
+            "respond_probability": turn_taking_config[
+                "rand_weighted_respond_probability"
+            ]
+        },
+    }
+
+    ctx_prompt = experiment_variables["context_prompt"]
+    mod_attributes = experiment_variables["moderator_attributes"]
+    seed_usernames = experiment_variables["seed_user_names"]
 
     print("Processing...")
     discussion_io_objects = []
-    for _ in range(args.num_generated_files):
+    for _ in range(num_generated_files):
         conv_file = generate_conv_config(
+            context_prompt=ctx_prompt,
+            moderator_attributes=mod_attributes,
             personas=personas,
             user_instructions=user_instructions,
             mod_instructions=mod_instructions,
-            config=config,
-            num_users=args.num_users,
-            mod_exists=args.include_mod,
+            config=turn_taking_dict,
+            num_users=num_users,
+            mod_exists=include_mod,
             seed_opinions=topics,
-            seed_opinion_usernames=SEED_USERNAMES
+            seed_opinion_usernames=seed_usernames,
         )
         discussion_io_objects.append(conv_file)
 
     print("Writing new conversation input files...")
     for io_object in discussion_io_objects:
         io_object.to_json_file(
-            os.path.join(args.output_dir, str(uuid.uuid4()) + ".json")
+            os.path.join(data_output_dir, str(uuid.uuid4()) + ".json")
         )
-    print("Files exported to " + args.output_dir)
+    print("Files exported to " + str(data_output_dir))
 
 
 if __name__ == "__main__":
