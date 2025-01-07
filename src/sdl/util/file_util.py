@@ -1,6 +1,7 @@
 import os
 import json
 import datetime
+import shutil
 
 from typing import Any, Optional
 from pathlib import Path
@@ -91,3 +92,13 @@ def generate_datetime_filename(
         return datetime_name
     else:
         return os.path.join(output_dir, datetime_name)
+
+
+def wipe_directory(directory_path: Path, auto_confirm: bool):
+    """Wipes the directory after asking for user confirmation (unless auto_confirm is True)."""
+    if auto_confirm or input(f"Are you sure you want to wipe the contents of {directory_path}? [y|n]: ").strip().lower() == "y":
+        shutil.rmtree(directory_path)
+        os.makedirs(directory_path)  # Recreate the directory after wiping
+        print(f"Directory {directory_path} has been wiped.")
+    else:
+        print(f"Skipping wipe of {directory_path}.")

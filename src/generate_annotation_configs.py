@@ -6,7 +6,7 @@ import yaml
 from pathlib import Path
 
 from sdl.serialization import annotation_io, persona
-from sdl.util.file_util import read_file
+from sdl.util.file_util import read_file, wipe_directory
 
 
 def generate_annotator_file(
@@ -23,16 +23,6 @@ def generate_annotator_file(
         include_moderator_comments=include_moderator_comments,
     )
     return data
-
-
-def wipe_directory(directory_path: Path, auto_confirm: bool):
-    """Wipes the directory after asking for user confirmation (unless auto_confirm is True)."""
-    if auto_confirm or input(f"Are you sure you want to wipe the contents of {directory_path}? [y|n]: ").strip().lower() == "y":
-        shutil.rmtree(directory_path)
-        os.makedirs(directory_path)  # Recreate the directory after wiping
-        print(f"Directory {directory_path} has been wiped.")
-    else:
-        print(f"Skipping wipe of {directory_path}.")
 
 
 def main():

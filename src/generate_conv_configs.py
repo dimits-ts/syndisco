@@ -8,7 +8,7 @@ from pathlib import Path
 
 from sdl.serialization.persona import LlmPersona
 from sdl.serialization import conversation_io
-from sdl.util.file_util import read_files_from_directory, read_file
+from sdl.util.file_util import read_files_from_directory, read_file, wipe_directory
 
 
 def generate_conv_config(
@@ -88,26 +88,11 @@ def main():
     num_users = experiment_variables["num_users"]
     include_mod = experiment_variables["include_mod"]
 
-    # Ask for confirmation before wiping files
-    confirmation = (
-        input(
-            f"Are you sure you want to remove all files in {data_output_dir}? [y/n]: "
-        )
-        .strip()
-        .lower()
-    )
-
-    if confirmation == "y" or args.yes:
-        print("Removing old generated files...")
-        if data_output_dir.exists() and data_output_dir.is_dir():
-            for file in data_output_dir.iterdir():
-                if file.is_file():
-                    file.unlink()
+   # Ensure output directory exists or ask to wipe it
+    if data_output_dir.is_dir():
+        wipe_directory(data_output_dir, args.yes)
     else:
-        print("Skipping the removal of old files.")
-
-    # Ensure the output directory exists
-    os.makedirs(data_output_dir, exist_ok=True)
+        os.makedirs(data_output_dir, exist_ok=True)
 
     print("Reading input files...")
     persona_files = os.listdir(persona_dir)
