@@ -8,15 +8,12 @@ from pathlib import Path
 
 from sdl.serialization.persona import LlmPersona
 from sdl.serialization import conversation_io
-from sdl.util.file_util import read_files_from_directory, read_file, read_json_file
-
-
-CONTEXT = "You are a human participating in an online chatroom."
-DEFAULT_MODERATOR_ATTRIBUTES = ["just", "strict", "understanding"]
-SEED_USERNAMES = ["FirstUser"]
+from sdl.util.file_util import read_files_from_directory, read_file
 
 
 def generate_conv_config(
+    context_prompt: str,
+    moderator_attributes: list[str],
     personas: list[LlmPersona],
     user_instructions: str,
     mod_instructions: str,
@@ -27,28 +24,29 @@ def generate_conv_config(
     mod_exists: bool,
 ) -> conversation_io.LLMConvData:
     """Generate a conversation configuration object from provided attributes."""
-    assert num_users <= len(personas), "Number of users must be less or equal to the number of provided personas"
+    assert num_users <= len(
+        personas
+    ), "Number of users must be less or equal to the number of provided personas"
     rand_personas = random.sample(personas, k=num_users)
     topic = random.choice(seed_opinions)
-    seed_username = random.choice(seed_opinion_usernames)
 
     user_names = [persona.username for persona in rand_personas]
     user_attributes = [persona.to_attribute_list() for persona in rand_personas]
 
     data = conversation_io.LLMConvData(
-        context=CONTEXT,
+        context=context_prompt,
         user_names=user_names,
         user_attributes=user_attributes,
         user_instructions=user_instructions,
         moderator_name="moderator" if mod_exists else None,
         moderator_instructions=mod_instructions if mod_exists else None,
-        moderator_attributes=DEFAULT_MODERATOR_ATTRIBUTES if mod_exists else None,
+        moderator_attributes=moderator_attributes if mod_exists else None,
         turn_manager_type=config["turn_manager_type"],
         turn_manager_config=config["turn_manager_config"],
         conv_len=config["conv_len"],
         history_ctx_len=config["history_ctx_len"],
         seed_opinions=[topic],  # only one seed opinion for our experiments
-        seed_opinion_usernames=[seed_username]  # only one seed opinion for our experiments
+        seed_opinion_usernames=seed_opinion_usernames
     )
     return data
 
@@ -62,7 +60,8 @@ def main():
         help="Path to the YAML configuration file",
     )
     parser.add_argument(
-        "-y", "--yes",
+        "-y",
+        "--yes",
         action="store_true",
         help="Bypass the confirmation prompt and proceed with wiping files",
     )
@@ -74,6 +73,7 @@ def main():
 
     # Extract yaml configs
     paths = config_data["generate_conv_configs"]["paths"]
+    turn_taking_config = config_data["generate_conv_configs"]["turn_taking"]
     experiment_variables = config_data["generate_conv_configs"]["experiment_variables"]
 
     # Paths for various required files and directories
@@ -81,7 +81,6 @@ def main():
     persona_dir = paths["persona_dir"]
     user_instruction_path = paths["user_instructions_path"]
     mod_instruction_path = paths["mod_instructions_path"]
-    turn_taking_configs_path = paths["turn_taking_configs_path"]
     data_output_dir = Path(paths["experiment_export_dir"])
 
     # Experiment variables
@@ -89,10 +88,16 @@ def main():
     num_users = experiment_variables["num_users"]
     include_mod = experiment_variables["include_mod"]
 
-   # Ask for confirmation before wiping files
-    confirmation = input(f"Are you sure you want to remove all files in {data_output_dir}? [y/n]: ").strip().lower()
+    # Ask for confirmation before wiping files
+    confirmation = (
+        input(
+            f"Are you sure you want to remove all files in {data_output_dir}? [y/n]: "
+        )
+        .strip()
+        .lower()
+    )
 
-    if confirmation == 'y' or args.yes:
+    if confirmation == "y" or args.yes:
         print("Removing old generated files...")
         if data_output_dir.exists() and data_output_dir.is_dir():
             for file in data_output_dir.iterdir():
@@ -101,7 +106,7 @@ def main():
     else:
         print("Skipping the removal of old files.")
 
-    # Ensure the output directory exists 
+    # Ensure the output directory exists
     os.makedirs(data_output_dir, exist_ok=True)
 
     print("Reading input files...")
@@ -114,20 +119,36 @@ def main():
     topics = read_files_from_directory(topics_dir)
     user_instructions = read_file(user_instruction_path)
     mod_instructions = read_file(mod_instruction_path)
-    config = read_json_file(turn_taking_configs_path)
+
+    turn_taking_dict = {
+        "conv_len": turn_taking_config["conv_len"],
+        "history_ctx_len": turn_taking_config["history_ctx_len"],
+        "turn_manager_type": turn_taking_config["turn_manager_type"],
+        "turn_manager_config": {
+            "respond_probability": turn_taking_config[
+                "rand_weighted_respond_probability"
+            ]
+        },
+    }
+
+    ctx_prompt = experiment_variables["context_prompt"]
+    mod_attributes = experiment_variables["moderator_attributes"]
+    seed_usernames = experiment_variables["seed_user_names"]
 
     print("Processing...")
     discussion_io_objects = []
     for _ in range(num_generated_files):
         conv_file = generate_conv_config(
+            context_prompt=ctx_prompt,
+            moderator_attributes=mod_attributes,
             personas=personas,
             user_instructions=user_instructions,
             mod_instructions=mod_instructions,
-            config=config,
+            config=turn_taking_dict,
             num_users=num_users,
             mod_exists=include_mod,
             seed_opinions=topics,
-            seed_opinion_usernames=SEED_USERNAMES
+            seed_opinion_usernames=seed_usernames,
         )
         discussion_io_objects.append(conv_file)
 

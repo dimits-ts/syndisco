@@ -58,7 +58,7 @@ def main():
 
     # Extract values from the config
     persona_dir = Path(paths["persona_dir"])
-    output_dir = Path(paths["output_dir"])
+    annotation_export_dir = Path(paths["annotation_export_dir"])
     instruction_path = paths["instruction_path"]
 
     history_ctx_len = experiment_vars["history_ctx_len"]
@@ -71,10 +71,10 @@ def main():
         exit(1)
 
     # Ensure output directory exists or ask to wipe it
-    if output_dir.is_dir():
-        wipe_directory(output_dir, auto_confirm)
+    if annotation_export_dir.is_dir():
+        wipe_directory(annotation_export_dir, auto_confirm)
     else:
-        os.makedirs(output_dir, exist_ok=True)
+        os.makedirs(annotation_export_dir, exist_ok=True)
 
     print("Reading input files...")
     persona_files = os.listdir(persona_dir)
@@ -93,10 +93,11 @@ def main():
             include_moderator_comments=include_mod_comments
         )
         annotation_config_file.to_json_file(
-            os.path.join(output_dir, str(uuid.uuid4()) + ".json")
+            os.path.join(annotation_export_dir, str(uuid.uuid4()) + ".json")
         )
     
-    print(f"Files exported to {output_dir}")
+    print(f"Files exported to {annotation_export_dir}")
+
 
 if __name__ == "__main__":
     main()

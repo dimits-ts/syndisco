@@ -7,9 +7,6 @@ from sdl.serialization import conversation_io
 from sdl.util import file_util
 
 
-REMOVE_STR_LIST = ["```"]
-
-
 def process_file(input_file, output_dir, model):
     print(f"Processing file: {input_file}")
 
@@ -58,6 +55,8 @@ def main():
     library_type = model_params["general"]["library_type"]
     max_tokens = model_params["general"]["max_tokens"]
     ctx_width_tokens = model_params["general"]["ctx_width_tokens"]
+    remove_str_list = model_params["general"]["disallowed_strings"]
+
     inference_threads = model_params["llama_cpp"]["inference_threads"]
     gpu_layers = model_params["llama_cpp"]["gpu_layers"]
 
@@ -81,7 +80,7 @@ def main():
             name=model_name,
             max_out_tokens=max_tokens,
             seed=42,  # Random seed (this can be adjusted)
-            remove_string_list=REMOVE_STR_LIST,
+            remove_string_list=remove_str_list,
             ctx_width_tokens=ctx_width_tokens,
             inference_threads=inference_threads,
             gpu_layers=gpu_layers,
@@ -93,7 +92,7 @@ def main():
             model_path=model_path,
             name=model_name,
             max_out_tokens=max_tokens,
-            remove_string_list=REMOVE_STR_LIST,
+            remove_string_list=remove_str_list,
         )
     else:
         raise NotImplementedError(f"Unknown model type: {library_type}. Supported types: llama_cpp, transformers")

@@ -8,9 +8,6 @@ from sdl.util import file_util
 from sdl.backend import model
 
 
-REMOVE_STR_LIST = ["```"]
-
-
 def process_file(
     annotation_config_input_file: str | Path,
     output_dir: str | Path,
@@ -57,7 +54,7 @@ def main():
 
     # Extract values from the config
     annotator_input_dir = Path(paths["annotator_input_dir"])
-    output_dir = Path(paths["output_dir"])
+    annotation_export_dir = Path(paths["annotation_export_dir"])
     model_path = paths["model_path"]
     convs_dir = Path(paths["conv_logs_dir"])
 
@@ -65,11 +62,13 @@ def main():
     model_name = model_params["general"]["model_name"]
     max_tokens = model_params["general"]["max_tokens"]
     ctx_width_tokens = model_params["general"]["ctx_width_tokens"]
+    remove_str_list = model_params["general"]["disallowed_strings"]
+
     inference_threads = model_params["llama_cpp"]["inference_threads"]
     gpu_layers = model_params["llama_cpp"]["gpu_layers"]
 
-    # Ensure output directory exists
-    os.makedirs(output_dir, exist_ok=True)
+    # Ensure annotation config output directory exists
+    os.makedirs(annotation_export_dir, exist_ok=True)
 
     # Check if input directory exists
     if not annotator_input_dir.is_dir():
@@ -93,7 +92,7 @@ def main():
             name=model_name,
             max_out_tokens=max_tokens,
             seed=42,  # Random seed (this can be adjusted)
-            remove_string_list=REMOVE_STR_LIST,
+            remove_string_list=remove_str_list,
             ctx_width_tokens=ctx_width_tokens,
             inference_threads=inference_threads,
             gpu_layers=gpu_layers,
@@ -106,7 +105,7 @@ def main():
             model_path=model_path,
             name=model_name,
             max_out_tokens=max_tokens,
-            remove_string_list=REMOVE_STR_LIST,
+            remove_string_list=remove_str_list,
         )
     else:
         raise NotImplementedError(
@@ -123,7 +122,7 @@ def main():
             if annotator_input_file.is_file():
                 process_file(
                     annotation_config_input_file=annotator_input_file,
-                    output_dir=output_dir,
+                    output_dir=annotation_export_dir,
                     model=model,
                     conv_logs_path=completed_discussion_path,
                 )
