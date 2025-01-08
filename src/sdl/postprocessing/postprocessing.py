@@ -5,8 +5,13 @@ import json
 import re
 
 
+
 def import_conversations(conv_dir: str) -> pd.DataFrame:
     df = _read_conversations(conv_dir)
+    df = df.reset_index(drop=True)
+
+    # remove useless columns
+    del df["users"]
     
     # from having a list of all user_prompts -> having only the relevant prompt
     selected_prompt = _select_user_prompt(df)
@@ -18,11 +23,10 @@ def import_conversations(conv_dir: str) -> pd.DataFrame:
     df.user_prompt = df.moderator_prompt.where(df.is_moderator, df.user_prompt)
     del df["moderator"], df["moderator_prompt"]
 
-    # add a dictionary of attributes for each user
-    df["attributes"] = [_extract_traits(prompt) for prompt in df.user_prompt]
-
-    del df["users"]
-    
+    # add attributes for each user as rows
+    df2 = process_traits(df.user_prompt.apply(_extract_traits)).reset_index()
+    del df2["username"]
+    df = pd.concat([df, df2], axis=1)
     return df
 
 
@@ -105,6 +109,21 @@ def _extract_user_prompt(user_prompts: list[str], username: str | None) -> str |
     return None
 
 
+def process_traits(series):
+    """
+    Processes a pandas Series of strings containing schema-like traits
+    and converts them into a DataFrame with a column for each attribute.
+    
+    Parameters:
+        series (pd.Series): The input pandas Series containing trait schemas.
+        
+    Returns:
+        pd.DataFrame: A DataFrame where each column represents an attribute.
+    """
+    traits_list = series
+    return pd.DataFrame(traits_list.tolist())
+
+
 def _extract_traits(message):
     """
     Extracts attribute-value pairs from the 'traits' section of the message.
@@ -137,6 +156,8 @@ def _extract_traits(message):
                 value = eval(value)  # Safely parse list-like values
             elif value.startswith(("'", '"')) and value.endswith(("'", '"')):
                 value = value.strip("'\"")
+            else:
+                value = value.replace(',', '')
         except Exception:
             pass  # Leave the value as a string if parsing fails
 
