@@ -7,6 +7,9 @@ import logging
 from typing import Optional
 
 
+logger = logging.getLogger(__name__)
+
+
 @dataclasses.dataclass
 class LLMConvData:
     """
@@ -127,7 +130,7 @@ class LLMConvGenerator:
                 instructions=self.data.moderator_instructions,
             )
         else:
-            logging.warn("Warning: Generating conversation without moderator")
+            logger.warning("Warning: Generating conversation without moderator")
             moderator = None
 
         generated_conv = conversation.Conversation(

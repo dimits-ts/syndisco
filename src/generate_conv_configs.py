@@ -13,6 +13,9 @@ from sdl.util.file_util import read_files_from_directory, read_file, wipe_direct
 from sdl.util.logging_util import logging_setup
 
 
+logger = logging.getLogger(__name__)
+
+
 def generate_conv_config(
     context_prompt: str,
     moderator_attributes: list[str],
@@ -104,7 +107,7 @@ def main():
     else:
         os.makedirs(data_output_dir, exist_ok=True)
 
-    logging.info("Reading input files...")
+    logger.info("Reading input files...")
     persona_files = os.listdir(persona_dir)
     personas = [
         LlmPersona.from_json_file(os.path.join(persona_dir, persona_file))
@@ -130,7 +133,7 @@ def main():
     mod_attributes = experiment_variables["moderator_attributes"]
     seed_usernames = experiment_variables["seed_user_names"]
 
-    logging.info("Processing...")
+    logger.info("Processing...")
     discussion_io_objects = []
     for _ in range(num_generated_files):
         conv_file = generate_conv_config(
@@ -147,12 +150,12 @@ def main():
         )
         discussion_io_objects.append(conv_file)
 
-    logging.info("Writing new conversation input files...")
+    logger.info("Writing new conversation input files...")
     for io_object in discussion_io_objects:
         io_object.to_json_file(
             os.path.join(data_output_dir, str(uuid.uuid4()) + ".json")
         )
-    logging.info("Files exported to " + str(data_output_dir))
+    logger.info("Files exported to " + str(data_output_dir))
 
 
 if __name__ == "__main__":

@@ -10,6 +10,9 @@ from sdl.backend import model
 from sdl.util.logging_util import logging_setup
 
 
+logger = logging.getLogger(__name__)
+
+
 def process_file(
     annotation_config_input_file: str | Path,
     output_dir: str | Path,
@@ -17,7 +20,7 @@ def process_file(
     conv_logs_path: str | Path,
 ) -> None:
     try:
-        logging.info(f"Processing file: {annotation_config_input_file}")
+        logger.info(f"Processing file: {annotation_config_input_file}")
 
         # Load data and start conversation
         data = annotation_io.LlmAnnotationData.from_json_file(annotation_config_input_file)
@@ -26,15 +29,15 @@ def process_file(
         )
         conv = generator.produce_conversation()
     
-        logging.info("Beginning conversation...")
+        logger.info("Beginning conversation...")
         conv.begin_annotation(verbose=True)
         output_path = file_util.generate_datetime_filename(
             output_dir=output_dir, file_ending=".json"
         )
         conv.to_json_file(output_path)
-        logging.info("Conversation saved to ", output_path)
+        logger.info("Conversation saved to ", output_path)
     except Exception:
-        logging.exception("Experiment aborted due to error.")
+        logger.exception("Experiment aborted due to error.")
 
 
 def main():
@@ -82,15 +85,15 @@ def main():
 
     # Check if input directory exists
     if not annotator_input_dir.is_dir():
-        logging.error(f"Error: Input directory '{annotator_input_dir}' does not exist.")
+        logger.error(f"Error: Input directory '{annotator_input_dir}' does not exist.")
         exit(1)
 
     if not convs_dir.is_dir():
-        logging.error(f"Error: Convs directory '{convs_dir}' does not exist.")
+        logger.error(f"Error: Convs directory '{convs_dir}' does not exist.")
         exit(1)
 
     # Load model based on type
-    logging.info("Loading LLM...")
+    logger.info("Loading LLM...")
 
     model = None
     if library_type == "llama_cpp":
@@ -122,10 +125,10 @@ def main():
             f"Unknown model type: {library_type}. Supported types: llama_cpp, transformers"
         )
 
-    logging.info("Model loaded.")
+    logger.info("Model loaded.")
 
     # Process the files in the input directory
-    logging.info(f"Starting annotation generation...")
+    logger.info(f"Starting annotation generation...")
 
     for completed_discussion_path in convs_dir.iterdir():
         for annotator_input_file in annotator_input_dir.glob("*.json"):
@@ -137,9 +140,9 @@ def main():
                     conv_logs_path=completed_discussion_path,
                 )
             else:
-                logging.warn(f"Skipping non-file entry: {annotator_input_file}")
+                logger.warning(f"Skipping non-file entry: {annotator_input_file}")
 
-    logging.info(f"Finished annotation generation.")
+    logger.info(f"Finished annotation generation.")
 
 
 if __name__ == "__main__":

@@ -8,6 +8,9 @@ from typing import Any, Optional
 from pathlib import Path
 
 
+logger = logging.getLogger(__name__)
+
+
 def read_files_from_directory(directory: str | Path) -> list[str]:
     """Reads all files from a given directory.
 
@@ -105,6 +108,6 @@ def wipe_directory(directory_path: Path, auto_confirm: bool):
     if auto_confirm or input(f"Are you sure you want to wipe the contents of {directory_path}? [y|n]: ").strip().lower() == "y":
         shutil.rmtree(directory_path)
         os.makedirs(directory_path)  # Recreate the directory after wiping
-        logging.info(f"Directory {directory_path} has been wiped.")
+        logger.info(f"Directory {directory_path} has been wiped.")
     else:
-        logging.info(f"Skipping wipe of {directory_path}.")
+        logger.info(f"Skipping wipe of {directory_path}.")

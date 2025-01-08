@@ -10,6 +10,9 @@ from sdl.util.file_util import read_file, wipe_directory
 from sdl.util.logging_util import logging_setup
 
 
+logger = logging.getLogger(__name__)
+
+
 def generate_annotator_file(
     annotator_persona: persona.LlmPersona,
     instructions: str,
@@ -67,7 +70,7 @@ def main():
 
     # Ensure persona directory exists
     if not persona_dir.is_dir():
-        logging.error(f"Error: Persona directory '{persona_dir}' does not exist.")
+        logger.error(f"Error: Persona directory '{persona_dir}' does not exist.")
         exit(1)
 
     # Ensure output directory exists or ask to wipe it
@@ -76,7 +79,7 @@ def main():
     else:
         os.makedirs(annotation_export_dir, exist_ok=True)
 
-    logging.info("Reading input files...")
+    logger.info("Reading input files...")
     persona_files = os.listdir(persona_dir)
     personas = [
         persona.LlmPersona.from_json_file(os.path.join(persona_dir, persona_file))
@@ -84,7 +87,7 @@ def main():
     ]
     instructions = read_file(instruction_path)
 
-    logging.info("Processing...")
+    logger.info("Processing...")
     for llm_persona in personas:
         annotation_config_file = generate_annotator_file(
             annotator_persona=llm_persona,
@@ -96,7 +99,7 @@ def main():
             os.path.join(annotation_export_dir, str(uuid.uuid4()) + ".json")
         )
 
-    logging.info(f"Files exported to {annotation_export_dir}")
+    logger.info(f"Files exported to {annotation_export_dir}")
 
 
 if __name__ == "__main__":

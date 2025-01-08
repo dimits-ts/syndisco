@@ -6,6 +6,9 @@ import logging
 from . import model
 
 
+logger = logging.getLogger(__name__)
+
+
 class TransformersModel(model.Model):
     def __init__(
         self,
@@ -33,7 +36,7 @@ class TransformersModel(model.Model):
             model_path, device_map="auto"
         )
 
-        logging.info(
+        logger.info(
             f"Model memory footprint:  {model.get_memory_footprint()/2**20:.2f} MBs"
         )
 

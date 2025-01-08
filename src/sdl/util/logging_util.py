@@ -6,6 +6,9 @@ from pathlib import Path
 from . import file_util
 
 
+logger = logging.getLogger(__name__)
+
+
 def logging_setup(
     print_to_terminal: bool,
     write_to_file: bool,
@@ -64,5 +67,5 @@ def _str_to_log_level(level_str: str):
         case "critical":
             return logging.CRITICAL
         case _:
-            logging.warning(f"Unrecognized log level {level_str}. Defaulting to NOT_SET")
+            logger.warning(f"Unrecognized log level {level_str}. Defaulting to NOT_SET")
             return logging.NOTSET
