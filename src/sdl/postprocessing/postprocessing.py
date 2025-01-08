@@ -19,7 +19,9 @@ def import_conversations(conv_dir: str) -> pd.DataFrame:
     del df["moderator"], df["moderator_prompt"]
 
     # add a dictionary of attributes for each user
-    #TODO
+    df["attributes"] = [_extract_traits(prompt) for prompt in df.user_prompt]
+
+    del df["users"]
     
     return df
 
@@ -102,3 +104,42 @@ def _extract_user_prompt(user_prompts: list[str], username: str | None) -> str |
             return user_prompt
     return None
 
+
+def _extract_traits(message):
+    """
+    Extracts attribute-value pairs from the 'traits' section of the message.
+    
+    Parameters:
+        message (str): The input message containing traits.
+        
+    Returns:
+        dict: A dictionary of extracted traits as attribute-value pairs.
+    """
+    if message is None:
+        return {}
+
+    # Extract the traits section
+    traits_match = re.search(r'Your traits: (.+?) Your instructions:', message, re.DOTALL)
+    if not traits_match:
+        return {}
+
+    traits_section = traits_match.group(1).strip()
+
+    # Split traits into individual attribute-value pairs
+    traits = {}
+    for match in re.finditer(r'(\w+):\s*(\[.*?\]|".*?"|\'.*?\'|\S+)', traits_section):
+        key = match.group(1)
+        value = match.group(2)
+
+        # Convert list-like and quoted values to appropriate Python objects
+        try:
+            if value.startswith('[') and value.endswith(']'):
+                value = eval(value)  # Safely parse list-like values
+            elif value.startswith(("'", '"')) and value.endswith(("'", '"')):
+                value = value.strip("'\"")
+        except Exception:
+            pass  # Leave the value as a string if parsing fails
+
+        traits[key] = value
+
+    return traits
