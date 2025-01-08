@@ -7,12 +7,20 @@ import re
 
 def import_conversations(conv_dir: str) -> pd.DataFrame:
     df = _read_conversations(conv_dir)
-    df = _add_moderator_exists(df)
     
+    # from having a list of all user_prompts -> having only the relevant prompt
     selected_prompt = _select_user_prompt(df)
     df["user_prompt"] = selected_prompt
     del df["user_prompts"]
 
+    # merge the moderator_prompt and user_prompt columns
+    df["is_moderator"] = _is_moderator(df.moderator, df.user)
+    df.user_prompt = df.moderator_prompt.where(df.is_moderator, df.user_prompt)
+    del df["moderator"], df["moderator_prompt"]
+
+    # add a dictionary of attributes for each user
+    #TODO
+    
     return df
 
 
@@ -53,6 +61,10 @@ def _read_conversations(conv_dir: str) -> pd.DataFrame:
     return full_df
 
 
+def _is_moderator(moderator_name: pd.Series, username: pd.Series) -> pd.Series:
+    return moderator_name == username
+    
+
 # code adapted from https://www.geeksforgeeks.org/python-list-all-files-in-directory-and-subdirectories/
 def _list_files_recursive(start_path: str) -> list[str]:
     """
@@ -71,12 +83,6 @@ def _list_files_recursive(start_path: str) -> list[str]:
         for file in files:
             all_files.append(os.path.join(root, file))
     return all_files
-
-
-def _add_moderator_exists(df: pd.DataFrame) -> pd.DataFrame:
-    moderator_ids = set(df[df["user"] == "moderator"]["id"])
-    df["moderator_exists"] = df["id"].apply(lambda x: x in moderator_ids)
-    return df
 
 
 def _select_user_prompt(df: pd.DataFrame) -> list[str]:
