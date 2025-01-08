@@ -13,7 +13,7 @@ from sdl.util.file_util import read_files_from_directory, read_file, wipe_direct
 from sdl.util.logging_util import logging_setup
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(Path(__file__).name)
 
 
 def generate_conv_config(

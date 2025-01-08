@@ -6,7 +6,7 @@ from pathlib import Path
 from . import file_util
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(Path(__file__).name)
 
 
 def logging_setup(

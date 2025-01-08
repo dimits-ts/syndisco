@@ -9,7 +9,7 @@ from sdl.util import file_util
 from sdl.util.logging_util import logging_setup
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(Path(__file__).name)
 
 
 def process_file(input_file, output_dir, model):

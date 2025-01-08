@@ -4,10 +4,11 @@ from ..generation import conversation
 import dataclasses
 import json
 import logging
+from pathlib import Path
 from typing import Optional
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(Path(__file__).name)
 
 
 @dataclasses.dataclass

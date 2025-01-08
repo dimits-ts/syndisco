@@ -10,7 +10,7 @@ from sdl.backend import model
 from sdl.util.logging_util import logging_setup
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(Path(__file__).name)
 
 
 def process_file(

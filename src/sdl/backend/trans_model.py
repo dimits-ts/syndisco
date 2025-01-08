@@ -2,11 +2,12 @@ import transformers
 
 import typing
 import logging
+from pathlib import Path
 
 from . import model
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(Path(__file__).name)
 
 
 class TransformersModel(model.Model):
