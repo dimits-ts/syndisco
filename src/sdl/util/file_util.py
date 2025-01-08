@@ -37,12 +37,12 @@ def read_files_from_directory(directory: str | Path) -> list[str]:
 
 
 def read_file(path: str | Path) -> str:
-    """Read a plain text or JSON file depending on its extension
-
+    """Return the contents of a file
+    
     :param path: the path of the file
     :type path: str | Path
     :return: the file's contents
-    :rtype: str | dict[str, Any]
+    :rtype: str 
     """
     with open(path, "r", encoding="utf-8") as file:
         return file.read()
