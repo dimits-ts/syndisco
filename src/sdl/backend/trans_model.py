@@ -12,7 +12,7 @@ class TransformersModel(model.Model):
         model_path: str,
         name: str,
         max_out_tokens: int,
-        remove_string_list=[],
+        remove_string_list: list[str]=[],
     ):
         """
         Initialize a new LLM wrapper.
@@ -25,7 +25,7 @@ class TransformersModel(model.Model):
         :type max_out_tokens: int
         :param remove_string_list: a list of strings to be removed from the response.
         Used to prevent model-specific conversational collapse, defaults to []
-        :type remove_string_list: list, optional
+        :type remove_string_list: list[str], optional
         """
         super().__init__(name, max_out_tokens, remove_string_list)
 
@@ -48,4 +48,4 @@ class TransformersModel(model.Model):
     ) -> str:
         return self.generator(
             json_prompt, max_length=self.max_out_tokens, return_full_text=False
-        )[0]["generated_text"]
+        )[0]["generated_text"] #type: ignore
