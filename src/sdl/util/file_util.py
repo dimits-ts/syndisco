@@ -2,9 +2,13 @@ import os
 import json
 import datetime
 import shutil
+import logging
 
 from typing import Any, Optional
 from pathlib import Path
+
+
+logger = logging.getLogger(Path(__file__).name)
 
 
 def read_files_from_directory(directory: str | Path) -> list[str]:
@@ -73,7 +77,7 @@ def generate_datetime_filename(
     output_dir: Optional[str | Path] = None,
     timestamp_format: str = "%y-%m-%d-%H-%M",
     file_ending: str = "",
-) -> str:
+) -> Path:
     """
     Generate a filename based on the current date and time.
 
@@ -87,11 +91,16 @@ def generate_datetime_filename(
     :rtype: str
     """
     datetime_name = datetime.datetime.now().strftime(timestamp_format) + file_ending
-
+    path = ""
     if output_dir is None:
-        return datetime_name
+        path = Path(datetime_name)
     else:
-        return os.path.join(output_dir, datetime_name)
+        path = Path(os.path.join(output_dir, datetime_name))
+    
+    if not path.exists():
+        path.touch()
+
+    return path
 
 
 def wipe_directory(directory_path: Path, auto_confirm: bool):
@@ -99,6 +108,6 @@ def wipe_directory(directory_path: Path, auto_confirm: bool):
     if auto_confirm or input(f"Are you sure you want to wipe the contents of {directory_path}? [y|n]: ").strip().lower() == "y":
         shutil.rmtree(directory_path)
         os.makedirs(directory_path)  # Recreate the directory after wiping
-        print(f"Directory {directory_path} has been wiped.")
+        logger.info(f"Directory {directory_path} has been wiped.")
     else:
-        print(f"Skipping wipe of {directory_path}.")
+        logger.info(f"Skipping wipe of {directory_path}.")

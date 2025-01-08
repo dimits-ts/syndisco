@@ -1,12 +1,16 @@
 import argparse
 import os
 import yaml
-import traceback
+import logging
 from pathlib import Path
 
 from sdl.serialization import annotation_io
 from sdl.util import file_util
 from sdl.backend import model
+from sdl.util.logging_util import logging_setup
+
+
+logger = logging.getLogger(Path(__file__).name)
 
 
 def process_file(
@@ -16,7 +20,7 @@ def process_file(
     conv_logs_path: str | Path,
 ) -> None:
     try:
-        print(f"Processing file: {annotation_config_input_file}")
+        logger.info(f"Processing file: {annotation_config_input_file}")
 
         # Load data and start conversation
         data = annotation_io.LlmAnnotationData.from_json_file(annotation_config_input_file)
@@ -25,16 +29,15 @@ def process_file(
         )
         conv = generator.produce_conversation()
     
-        print("Beginning conversation...")
+        logger.info("Beginning conversation...")
         conv.begin_annotation(verbose=True)
         output_path = file_util.generate_datetime_filename(
             output_dir=output_dir, file_ending=".json"
         )
         conv.to_json_file(output_path)
-        print("Conversation saved to ", output_path)
+        logger.info("Conversation saved to ", output_path)
     except Exception:
-        print("Experiment aborted due to error:")
-        print(traceback.format_exc())
+        logger.exception("Experiment aborted due to error.")
 
 
 def main():
@@ -53,10 +56,18 @@ def main():
 
     paths = config_data["generate_annotations"]["paths"]
     model_params = config_data["generate_annotations"]["model_parameters"]
+    logging_config = config_data["logging"]
+
+    logging_setup(
+        print_to_terminal=logging_config["print_to_terminal"],
+        write_to_file=logging_config["write_to_file"],
+        logs_dir=logging_config["logs_dir"],
+        level=logging_config["level"]
+    )
 
     # Extract values from the config
     annotator_input_dir = Path(paths["annotator_input_dir"])
-    annotation_export_dir = Path(paths["annotation_export_dir"])
+    output_dir = Path(paths["output_dir"])
     model_path = paths["model_path"]
     convs_dir = Path(paths["conv_logs_dir"])
 
@@ -70,19 +81,19 @@ def main():
     gpu_layers = model_params["llama_cpp"]["gpu_layers"]
 
     # Ensure annotation config output directory exists
-    os.makedirs(annotation_export_dir, exist_ok=True)
+    os.makedirs(output_dir, exist_ok=True)
 
     # Check if input directory exists
     if not annotator_input_dir.is_dir():
-        print(f"Error: Input directory '{annotator_input_dir}' does not exist.")
+        logger.error(f"Error: Input directory '{annotator_input_dir}' does not exist.")
         exit(1)
 
     if not convs_dir.is_dir():
-        print(f"Error: Convs directory '{convs_dir}' does not exist.")
+        logger.error(f"Error: Convs directory '{convs_dir}' does not exist.")
         exit(1)
 
     # Load model based on type
-    print("Loading LLM...")
+    logger.info("Loading LLM...")
 
     model = None
     if library_type == "llama_cpp":
@@ -114,24 +125,24 @@ def main():
             f"Unknown model type: {library_type}. Supported types: llama_cpp, transformers"
         )
 
-    print("Model loaded.")
+    logger.info("Model loaded.")
 
     # Process the files in the input directory
-    print(f"Starting annotation generation...")
+    logger.info(f"Starting annotation generation...")
 
     for completed_discussion_path in convs_dir.iterdir():
         for annotator_input_file in annotator_input_dir.glob("*.json"):
             if annotator_input_file.is_file():
                 process_file(
                     annotation_config_input_file=annotator_input_file,
-                    output_dir=annotation_export_dir,
+                    output_dir=output_dir,
                     model=model,
                     conv_logs_path=completed_discussion_path,
                 )
             else:
-                print(f"Skipping non-file entry: {annotator_input_file}")
+                logger.warning(f"Skipping non-file entry: {annotator_input_file}")
 
-    print(f"Finished annotation generation.")
+    logger.info(f"Finished annotation generation.")
 
 
 if __name__ == "__main__":

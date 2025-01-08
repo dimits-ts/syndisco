@@ -3,7 +3,12 @@ from ..generation import conversation
 
 import dataclasses
 import json
+import logging
+from pathlib import Path
 from typing import Optional
+
+
+logger = logging.getLogger(Path(__file__).name)
 
 
 @dataclasses.dataclass
@@ -126,7 +131,7 @@ class LLMConvGenerator:
                 instructions=self.data.moderator_instructions,
             )
         else:
-            print("Warning: Generating conversation without moderator")
+            logger.warning("Warning: Generating conversation without moderator")
             moderator = None
 
         generated_conv = conversation.Conversation(

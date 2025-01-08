@@ -3,12 +3,17 @@ import os
 import random
 import yaml
 import argparse
+import logging
 from typing import Any
 from pathlib import Path
 
 from sdl.serialization.persona import LlmPersona
 from sdl.serialization import conversation_io
 from sdl.util.file_util import read_files_from_directory, read_file, wipe_directory
+from sdl.util.logging_util import logging_setup
+
+
+logger = logging.getLogger(Path(__file__).name)
 
 
 def generate_conv_config(
@@ -75,6 +80,14 @@ def main():
     paths = config_data["generate_conv_configs"]["paths"]
     turn_taking_config = config_data["generate_conv_configs"]["turn_taking"]
     experiment_variables = config_data["generate_conv_configs"]["experiment_variables"]
+    logging_config = config_data["logging"]
+
+    logging_setup(
+        print_to_terminal=logging_config["print_to_terminal"],
+        write_to_file=logging_config["write_to_file"],
+        logs_dir=logging_config["logs_dir"],
+        level=logging_config["level"]
+    )
 
     # Paths for various required files and directories
     topics_dir = paths["topics_dir"]
@@ -94,7 +107,7 @@ def main():
     else:
         os.makedirs(data_output_dir, exist_ok=True)
 
-    print("Reading input files...")
+    logger.info("Reading input files...")
     persona_files = os.listdir(persona_dir)
     personas = [
         LlmPersona.from_json_file(os.path.join(persona_dir, persona_file))
@@ -120,7 +133,7 @@ def main():
     mod_attributes = experiment_variables["moderator_attributes"]
     seed_usernames = experiment_variables["seed_user_names"]
 
-    print("Processing...")
+    logger.info("Processing...")
     discussion_io_objects = []
     for _ in range(num_generated_files):
         conv_file = generate_conv_config(
@@ -137,12 +150,12 @@ def main():
         )
         discussion_io_objects.append(conv_file)
 
-    print("Writing new conversation input files...")
+    logger.info("Writing new conversation input files...")
     for io_object in discussion_io_objects:
         io_object.to_json_file(
             os.path.join(data_output_dir, str(uuid.uuid4()) + ".json")
         )
-    print("Files exported to " + str(data_output_dir))
+    logger.info("Files exported to " + str(data_output_dir))
 
 
 if __name__ == "__main__":
