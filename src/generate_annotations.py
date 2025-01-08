@@ -7,6 +7,7 @@ from pathlib import Path
 from sdl.serialization import annotation_io
 from sdl.util import file_util
 from sdl.backend import model
+from sdl.util.logging_util import logging_setup
 
 
 def process_file(
@@ -52,6 +53,14 @@ def main():
 
     paths = config_data["generate_annotations"]["paths"]
     model_params = config_data["generate_annotations"]["model_parameters"]
+    logging_config = config_data["logging"]
+
+    logging_setup(
+        print_to_terminal=logging_config["print_to_terminal"],
+        write_to_file=logging_config["write_to_file"],
+        logs_dir=logging_config["logs_dir"],
+        level=logging_config["level"]
+    )
 
     # Extract values from the config
     annotator_input_dir = Path(paths["annotator_input_dir"])

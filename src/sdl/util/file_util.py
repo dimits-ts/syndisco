@@ -74,7 +74,7 @@ def generate_datetime_filename(
     output_dir: Optional[str | Path] = None,
     timestamp_format: str = "%y-%m-%d-%H-%M",
     file_ending: str = "",
-) -> str:
+) -> Path:
     """
     Generate a filename based on the current date and time.
 
@@ -88,11 +88,16 @@ def generate_datetime_filename(
     :rtype: str
     """
     datetime_name = datetime.datetime.now().strftime(timestamp_format) + file_ending
-
+    path = ""
     if output_dir is None:
-        return datetime_name
+        path = Path(datetime_name)
     else:
-        return os.path.join(output_dir, datetime_name)
+        path = Path(os.path.join(output_dir, datetime_name))
+    
+    if not path.exists():
+        path.touch()
+
+    return path
 
 
 def wipe_directory(directory_path: Path, auto_confirm: bool):

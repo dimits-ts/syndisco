@@ -6,6 +6,7 @@ from pathlib import Path
 
 from sdl.serialization import conversation_io
 from sdl.util import file_util
+from sdl.util.logging_util import logging_setup
 
 
 def process_file(input_file, output_dir, model):
@@ -45,6 +46,14 @@ def main():
 
     paths = config_data["generate_conversations"]["paths"]
     model_params = config_data["generate_conversations"]["model_parameters"]
+    logging_config = config_data["logging"]
+
+    logging_setup(
+        print_to_terminal=logging_config["print_to_terminal"],
+        write_to_file=logging_config["write_to_file"],
+        logs_dir=logging_config["logs_dir"],
+        level=logging_config["level"]
+    )
 
     # Extract values from the config
     input_dir = Path(paths["input_dir"])

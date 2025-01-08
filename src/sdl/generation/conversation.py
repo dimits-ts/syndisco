@@ -1,6 +1,7 @@
 import collections
 import datetime
 import json
+from pathlib import Path
 import uuid
 from typing import Any, Optional
 
@@ -161,7 +162,7 @@ class Conversation:
             "logs": self.conv_logs,
         }
 
-    def to_json_file(self, output_path: str):
+    def to_json_file(self, output_path: str | Path) -> None:
         """
         Export the data and metadata of the conversation as a json file.
         Convenience function equivalent to json.dump(self.to_dict(), output_path)

@@ -10,6 +10,7 @@ from pathlib import Path
 from sdl.serialization.persona import LlmPersona
 from sdl.serialization import conversation_io
 from sdl.util.file_util import read_files_from_directory, read_file, wipe_directory
+from sdl.util.logging_util import logging_setup
 
 
 def generate_conv_config(
@@ -76,6 +77,14 @@ def main():
     paths = config_data["generate_conv_configs"]["paths"]
     turn_taking_config = config_data["generate_conv_configs"]["turn_taking"]
     experiment_variables = config_data["generate_conv_configs"]["experiment_variables"]
+    logging_config = config_data["logging"]
+
+    logging_setup(
+        print_to_terminal=logging_config["print_to_terminal"],
+        write_to_file=logging_config["write_to_file"],
+        logs_dir=logging_config["logs_dir"],
+        level=logging_config["level"]
+    )
 
     # Paths for various required files and directories
     topics_dir = paths["topics_dir"]
