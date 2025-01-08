@@ -3,6 +3,7 @@ import os
 import random
 import yaml
 import argparse
+import logging
 from typing import Any
 from pathlib import Path
 
@@ -94,7 +95,7 @@ def main():
     else:
         os.makedirs(data_output_dir, exist_ok=True)
 
-    print("Reading input files...")
+    logging.info("Reading input files...")
     persona_files = os.listdir(persona_dir)
     personas = [
         LlmPersona.from_json_file(os.path.join(persona_dir, persona_file))
@@ -120,7 +121,7 @@ def main():
     mod_attributes = experiment_variables["moderator_attributes"]
     seed_usernames = experiment_variables["seed_user_names"]
 
-    print("Processing...")
+    logging.info("Processing...")
     discussion_io_objects = []
     for _ in range(num_generated_files):
         conv_file = generate_conv_config(
@@ -137,12 +138,12 @@ def main():
         )
         discussion_io_objects.append(conv_file)
 
-    print("Writing new conversation input files...")
+    logging.info("Writing new conversation input files...")
     for io_object in discussion_io_objects:
         io_object.to_json_file(
             os.path.join(data_output_dir, str(uuid.uuid4()) + ".json")
         )
-    print("Files exported to " + str(data_output_dir))
+    logging.info("Files exported to " + str(data_output_dir))
 
 
 if __name__ == "__main__":

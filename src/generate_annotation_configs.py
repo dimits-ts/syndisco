@@ -1,7 +1,7 @@
 import uuid
 import os
 import argparse
-import shutil
+import logging
 import yaml
 from pathlib import Path
 
@@ -57,7 +57,7 @@ def main():
 
     # Ensure persona directory exists
     if not persona_dir.is_dir():
-        print(f"Error: Persona directory '{persona_dir}' does not exist.")
+        logging.error(f"Error: Persona directory '{persona_dir}' does not exist.")
         exit(1)
 
     # Ensure output directory exists or ask to wipe it
@@ -66,7 +66,7 @@ def main():
     else:
         os.makedirs(annotation_export_dir, exist_ok=True)
 
-    print("Reading input files...")
+    logging.info("Reading input files...")
     persona_files = os.listdir(persona_dir)
     personas = [
         persona.LlmPersona.from_json_file(os.path.join(persona_dir, persona_file))
@@ -74,7 +74,7 @@ def main():
     ]
     instructions = read_file(instruction_path)
 
-    print("Processing...")
+    logging.info("Processing...")
     for llm_persona in personas:
         annotation_config_file = generate_annotator_file(
             annotator_persona=llm_persona,
@@ -86,7 +86,7 @@ def main():
             os.path.join(annotation_export_dir, str(uuid.uuid4()) + ".json")
         )
     
-    print(f"Files exported to {annotation_export_dir}")
+    logging.info(f"Files exported to {annotation_export_dir}")
 
 
 if __name__ == "__main__":

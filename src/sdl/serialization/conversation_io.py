@@ -3,6 +3,7 @@ from ..generation import conversation
 
 import dataclasses
 import json
+import logging
 from typing import Optional
 
 
@@ -126,7 +127,7 @@ class LLMConvGenerator:
                 instructions=self.data.moderator_instructions,
             )
         else:
-            print("Warning: Generating conversation without moderator")
+            logging.warn("Warning: Generating conversation without moderator")
             moderator = None
 
         generated_conv = conversation.Conversation(

@@ -1,7 +1,7 @@
 import argparse
 import os
 import yaml
-import traceback
+import logging
 from pathlib import Path
 
 from sdl.serialization import conversation_io
@@ -10,7 +10,7 @@ from sdl.util import file_util
 
 def process_file(input_file, output_dir, model):
     try:
-        print(f"Processing file: {input_file}")
+        logging.info(f"Processing file: {input_file}")
         # Load data and start conversation
         data = conversation_io.LLMConvData.from_json_file(input_file)
         generator = conversation_io.LLMConvGenerator(
@@ -18,16 +18,15 @@ def process_file(input_file, output_dir, model):
         )
         conv = generator.produce_conversation()
 
-        print("Beginning conversation...")
+        logging.info("Beginning conversation...")
         conv.begin_conversation(verbose=True)
         output_path = file_util.generate_datetime_filename(
             output_dir=output_dir, file_ending=".json"
         )
         conv.to_json_file(output_path)
-        print("Conversation saved to ", output_path)
+        logging.info("Conversation saved to ", output_path)
     except Exception:
-        print("Experiment aborted due to error:")
-        print(traceback.format_exc())
+        logging.exception("Experiment aborted due to error.")
 
 
 def main():
@@ -66,11 +65,11 @@ def main():
 
     # Check if input directory exists
     if not input_dir.is_dir():
-        print(f"Error: Input directory '{input_dir}' does not exist.")
+        logging.error(f"Error: Input directory '{input_dir}' does not exist.")
         exit(1)
 
     # Load model based on type
-    print("Loading LLM...")
+    logging.info("Loading LLM...")
 
     model = None
     if library_type == "llama_cpp":
@@ -98,18 +97,18 @@ def main():
     else:
         raise NotImplementedError(f"Unknown model type: {library_type}. Supported types: llama_cpp, transformers")
 
-    print("Model loaded.")
+    logging.info("Model loaded.")
 
     # Process the files in the input directory
-    print(f"Starting experiments...")
+    logging.info(f"Starting experiments...")
 
     for input_file in input_dir.glob("*.json"):
         if input_file.is_file():
             process_file(input_file, output_dir, model)
         else:
-            print(f"Skipping non-file entry: {input_file}")
+            logging.warn(f"Skipping non-file entry: {input_file}")
 
-    print(f"Finished experiments.")
+    logging.info(f"Finished experiments.")
 
 
 if __name__ == "__main__":
