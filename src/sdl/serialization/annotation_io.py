@@ -70,9 +70,9 @@ class LLMAnnotationGenerator:
         """
         annotator = actors.LLMAnnotator(
             model=self.llm,
-            name="",
+            name="annotator",
             attributes=self.data.attributes,
-            context="",
+            context="You are a human working as an annotator",
             instructions=self.data.instructions,
         )
 
