@@ -64,6 +64,7 @@ class AnnotationConv:
             if "moderator" in username:
                 if not self.include_moderator_comments:
                     continue
+        
             formatted_message = output_util.format_chat_message(username, message)
             ctx_history.append(formatted_message)
             annotation = self.annotator.speak(list(ctx_history))
@@ -85,7 +86,7 @@ class AnnotationConv:
         return {
             "conv_id": str(self.conv_data_dict["id"]),
             "timestamp": datetime.datetime.now().strftime(timestamp_format),
-            "annotator_type": type(self.annotator).__name__,
+            "annotator_model": self.annotator.model.name,
             "annotator_prompt": self.annotator.describe(),
             "ctx_length": self.history_ctx_len,
             "logs": self.annotation_logs,
