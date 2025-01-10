@@ -22,8 +22,8 @@ class Conversation:
         moderator: Optional[actors.LLMUser] = None,
         history_context_len: int = 5,
         conv_len: int = 5,
-        seed_opinions: list[str] = [],
-        seed_opinion_users: list[str] = [],
+        seed_opinion: str = "",
+        seed_opinion_user: str = "",
     ) -> None:
         """
         Construct the framework for a conversation to take place.
@@ -40,10 +40,10 @@ class Conversation:
         :param conv_len: The total length of the conversation (how many times each actor will be prompted),
          defaults to 5
         :type conv_len: int, optional
-        :param seed_opinions: The first hardcoded comments to start the conversation with
-        :type seed_opinions: list[str], optional
-        :param seed_opinion_users: The usernames of each seed opinion
-        :type seed_opinion_users: int, optional
+        :param seed_opinion: The first hardcoded comments to start the conversation with
+        :type seed_opinion: str, optional
+        :param seed_opinion_user: The username for the seed opinion
+        :type seed_opinion_user: int, optional
         :raises ValueError: if the number of seed opinions and seed opinion users are different, or
         if the number of seed opinions exceeds history_context_len
         """
@@ -61,19 +61,8 @@ class Conversation:
         # keep a limited context of the conversation to feed to the models
         self.ctx_history = collections.deque(maxlen=history_context_len)
 
-        if len(seed_opinion_users) != len(seed_opinions):
-            raise ValueError(
-                "Seed opinions and seed opinion users should have the same length."
-            )
-
-        if len(seed_opinions) > history_context_len:
-            raise ValueError(
-                "More seed opinions provided than model context length."
-                "The first seed opinions will never be read by the model."
-            )
-
-        self.seed_opinion_users = seed_opinion_users
-        self.seed_opinions = seed_opinions
+        self.seed_opinion_user = seed_opinion_user
+        self.seed_opinion = seed_opinion
 
     def begin_conversation(self, verbose: bool = True) -> None:
         """
@@ -87,19 +76,15 @@ class Conversation:
                 "This conversation has already been concluded, create a new Conversation object."
             )
 
-        # hardcoded comments at the start of the conversation
-        for seed_user_name, seed_opinion in zip(
-            self.seed_opinion_users, self.seed_opinions
-        ):
-            # dummy LLMUser
-            seed_user = actors.LLMUser(
-                model=None,  # type: ignore
-                name=seed_user_name,
-                attributes=[],
-                context="",
-                instructions="",
-            )
-            self._archive_response(seed_user, seed_opinion, verbose=verbose)
+        # create first "seed" opinion
+        seed_user = actors.LLMUser(
+            model=None,  # type: ignore
+            name=self.seed_opinion_user,
+            attributes=[],
+            context="",
+            instructions="",
+        )
+        self._archive_response(seed_user, self.seed_opinion, verbose=verbose)
 
         # begin generation
         for _ in range(self.conv_len):
