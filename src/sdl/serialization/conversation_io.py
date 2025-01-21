@@ -28,8 +28,8 @@ class LLMConvData:
     moderator_name: Optional[str] = None
     moderator_attributes: Optional[list[str]] = None
     moderator_instructions: Optional[str] = None
-    seed_opinions: list[str] = dataclasses.field(default_factory=list)
-    seed_opinion_usernames: list[str] = dataclasses.field(default_factory=list)
+    seed_opinion: str = ""
+    seed_opinion_username: str = "FirstUser"
 
     def __post_init__(self):
         assert len(self.user_names) == len(
@@ -140,7 +140,7 @@ class LLMConvGenerator:
             moderator=moderator,
             history_context_len=self.data.history_ctx_len,
             conv_len=self.data.conv_len,
-            seed_opinion_users=self.data.seed_opinion_usernames,
-            seed_opinions=self.data.seed_opinions
+            seed_opinion_user=self.data.seed_opinion_username,
+            seed_opinion=self.data.seed_opinion
         )
         return generated_conv

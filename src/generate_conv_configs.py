@@ -22,18 +22,17 @@ def generate_conv_config(
     personas: list[LlmPersona],
     user_instructions: str,
     mod_instructions: str,
-    seed_opinions: list[str],
-    seed_opinion_usernames: list[str],
     config: dict[str, Any],
     num_users: int,
     mod_exists: bool,
+    topics: list[str]
 ) -> conversation_io.LLMConvData:
     """Generate a conversation configuration object from provided attributes."""
     assert num_users <= len(
         personas
     ), "Number of users must be less or equal to the number of provided personas"
     rand_personas = random.sample(personas, k=num_users)
-    topic = random.choice(seed_opinions)
+    topic = random.choice(topics)
 
     user_names = [persona.username for persona in rand_personas]
     user_attributes = [persona.to_attribute_list() for persona in rand_personas]
@@ -50,8 +49,8 @@ def generate_conv_config(
         turn_manager_config=config["turn_manager_config"],
         conv_len=config["conv_len"],
         history_ctx_len=config["history_ctx_len"],
-        seed_opinions=[topic],  # only one seed opinion for our experiments
-        seed_opinion_usernames=seed_opinion_usernames
+        seed_opinion=topic,  # only one seed opinion for our experiments
+        seed_opinion_username=random.choice(user_names)
     )
     return data
 
@@ -131,7 +130,6 @@ def main():
 
     ctx_prompt = experiment_variables["context_prompt"]
     mod_attributes = experiment_variables["moderator_attributes"]
-    seed_usernames = experiment_variables["seed_user_names"]
 
     logger.info("Processing...")
     discussion_io_objects = []
@@ -145,8 +143,7 @@ def main():
             config=turn_taking_dict,
             num_users=num_users,
             mod_exists=include_mod,
-            seed_opinions=topics,
-            seed_opinion_usernames=seed_usernames,
+            topics=topics
         )
         discussion_io_objects.append(conv_file)
 

@@ -37,12 +37,12 @@ def read_files_from_directory(directory: str | Path) -> list[str]:
 
 
 def read_file(path: str | Path) -> str:
-    """Read a plain text or JSON file depending on its extension
-
+    """Return the contents of a file
+    
     :param path: the path of the file
     :type path: str | Path
     :return: the file's contents
-    :rtype: str | dict[str, Any]
+    :rtype: str 
     """
     with open(path, "r", encoding="utf-8") as file:
         return file.read()
@@ -98,6 +98,7 @@ def generate_datetime_filename(
         path = Path(os.path.join(output_dir, datetime_name))
     
     if not path.exists():
+        path.parent.mkdir(parents=True, exist_ok=True)
         path.touch()
 
     return path
