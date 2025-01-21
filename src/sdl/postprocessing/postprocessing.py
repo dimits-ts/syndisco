@@ -3,16 +3,16 @@ import pandas as pd
 import os
 import json
 import re
+from pathlib import Path
 
 
-
-def import_conversations(conv_dir: str) -> pd.DataFrame:
+def import_conversations(conv_dir: str | Path) -> pd.DataFrame:
     df = _read_conversations(conv_dir)
     df = df.reset_index(drop=True)
 
     # remove useless columns
     del df["users"]
-    
+
     # from having a list of all user_prompts -> having only the relevant prompt
     selected_prompt = _select_user_prompt(df)
     df["user_prompt"] = selected_prompt
@@ -30,7 +30,72 @@ def import_conversations(conv_dir: str) -> pd.DataFrame:
     return df
 
 
-def _read_conversations(conv_dir: str) -> pd.DataFrame:
+def import_annotations(annot_dir: str | Path, include_sdb_info: bool=False) -> pd.DataFrame:
+    """
+    Import annotation data from a directory containing JSON files and convert them to a DataFrame.
+
+    Recursively reads all JSON files from the specified directory,
+    and extracts relevant fields. It also adds metadata about the conversation variant.
+
+    :param conv_dir: Path to the root directory containing the conversation JSON files.
+    :type conv_dir: str
+    :return: A DataFrame with conversation data, including the ID, user prompts, messages,
+             and conversation variant.
+    :rtype: pd.DataFrame
+
+    :example:
+        >>> df = import_conversations("/path/to/conversation/data")
+    """
+    annot_df = _read_annotations(annot_dir=annot_dir)
+    annot_df = annot_df.reset_index(drop=True)
+
+    if include_sdb_info:
+        # add attributes for each user as rows
+        traits_df = process_traits(annot_df.annotator_prompt.apply(_extract_traits)).reset_index()
+        annot_df = pd.concat([annot_df, traits_df], axis=1)
+        del annot_df["special_instructions"]
+    
+    return annot_df
+
+
+def _read_annotations(annot_dir: str | Path) -> pd.DataFrame:
+    """
+    Import conversation data from a directory containing JSON files and convert them to a DataFrame.
+
+    Recursively reads all JSON files from the specified directory,
+    and extracts relevant fields. It also adds metadata about the conversation variant.
+
+    :param conv_dir: Path to the root directory containing the conversation JSON files.
+    :type conv_dir: str
+    :return: A DataFrame with conversation data, including the ID, user prompts, messages,
+             and conversation variant.
+    :rtype: pd.DataFrame
+
+    :example:
+        >>> df = import_conversations("/path/to/conversation/data")
+    """
+    file_paths = _list_files_recursive(annot_dir)
+    rows = []
+
+    for file_path in file_paths:
+        with open(file_path, "r") as fin:
+            conv = json.load(fin)
+
+        conv = pd.json_normalize(conv)
+        conv = conv.explode("logs")
+        # get name, not path of parent directory
+        conv["annotation_variant"] = os.path.basename(os.path.dirname(file_path))
+        conv["message"] = conv.logs.apply(lambda x: x[0])
+        conv["annotation"] = conv.logs.apply(lambda x: x[1])
+
+        del conv["logs"]
+        rows.append(conv)
+
+    full_df = pd.concat(rows)
+    return full_df
+
+
+def _read_conversations(conv_dir: str | Path) -> pd.DataFrame:
     """
     Import conversation data from a directory containing JSON files and convert them to a DataFrame.
 
@@ -69,10 +134,10 @@ def _read_conversations(conv_dir: str) -> pd.DataFrame:
 
 def _is_moderator(moderator_name: pd.Series, username: pd.Series) -> pd.Series:
     return moderator_name == username
-    
+
 
 # code adapted from https://www.geeksforgeeks.org/python-list-all-files-in-directory-and-subdirectories/
-def _list_files_recursive(start_path: str) -> list[str]:
+def _list_files_recursive(start_path: str | Path) -> list[str]:
     """
     Recursively list all files in a directory and its subdirectories.
 
@@ -113,10 +178,10 @@ def process_traits(series):
     """
     Processes a pandas Series of strings containing schema-like traits
     and converts them into a DataFrame with a column for each attribute.
-    
+
     Parameters:
         series (pd.Series): The input pandas Series containing trait schemas.
-        
+
     Returns:
         pd.DataFrame: A DataFrame where each column represents an attribute.
     """
@@ -127,10 +192,10 @@ def process_traits(series):
 def _extract_traits(message):
     """
     Extracts attribute-value pairs from the 'traits' section of the message.
-    
+
     Parameters:
         message (str): The input message containing traits.
-        
+
     Returns:
         dict: A dictionary of extracted traits as attribute-value pairs.
     """
@@ -138,7 +203,9 @@ def _extract_traits(message):
         return {}
 
     # Extract the traits section
-    traits_match = re.search(r'Your traits: (.+?) Your instructions:', message, re.DOTALL)
+    traits_match = re.search(
+        r"Your traits: (.+?) Your instructions:", message, re.DOTALL
+    )
     if not traits_match:
         return {}
 
@@ -152,12 +219,12 @@ def _extract_traits(message):
 
         # Convert list-like and quoted values to appropriate Python objects
         try:
-            if value.startswith('[') and value.endswith(']'):
+            if value.startswith("[") and value.endswith("]"):
                 value = eval(value)  # Safely parse list-like values
             elif value.startswith(("'", '"')) and value.endswith(("'", '"')):
                 value = value.strip("'\"")
             else:
-                value = value.replace(',', '')
+                value = value.replace(",", "")
         except Exception:
             pass  # Leave the value as a string if parsing fails
 
