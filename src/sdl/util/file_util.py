@@ -98,6 +98,7 @@ def generate_datetime_filename(
         path = Path(os.path.join(output_dir, datetime_name))
     
     if not path.exists():
+        path.parent.mkdir(parents=True, exist_ok=True)
         path.touch()
 
     return path
