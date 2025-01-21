@@ -4,10 +4,10 @@ import yaml
 import logging
 from pathlib import Path
 
-from sdl.serialization import annotation_io
 from sdl.util import file_util
 from sdl.backend import model
 from sdl.util.logging_util import logging_setup
+import sdl.annotations.io
 
 
 logger = logging.getLogger(Path(__file__).name)
@@ -23,8 +23,8 @@ def process_file(
         logger.info(f"Processing file: {annotation_config_input_file}")
 
         # Load data and start conversation
-        data = annotation_io.LlmAnnotationData.from_json_file(annotation_config_input_file)
-        generator = annotation_io.LLMAnnotationGenerator(
+        data = sdl.annotations.io.LlmAnnotationData.from_json_file(annotation_config_input_file)
+        generator = sdl.annotations.io.LLMAnnotationGenerator(
             data=data, llm=model, conv_logs_path=conv_logs_path
         )
         conv = generator.produce_conversation()

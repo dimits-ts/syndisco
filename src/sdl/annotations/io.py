@@ -2,7 +2,7 @@ import dataclasses
 import json
 from pathlib import Path
 
-from ..generation import annotation
+from . import generate
 from ..backend import actors, model
 
 
@@ -61,7 +61,7 @@ class LLMAnnotationGenerator:
         self.llm = llm
         self.conv_logs_path = conv_logs_path
 
-    def produce_conversation(self) -> annotation.AnnotationConv:
+    def produce_conversation(self) -> generate.AnnotationConv:
         """
         Generate and return the setup for the synthetic annotation.
 
@@ -76,7 +76,7 @@ class LLMAnnotationGenerator:
             instructions=self.data.instructions,
         )
 
-        conversation = annotation.AnnotationConv(
+        conversation = generate.AnnotationConv(
             annotator=annotator,
             conv_logs_path=self.conv_logs_path,
             history_ctx_len=self.data.history_ctx_len,

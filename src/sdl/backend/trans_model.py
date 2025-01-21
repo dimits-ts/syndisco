@@ -60,6 +60,4 @@ class TransformersModel(model.Model):
     ) -> str:
         return self.generator(
             json_prompt, max_length=self.max_out_tokens, return_full_text=False
-        )[0][
-            "generated_text"
-        ]  # type: ignore
+        )[0]["generated_text"]  # type: ignore

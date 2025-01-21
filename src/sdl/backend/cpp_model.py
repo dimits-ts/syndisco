@@ -1,5 +1,6 @@
-import llama_cpp
 import typing
+
+import llama_cpp # pyright: ignore[reportMissingImports]
 
 from . import model
 

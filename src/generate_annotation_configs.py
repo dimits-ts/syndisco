@@ -5,9 +5,10 @@ import logging
 import yaml
 from pathlib import Path
 
-from sdl.serialization import annotation_io, persona
+from sdl.backend import persona
 from sdl.util.file_util import read_file, wipe_directory
 from sdl.util.logging_util import logging_setup
+import sdl.annotations.io
 
 
 logger = logging.getLogger(__name__)
@@ -18,9 +19,9 @@ def generate_annotator_file(
     instructions: str,
     history_ctx_len: int,
     include_moderator_comments: bool,
-) -> annotation_io.LlmAnnotationData:
+) -> sdl.annotations.io.LlmAnnotationData:
     """Generate an annotation configuration object from provided attributes."""
-    data = annotation_io.LlmAnnotationData(
+    data = sdl.annotations.io.LlmAnnotationData(
         attributes=annotator_persona.to_attribute_list(),
         instructions=instructions,
         history_ctx_len=history_ctx_len,

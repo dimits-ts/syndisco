@@ -7,10 +7,10 @@ import logging
 from typing import Any
 from pathlib import Path
 
-from sdl.serialization.persona import LlmPersona
-from sdl.serialization import conversation_io
+from sdl.backend.persona import LlmPersona
 from sdl.util.file_util import read_files_from_directory, read_file, wipe_directory
 from sdl.util.logging_util import logging_setup
+import sdl.discussions.io
 
 
 logger = logging.getLogger(Path(__file__).name)
@@ -26,7 +26,7 @@ def generate_conv_config(
     num_users: int,
     mod_exists: bool,
     topics: list[str]
-) -> conversation_io.LLMConvData:
+) -> sdl.discussions.io.LLMConvData:
     """Generate a conversation configuration object from provided attributes."""
     assert num_users <= len(
         personas
@@ -37,7 +37,7 @@ def generate_conv_config(
     user_names = [persona.username for persona in rand_personas]
     user_attributes = [persona.to_attribute_list() for persona in rand_personas]
 
-    data = conversation_io.LLMConvData(
+    data = sdl.discussions.io.LLMConvData(
         context=context_prompt,
         user_names=user_names,
         user_attributes=user_attributes,

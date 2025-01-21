@@ -1,11 +1,11 @@
-from ..backend import actors, model, turn_manager
-from ..generation import conversation
-
 import dataclasses
 import json
 import logging
 from pathlib import Path
 from typing import Optional
+
+from ..backend import actors, model, turn_manager
+from . import generate
 
 
 logger = logging.getLogger(Path(__file__).name)
@@ -98,7 +98,7 @@ class LLMConvGenerator:
             data.turn_manager_type, data.user_names
         )
 
-    def produce_conversation(self) -> conversation.Conversation:
+    def produce_conversation(self) -> generate.Conversation:
         """
         Generate a conversation.
 
@@ -134,7 +134,7 @@ class LLMConvGenerator:
             logger.warning("Warning: Generating conversation without moderator")
             moderator = None
 
-        generated_conv = conversation.Conversation(
+        generated_conv = generate.Conversation(
             turn_manager=self.next_turn_manager,
             users=user_list,
             moderator=moderator,

@@ -4,9 +4,9 @@ import yaml
 import logging
 from pathlib import Path
 
-from sdl.serialization import conversation_io
 from sdl.util import file_util
 from sdl.util.logging_util import logging_setup
+import sdl.discussions.io
 
 
 logger = logging.getLogger(Path(__file__).name)
@@ -16,8 +16,8 @@ def process_file(input_file, output_dir, model):
     try:
         logger.info(f"Processing file: {input_file}")
         # Load data and start conversation
-        data = conversation_io.LLMConvData.from_json_file(input_file)
-        generator = conversation_io.LLMConvGenerator(
+        data = sdl.discussions.io.LLMConvData.from_json_file(input_file)
+        generator = sdl.discussions.io.LLMConvGenerator(
             data=data, user_model=model, moderator_model=model
         )
         conv = generator.produce_conversation()
