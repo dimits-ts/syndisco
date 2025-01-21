@@ -55,38 +55,11 @@ def generate_conv_config(
     return data
 
 
-def main():
-    # Set up argument parsing for the YAML config file
-    parser = argparse.ArgumentParser(description="Generate conversation configurations")
-    parser.add_argument(
-        "--config_file",
-        required=True,
-        help="Path to the YAML configuration file",
-    )
-    parser.add_argument(
-        "-y",
-        "--yes",
-        action="store_true",
-        help="Bypass the confirmation prompt and proceed with wiping files",
-    )
-    args = parser.parse_args()
-
-    # Load the provided YAML configuration file
-    with open(args.config_file, "r") as file:
-        config_data = yaml.safe_load(file)
-
+def generate_experiments(yaml_data: dict, auto_confirm: bool):
     # Extract yaml configs
-    paths = config_data["generate_conv_configs"]["paths"]
-    turn_taking_config = config_data["generate_conv_configs"]["turn_taking"]
-    experiment_variables = config_data["generate_conv_configs"]["experiment_variables"]
-    logging_config = config_data["logging"]
-
-    logging_setup(
-        print_to_terminal=logging_config["print_to_terminal"],
-        write_to_file=logging_config["write_to_file"],
-        logs_dir=logging_config["logs_dir"],
-        level=logging_config["level"]
-    )
+    paths = yaml_data["generate_conv_configs"]["paths"]
+    turn_taking_config = yaml_data["generate_conv_configs"]["turn_taking"]
+    experiment_variables = yaml_data["generate_conv_configs"]["experiment_variables"]
 
     # Paths for various required files and directories
     topics_dir = paths["topics_dir"]
@@ -102,7 +75,7 @@ def main():
 
    # Ensure output directory exists or ask to wipe it
     if data_output_dir.is_dir():
-        wipe_directory(data_output_dir, args.yes)
+        wipe_directory(data_output_dir, auto_confirm)
     else:
         os.makedirs(data_output_dir, exist_ok=True)
 
@@ -153,7 +126,3 @@ def main():
             os.path.join(data_output_dir, str(uuid.uuid4()) + ".json")
         )
     logger.info("Files exported to " + str(data_output_dir))
-
-
-if __name__ == "__main__":
-    main()

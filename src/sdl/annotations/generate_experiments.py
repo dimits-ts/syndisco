@@ -1,13 +1,10 @@
 import uuid
 import os
-import argparse
 import logging
-import yaml
 from pathlib import Path
 
 from sdl.backend import persona
 from sdl.util.file_util import read_file, wipe_directory
-from sdl.util.logging_util import logging_setup
 import sdl.annotations.io
 
 
@@ -30,35 +27,9 @@ def generate_annotator_file(
     return data
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description="Generate annotation files using configuration files."
-    )
-    parser.add_argument(
-        "--config_file", required=True, help="Path to the YAML configuration file."
-    )
-    parser.add_argument(
-        "-y",
-        "--yes",
-        action="store_true",
-        help="Bypass the confirmation prompt and proceed with wiping files",
-    )
-    args = parser.parse_args()
-
-    # Load configuration from YAML file
-    with open(args.config_file, "r") as file:
-        config_data = yaml.safe_load(file)
-
-    paths = config_data["generate_annotation_configs"]["paths"]
-    experiment_vars = config_data["generate_annotation_configs"]["experiment_variables"]
-    logging_config = config_data["logging"]
-
-    logging_setup(
-        print_to_terminal=logging_config["print_to_terminal"],
-        write_to_file=logging_config["write_to_file"],
-        logs_dir=logging_config["logs_dir"],
-        level=logging_config["level"]
-    )
+def generate_experiments(yaml_data: dict, auto_confirm: bool):
+    paths = yaml_data["generate_annotation_configs"]["paths"]
+    experiment_vars = yaml_data["generate_annotation_configs"]["experiment_variables"]
 
     # Extract values from the config
     persona_dir = Path(paths["persona_dir"])
@@ -67,7 +38,6 @@ def main():
 
     history_ctx_len = experiment_vars["history_ctx_len"]
     include_mod_comments = experiment_vars["include_mod_comments"]
-    auto_confirm = args.yes
 
     # Ensure persona directory exists
     if not persona_dir.is_dir():
@@ -101,7 +71,3 @@ def main():
         )
 
     logger.info(f"Files exported to {annotation_export_dir}")
-
-
-if __name__ == "__main__":
-    main()
