@@ -54,7 +54,7 @@ def _generate_experiments(yaml_data: dict, llm: model.Model):
     mod_instruction_path = paths["mod_instructions_path"]
 
     # Experiment variables
-    num_experiments = experiment_variables["num_turns"]
+    num_experiments = experiment_variables["num_experiments"]
     num_users = experiment_variables["num_users"]
     include_mod = experiment_variables["include_mod"]
 
@@ -69,7 +69,7 @@ def _generate_experiments(yaml_data: dict, llm: model.Model):
     mod_instructions = file_util.read_file(mod_instruction_path)
 
     turn_taking_dict = {
-        "conv_len": turn_taking_config["conv_len"],
+        "conv_len": turn_taking_config["num_turns"],
         "history_ctx_len": turn_taking_config["history_ctx_len"],
         "turn_manager_type": turn_taking_config["turn_manager_type"],
         "turn_manager_config": {

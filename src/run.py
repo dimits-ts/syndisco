@@ -71,10 +71,11 @@ def main():
 
     if export_dataset:
         # Export full dataset
-        conv_dir = yaml_data["discussions"]["files"]["output_dir"]
-        annot_dir = yaml_data["annotation"]["files"]["output_dir"]
-        export_path = yaml_data["dataset_export"]["export_path"]
-        include_sdbs = yaml_data["dataset_export"]["include_annotator_sdb_info"]
+        export_config = yaml_data["dataset_export"]
+        conv_dir = export_config["discussion_root_dir"]
+        annot_dir = export_config["annotation_root_dir"]
+        export_path = export_config["export_path"]
+        include_sdbs = export_config["include_annotator_sdb_info"]
 
         df = _create_dataset(
             conv_dir=conv_dir, annot_dir=annot_dir, include_sdbs=include_sdbs
