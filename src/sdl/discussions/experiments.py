@@ -3,8 +3,7 @@ import random
 import logging
 from pathlib import Path
 
-import generation
-from sdl.backend.persona import LlmPersona
+from . import generation
 from ..util import file_util
 from ..backend import turn_manager
 from ..backend import persona
@@ -61,7 +60,7 @@ def _generate_experiments(yaml_data: dict, llm: model.Model):
 
     persona_files = os.listdir(persona_dir)
     personas = [
-        LlmPersona.from_json_file(os.path.join(persona_dir, persona_file))
+        persona.LlmPersona.from_json_file(os.path.join(persona_dir, persona_file))
         for persona_file in persona_files
     ]
 

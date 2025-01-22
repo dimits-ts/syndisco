@@ -4,7 +4,7 @@ from pathlib import Path
 
 from sdl.backend import persona, model, actors
 from ..util import file_util
-import generation
+from . import generation
 
 
 logger = logging.getLogger(__name__)

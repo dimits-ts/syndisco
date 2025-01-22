@@ -71,16 +71,16 @@ def main():
 
 def _initialize_model(yaml_data: dict) -> sdl.backend.model.Model:
     # Extract values from the config
-    model_path = yaml_data["model_path"]
+    model_params = yaml_data["model_parameters"]
+    model_path = model_params["general"]["model_path"]
+    model_name = model_params["general"]["model_pseudoname"]
+    library_type = model_params["general"]["library_type"]
+    max_tokens = model_params["general"]["max_tokens"]
+    ctx_width_tokens = model_params["general"]["ctx_width_tokens"]
+    remove_str_list = model_params["general"]["disallowed_strings"]
 
-    model_name = yaml_data["general"]["model_name"]
-    library_type = yaml_data["general"]["library_type"]
-    max_tokens = yaml_data["general"]["max_tokens"]
-    ctx_width_tokens = yaml_data["general"]["ctx_width_tokens"]
-    remove_str_list = yaml_data["general"]["disallowed_strings"]
-
-    inference_threads = yaml_data["llama_cpp"]["inference_threads"]
-    gpu_layers = yaml_data["llama_cpp"]["gpu_layers"]
+    inference_threads = model_params["llama_cpp"]["inference_threads"]
+    gpu_layers = model_params["llama_cpp"]["gpu_layers"]
 
     llm = None
     if library_type == "llama_cpp":
