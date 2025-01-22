@@ -101,26 +101,6 @@ class Conversation:
                     res = self.moderator.speak(list(self.ctx_history))
                     self._archive_response(self.moderator, res, verbose)
 
-    def _archive_response(
-        self, user: actors.LlmActor, response: str, verbose: bool
-    ) -> None:
-        self._log_comment(user, response)
-        self._add_comment_to_history(user, response, verbose)
-
-    def _log_comment(self, user: actors.LlmActor, comment: str) -> None:
-        model_name = user.model.name if user.model is not None else "hardcoded" 
-        artifact = {"name": user.name, "text": comment, "model": model_name}
-        self.conv_logs.append(artifact)
-
-    def _add_comment_to_history(
-        self, user: actors.LlmActor, response: str, verbose: bool
-    ) -> None:
-        formatted_res = output_util.format_chat_message(user.name, response)
-        self.ctx_history.append(formatted_res)
-
-        if verbose:
-            print(formatted_res)
-
     def to_dict(self, timestamp_format: str = "%y-%m-%d-%H-%M") -> dict[str, Any]:
         """
         Get a dictionary view of the data and metadata contained in the conversation.
@@ -162,3 +142,25 @@ class Conversation:
 
     def __str__(self) -> str:
         return json.dumps(self.to_dict(), indent=4)
+
+
+    def _archive_response(
+        self, user: actors.LlmActor, response: str, verbose: bool
+    ) -> None:
+        self._log_comment(user, response)
+        self._add_comment_to_history(user, response, verbose)
+
+    def _log_comment(self, user: actors.LlmActor, comment: str) -> None:
+        model_name = user.model.name if user.model is not None else "hardcoded" 
+        artifact = {"name": user.name, "text": comment, "model": model_name}
+        self.conv_logs.append(artifact)
+
+    def _add_comment_to_history(
+        self, user: actors.LlmActor, response: str, verbose: bool
+    ) -> None:
+        formatted_res = output_util.format_chat_message(user.name, response)
+        self.ctx_history.append(formatted_res)
+
+        if verbose:
+            print(formatted_res)
+

@@ -5,7 +5,7 @@ import textwrap
 from typing import Any
 from pathlib import Path
 
-from ..backend import actors
+from ..backend import actors, model
 from ..util import output_util, file_util
 
 
@@ -46,6 +46,7 @@ class AnnotationConv:
 
         with open(conv_logs_path, "r", encoding="utf8") as fin:
             self.conv_data_dict = json.load(fin)
+
 
     def begin_annotation(self, verbose=True) -> None:
         """

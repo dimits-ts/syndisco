@@ -14,7 +14,7 @@ logger = logging.getLogger(Path(__file__).name)
 class TransformersModel(model.Model):
     def __init__(
         self,
-        model_path: str,
+        model_path: str | Path,
         name: str,
         max_out_tokens: int,
         remove_string_list: list[str] = [],
