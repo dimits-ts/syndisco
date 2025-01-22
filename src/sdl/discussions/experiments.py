@@ -73,9 +73,7 @@ def _generate_experiments(yaml_data: dict, llm: model.Model):
         "history_ctx_len": turn_taking_config["history_ctx_len"],
         "turn_manager_type": turn_taking_config["turn_manager_type"],
         "turn_manager_config": {
-            "respond_probability": turn_taking_config[
-                "rand_weighted_respond_probability"
-            ]
+            "respond_probability": turn_taking_config["respond_probability"]
         },
     }
 
@@ -140,7 +138,7 @@ def _create_synthetic_discussion(
         instructions=mod_instructions,
         context=context,
     )
-
+    print(turn_manager_config)
     next_turn_manager = turn_manager.turn_manager_factory(
         turn_manager_type, rand_user_names, config=turn_manager_config
     )
