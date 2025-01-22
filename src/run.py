@@ -39,34 +39,48 @@ def main():
         level=logging_config["level"],
     )
 
-    # Load model
-    logger.info("Loading LLM...")
-    llm = _initialize_model(yaml_data)
-    logger.info("Model loaded.")
+    action_config = yaml_data["actions"]
+    generate_discussions = action_config["generate_discussions"]
+    generate_annotations = action_config["generate_annotations"]
+    export_dataset = action_config["export_dataset"]
 
-    # Create discussions
-    logger.info("Starting synthetic discussion experiments...")
-    sdl.discussions.experiments.run_experiments(llm=llm, yaml_data=yaml_data)
-    logger.info("Finished synthetic discussion experiments.")
+    if not generate_discussions and not generate_annotations and not export_dataset:
+        logger.warning(
+            "All procedures have been disabled for this run. Exiting..."
+        )
+        
+    if generate_discussions:
+        # Create discussions
+        logger.info("Loading LLM...")
+        llm = _initialize_model(yaml_data)
+        logger.info("Model loaded.")
 
-    # Create annotations
-    logger.info("Starting synthetic annotation...")
-    sdl.annotations.experiments.run_experiments(llm=llm, yaml_data=yaml_data)
-    logger.info("Finished synthetic annotation.")
+        logger.info("Starting synthetic discussion experiments...")
+        sdl.discussions.experiments.run_experiments(llm=llm, yaml_data=yaml_data)
+        logger.info("Finished synthetic discussion experiments.")
 
-    # Export full dataset
-    conv_dir = yaml_data["discussions"]["files"]["output_dir"]
-    annot_dir = yaml_data["annotation"]["files"]["output_dir"]
-    export_path = yaml_data["dataset_export"]["export_path"]
-    include_sdbs = yaml_data["dataset_export"]["include_annotator_sdb_info"]
+    if generate_annotations:
+        # Create annotations
+        logger.info("Loading LLM...")
+        llm = _initialize_model(yaml_data)
+        logger.info("Model loaded.")
 
-    df = _create_dataset(
-        conv_dir=conv_dir, 
-        annot_dir=annot_dir, 
-        include_sdbs=include_sdbs
-    )
-    _export_dataset(df=df, output_path=export_path)
-    logger.info("Dataset exported to " + str(export_path))
+        logger.info("Starting synthetic annotation...")
+        sdl.annotations.experiments.run_experiments(llm=llm, yaml_data=yaml_data)
+        logger.info("Finished synthetic annotation.")
+
+    if export_dataset:
+        # Export full dataset
+        conv_dir = yaml_data["discussions"]["files"]["output_dir"]
+        annot_dir = yaml_data["annotation"]["files"]["output_dir"]
+        export_path = yaml_data["dataset_export"]["export_path"]
+        include_sdbs = yaml_data["dataset_export"]["include_annotator_sdb_info"]
+
+        df = _create_dataset(
+            conv_dir=conv_dir, annot_dir=annot_dir, include_sdbs=include_sdbs
+        )
+        _export_dataset(df=df, output_path=export_path)
+        logger.info("Dataset exported to " + str(export_path))
 
 
 def _initialize_model(yaml_data: dict) -> sdl.backend.model.Model:
@@ -142,9 +156,7 @@ def _create_dataset(
 def _export_dataset(df: pd.DataFrame, output_path: Path):
     sdl.util.file_util.ensure_parent_directories_exist(output_path)
     df.to_csv(
-        path_or_buf=output_path, 
-        encoding="utf8", 
-        mode="w+"
+        path_or_buf=output_path, encoding="utf8", mode="w+"
     )  # overwrite previous dataset
 
 
