@@ -7,6 +7,7 @@ import pandas as pd
 
 import sdl.util.logging_util
 import sdl.util.file_util
+import sdl.util.model_util
 import sdl.annotations.experiments
 import sdl.discussions.experiments
 import sdl.postprocessing.postprocessing
@@ -44,6 +45,8 @@ def main():
     generate_annotations = action_config["generate_annotations"]
     export_dataset = action_config["export_dataset"]
 
+    model_manager = sdl.util.model_util.ModelManager(yaml_data=yaml_data)
+
     if not generate_discussions and not generate_annotations and not export_dataset:
         logger.warning(
             "All procedures have been disabled for this run. Exiting..."
@@ -52,7 +55,7 @@ def main():
     if generate_discussions:
         # Create discussions
         logger.info("Loading LLM...")
-        llm = _initialize_model(yaml_data)
+        llm = model_manager.get()
         logger.info("Model loaded.")
 
         logger.info("Starting synthetic discussion experiments...")
@@ -62,7 +65,7 @@ def main():
     if generate_annotations:
         # Create annotations
         logger.info("Loading LLM...")
-        llm = _initialize_model(yaml_data)
+        llm = model_manager.get()
         logger.info("Model loaded.")
 
         logger.info("Starting synthetic annotation...")
@@ -82,51 +85,6 @@ def main():
         )
         _export_dataset(df=df, output_path=export_path)
         logger.info("Dataset exported to " + str(export_path))
-
-
-def _initialize_model(yaml_data: dict) -> sdl.backend.model.Model:
-    # Extract values from the config
-    model_params = yaml_data["model_parameters"]
-    model_path = model_params["general"]["model_path"]
-    model_name = model_params["general"]["model_pseudoname"]
-    library_type = model_params["general"]["library_type"]
-    max_tokens = model_params["general"]["max_tokens"]
-    ctx_width_tokens = model_params["general"]["ctx_width_tokens"]
-    remove_str_list = model_params["general"]["disallowed_strings"]
-
-    inference_threads = model_params["llama_cpp"]["inference_threads"]
-    gpu_layers = model_params["llama_cpp"]["gpu_layers"]
-
-    llm = None
-    if library_type == "llama_cpp":
-        # dynamically load library to avoid dependency hell
-        from sdl.backend.cpp_model import LlamaModel
-
-        llm = LlamaModel(
-            model_path=model_path,
-            name=model_name,
-            max_out_tokens=max_tokens,
-            seed=42,  # Random seed (this can be adjusted)
-            remove_string_list=remove_str_list,
-            ctx_width_tokens=ctx_width_tokens,
-            inference_threads=inference_threads,
-            gpu_layers=gpu_layers,
-        )
-    elif library_type == "transformers":
-        # dynamically load library to avoid dependency hell
-        from sdl.backend.trans_model import TransformersModel
-
-        llm = TransformersModel(
-            model_path=model_path,
-            name=model_name,
-            max_out_tokens=max_tokens,
-            remove_string_list=remove_str_list,
-        )
-    else:
-        raise NotImplementedError(
-            f"Unknown model type: {library_type}. Supported types: llama_cpp, transformers"
-        )
-    return llm
 
 
 def _create_dataset(
