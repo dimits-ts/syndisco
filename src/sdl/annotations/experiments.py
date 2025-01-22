@@ -14,12 +14,12 @@ def run_experiments(
     llm: model.Model,
     yaml_data: dict
 ) -> None:
-    discussions_dir = yaml_data["discussions"]["files"]["output_dir"]
+    discussions_dir = Path(yaml_data["discussions"]["files"]["output_dir"])
 
     annotation_file_data = yaml_data["annotation"]["files"]
-    annotator_persona_dir = annotation_file_data["annotator_persona_dir"]
-    output_dir = annotation_file_data["output_dir"]
-    instruction_path = annotation_file_data["instruction_path"]
+    annotator_persona_dir = Path(annotation_file_data["annotator_persona_dir"])
+    output_dir = Path(annotation_file_data["output_dir"])
+    instruction_path = Path(annotation_file_data["instruction_path"])
 
     annotation_experiment_data = yaml_data["annotation"]["experiment_variables"]
     include_mod_comments = annotation_experiment_data["include_mod_comments"]

@@ -162,5 +162,5 @@ class Conversation:
         self.ctx_history.append(formatted_res)
 
         if verbose:
-            print(formatted_res)
+            print(formatted_res, "\n")
 

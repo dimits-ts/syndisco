@@ -36,7 +36,7 @@ def main():
     sdl.util.logging_util.logging_setup(
         print_to_terminal=logging_config["print_to_terminal"],
         write_to_file=logging_config["write_to_file"],
-        logs_dir=logging_config["logs_dir"],
+        logs_dir=Path(logging_config["logs_dir"]),
         level=logging_config["level"],
     )
 
@@ -75,9 +75,9 @@ def main():
     if export_dataset:
         # Export full dataset
         export_config = yaml_data["dataset_export"]
-        conv_dir = export_config["discussion_root_dir"]
-        annot_dir = export_config["annotation_root_dir"]
-        export_path = export_config["export_path"]
+        conv_dir = Path(export_config["discussion_root_dir"])
+        annot_dir = Path(export_config["annotation_root_dir"])
+        export_path = Path(export_config["export_path"])
         include_sdbs = export_config["include_annotator_sdb_info"]
 
         df = _create_dataset(
