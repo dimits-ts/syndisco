@@ -1,11 +1,13 @@
 """
 Combine JSON output files for synthetic discussions and annotations into cohesive CSV files.
 """
-import pandas as pd
 import os
 import json
 import re
+import ast
 from pathlib import Path
+
+import pandas as pd
 
 
 def import_conversations(conv_dir: str | Path) -> pd.DataFrame:
@@ -65,7 +67,7 @@ def import_annotations(annot_dir: str | Path, include_sdb_info: bool = False) ->
         traits_df = _process_traits(annot_df.annotator_prompt.apply(_extract_traits)).reset_index()
         annot_df = pd.concat([annot_df, traits_df], axis=1)
         del annot_df["special_instructions"]
-    
+
     return annot_df
 
 
@@ -85,7 +87,7 @@ def _read_annotations(annot_dir: str | Path) -> pd.DataFrame:
     rows = []
 
     for file_path in file_paths:
-        with open(file_path, "r") as fin:
+        with open(file_path, "r", encoding="utf8") as fin:
             conv = json.load(fin)
 
         conv = pd.json_normalize(conv)
@@ -117,7 +119,7 @@ def _read_conversations(conv_dir: str | Path) -> pd.DataFrame:
     rows = []
 
     for file_path in file_paths:
-        with open(file_path, "r") as fin:
+        with open(file_path, "r", encoding="utf8") as fin:
             conv = json.load(fin)
 
         conv = pd.json_normalize(conv)
@@ -157,7 +159,7 @@ def _list_files_recursive(start_path: str | Path) -> list[str]:
     :rtype: list[str]
     """
     all_files = []
-    for root, dirs, files in os.walk(start_path):
+    for root, _, files in os.walk(start_path):
         for file in files:
             all_files.append(os.path.join(root, file))
     return all_files
@@ -237,7 +239,7 @@ def _extract_traits(message: str | None) -> dict:
 
         try:
             if value.startswith("[") and value.endswith("]"):
-                value = eval(value)
+                value = ast.literal_eval(value)
             elif value.startswith(("'", '"')) and value.endswith(("'", '"')):
                 value = value.strip("'\"")
         except Exception:

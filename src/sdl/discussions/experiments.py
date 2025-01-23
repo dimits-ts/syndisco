@@ -3,6 +3,7 @@ Generates experiments by combining the sample input configs.
 Each experiment is packaged into a Conversation object (@see generation.py).
 Then runs each experiment sequentially, and saves the output to disk as an auto-generated file.
 """
+
 import os
 import random
 import logging
@@ -45,7 +46,7 @@ def _run_single_experiment(
 
     :param experiment: A Conversation object describing the experiment.
     :type experiment: generation.Conversation
-    :param output_dir: The directory where the auto-generated file with the 
+    :param output_dir: The directory where the auto-generated file with the
     experiment's output will be saved
     :type output_dir: Path
     """
@@ -61,7 +62,9 @@ def _run_single_experiment(
         logger.exception("Experiment aborted due to error.")
 
 
-def _generate_experiments(yaml_data: dict, llm: model.Model) -> list[generation.Conversation]:
+def _generate_experiments(
+    yaml_data: dict, llm: model.Model
+) -> list[generation.Conversation]:
     """Generate experiments from the basic configurations and wrap them into
     Conversation objects.
 
@@ -149,8 +152,8 @@ def _create_synthetic_discussion(
     """
     Generate a synthetic discussion with users, a moderator, and a turn manager.
 
-    This function creates a conversation simulation using an LLM for a specified number of users 
-    and a moderator, with topics, personas, and turn management strategies. The output is a 
+    This function creates a conversation simulation using an LLM for a specified number of users
+    and a moderator, with topics, personas, and turn management strategies. The output is a
     structured conversation object.
 
     :param llm: The language model used to generate user and moderator responses.
@@ -216,7 +219,7 @@ def _create_synthetic_discussion(
         conv_len=conv_len,
         seed_opinion=rand_topic,
         seed_opinion_user=random.choice(rand_user_names),
-        turn_manager=next_turn_manager,
+        next_turn_manager=next_turn_manager,
     )
 
 
@@ -239,7 +242,8 @@ def _create_users(
     :type context: str
     :param instructions: the instructions given to all LLM users (not the moderator)
     :type instructions: str
-    :return: a list of initialized runtime LLMUser objects corresponding to the given characteristics
+    :return: a list of initialized runtime LLMUser objects
+    corresponding to the given characteristics
     :rtype: list[actors.LLMUser]
     """
     user_list = []

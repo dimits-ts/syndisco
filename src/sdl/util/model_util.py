@@ -1,6 +1,7 @@
 """
 Holds a utility class which helps manage initialization, loading and unloading of models on demand.
 """
+
 from pathlib import Path
 import logging
 
@@ -12,7 +13,8 @@ logger = logging.getLogger(Path(__file__).name)
 
 class ModelManager:
     """
-    A Factory and Singleton class initializing and managing access to a single, unique instance of a model.
+    A Factory and Singleton class initializing and managing access to a single,
+    unique instance of a model.
     """
 
     def __init__(self, yaml_data: dict):
@@ -44,7 +46,6 @@ class ModelManager:
         logger.info("Using already loaded model...")
         return self.model
 
-    
     def _initialize_model(self) -> model.Model:
         """
         Initialize a new LLM model wrapper instance.

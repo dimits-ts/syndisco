@@ -157,7 +157,7 @@ def _generate_experiments(
     if not persona_dir.is_dir():
         logger.error(f"Error: Persona directory '{persona_dir}' does not exist.")
         exit(1)
-    
+
     if not instruction_path.exists():
         logger.error(f"Error: Instructions file '{instruction_path}' does not exist.")
         exit(1)

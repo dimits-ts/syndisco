@@ -21,7 +21,7 @@ class Conversation:
 
     def __init__(
         self,
-        turn_manager: turn_manager.TurnManager,
+        next_turn_manager: turn_manager.TurnManager,
         users: list[actors.LLMUser],
         moderator: Optional[actors.LLMUser] = None,
         history_context_len: int = 5,
@@ -36,23 +36,28 @@ class Conversation:
         :type turn_manager: turn_manager.TurnManager
         :param users: A list of discussion participants
         :type users: list[actors.Actor]
-        :param moderator: An actor tasked with moderation if not None, can speak at any point in the conversation,
+        :param moderator: An actor tasked with moderation if not None, 
+        can speak at any point in the conversation,
          defaults to None
         :type moderator: actors.Actor | None, optional
-        :param history_context_len: How many prior messages are included to the LLMs prompt as context, defaults to 5
+        :param history_context_len: How many prior messages are included 
+        to the LLMs prompt as context, defaults to 5
         :type history_context_len: int, optional
-        :param conv_len: The total length of the conversation (how many times each actor will be prompted),
+        :param conv_len: The total length of the conversation 
+        (how many times each actor will be prompted),
          defaults to 5
         :type conv_len: int, optional
-        :param seed_opinion: The first hardcoded comments to start the conversation with
+        :param seed_opinion: The first hardcoded comments to 
+        start the conversation with
         :type seed_opinion: str, optional
         :param seed_opinion_user: The username for the seed opinion
         :type seed_opinion_user: int, optional
-        :raises ValueError: if the number of seed opinions and seed opinion users are different, or
+        :raises ValueError: if the number of seed opinions and seed 
+        opinion users are different, or
         if the number of seed opinions exceeds history_context_len
         """
         # just to satisfy the type checker
-        self.next_turn_manager = turn_manager
+        self.next_turn_manager = next_turn_manager
         self.username_user_map = {user.get_name(): user for user in users}
         # used during export, in order to keep information about the underlying models
         self.user_types = [type(user).__name__ for user in self.username_user_map]
@@ -71,7 +76,8 @@ class Conversation:
     def begin_conversation(self, verbose: bool = True) -> None:
         """
         Begin the conversation between the actors.
-        :param verbose: whether to print the messages on the screen as they are generated, defaults to True
+        :param verbose: whether to print the messages on the screen 
+        as they are generated, defaults to True
         :type verbose: bool, optional
         :raises RuntimeError: if the object has already been used to generate a conversation
         """
@@ -109,7 +115,8 @@ class Conversation:
         """
         Get a dictionary view of the data and metadata contained in the conversation.
 
-        :param timestamp_format: the format for the conversation's creation time, defaults to "%y-%m-%d-%H-%M"
+        :param timestamp_format: the format for the conversation's creation time,
+         defaults to "%y-%m-%d-%H-%M"
         :type timestamp_format: str, optional
         :return: a dict representing the conversation
         :rtype: dict[str, Any]
@@ -172,7 +179,7 @@ class Conversation:
         :param comment: The new comment
         :type comment: str
         """
-        model_name = user.model.name if user.model is not None else "hardcoded" 
+        model_name = user.model.name if user.model is not None else "hardcoded"
         artifact = {"name": user.name, "text": comment, "model": model_name}
         self.conv_logs.append(artifact)
 
