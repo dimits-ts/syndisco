@@ -1,3 +1,8 @@
+"""
+Generates an annotation task for each annotator and for each synthetic discussion.  
+Each annotation task is packaged into an AnnotationConv object (@see generation.py).
+Then runs each annotation task sequentially, and saves the output to disk as an auto-generated file.
+"""
 import os
 import logging
 from pathlib import Path
@@ -14,6 +19,14 @@ def run_experiments(
     llm: model.Model,
     yaml_data: dict
 ) -> None:
+    """
+    Creates annotation experiments for synthetic discussions and saves their outputs.
+
+    :param llm: The language model instance.
+    :type llm: model.Model
+    :param yaml_data: Serialized YAML configuration containing input paths and parameters.
+    :type yaml_data: dict
+    """
     discussions_dir = Path(yaml_data["discussions"]["files"]["output_dir"])
 
     annotation_file_data = yaml_data["annotation"]["files"]
@@ -32,7 +45,6 @@ def run_experiments(
         logger.error(f"Error: Synthetic discussion directory '{discussions_dir}' does not exist.")
         exit(1)
 
-
     annotation_experiments = _generate_experiments(
         llm=llm,
         persona_dir=annotator_persona_dir,
@@ -49,6 +61,14 @@ def run_experiments(
 
 
 def _run_single_experiment(experiment: generation.AnnotationConv, output_dir: Path) -> None:
+    """
+    Executes a single annotation experiment and saves its output to a file.
+
+    :param experiment: An AnnotationConv object containing the annotation task.
+    :type experiment: generation.AnnotationConv
+    :param output_dir: The directory to save the experiment's output file.
+    :type output_dir: Path
+    """
     try:
         logger.info("Beginning conversation...")
         experiment.begin_annotation(verbose=True)
@@ -69,7 +89,24 @@ def _generate_annotator_conv(
     history_ctx_len: int,
     include_moderator_comments: bool,
 ) -> generation.AnnotationConv:
-    """Generate an annotation configuration object from provided attributes."""
+    """
+    Generates a single annotation task configuration.
+
+    :param llm: The language model instance used for the annotator.
+    :type llm: model.Model
+    :param conv_logs_path: Path to the conversation logs for the annotation.
+    :type conv_logs_path: str | Path
+    :param annotator_persona: Persona details of the annotator.
+    :type annotator_persona: persona.LlmPersona
+    :param instructions: Instructions provided to the annotator.
+    :type instructions: str
+    :param history_ctx_len: Context history length provided to the annotator.
+    :type history_ctx_len: int
+    :param include_moderator_comments: Flag indicating whether moderator comments are included.
+    :type include_moderator_comments: bool
+    :return: A configured AnnotationConv object.
+    :rtype: generation.AnnotationConv
+    """
     annotator = actors.LLMAnnotator(
         model=llm,
         name="annotator",
@@ -95,7 +132,27 @@ def _generate_experiments(
     history_ctx_len: int,
     include_mod_comments: bool,
 ) -> list[generation.AnnotationConv]:
+    """
+    Generates a list of annotation experiments by combining synthetic discussions
+    and annotator personas.
 
+    :param llm: The language model instance.
+    :type llm: model.Model
+    :param persona_dir: Directory containing JSON files for annotator personas.
+    :type persona_dir: Path
+    :param instruction_path: Path to the instructions file for annotators.
+    :type instruction_path: Path
+    :param discussions_dir: Directory containing synthetic discussion files.
+    :type discussions_dir: Path
+    :param history_ctx_len: Context history length provided to annotators.
+    :type history_ctx_len: int
+    :param include_mod_comments: Flag indicating whether moderator comments are included.
+    :type include_mod_comments: bool
+    :return: List of configured AnnotationConv objects for annotation experiments.
+    :rtype: list[generation.AnnotationConv]
+
+    :raises SystemExit: If any required directory or file is missing.
+    """
     # Ensure persona directory exists
     if not persona_dir.is_dir():
         logger.error(f"Error: Persona directory '{persona_dir}' does not exist.")

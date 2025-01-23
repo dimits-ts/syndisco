@@ -1,8 +1,13 @@
+"""
+The main entry point for the library.
+Imports the configuration file, sets up logging, and directs calls for discussion generation, 
+annotation, and dataset export.
+"""
+import sys
 import argparse
 import logging
 from pathlib import Path
 import yaml
-import sys
 
 import pandas as pd
 
@@ -19,6 +24,13 @@ logger = logging.getLogger(Path(__file__).name)
 
 
 def main():
+    """
+    Run synthetic discussion generation, annotation, and dataset export.
+
+    This function parses the configuration file, sets up logging, and performs 
+    tasks based on the actions specified in the configuration. Actions include 
+    generating synthetic discussions, creating annotations, and exporting the dataset.
+    """
     # Set up argument parser for config file path
     parser = argparse.ArgumentParser(description="Generate synthetic conversations")
     parser.add_argument(
@@ -50,16 +62,16 @@ def main():
 
     model_manager = sdl.util.model_util.ModelManager(yaml_data=yaml_data)
 
-    # disabled functionality warnings
+    # Disabled functionality warnings
     if not generate_discussions and not generate_annotations and not export_dataset:
         logger.warning("All procedures have been disabled for this run. Exiting...")
         sys.exit(0)
     else:
         if not generate_discussions:
             logger.warning("Synthetic discussion generation disabled.")
-        if not generate_discussions:
+        if not generate_annotations:
             logger.warning("Synthetic annotation disabled.")
-        if not generate_discussions:
+        if not export_dataset:
             logger.warning("Dataset export to CSV disabled.")
 
     if generate_discussions:
@@ -94,6 +106,18 @@ def main():
 def _create_dataset(
     conv_dir: Path, annot_dir: Path, include_sdbs: bool
 ) -> pd.DataFrame:
+    """
+    Create a combined dataset from conversation and annotation files.
+
+    :param conv_dir: Directory containing conversation data files.
+    :type conv_dir: Path
+    :param annot_dir: Directory containing annotation data files.
+    :type annot_dir: Path
+    :param include_sdbs: Whether to include annotator SDB information in the dataset.
+    :type include_sdbs: bool
+    :return: A combined DataFrame containing conversation and annotation data.
+    :rtype: pd.DataFrame
+    """
     if not include_sdbs:
         logger.warning("Not including annotator SDBs to output.")
 
@@ -117,6 +141,14 @@ def _create_dataset(
 
 
 def _export_dataset(df: pd.DataFrame, output_path: Path):
+    """
+    Export the dataset to a CSV file.
+
+    :param df: The dataset to export.
+    :type df: pd.DataFrame
+    :param output_path: The path where the exported dataset will be saved.
+    :type output_path: Path
+    """
     sdl.util.file_util.ensure_parent_directories_exist(output_path)
     df.to_csv(
         path_or_buf=output_path, encoding="utf8", mode="w+"

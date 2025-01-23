@@ -1,3 +1,6 @@
+"""
+Holds a utility class which helps manage initialization, loading and unloading of models on demand.
+"""
 from pathlib import Path
 import logging
 
@@ -6,13 +9,33 @@ from ..backend import model
 
 logger = logging.getLogger(Path(__file__).name)
 
+
 class ModelManager:
+    """
+    A Factory and Singleton class initializing and managing access to a single, unique instance of a model.
+    """
 
     def __init__(self, yaml_data: dict):
+        """
+        Initialize the manager without loading the model to the runtime.
+
+        :param yaml_data: the experiment configuration
+        :type yaml_data: dict
+        """
+        # TODO: Write record classes for such configurations to be transferred
         self.model = None
         self.yaml_data = yaml_data
 
     def get(self) -> model.Model:
+        """
+        Get a reference to the protected model instance.
+        First invocation loads the instance to runtime.
+
+        :raises NotImplementedError: if an incompatible library_type
+         is given in the yaml_data of the constructor
+        :return: The initialized model instance.
+        :rtype: model.Model
+        """
         if self.model is None:
             logger.info("Loading model...")
             self.model = self._initialize_model()
@@ -23,6 +46,13 @@ class ModelManager:
 
     
     def _initialize_model(self) -> model.Model:
+        """
+        Initialize a new LLM model wrapper instance.
+
+        :raises NotImplementedError: if an incompatible library_type is given
+        :return: an initialized, loaded LLM model wrapper
+        :rtype: model.Model
+        """
         # Extract values from the config
         model_params = self.yaml_data["model_parameters"]
         model_path = model_params["general"]["model_path"]

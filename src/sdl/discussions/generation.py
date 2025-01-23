@@ -1,3 +1,7 @@
+"""
+Runtime class which saves synthetic discussion experiment 
+configs at runtime and is responsible for executing it.
+"""
 import collections
 import datetime
 import json
@@ -145,22 +149,48 @@ class Conversation:
 
 
     def _archive_response(
-        self, user: actors.LlmActor, response: str, verbose: bool
+        self, user: actors.LLMUser, comment: str, verbose: bool
     ) -> None:
-        self._log_comment(user, response)
-        self._add_comment_to_history(user, response, verbose)
+        """Save the new comment to discussion output, 
+        to discussion history for other users to see, maybe print it on screen.
+
+        :param user: The user who created the new comment.
+        :type user: actors.LLMUser
+        :param comment: The new comment.
+        :type comment: str
+        :param verbose: Whether to print the comment to stdout
+        :type verbose: bool
+        """
+        self._log_comment(user, comment)
+        self._add_comment_to_history(user, comment, verbose)
 
     def _log_comment(self, user: actors.LlmActor, comment: str) -> None:
+        """Save new comment to the output history.
+
+        :param user: The user who created the new comment
+        :type user: actors.LlmActor
+        :param comment: The new comment
+        :type comment: str
+        """
         model_name = user.model.name if user.model is not None else "hardcoded" 
         artifact = {"name": user.name, "text": comment, "model": model_name}
         self.conv_logs.append(artifact)
 
     def _add_comment_to_history(
-        self, user: actors.LlmActor, response: str, verbose: bool
+        self, user: actors.LlmActor, comment: str, verbose: bool
     ) -> None:
-        formatted_res = output_util.format_chat_message(user.name, response)
+        """Add new comment to the discussion history, 
+        so it can be shown to the other participants in the future.
+
+        :param user: The user who created the new comment
+        :type user: actors.LlmActor
+        :param comment: The new comment
+        :type comment: str
+        :param verbose: Whether to print the comment to stdout
+        :type verbose: bool
+        """
+        formatted_res = output_util.format_chat_message(user.name, comment)
         self.ctx_history.append(formatted_res)
 
         if verbose:
             print(formatted_res, "\n")
-

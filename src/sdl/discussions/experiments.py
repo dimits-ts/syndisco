@@ -1,3 +1,8 @@
+"""
+Generates experiments by combining the sample input configs. 
+Each experiment is packaged into a Conversation object (@see generation.py).
+Then runs each experiment sequentially, and saves the output to disk as an auto-generated file.
+"""
 import os
 import random
 import logging
@@ -15,6 +20,13 @@ logger = logging.getLogger(Path(__file__).name)
 
 
 def run_experiments(llm: model.Model, yaml_data: dict) -> None:
+    """Creates experiments by combining the given input data, then runs each one sequentially.
+
+    :param llm: The wrapped LLM
+    :type llm: model.Model
+    :param yaml_data: the serialized experiment configurations
+    :type yaml_data: dict
+    """
     # Ensure output directory exists
     output_dir = yaml_data["discussions"]["files"]["output_dir"]
     os.makedirs(output_dir, exist_ok=True)
@@ -29,6 +41,14 @@ def run_experiments(llm: model.Model, yaml_data: dict) -> None:
 def _run_single_experiment(
     experiment: generation.Conversation, output_dir: Path
 ) -> None:
+    """Run a single experiment, then save its output to a auto-generated file.
+
+    :param experiment: A Conversation object describing the experiment.
+    :type experiment: generation.Conversation
+    :param output_dir: The directory where the auto-generated file with the 
+    experiment's output will be saved
+    :type output_dir: Path
+    """
     try:
         logger.info("Beginning conversation...")
         experiment.begin_conversation(verbose=True)
@@ -41,7 +61,17 @@ def _run_single_experiment(
         logger.exception("Experiment aborted due to error.")
 
 
-def _generate_experiments(yaml_data: dict, llm: model.Model):
+def _generate_experiments(yaml_data: dict, llm: model.Model) -> list[generation.Conversation]:
+    """Generate experiments from the basic configurations and wrap them into
+    Conversation objects.
+
+    :param yaml_data: the serialized experiment configurations
+    :type yaml_data: dict
+    :param llm: the wrapped LLM
+    :type llm: model.Model
+    :return: a list of Conversation objects containing the experiments
+    :rtype: _type_
+    """
     # Extract yaml configs
     paths = yaml_data["discussions"]["files"]
     turn_taking_config = yaml_data["discussions"]["turn_taking"]
@@ -116,6 +146,42 @@ def _create_synthetic_discussion(
     conv_len: int,
     history_ctx_len: int,
 ) -> generation.Conversation:
+    """
+    Generate a synthetic discussion with users, a moderator, and a turn manager.
+
+    This function creates a conversation simulation using an LLM for a specified number of users 
+    and a moderator, with topics, personas, and turn management strategies. The output is a 
+    structured conversation object.
+
+    :param llm: The language model used to generate user and moderator responses.
+    :type llm: model.Model
+    :param topics: A list of topics to seed the discussion.
+    :type topics: list[str]
+    :param context: Contextual information shared with users and the moderator.
+    :type context: str
+    :param all_personas: A list of all possible personas that define user attributes and behaviors.
+    :type all_personas: list[persona.LlmPersona]
+    :param mod_attributes: Attributes for the moderator persona, defaults to None.
+    :type mod_attributes: list[str] | None
+    :param user_instructions: Instructions provided to the users.
+    :type user_instructions: str
+    :param mod_instructions: Instructions provided to the moderator, defaults to None.
+    :type mod_instructions: str | None
+    :param turn_manager_type: The type of turn manager to control turn-taking.
+    :type turn_manager_type: str
+    :param turn_manager_config: Configuration dictionary for the turn manager.
+    :type turn_manager_config: dict
+    :param num_users: Number of users participating in the discussion.
+    :type num_users: int
+    :param conv_len: Length of the conversation in terms of the number of turns.
+    :type conv_len: int
+    :param history_ctx_len: Length of the context history shared during the conversation.
+    :type history_ctx_len: int
+    :return: A synthetic conversation object.
+    :rtype: generation.Conversation
+
+    :raises AssertionError: If the number of users exceeds the number of provided personas.
+    """
     assert num_users <= len(
         all_personas
     ), "Number of users must be less or equal to the number of provided personas"
@@ -161,6 +227,21 @@ def _create_users(
     context: str,
     instructions: str,
 ) -> list[actors.LLMUser]:
+    """Create runtime LLMUser objects with the specified information.
+
+    :param llm: the wrapped LLM instance that the users will use to generate text
+    :type llm: model.Model
+    :param usernames: a list of usernames for each of the users
+    :type usernames: list[str]
+    :param attributes: a list containing a list of personality/mood attributes for each user
+    :type attributes: list[list[str]]
+    :param context: the global context of the experiment
+    :type context: str
+    :param instructions: the instructions given to all LLM users (not the moderator)
+    :type instructions: str
+    :return: a list of initialized runtime LLMUser objects corresponding to the given characteristics
+    :rtype: list[actors.LLMUser]
+    """
     user_list = []
 
     assert len(usernames) == len(
@@ -186,6 +267,21 @@ def _create_moderator(
     instructions: str | None,
     context: str,
 ) -> actors.LLMUser | None:
+    """Create a LLMUser instance, which will assume the role of moderator.
+    Returns None if any of the input arguments are set to None.
+
+    :param llm: the wrapped LLM instance that the moderator will use to generate text
+    :type llm: model.Model | None
+    :param mod_attributes: a list of personality/mood attributes for the moderator
+    :type mod_attributes: list[str] | None
+    :param instructions: the moderator-specific instructions
+    :type instructions: str | None
+    :param context: the global context of the experiment
+    :type context: str
+    :return: an initialized LLMUser instance which will assume the role of moderator,
+    or None if any of the fields above are set to None
+    :rtype: actors.LLMUser | None
+    """
     if mod_attributes is not None and llm is not None and instructions is not None:
         moderator = actors.LLMUser(
             model=llm,
