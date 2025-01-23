@@ -2,6 +2,7 @@ import argparse
 import logging
 from pathlib import Path
 import yaml
+import sys
 
 import pandas as pd
 
@@ -39,7 +40,7 @@ def main():
         logs_dir=Path(logging_config["logs_dir"]),
         level=logging_config["level"],
         use_colors=True,
-        log_warnings=True
+        log_warnings=True,
     )
 
     action_config = yaml_data["actions"]
@@ -49,27 +50,28 @@ def main():
 
     model_manager = sdl.util.model_util.ModelManager(yaml_data=yaml_data)
 
+    # disabled functionality warnings
     if not generate_discussions and not generate_annotations and not export_dataset:
-        logger.warning(
-            "All procedures have been disabled for this run. Exiting..."
-        )
-        
+        logger.warning("All procedures have been disabled for this run. Exiting...")
+        sys.exit(0)
+    else:
+        if not generate_discussions:
+            logger.warning("Synthetic discussion generation disabled.")
+        if not generate_discussions:
+            logger.warning("Synthetic annotation disabled.")
+        if not generate_discussions:
+            logger.warning("Dataset export to CSV disabled.")
+
     if generate_discussions:
         # Create discussions
-        logger.info("Loading LLM...")
         llm = model_manager.get()
-        logger.info("Model loaded.")
-
         logger.info("Starting synthetic discussion experiments...")
         sdl.discussions.experiments.run_experiments(llm=llm, yaml_data=yaml_data)
         logger.info("Finished synthetic discussion experiments.")
 
     if generate_annotations:
         # Create annotations
-        logger.info("Loading LLM...")
         llm = model_manager.get()
-        logger.info("Model loaded.")
-
         logger.info("Starting synthetic annotation...")
         sdl.annotations.experiments.run_experiments(llm=llm, yaml_data=yaml_data)
         logger.info("Finished synthetic annotation.")

@@ -1,5 +1,10 @@
+from pathlib import Path
+import logging
+
 from ..backend import model
 
+
+logger = logging.getLogger(Path(__file__).name)
 
 class ModelManager:
 
@@ -9,7 +14,11 @@ class ModelManager:
 
     def get(self) -> model.Model:
         if self.model is None:
+            logger.info("Loading model...")
             self.model = self._initialize_model()
+            logger.info("Model loaded.")
+
+        logger.info("Using already loaded model...")
         return self.model
 
     
