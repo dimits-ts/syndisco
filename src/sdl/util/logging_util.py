@@ -5,6 +5,7 @@ from pathlib import Path
 
 from . import file_util
 
+import coloredlogs
 
 logger = logging.getLogger(Path(__file__).name)
 
@@ -14,6 +15,7 @@ def logging_setup(
     write_to_file: bool,
     logs_dir: typing.Optional[str | Path] = None,
     level: str="debug",
+    use_colors: bool=True,
 ) -> None:
     """
     Create the logger configuration.
@@ -25,6 +27,8 @@ def logging_setup(
     :param logs_dir: the directory where the logs will be placed, defaults to None
     :type logs_dir: typing.Optional[str  |  Path], optional
     :param level: the logging level, defaults to logging.DEBUG
+    :param use_colors: whether to color the output. Uses the coloredlogs library
+    :type use_colors: bool, defaults to True
     """
     if not print_to_terminal and logs_dir is None:
         warnings.warn(
@@ -48,6 +52,9 @@ def logging_setup(
             handlers.append(logging.FileHandler(filename))
 
     logging.basicConfig(handlers=handlers, level=_str_to_log_level(level))
+    
+    if use_colors:
+        coloredlogs.install()
 
 
 def _str_to_log_level(level_str: str):
