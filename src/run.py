@@ -14,7 +14,7 @@ import sdl.postprocessing.postprocessing
 import sdl.backend.model
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(Path(__file__).name)
 
 
 def main():

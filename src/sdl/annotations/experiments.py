@@ -7,7 +7,7 @@ from ..util import file_util
 from . import generation
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(Path(__file__).name)
 
 
 def run_experiments(
