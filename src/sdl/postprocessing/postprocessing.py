@@ -24,7 +24,7 @@ def import_conversations(conv_dir: str | Path) -> pd.DataFrame:
     del df["moderator"], df["moderator_prompt"]
 
     # add attributes for each user as rows
-    df2 = process_traits(df.user_prompt.apply(_extract_traits)).reset_index()
+    df2 = _process_traits(df.user_prompt.apply(_extract_traits)).reset_index()
     del df2["username"]
     df = pd.concat([df, df2], axis=1)
     return df
@@ -51,7 +51,7 @@ def import_annotations(annot_dir: str | Path, include_sdb_info: bool=False) -> p
 
     if include_sdb_info:
         # add attributes for each user as rows
-        traits_df = process_traits(annot_df.annotator_prompt.apply(_extract_traits)).reset_index()
+        traits_df = _process_traits(annot_df.annotator_prompt.apply(_extract_traits)).reset_index()
         annot_df = pd.concat([annot_df, traits_df], axis=1)
         del annot_df["special_instructions"]
     
@@ -159,7 +159,7 @@ def _list_files_recursive(start_path: str | Path) -> list[str]:
 def _select_user_prompt(df: pd.DataFrame) -> list[str]:
     selected_user_prompts = []
     for row in df.itertuples():
-        prompt = _extract_user_prompt(row.user_prompts, row.user)
+        prompt = _extract_user_prompt(row.user_prompts, row.user) # type: ignore
         selected_user_prompts.append(prompt)
     return selected_user_prompts
 
@@ -174,7 +174,7 @@ def _extract_user_prompt(user_prompts: list[str], username: str | None) -> str |
     return None
 
 
-def process_traits(series):
+def _process_traits(series):
     """
     Processes a pandas Series of strings containing schema-like traits
     and converts them into a DataFrame with a column for each attribute.
@@ -211,11 +211,11 @@ def _extract_traits(message):
 
     traits_section = traits_match.group(1).strip()
 
-    # Split traits into individual attribute-value pairs
+    # Updated regex to capture entire values, including multi-word ones
     traits = {}
-    for match in re.finditer(r'(\w+):\s*(\[.*?\]|".*?"|\'.*?\'|\S+)', traits_section):
+    for match in re.finditer(r'(\w+):\s*(".*?"|\[.*?\]|[\w\s]+)(?=,|$)', traits_section):
         key = match.group(1)
-        value = match.group(2)
+        value = match.group(2).strip()
 
         # Convert list-like and quoted values to appropriate Python objects
         try:
@@ -223,8 +223,6 @@ def _extract_traits(message):
                 value = eval(value)  # Safely parse list-like values
             elif value.startswith(("'", '"')) and value.endswith(("'", '"')):
                 value = value.strip("'\"")
-            else:
-                value = value.replace(",", "")
         except Exception:
             pass  # Leave the value as a string if parsing fails
 
