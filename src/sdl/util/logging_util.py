@@ -16,6 +16,7 @@ def logging_setup(
     logs_dir: typing.Optional[str | Path] = None,
     level: str="debug",
     use_colors: bool=True,
+    log_warnings: bool=True
 ) -> None:
     """
     Create the logger configuration.
@@ -29,6 +30,8 @@ def logging_setup(
     :param level: the logging level, defaults to logging.DEBUG
     :param use_colors: whether to color the output. Uses the coloredlogs library
     :type use_colors: bool, defaults to True
+    :param log_warnings: whether to log library warnings 
+    :type log_warnings: bool, defaults to True
     """
     if not print_to_terminal and logs_dir is None:
         warnings.warn(
@@ -55,6 +58,8 @@ def logging_setup(
     
     if use_colors:
         coloredlogs.install()
+    
+    logging.captureWarnings(log_warnings)
 
 
 def _str_to_log_level(level_str: str):

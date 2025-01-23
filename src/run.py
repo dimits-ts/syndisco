@@ -38,6 +38,8 @@ def main():
         write_to_file=logging_config["write_to_file"],
         logs_dir=Path(logging_config["logs_dir"]),
         level=logging_config["level"],
+        use_colors=True,
+        log_warnings=True
     )
 
     action_config = yaml_data["actions"]
