@@ -76,7 +76,7 @@ def _run_single_experiment(experiment: generation.AnnotationConv, output_dir: Pa
             output_dir=output_dir, file_ending=".json"
         )
         experiment.to_json_file(output_path)
-        logger.info("Annotation saved to " + str(output_path))
+        logger.info(f"Annotation saved to {output_path}")
     except Exception:
         logger.exception("Experiment aborted due to error.")
 

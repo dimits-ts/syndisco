@@ -100,7 +100,7 @@ def main():
             conv_dir=conv_dir, annot_dir=annot_dir, include_sdbs=include_sdbs
         )
         _export_dataset(df=df, output_path=export_path)
-        logger.info("Dataset exported to " + str(export_path))
+        logger.info(f"Dataset exported to {export_path}")
 
 
 def _create_dataset(

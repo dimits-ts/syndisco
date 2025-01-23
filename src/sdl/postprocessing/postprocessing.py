@@ -242,7 +242,7 @@ def _extract_traits(message: str | None) -> dict:
                 value = ast.literal_eval(value)
             elif value.startswith(("'", '"')) and value.endswith(("'", '"')):
                 value = value.strip("'\"")
-        except Exception:
+        except ValueError:
             pass
 
         traits[key] = value

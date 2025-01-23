@@ -57,7 +57,7 @@ def _run_single_experiment(
             output_dir=output_dir, file_ending=".json"
         )
         experiment.to_json_file(output_path)
-        logger.info("Conversation saved to " + str(output_path))
+        logger.info(f"Conversation saved to {output_path}")
     except Exception:
         logger.exception("Experiment aborted due to error.")
 
