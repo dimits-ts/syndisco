@@ -1,5 +1,4 @@
 import transformers
-import torch
 
 import typing
 import logging
@@ -14,7 +13,7 @@ logger = logging.getLogger(Path(__file__).name)
 class TransformersModel(model.Model):
     def __init__(
         self,
-        model_path: str,
+        model_path: str | Path,
         name: str,
         max_out_tokens: int,
         remove_string_list: list[str] = [],
@@ -34,15 +33,8 @@ class TransformersModel(model.Model):
         """
         super().__init__(name, max_out_tokens, remove_string_list)
 
-        bnb_config = transformers.BitsAndBytesConfig(
-            load_in_4bit=True,
-            bnb_4bit_use_double_quant=True,
-            bnb_4bit_quant_type="nf4",
-            bnb_4bit_compute_dtype=torch.bfloat16,
-        )
-
         model = transformers.AutoModelForCausalLM.from_pretrained(
-            model_path, device_map="auto", quantization_config=bnb_config
+            model_path, device_map="auto"
         )
 
         logger.info(
@@ -60,6 +52,4 @@ class TransformersModel(model.Model):
     ) -> str:
         return self.generator(
             json_prompt, max_length=self.max_out_tokens, return_full_text=False
-        )[0][
-            "generated_text"
-        ]  # type: ignore
+        )[0]["generated_text"]  # type: ignore

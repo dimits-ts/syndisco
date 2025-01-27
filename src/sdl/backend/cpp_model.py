@@ -1,5 +1,7 @@
-import llama_cpp
 import typing
+from pathlib import Path
+
+import llama_cpp # pyright: ignore[reportMissingImports]
 
 from . import model
 
@@ -8,7 +10,7 @@ class LlamaModel(model.Model):
 
     def __init__(
         self,
-        model_path: str,
+        model_path: str | Path,
         name: str,
         gpu_layers: int,
         seed: int = 42,

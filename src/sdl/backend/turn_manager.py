@@ -58,12 +58,12 @@ class RandomWeighted(TurnManager):
         super().__init__(usernames, config)
 
         if config.get("respond_probability") is None:
-            self.chance_to_respond = RandomWeighted.DEFAULT_RESPOND_PROBABILITY
-        else:
             warnings.warn(
                 "Warning: No respond_probability set in RandomWeighted TurnManager instance, "
                 + f"defaulting to {RandomWeighted.DEFAULT_RESPOND_PROBABILITY}"
             )
+            self.chance_to_respond = RandomWeighted.DEFAULT_RESPOND_PROBABILITY
+        else:
             self.chance_to_respond = config["respond_probability"]
             assert 0 < self.chance_to_respond < 1
 
