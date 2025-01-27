@@ -207,7 +207,7 @@ def _create_synthetic_discussion(
         instructions=mod_instructions,
         context=context,
     )
-    print(turn_manager_config)
+
     next_turn_manager = turn_manager.turn_manager_factory(
         turn_manager_type, rand_user_names, config=turn_manager_config
     )
