@@ -1,6 +1,3 @@
-import matplotlib.pyplot as plt
-
-import os
 import textwrap
 
 
@@ -25,21 +22,3 @@ def format_chat_message(username: str, message: str) -> str:
         formatted_res = ""
 
     return formatted_res
-
-
-def save_plot(filename: str, dir_name: str = "output") -> None:
-    """
-    Saves a plot to the output directory.
-
-    :param filename: The name of the file for the Figure.
-    :type filename: str
-    :param dir_name: The directory where the plot will be saved. Default is "output".
-    :type dir_name: str
-    """
-    path = os.path.join(dir_name, filename)
-
-    if not os.path.exists(dir_name):
-        os.makedirs(dir_name)
-
-    plt.savefig(path, bbox_inches="tight")
-    print(f"Figure saved to " + path)
