@@ -72,6 +72,7 @@ class Conversation:
 
         self.conv_logs = []
         # keep a limited context of the conversation to feed to the models
+        self.ctx_len = history_context_len
         self.ctx_history = collections.deque(maxlen=history_context_len)
 
         self.seed_opinion_user = seed_opinion_user
@@ -141,7 +142,7 @@ class Conversation:
             "moderator_prompt": (
                 self.moderator.describe() if self.moderator is not None else None
             ),
-            "ctx_length": len(self.ctx_history),
+            "ctx_length": self.ctx_len,
             "logs": self.conv_logs,
         }
 
@@ -157,10 +158,6 @@ class Conversation:
 
         with open(output_path, "w", encoding="utf8") as fout:
             json.dump(self.to_dict(), fout, indent=4)
-
-    def __str__(self) -> str:
-        return json.dumps(self.to_dict(), indent=4)
-
 
     def _archive_response(
         self, user: actors.LLMUser, comment: str, verbose: bool
@@ -208,3 +205,6 @@ class Conversation:
 
         if verbose:
             print(formatted_res, "\n")
+
+    def __str__(self) -> str:
+        return json.dumps(self.to_dict(), indent=4)
