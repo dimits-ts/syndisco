@@ -1,4 +1,4 @@
-# Synthetic Discussion Framework (SDF)
+# SynDisco
 
 Continuation of the [sister thesis project](https://github.com/dimits-ts/llm_moderation_research). A lightweight, simple and specialized framework used for creating, storing, annotating and analyzing
 synthetic discussions between LLM users in the context of online discussions.
