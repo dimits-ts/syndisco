@@ -39,6 +39,7 @@ def logging_setup(
             "No logs will be recorded for this session."
         )
 
+    level = _str_to_log_level(level) # type: ignore
     handlers = []
     if print_to_terminal:
         handlers.append(logging.StreamHandler())
@@ -54,16 +55,16 @@ def logging_setup(
             )
             handlers.append(logging.FileHandler(filename))
 
-    logging.basicConfig(handlers=handlers, level=_str_to_log_level(level))
+    logging.basicConfig(handlers=handlers, level=level)
     
     if use_colors:
-        coloredlogs.install()
+        coloredlogs.install(level=level)
     
     logging.captureWarnings(log_warnings)
 
 
 def _str_to_log_level(level_str: str):
-    match level_str.lower():
+    match level_str.lower().strip():
         case "debug":
             return logging.DEBUG
         case "info":
