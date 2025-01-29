@@ -60,7 +60,12 @@ def logging_setup(
             )
             handlers.append(logging.FileHandler(filename))
 
-    logging.basicConfig(handlers=handlers, level=level)
+    logging.basicConfig(
+        handlers=handlers,
+        level=level,
+        format="%(asctime)s %(levelname)-8s %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
 
     if use_colors:
         coloredlogs.install(level=level)
