@@ -51,7 +51,7 @@ def logging_setup(
             )
         else:
             filename = file_util.generate_datetime_filename(
-                logs_dir, file_ending=".log"
+                logs_dir, file_ending=".log", timestamp_format="%y-%m-%d"
             )
             handlers.append(logging.FileHandler(filename))
 
