@@ -42,8 +42,9 @@ class ModelManager:
             logger.info("Loading model...")
             self.model = self._initialize_model()
             logger.info("Model loaded.")
-
-        logger.info("Using already loaded model...")
+        else:
+            logger.info("Using already loaded model...")
+            
         return self.model
 
     def _initialize_model(self) -> model.Model:

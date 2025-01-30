@@ -52,6 +52,7 @@ def _run_single_experiment(
     """
     try:
         logger.info("Beginning conversation...")
+        logger.debug(f"Experiment parameters: {str(experiment)}")
         experiment.begin_conversation(verbose=True)
         output_path = file_util.generate_datetime_filename(
             output_dir=output_dir, file_ending=".json"
