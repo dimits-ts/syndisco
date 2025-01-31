@@ -54,7 +54,8 @@ def run_experiments(
         include_mod_comments=include_mod_comments,
     )
 
-    for annotation_experiment in annotation_experiments:
+    for i, annotation_experiment in enumerate(annotation_experiments):
+        logging.info(f"Running experiment {i}/{len(annotation_experiments)}...")
         _run_single_experiment(annotation_experiment, output_dir)
 
     logger.info("Finished annotation generation.")

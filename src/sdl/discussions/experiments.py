@@ -33,7 +33,8 @@ def run_experiments(llm: model.Model, yaml_data: dict) -> None:
     os.makedirs(output_dir, exist_ok=True)
 
     experiments = _generate_experiments(llm=llm, yaml_data=yaml_data)
-    for experiment in experiments:
+    for i, experiment in enumerate(experiments):
+        logging.info(f"Running experiment {i}/{len(experiments)}...")
         _run_single_experiment(experiment=experiment, output_dir=output_dir)
 
     logger.info("Finished synthetic discussion generation.")
