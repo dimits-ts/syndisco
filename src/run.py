@@ -94,17 +94,14 @@ def main():
         conv_dir = Path(export_config["discussion_root_dir"])
         annot_dir = Path(export_config["annotation_root_dir"])
         export_path = Path(export_config["export_path"])
-        include_sdbs = export_config["include_annotator_sdb_info"]
 
-        df = _create_dataset(
-            conv_dir=conv_dir, annot_dir=annot_dir, include_sdbs=include_sdbs
-        )
+        df = _create_dataset(conv_dir=conv_dir, annot_dir=annot_dir)
         _export_dataset(df=df, output_path=export_path)
         logger.info(f"Dataset exported to {export_path}")
 
 
 def _create_dataset(
-    conv_dir: Path, annot_dir: Path, include_sdbs: bool
+    conv_dir: Path, annot_dir: Path
 ) -> pd.DataFrame:
     """
     Create a combined dataset from conversation and annotation files.
@@ -113,18 +110,13 @@ def _create_dataset(
     :type conv_dir: Path
     :param annot_dir: Directory containing annotation data files.
     :type annot_dir: Path
-    :param include_sdbs: Whether to include annotator SDB information in the dataset.
-    :type include_sdbs: bool
     :return: A combined DataFrame containing conversation and annotation data.
     :rtype: pd.DataFrame
     """
-    if not include_sdbs:
-        logger.warning("Not including annotator SDBs to output.")
-
     conv_df = sdl.postprocessing.postprocessing.import_conversations(conv_dir)
     conv_df = conv_df.rename({"id": "conv_id"}, axis=1)
     annot_df = sdl.postprocessing.postprocessing.import_annotations(
-        annot_dir, include_sdbs
+        annot_dir
     )
 
     full_df = pd.merge(
