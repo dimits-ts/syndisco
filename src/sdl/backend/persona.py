@@ -1,5 +1,6 @@
 import dataclasses
 import json
+from pathlib import Path
 
 
 @dataclasses.dataclass
@@ -14,16 +15,7 @@ class LlmPersona:
     education_level: str
     special_instructions: str
     personality_characteristics: list[str]
-
-    @staticmethod
-    def from_json_file(file_path: str):
-        with open(file_path, "r", encoding="utf-8") as file:
-            data_dict = json.load(file)
-
-        # code from https://stackoverflow.com/questions/68417319/initialize-python-dataclass-from-dictionary
-        field_set = {f.name for f in dataclasses.fields(LlmPersona) if f.init}
-        filtered_arg_dict = {k: v for k, v in data_dict.items() if k in field_set}
-        return LlmPersona(**filtered_arg_dict)
+        
 
     def to_json_file(self, output_path: str) -> None:
         """
@@ -52,3 +44,26 @@ class LlmPersona:
             return "woman"
         else:
             return "non-binary"
+
+
+def from_json_file(file_path: Path) -> list[LlmPersona]:
+    """
+    Generate a list of personas from a properly formatted persona JSON file.
+
+    :param file_path: the path to the JSON file containing the personas
+    :type file_path: Path
+    :return: a list of LlmPersona objects for each of the file entries
+    :rtype: list[LlmPersona]
+    """
+    with open(file_path, "r", encoding="utf-8") as file:
+        all_personas = json.load(file)
+
+    persona_objs = []
+    for data_dict in all_personas:
+        # code from https://stackoverflow.com/questions/68417319/initialize-python-dataclass-from-dictionary
+        field_set = {f.name for f in dataclasses.fields(LlmPersona) if f.init}
+        filtered_arg_dict = {k: v for k, v in data_dict.items() if k in field_set}
+        persona_obj = LlmPersona(**filtered_arg_dict)
+        persona_objs.append(persona_obj)
+    
+    return persona_objs

@@ -82,7 +82,7 @@ def _generate_experiments(
 
     # Paths for various required files and directories
     topics_dir = paths["topics_dir"]
-    persona_dir = paths["user_persona_dir"]
+    persona_path = paths["user_persona_path"]
     user_instruction_path = paths["user_instructions_path"]
     mod_instruction_path = paths["mod_instructions_path"]
 
@@ -91,11 +91,7 @@ def _generate_experiments(
     num_users = experiment_variables["num_users"]
     include_mod = experiment_variables["include_mod"]
 
-    persona_files = os.listdir(persona_dir)
-    personas = [
-        persona.LlmPersona.from_json_file(os.path.join(persona_dir, persona_file))
-        for persona_file in persona_files
-    ]
+    personas = persona.from_json_file(persona_path)
 
     topics = file_util.read_files_from_directory(topics_dir)
     user_instructions = file_util.read_file(user_instruction_path)
