@@ -1,11 +1,16 @@
+"""
+Provides logging customization for the whole project.
+"""
+
 import logging
 import typing
 import warnings
 from pathlib import Path
 
+import coloredlogs
+
 from . import file_util
 
-import coloredlogs
 
 logger = logging.getLogger(Path(__file__).name)
 
@@ -14,9 +19,9 @@ def logging_setup(
     print_to_terminal: bool,
     write_to_file: bool,
     logs_dir: typing.Optional[str | Path] = None,
-    level: str="debug",
-    use_colors: bool=True,
-    log_warnings: bool=True
+    level: str = "debug",
+    use_colors: bool = True,
+    log_warnings: bool = True,
 ) -> None:
     """
     Create the logger configuration.
@@ -30,7 +35,7 @@ def logging_setup(
     :param level: the logging level, defaults to logging.DEBUG
     :param use_colors: whether to color the output. Uses the coloredlogs library
     :type use_colors: bool, defaults to True
-    :param log_warnings: whether to log library warnings 
+    :param log_warnings: whether to log library warnings
     :type log_warnings: bool, defaults to True
     """
     if not print_to_terminal and logs_dir is None:
@@ -39,6 +44,7 @@ def logging_setup(
             "No logs will be recorded for this session."
         )
 
+    level = _str_to_log_level(level)  # type: ignore
     handlers = []
     if print_to_terminal:
         handlers.append(logging.StreamHandler())
@@ -50,20 +56,25 @@ def logging_setup(
             )
         else:
             filename = file_util.generate_datetime_filename(
-                logs_dir, file_ending=".log"
+                logs_dir, file_ending=".log", timestamp_format="%y-%m-%d"
             )
             handlers.append(logging.FileHandler(filename))
 
-    logging.basicConfig(handlers=handlers, level=_str_to_log_level(level))
-    
+    logging.basicConfig(
+        handlers=handlers,
+        level=level,
+        format="%(asctime)s %(levelname)-8s %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+
     if use_colors:
-        coloredlogs.install()
-    
+        coloredlogs.install(level=level)
+
     logging.captureWarnings(log_warnings)
 
 
 def _str_to_log_level(level_str: str):
-    match level_str.lower():
+    match level_str.lower().strip():
         case "debug":
             return logging.DEBUG
         case "info":

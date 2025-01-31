@@ -45,7 +45,7 @@ def import_conversations(conv_dir: str | Path) -> pd.DataFrame:
     return df
 
 
-def import_annotations(annot_dir: str | Path, include_sdb_info: bool = False) -> pd.DataFrame:
+def import_annotations(annot_dir: str | Path) -> pd.DataFrame:
     """
     Import annotation data from JSON files in a directory and process it into a DataFrame.
 
@@ -54,19 +54,16 @@ def import_annotations(annot_dir: str | Path, include_sdb_info: bool = False) ->
 
     :param annot_dir: Directory containing JSON files with annotation data.
     :type annot_dir: str | Path
-    :param include_sdb_info: Whether to include SDB information for annotators, defaults to False.
-    :type include_sdb_info: bool
     :return: A DataFrame containing processed annotation data.
     :rtype: pd.DataFrame
     """
     annot_df = _read_annotations(annot_dir)
     annot_df = annot_df.reset_index(drop=True)
 
-    if include_sdb_info:
-        # Add annotator traits
-        traits_df = _process_traits(annot_df.annotator_prompt.apply(_extract_traits)).reset_index()
-        annot_df = pd.concat([annot_df, traits_df], axis=1)
-        del annot_df["special_instructions"]
+    # Add annotator traits
+    traits_df = _process_traits(annot_df.annotator_prompt.apply(_extract_traits)).reset_index()
+    annot_df = pd.concat([annot_df, traits_df], axis=1)
+    del annot_df["special_instructions"]
 
     return annot_df
 

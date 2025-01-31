@@ -5,12 +5,16 @@ configs at runtime and is responsible for executing it.
 import collections
 import datetime
 import json
-from pathlib import Path
+import logging
 import uuid
+from pathlib import Path
 from typing import Any, Optional
 
 from ..backend import actors, turn_manager
 from ..util import output_util, file_util
+
+
+logger = logging.getLogger(Path(__file__).name)
 
 
 class Conversation:
@@ -68,6 +72,7 @@ class Conversation:
 
         self.conv_logs = []
         # keep a limited context of the conversation to feed to the models
+        self.ctx_len = history_context_len
         self.ctx_history = collections.deque(maxlen=history_context_len)
 
         self.seed_opinion_user = seed_opinion_user
@@ -86,15 +91,18 @@ class Conversation:
                 "This conversation has already been concluded, create a new Conversation object."
             )
 
-        # create first "seed" opinion
-        seed_user = actors.LLMUser(
-            model=None,  # type: ignore
-            name=self.seed_opinion_user,
-            attributes=[],
-            context="",
-            instructions="",
-        )
-        self._archive_response(seed_user, self.seed_opinion, verbose=verbose)
+        if self.seed_opinion.strip() != "":
+            # create first "seed" opinion
+            seed_user = actors.LLMUser(
+                model=None,  # type: ignore
+                name=self.seed_opinion_user,
+                attributes=[],
+                context="",
+                instructions="",
+            )
+            self._archive_response(seed_user, self.seed_opinion, verbose=verbose)
+        else:
+            logger.info("No seed opinion provided.")
 
         # begin generation
         for _ in range(self.conv_len):
@@ -134,7 +142,7 @@ class Conversation:
             "moderator_prompt": (
                 self.moderator.describe() if self.moderator is not None else None
             ),
-            "ctx_length": len(self.ctx_history),
+            "ctx_length": self.ctx_len,
             "logs": self.conv_logs,
         }
 
@@ -150,10 +158,6 @@ class Conversation:
 
         with open(output_path, "w", encoding="utf8") as fout:
             json.dump(self.to_dict(), fout, indent=4)
-
-    def __str__(self) -> str:
-        return json.dumps(self.to_dict(), indent=4)
-
 
     def _archive_response(
         self, user: actors.LLMUser, comment: str, verbose: bool
@@ -201,3 +205,6 @@ class Conversation:
 
         if verbose:
             print(formatted_res, "\n")
+
+    def __str__(self) -> str:
+        return json.dumps(self.to_dict(), indent=4)
