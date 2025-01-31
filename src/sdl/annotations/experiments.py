@@ -55,7 +55,7 @@ def run_experiments(
     )
 
     for i, annotation_experiment in enumerate(annotation_experiments):
-        logging.info(f"Running experiment {i}/{len(annotation_experiments)}...")
+        logging.info(f"Running experiment {i+1}/{len(annotation_experiments)+1}...")
         _run_single_experiment(annotation_experiment, output_dir)
 
     logger.info("Finished annotation generation.")
