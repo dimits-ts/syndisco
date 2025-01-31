@@ -71,6 +71,7 @@ def _run_single_experiment(experiment: generation.AnnotationConv, output_dir: Pa
     """
     try:
         logger.info("Beginning conversation...")
+        logger.debug(f"Experiment parameters: {str(experiment)}")
         experiment.begin_annotation(verbose=True)
         output_path = file_util.generate_datetime_filename(
             output_dir=output_dir, file_ending=".json"
