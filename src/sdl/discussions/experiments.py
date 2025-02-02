@@ -7,10 +7,11 @@ Then runs each experiment sequentially, and saves the output to disk as an auto-
 import os
 import random
 import logging
+import time
 from pathlib import Path
 
 from . import generation
-from ..util import file_util
+from ..util import file_util, output_util
 from ..backend import turn_manager
 from ..backend import persona
 from ..backend import actors
@@ -20,7 +21,8 @@ from ..backend import model
 logger = logging.getLogger(Path(__file__).name)
 
 
-def run_experiments(llm: model.Model, yaml_data: dict) -> None:
+@output_util.timing
+def run_discussion_experiments(llm: model.Model, yaml_data: dict) -> None:
     """Creates experiments by combining the given input data, then runs each one sequentially.
 
     :param llm: The wrapped LLM
@@ -32,13 +34,15 @@ def run_experiments(llm: model.Model, yaml_data: dict) -> None:
     output_dir = yaml_data["discussions"]["files"]["output_dir"]
     os.makedirs(output_dir, exist_ok=True)
 
-    experiments = _generate_experiments(llm=llm, yaml_data=yaml_data)
-    for experiment in experiments:
+    experiments = _generate_discussion_experiments(llm=llm, yaml_data=yaml_data)
+    for i, experiment in enumerate(experiments):
+        logging.info(f"Running experiment {i+1}/{len(experiments)+1}...")
         _run_single_experiment(experiment=experiment, output_dir=output_dir)
 
     logger.info("Finished synthetic discussion generation.")
 
 
+@output_util.timing
 def _run_single_experiment(
     experiment: generation.Conversation, output_dir: Path
 ) -> None:
@@ -53,17 +57,21 @@ def _run_single_experiment(
     try:
         logger.info("Beginning conversation...")
         logger.debug(f"Experiment parameters: {str(experiment)}")
+
+        start_time = time.time()
         experiment.begin_conversation(verbose=True)
         output_path = file_util.generate_datetime_filename(
             output_dir=output_dir, file_ending=".json"
         )
+        logging.debug(f"Finished discussion in {(time.time() - start_time)} seconds.")
+
         experiment.to_json_file(output_path)
         logger.info(f"Conversation saved to {output_path}")
     except Exception:
         logger.exception("Experiment aborted due to error.")
 
 
-def _generate_experiments(
+def _generate_discussion_experiments(
     yaml_data: dict, llm: model.Model
 ) -> list[generation.Conversation]:
     """Generate experiments from the basic configurations and wrap them into
@@ -83,7 +91,7 @@ def _generate_experiments(
 
     # Paths for various required files and directories
     topics_dir = paths["topics_dir"]
-    persona_dir = paths["user_persona_dir"]
+    persona_path = paths["user_persona_path"]
     user_instruction_path = paths["user_instructions_path"]
     mod_instruction_path = paths["mod_instructions_path"]
 
@@ -92,11 +100,7 @@ def _generate_experiments(
     num_users = experiment_variables["num_users"]
     include_mod = experiment_variables["include_mod"]
 
-    persona_files = os.listdir(persona_dir)
-    personas = [
-        persona.LlmPersona.from_json_file(os.path.join(persona_dir, persona_file))
-        for persona_file in persona_files
-    ]
+    personas = persona.from_json_file(persona_path)
 
     topics = file_util.read_files_from_directory(topics_dir)
     user_instructions = file_util.read_file(user_instruction_path)

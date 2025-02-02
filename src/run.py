@@ -78,14 +78,14 @@ def main():
         # Create discussions
         llm = model_manager.get()
         logger.info("Starting synthetic discussion experiments...")
-        sdl.discussions.experiments.run_experiments(llm=llm, yaml_data=yaml_data)
+        sdl.discussions.experiments.run_discussion_experiments(llm=llm, yaml_data=yaml_data)
         logger.info("Finished synthetic discussion experiments.")
 
     if generate_annotations:
         # Create annotations
         llm = model_manager.get()
         logger.info("Starting synthetic annotation...")
-        sdl.annotations.experiments.run_experiments(llm=llm, yaml_data=yaml_data)
+        sdl.annotations.experiments.run_annotation_experiments(llm=llm, yaml_data=yaml_data)
         logger.info("Finished synthetic annotation.")
 
     if export_dataset:

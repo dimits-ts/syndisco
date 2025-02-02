@@ -8,14 +8,15 @@ import logging
 from pathlib import Path
 
 from sdl.backend import persona, model, actors
-from ..util import file_util
+from ..util import file_util, output_util
 from . import generation
 
 
 logger = logging.getLogger(Path(__file__).name)
 
 
-def run_experiments(
+@output_util.timing
+def run_annotation_experiments(
     llm: model.Model,
     yaml_data: dict
 ) -> None:
@@ -30,7 +31,7 @@ def run_experiments(
     discussions_dir = Path(yaml_data["discussions"]["files"]["output_dir"])
 
     annotation_file_data = yaml_data["annotation"]["files"]
-    annotator_persona_dir = Path(annotation_file_data["annotator_persona_dir"])
+    annotator_persona_path = Path(annotation_file_data["annotator_persona_path"])
     output_dir = Path(annotation_file_data["output_dir"])
     instruction_path = Path(annotation_file_data["instruction_path"])
 
@@ -47,20 +48,22 @@ def run_experiments(
 
     annotation_experiments = _generate_experiments(
         llm=llm,
-        persona_dir=annotator_persona_dir,
+        persona_path=annotator_persona_path,
         instruction_path=instruction_path,
         discussions_dir=discussions_dir,
         history_ctx_len=history_ctx_len,
         include_mod_comments=include_mod_comments,
     )
 
-    for annotation_experiment in annotation_experiments:
-        _run_single_experiment(annotation_experiment, output_dir)
+    for i, annotation_experiment in enumerate(annotation_experiments):
+        logging.info(f"Running experiment {i+1}/{len(annotation_experiments)+1}...")
+        _run_single_annotation(annotation_experiment, output_dir)
 
     logger.info("Finished annotation generation.")
 
 
-def _run_single_experiment(experiment: generation.AnnotationConv, output_dir: Path) -> None:
+@output_util.timing
+def _run_single_annotation(experiment: generation.AnnotationConv, output_dir: Path) -> None:
     """
     Executes a single annotation experiment and saves its output to a file.
 
@@ -71,6 +74,7 @@ def _run_single_experiment(experiment: generation.AnnotationConv, output_dir: Pa
     """
     try:
         logger.info("Beginning conversation...")
+        logger.debug(f"Experiment parameters: {str(experiment)}")
         experiment.begin_annotation(verbose=True)
         output_path = file_util.generate_datetime_filename(
             output_dir=output_dir, file_ending=".json"
@@ -126,7 +130,7 @@ def _generate_annotator_conv(
 
 def _generate_experiments(
     llm: model.Model,
-    persona_dir: Path,
+    persona_path: Path,
     instruction_path: Path,
     discussions_dir: Path,
     history_ctx_len: int,
@@ -138,7 +142,7 @@ def _generate_experiments(
 
     :param llm: The language model instance.
     :type llm: model.Model
-    :param persona_dir: Directory containing JSON files for annotator personas.
+    :param persona_path: The JSON file containing annotator personas.
     :type persona_dir: Path
     :param instruction_path: Path to the instructions file for annotators.
     :type instruction_path: Path
@@ -154,8 +158,8 @@ def _generate_experiments(
     :raises SystemExit: If any required directory or file is missing.
     """
     # Ensure persona directory exists
-    if not persona_dir.is_dir():
-        logger.error(f"Error: Persona directory '{persona_dir}' does not exist.")
+    if not persona_path.exists():
+        logger.error(f"Error: Persona file '{persona_path}' does not exist.")
         exit(1)
 
     if not instruction_path.exists():
@@ -166,11 +170,7 @@ def _generate_experiments(
         logger.error(f"Error: Discussions directory '{discussions_dir}' does not exist.")
         exit(1)
 
-    persona_files = os.listdir(persona_dir)
-    personas = [
-        persona.LlmPersona.from_json_file(os.path.join(persona_dir, persona_file))
-        for persona_file in persona_files
-    ]
+    personas = persona.from_json_file(persona_path)
     instructions = file_util.read_file(instruction_path)
 
     annotation_experiments = []
