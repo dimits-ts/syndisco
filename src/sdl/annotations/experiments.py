@@ -8,14 +8,15 @@ import logging
 from pathlib import Path
 
 from sdl.backend import persona, model, actors
-from ..util import file_util
+from ..util import file_util, output_util
 from . import generation
 
 
 logger = logging.getLogger(Path(__file__).name)
 
 
-def run_experiments(
+@output_util.timing
+def run_annotation_experiments(
     llm: model.Model,
     yaml_data: dict
 ) -> None:
@@ -56,12 +57,13 @@ def run_experiments(
 
     for i, annotation_experiment in enumerate(annotation_experiments):
         logging.info(f"Running experiment {i+1}/{len(annotation_experiments)+1}...")
-        _run_single_experiment(annotation_experiment, output_dir)
+        _run_single_annotation(annotation_experiment, output_dir)
 
     logger.info("Finished annotation generation.")
 
 
-def _run_single_experiment(experiment: generation.AnnotationConv, output_dir: Path) -> None:
+@output_util.timing
+def _run_single_annotation(experiment: generation.AnnotationConv, output_dir: Path) -> None:
     """
     Executes a single annotation experiment and saves its output to a file.
 
