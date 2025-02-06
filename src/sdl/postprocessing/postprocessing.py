@@ -1,6 +1,7 @@
 """
 Combine JSON output files for synthetic discussions and annotations into cohesive CSV files.
 """
+
 import os
 import json
 import re
@@ -14,7 +15,7 @@ def import_conversations(conv_dir: str | Path) -> pd.DataFrame:
     """
     Import conversation data from JSON files in a directory and process it into a DataFrame.
 
-    This function reads JSON files containing conversation data, processes the data to 
+    This function reads JSON files containing conversation data, processes the data to
     standardize columns, and adds derived attributes such as user traits and prompts.
 
     :param conv_dir: Directory containing JSON files with conversation data.
@@ -38,6 +39,11 @@ def import_conversations(conv_dir: str | Path) -> pd.DataFrame:
     df.user_prompt = df.moderator_prompt.where(df.is_moderator, df.user_prompt)
     del df["moderator"], df["moderator_prompt"]
 
+    df["message_id"] = df.apply(
+        lambda row: _generate_message_hash(row["id"], row["message"]), axis=1
+    )
+    df["message_order"] = _add_message_order(df)
+
     # Extract user traits and add them as attributes
     df2 = _process_traits(df.user_prompt.apply(_extract_traits)).reset_index()
     del df2["username"]
@@ -49,7 +55,7 @@ def import_annotations(annot_dir: str | Path) -> pd.DataFrame:
     """
     Import annotation data from JSON files in a directory and process it into a DataFrame.
 
-    This function reads JSON files containing annotation data, processes the data to 
+    This function reads JSON files containing annotation data, processes the data to
     standardize columns, and optionally includes SDB information for annotators.
 
     :param annot_dir: Directory containing JSON files with annotation data.
@@ -61,7 +67,9 @@ def import_annotations(annot_dir: str | Path) -> pd.DataFrame:
     annot_df = annot_df.reset_index(drop=True)
 
     # Add annotator traits
-    traits_df = _process_traits(annot_df.annotator_prompt.apply(_extract_traits)).reset_index()
+    traits_df = _process_traits(
+        annot_df.annotator_prompt.apply(_extract_traits)
+    ).reset_index()
     annot_df = pd.concat([annot_df, traits_df], axis=1)
     del annot_df["special_instructions"]
 
@@ -72,7 +80,7 @@ def _read_annotations(annot_dir: str | Path) -> pd.DataFrame:
     """
     Read annotation data from JSON files and convert it into a DataFrame.
 
-    This function recursively reads all JSON files in the specified directory, extracts 
+    This function recursively reads all JSON files in the specified directory, extracts
     annotation data in raw form, and formats it into a DataFrame.
 
     :param annot_dir: Directory containing JSON files with annotation data.
@@ -104,7 +112,7 @@ def _read_conversations(conv_dir: str | Path) -> pd.DataFrame:
     """
     Read conversation data from JSON files and convert it into a DataFrame.
 
-    This function recursively reads all JSON files in the specified directory, extracts 
+    This function recursively reads all JSON files in the specified directory, extracts
     conversation data in raw form, and formats it into a DataFrame.
 
     :param conv_dir: Directory containing JSON files with conversation data.
@@ -223,14 +231,18 @@ def _extract_traits(message: str | None) -> dict:
     if message is None:
         return {}
 
-    traits_match = re.search(r"Your traits: (.+?) Your instructions:", message, re.DOTALL)
+    traits_match = re.search(
+        r"Your traits: (.+?) Your instructions:", message, re.DOTALL
+    )
     if not traits_match:
         return {}
 
     traits_section = traits_match.group(1).strip()
 
     traits = {}
-    for match in re.finditer(r'(\w+):\s*(".*?"|\[.*?\]|[\w\s]+)(?=,|$)', traits_section):
+    for match in re.finditer(
+        r'(\w+):\s*(".*?"|\[.*?\]|[\w\s]+)(?=,|$)', traits_section
+    ):
         key = match.group(1)
         value = match.group(2).strip()
 
@@ -245,3 +257,29 @@ def _extract_traits(message: str | None) -> dict:
         traits[key] = value
 
     return traits
+
+
+def _generate_message_hash(conv_id: str, message: str, hash_func=hash) -> str:
+    return hash_func(hash_func(conv_id) + hash_func(message))
+
+
+def _add_message_order(df: pd.DataFrame) -> pd.Series:
+    i = 1
+    last_conv_id = -1
+    last_message_id = -1
+    numbers = []
+
+    for _, row in df.iterrows():
+        new_conv_id = row["id"]
+        new_message_id = row["message_id"]
+
+        if new_conv_id != last_conv_id:
+            last_conv_id = new_conv_id
+            last_message_id = new_message_id
+            i = 1
+        elif new_message_id != last_message_id:
+            i += 1
+            last_message_id = new_message_id
+
+        numbers.append(i)
+    return pd.Series(numbers)
