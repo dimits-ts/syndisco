@@ -1,7 +1,11 @@
-import transformers
+"""
+Loads and manages HuggingFace Transformers models.
+"""
 import typing
 import logging
 from pathlib import Path
+
+import transformers
 
 from . import model
 
@@ -9,6 +13,10 @@ logger = logging.getLogger(Path(__file__).name)
 
 
 class TransformersModel(model.Model):
+    """
+    A class encapsulating Transformers HuggingFace models.
+    """
+    
     def __init__(
         self,
         model_path: str | Path,
@@ -54,11 +62,15 @@ class TransformersModel(model.Model):
                 json_prompt, tokenize=False, add_generation_prompt=True
             )
         else:
-            logger.warning("No chat template found in model's tokenizer: Falling back to default...")
-            formatted_prompt = "\n".join(f"{msg['role']}: {msg['content']}" for msg in json_prompt)
+            logger.warning(
+                "No chat template found in model's tokenizer: Falling back to default..."
+            )
+            formatted_prompt = "\n".join(
+                f"{msg['role']}: {msg['content']}" for msg in json_prompt
+            )
 
         response = self.generator(
             formatted_prompt, max_new_tokens=self.max_out_tokens, return_full_text=False
         )[0]["generated_text"]  # type: ignore
-        
-        return response #type: ignore
+
+        return response  # type: ignore
