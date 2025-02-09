@@ -58,7 +58,7 @@ class TransformersModel(model.Model):
             formatted_prompt = "\n".join(f"{msg['role']}: {msg['content']}" for msg in json_prompt)
 
         response = self.generator(
-            formatted_prompt, max_length=self.max_out_tokens, return_full_text=False
+            formatted_prompt, max_new_tokens=self.max_out_tokens, return_full_text=False
         )[0]["generated_text"]  # type: ignore
         
         return response #type: ignore
