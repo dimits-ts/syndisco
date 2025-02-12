@@ -19,10 +19,11 @@ class BaseModel(abc.ABC):
     Interface for all local LLM wrappers
     """
 
-    def __init__(self, name: str, max_out_tokens: int, stop_list: list[str] = list()):
+    def __init__(self, name: str, max_out_tokens: int, stop_list: list[str] | None = None):
         self.name = name
         self.max_out_tokens = max_out_tokens
-        self.stop_list = stop_list
+        # avoid mutable default value problem
+        self.stop_list = stop_list if stop_list is not None else []
 
     @typing.final
     def prompt(
@@ -77,7 +78,7 @@ class LlamaModel(BaseModel):
         ctx_width_tokens: int = 2048,
         max_out_tokens: int = 400,
         inference_threads: int = 3,
-        remove_string_list: list[str] = list(),
+        remove_string_list: list[str] | None = None,
     ):
         """
         Initialize a new LLM wrapper.
@@ -148,7 +149,7 @@ class TransformersModel(BaseModel):
         model_path: str | Path,
         name: str,
         max_out_tokens: int,
-        remove_string_list: list[str] = list(),
+        remove_string_list: list[str] | None = None,
     ):
         """
         Initialize a new LLM wrapper.
