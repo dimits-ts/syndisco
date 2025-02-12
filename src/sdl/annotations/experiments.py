@@ -18,27 +18,31 @@ logger = logging.getLogger(Path(__file__).name)
 @output_util.timing
 def run_annotation_experiments(
     llm: model.BaseModel,
-    yaml_data: dict
+    discussions_dir: Path,
+    persona_path: Path,
+    output_dir: Path,
+    instruction_path: Path,
+    history_ctx_len: int,
+    include_mod_comments: bool
 ) -> None:
     """
     Creates annotation experiments for synthetic discussions and saves their outputs.
 
     :param llm: The language model instance.
-    :type llm: model.Model
-    :param yaml_data: Serialized YAML configuration containing input paths and parameters.
-    :type yaml_data: dict
+    :type llm: model.BaseModel
+    :param discussions_dir: The directory containing synthetic discussion files.
+    :type discussions_dir: Path
+    :param persona_path: Path to the persona file for annotators.
+    :type persona_path: Path    
+    :param output_dir: Directory where the generated annotations will be saved.
+    :type output_dir: Path
+    :param instruction_path: Path to the instruction file for annotators.
+    :type instruction_path: Path
+    :param history_ctx_len: Maximum context length for annotator's memory.
+    :type history_ctx_len: int
+    :param include_moderator_comments: Flag indicating whether moderator comments are included.
+    :type include_moderator_comments: bool
     """
-    discussions_dir = Path(yaml_data["discussions"]["files"]["output_dir"])
-
-    annotation_file_data = yaml_data["annotation"]["files"]
-    annotator_persona_path = Path(annotation_file_data["annotator_persona_path"])
-    output_dir = Path(annotation_file_data["output_dir"])
-    instruction_path = Path(annotation_file_data["instruction_path"])
-
-    annotation_experiment_data = yaml_data["annotation"]["experiment_variables"]
-    include_mod_comments = annotation_experiment_data["include_mod_comments"]
-    history_ctx_len = annotation_experiment_data["history_ctx_len"]
-
     # Ensure annotation config output directory exists
     os.makedirs(output_dir, exist_ok=True)
 
@@ -48,7 +52,7 @@ def run_annotation_experiments(
 
     annotation_experiments = _generate_experiments(
         llm=llm,
-        persona_path=annotator_persona_path,
+        persona_path=persona_path,
         instruction_path=instruction_path,
         discussions_dir=discussions_dir,
         history_ctx_len=history_ctx_len,

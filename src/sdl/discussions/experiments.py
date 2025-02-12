@@ -22,7 +22,9 @@ logger = logging.getLogger(Path(__file__).name)
 
 
 @output_util.timing
-def run_discussion_experiments(llm: model.BaseModel, yaml_data: dict) -> None:
+def run_discussion_experiments(
+    llm: model.BaseModel, discussions_output_dir: Path
+) -> None:
     """Creates experiments by combining the given input data, then runs each one sequentially.
 
     :param llm: The wrapped LLM
@@ -31,7 +33,6 @@ def run_discussion_experiments(llm: model.BaseModel, yaml_data: dict) -> None:
     :type yaml_data: dict
     """
     # Ensure output directory exists
-    output_dir = yaml_data["discussions"]["files"]["output_dir"]
     os.makedirs(output_dir, exist_ok=True)
 
     experiments = _generate_discussion_experiments(llm=llm, yaml_data=yaml_data)
@@ -72,7 +73,20 @@ def _run_single_experiment(
 
 
 def _generate_discussion_experiments(
-    yaml_data: dict, llm: model.BaseModel
+    llm: model.BaseModel,
+    topics: list[str],
+    personas: list[backend.Persona],
+    user_instructions: str,
+    mod_instructions: str,
+    mod_attributes: list[str],
+    context: str,
+    turn_taking=None,
+    include_moderator: bool = True,
+    history_ctx_len: int = 3,
+    num_turns: int = 10,
+    num_users: int = 5,
+    num_experiments: int = 5,
+    random_weighted_response_prob: float = 0.5,
 ) -> list[generation.Conversation]:
     """Generate experiments from the basic configurations and wrap them into
     Conversation objects.
@@ -84,40 +98,15 @@ def _generate_discussion_experiments(
     :return: a list of Conversation objects containing the experiments
     :rtype: _type_
     """
-    # Extract yaml configs
-    paths = yaml_data["discussions"]["files"]
-    turn_taking_config = yaml_data["discussions"]["turn_taking"]
-    experiment_variables = yaml_data["discussions"]["experiment_variables"]
-
-    # Paths for various required files and directories
-    topics_dir = paths["topics_dir"]
-    persona_path = paths["user_persona_path"]
-    user_instruction_path = paths["user_instructions_path"]
-    mod_instruction_path = paths["mod_instructions_path"]
-
-    # Experiment variables
-    num_experiments = experiment_variables["num_experiments"]
-    num_users = experiment_variables["num_users"]
-    include_mod = experiment_variables["include_mod"]
-
-    personas = persona.from_json_file(persona_path)
-
-    topics = file_util.read_files_from_directory(topics_dir)
-    user_instructions = file_util.read_file(user_instruction_path)
-    mod_instructions = file_util.read_file(mod_instruction_path)
-
     turn_taking_dict = {
-        "conv_len": turn_taking_config["num_turns"],
-        "history_ctx_len": turn_taking_config["history_ctx_len"],
+        "conv_len": num_turns,
+        "history_ctx_len": history_ctx_len,
         "turn_manager_type": turn_taking_config["turn_manager_type"],
         "turn_manager_config": {
             "respond_probability": turn_taking_config["respond_probability"]
         },
     }
-
-    ctx_prompt = experiment_variables["context_prompt"]
-    mod_attributes = experiment_variables["moderator_attributes"]
-    mod_attributes = mod_attributes if include_mod else None
+    mod_attributes = mod_attributes if include_moderator else None
 
     experiments = []
     for _ in range(num_experiments):
@@ -125,7 +114,7 @@ def _generate_discussion_experiments(
             _create_synthetic_discussion(
                 llm=llm,
                 topics=topics,
-                context=ctx_prompt,
+                context=context,
                 all_personas=personas,
                 mod_attributes=mod_attributes,
                 user_instructions=user_instructions,
