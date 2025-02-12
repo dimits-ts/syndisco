@@ -28,7 +28,7 @@ class ModelManager:
         self.model = None
         self.yaml_data = yaml_data
 
-    def get(self) -> model.Model:
+    def get(self) -> model.BaseModel:
         """
         Get a reference to the protected model instance.
         First invocation loads the instance to runtime.
@@ -47,7 +47,7 @@ class ModelManager:
             
         return self.model
 
-    def _initialize_model(self) -> model.Model:
+    def _initialize_model(self) -> model.BaseModel:
         """
         Initialize a new LLM model wrapper instance.
 
@@ -69,10 +69,7 @@ class ModelManager:
 
         llm = None
         if library_type == "llama_cpp":
-            # dynamically load library to avoid dependency hell
-            from sdl.backend.cpp_model import LlamaModel
-
-            llm = LlamaModel(
+            llm = model.LlamaModel(
                 model_path=model_path,
                 name=model_name,
                 max_out_tokens=max_tokens,
@@ -83,10 +80,7 @@ class ModelManager:
                 gpu_layers=gpu_layers,
             )
         elif library_type == "transformers":
-            # dynamically load library to avoid dependency hell
-            from sdl.backend.trans_model import TransformersModel
-
-            llm = TransformersModel(
+            llm = model.TransformersModel(
                 model_path=model_path,
                 name=model_name,
                 max_out_tokens=max_tokens,

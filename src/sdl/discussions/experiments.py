@@ -22,7 +22,7 @@ logger = logging.getLogger(Path(__file__).name)
 
 
 @output_util.timing
-def run_discussion_experiments(llm: model.Model, yaml_data: dict) -> None:
+def run_discussion_experiments(llm: model.BaseModel, yaml_data: dict) -> None:
     """Creates experiments by combining the given input data, then runs each one sequentially.
 
     :param llm: The wrapped LLM
@@ -72,7 +72,7 @@ def _run_single_experiment(
 
 
 def _generate_discussion_experiments(
-    yaml_data: dict, llm: model.Model
+    yaml_data: dict, llm: model.BaseModel
 ) -> list[generation.Conversation]:
     """Generate experiments from the basic configurations and wrap them into
     Conversation objects.
@@ -141,7 +141,7 @@ def _generate_discussion_experiments(
 
 
 def _create_synthetic_discussion(
-    llm: model.Model,
+    llm: model.BaseModel,
     topics: list[str],
     context: str,
     all_personas: list[persona.LlmPersona],
@@ -229,7 +229,7 @@ def _create_synthetic_discussion(
 
 
 def _create_users(
-    llm: model.Model,
+    llm: model.BaseModel,
     usernames: list[str],
     attributes: list[list[str]],
     context: str,
@@ -271,7 +271,7 @@ def _create_users(
 
 
 def _create_moderator(
-    llm: model.Model | None,
+    llm: model.BaseModel | None,
     mod_attributes: list[str] | None,
     instructions: str | None,
     context: str,

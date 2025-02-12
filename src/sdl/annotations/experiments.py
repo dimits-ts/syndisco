@@ -17,7 +17,7 @@ logger = logging.getLogger(Path(__file__).name)
 
 @output_util.timing
 def run_annotation_experiments(
-    llm: model.Model,
+    llm: model.BaseModel,
     yaml_data: dict
 ) -> None:
     """
@@ -86,7 +86,7 @@ def _run_single_annotation(experiment: generation.AnnotationConv, output_dir: Pa
 
 
 def _generate_annotator_conv(
-    llm: model.Model,
+    llm: model.BaseModel,
     conv_logs_path: str | Path,
     annotator_persona: persona.LlmPersona,
     instructions: str,
@@ -129,7 +129,7 @@ def _generate_annotator_conv(
 
 
 def _generate_experiments(
-    llm: model.Model,
+    llm: model.BaseModel,
     persona_path: Path,
     instruction_path: Path,
     discussions_dir: Path,
