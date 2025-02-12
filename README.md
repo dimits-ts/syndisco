@@ -1,9 +1,34 @@
 # SynDisco: Automated experiment creation and execution using only LLM agents
 
-Continuation of the [sister thesis project](https://github.com/dimits-ts/llm_moderation_research). A lightweight, simple and specialized framework used for creating, storing, annotating and analyzing
-synthetic discussions between LLM users in the context of online discussions.
+A lightweight, simple and specialized framework used for creating, storing, annotating and analyzing synthetic discussions between LLM users in the context of online discussions.
+
+This framework is designed for academic use, mainly for simulating Social Science experiments with multiple participants. It is finetuned for heavy server-side use and multi-day computations with limited resources. It has been tested on both simulated debates and online fora.
 
 This repository only houses the source code for the framework. Input data, generated datasets, and analysis can be found in [this project](https://github.com/dimits-ts/synthetic_moderation_experiments).
+
+
+## Features
+
+#### Automated Experiment Generation
+
+SynDisco generates a randomized set of social experiences each time. With only a handful of configurations, the researcher can run hundreds or thousands of experiments.
+
+#### Synthetic Group Discussion Generation
+
+SynDisco accepts an arbitrarily large number of LLM user-agent profiles and possible Original Posts (OPs). Each experiment involves a random selection of these user-agents replying to a randomly selected OP. The researcher can determine how these participants behave, whether there is a moderator present and even how the turn-taking is determined.
+
+#### Synthetic Annotation Generation with multiple annotators
+
+The researcher can create multiple LLM annotator-agent profiles. Each of these annotators will process each generated discussion at the comment-level, and annotate according to the provided instruction prompt, enabling an arbitrary selection of metrics to be used.
+
+#### Native Transformers and llama.cpp support
+
+The framework natively accepts any model loaded with the libraries above. Extending the framework to accept models loaded with other libraries can be trivially achieved by extending the base [Model class](src/sdl/backend/model.py) and by overriding the two methods. 
+
+#### Native logging and fault tolerance
+
+Since SynDisco is expected to possibly run for days at a time in remote servers it keeps detailed logs both on-screen and on-disk. Additionally, should any experiment fail, the next one will be loaded. Results are intermittently saved to the disk, ensuring no data loss or corruption on even catastrophic errors.
+
 
 ## Project Structure
 
@@ -22,7 +47,7 @@ The code is tested for Linux only, but can run on any platform. The platform-spe
 
 ### Supported Models
 
-Currently the framework only supports the `llama-cpp-python` and `transformers` libraries as a backend for loading and managing the underlying LLMs. Thus, any model supported by these libraries may be used. 
+Currently the framework supports the `llama-cpp-python` and `transformers` libraries as a backend for loading and managing the underlying LLMs. Thus, any model supported by these libraries may be used. 
 
 ## Usage
 
@@ -37,7 +62,3 @@ Currently the framework only supports the `llama-cpp-python` and `transformers` 
 * A directory containing `.json` files representing the user personas (`persona_dir`). [Example file](https://github.com/dimits-ts/synthetic_moderation_experiments/blob/master/data/generated_discussions_input/modular_configurations/personas/chill_2.json).
 
 **This project is still in development. High-level documentation will soon be available**
-
-
-                                    [--gpu_layers GPU_LAYERS]
-```
