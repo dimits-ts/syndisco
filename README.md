@@ -34,10 +34,10 @@ Since SynDisco is expected to possibly run for days at a time in remote servers 
 
 The project is structured as follows:
 
-* `tests/`: self-explanatory
 * `src/scripts/`: automation scripts for batch processing of experiments 
 * `src/sdl/`: the *Synthetic Discussion Library*, containing the necessary modules for synthetic discussion creation and annotation
 * `src/run.py`: main script handling generation, annotation and export to csv
+
 
 ## Requirements
 
