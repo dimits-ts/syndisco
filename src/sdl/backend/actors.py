@@ -12,7 +12,7 @@ class LlmActor(abc.ABC):
 
     def __init__(
         self,
-        model: model.Model,
+        model: model.BaseModel,
         name: str,
         attributes: list[str],
         context: str,

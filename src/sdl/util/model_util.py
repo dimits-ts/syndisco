@@ -28,7 +28,7 @@ class ModelManager:
         self.model = None
         self.yaml_data = yaml_data
 
-    def get(self) -> model.Model:
+    def get(self) -> model.BaseModel:
         """
         Get a reference to the protected model instance.
         First invocation loads the instance to runtime.
@@ -47,7 +47,7 @@ class ModelManager:
             
         return self.model
 
-    def _initialize_model(self) -> model.Model:
+    def _initialize_model(self) -> model.BaseModel:
         """
         Initialize a new LLM model wrapper instance.
 

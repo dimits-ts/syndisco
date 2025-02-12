@@ -14,7 +14,7 @@ import transformers
 logger = logging.getLogger(Path(__file__).name)
 
 
-class Model(abc.ABC):
+class BaseModel(abc.ABC):
     """
     Interface for all local LLM wrappers
     """
@@ -62,7 +62,7 @@ class Model(abc.ABC):
         raise NotImplementedError("Abstract class call")
 
 
-class LlamaModel(Model):
+class LlamaModel(BaseModel):
 
     def __init__(
         self,
@@ -134,7 +134,7 @@ class LlamaModel(Model):
         return json_output["choices"][0]["message"]["content"]
 
 
-class TransformersModel(Model):
+class TransformersModel(BaseModel):
     """
     A class encapsulating Transformers HuggingFace models.
     """
