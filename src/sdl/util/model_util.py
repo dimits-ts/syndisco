@@ -69,10 +69,7 @@ class ModelManager:
 
         llm = None
         if library_type == "llama_cpp":
-            # dynamically load library to avoid dependency hell
-            from sdl.backend.cpp_model import LlamaModel
-
-            llm = LlamaModel(
+            llm = model.LlamaModel(
                 model_path=model_path,
                 name=model_name,
                 max_out_tokens=max_tokens,
@@ -83,10 +80,7 @@ class ModelManager:
                 gpu_layers=gpu_layers,
             )
         elif library_type == "transformers":
-            # dynamically load library to avoid dependency hell
-            from sdl.backend.trans_model import TransformersModel
-
-            llm = TransformersModel(
+            llm = model.TransformersModel(
                 model_path=model_path,
                 name=model_name,
                 max_out_tokens=max_tokens,

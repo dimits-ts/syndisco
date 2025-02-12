@@ -7,7 +7,7 @@ import typing
 import logging
 from pathlib import Path
 
-import llama_cpp 
+import llama_cpp
 import transformers
 
 
@@ -19,7 +19,7 @@ class BaseModel(abc.ABC):
     Interface for all local LLM wrappers
     """
 
-    def __init__(self, name: str, max_out_tokens: int, stop_list: list[str] = []):
+    def __init__(self, name: str, max_out_tokens: int, stop_list: list[str] = list()):
         self.name = name
         self.max_out_tokens = max_out_tokens
         self.stop_list = stop_list
@@ -63,17 +63,21 @@ class BaseModel(abc.ABC):
 
 
 class LlamaModel(BaseModel):
+    """
+    Wrapper for local LLMs loaded via the llama.cpp library.
+    Uses llama-cpp-python to manage the models
+    """
 
     def __init__(
         self,
-        model_path: str | Path,
+        model_path: Path,
         name: str,
         gpu_layers: int,
         seed: int = 42,
         ctx_width_tokens: int = 2048,
         max_out_tokens: int = 400,
         inference_threads: int = 3,
-        remove_string_list: list[str] = [],
+        remove_string_list: list[str] = list(),
     ):
         """
         Initialize a new LLM wrapper.
@@ -99,7 +103,7 @@ class LlamaModel(BaseModel):
         super().__init__(name, max_out_tokens, remove_string_list)
 
         self.model = llama_cpp.Llama(
-            model_path=model_path,
+            model_path=str(model_path),
             seed=seed,
             n_ctx=ctx_width_tokens,
             n_threads=inference_threads,
@@ -144,7 +148,7 @@ class TransformersModel(BaseModel):
         model_path: str | Path,
         name: str,
         max_out_tokens: int,
-        remove_string_list: list[str] = [],
+        remove_string_list: list[str] = list(),
     ):
         """
         Initialize a new LLM wrapper.
