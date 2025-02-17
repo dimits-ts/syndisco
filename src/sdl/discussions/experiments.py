@@ -4,6 +4,7 @@ Each experiment is packaged into a Conversation object (@see generation.py).
 Then runs each experiment sequentially, and saves the output to disk as an auto-generated file.
 """
 
+from operator import ne
 import random
 import logging
 import time
@@ -39,11 +40,8 @@ class DiscussionExperiment:
         self.moderator = moderator
 
         if next_turn_manager is None:
-            self.next_turn_manager = turn_manager.RoundRobbin(
-                [user.name for user in users]
-            )
-        else:
-            self.next_turn_manager = next_turn_manager
+            logger.warning("No TurnManager selected: Defaulting to round-robin strategy.")
+        self.next_turn_manager = next_turn_manager
 
         self.history_ctx_len = history_ctx_len
         self.num_active_users = num_active_users
@@ -78,6 +76,12 @@ class DiscussionExperiment:
         rand_topic = random.choice(self.topics)
         rand_users = random.sample(self.users, k=self.num_active_users)
 
+        if self.next_turn_manager is None:
+            next_turn_manager = turn_manager.RoundRobbin()
+        else:
+            next_turn_manager = self.next_turn_manager
+        next_turn_manager.initialize_names([user.name for user in rand_users])
+
         return generation.Conversation(
             users=rand_users,
             moderator=self.moderator,
@@ -85,7 +89,7 @@ class DiscussionExperiment:
             conv_len=self.num_turns,
             seed_opinion=rand_topic,
             seed_opinion_user=random.choice(rand_users).name,
-            next_turn_manager=self.next_turn_manager,
+            next_turn_manager=next_turn_manager,
         )
 
     @output_util.timing
