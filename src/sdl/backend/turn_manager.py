@@ -30,7 +30,7 @@ class TurnManager(abc.ABC):
         :return: the next speaker's username
         :rtype: str
         """
-        raise NotImplemented
+        raise NotImplementedError("Abstract method called")
 
 
 class RoundRobbin(TurnManager):
