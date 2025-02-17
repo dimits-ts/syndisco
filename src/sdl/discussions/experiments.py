@@ -26,7 +26,6 @@ class DiscussionExperiment:
     def __init__(
         self,
         topics: list[str],
-        context: str,
         users: list[actors.LLMActor],
         moderator: actors.LLMActor | None = None,
         next_turn_manager: turn_manager.TurnManager | None = None,
@@ -36,7 +35,6 @@ class DiscussionExperiment:
         num_discussions: int = 5,
     ):
         self.topics = topics
-        self.context = context
         self.users = users
         self.moderator = moderator
 
