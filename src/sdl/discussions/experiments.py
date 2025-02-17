@@ -13,282 +13,123 @@ from pathlib import Path
 from . import generation
 from ..util import file_util, output_util
 from ..backend import turn_manager
-from ..backend import persona
 from ..backend import actors
-from ..backend import model
 
 
 logger = logging.getLogger(Path(__file__).name)
 
 
-@output_util.timing
-def run_discussion_experiments(
-    llm: model.BaseModel, discussions_output_dir: Path
-) -> None:
-    """Creates experiments by combining the given input data, then runs each one sequentially.
-
-    :param llm: The wrapped LLM
-    :type llm: model.Model
-    :param yaml_data: the serialized experiment configurations
-    :type yaml_data: dict
+class DiscussionExperiment:
     """
-    # Ensure output directory exists
-    os.makedirs(output_dir, exist_ok=True)
-
-    experiments = _generate_discussion_experiments(llm=llm, yaml_data=yaml_data)
-    for i, experiment in enumerate(experiments):
-        logging.info(f"Running experiment {i+1}/{len(experiments)+1}...")
-        _run_single_experiment(experiment=experiment, output_dir=output_dir)
-
-    logger.info("Finished synthetic discussion generation.")
-
-
-@output_util.timing
-def _run_single_experiment(
-    experiment: generation.Conversation, output_dir: Path
-) -> None:
-    """Run a single experiment, then save its output to a auto-generated file.
-
-    :param experiment: A Conversation object describing the experiment.
-    :type experiment: generation.Conversation
-    :param output_dir: The directory where the auto-generated file with the
-    experiment's output will be saved
-    :type output_dir: Path
+    An Experiment where multiple, randomized synthetic discussions will take place.
     """
-    try:
-        logger.info("Beginning conversation...")
-        logger.debug(f"Experiment parameters: {str(experiment)}")
 
-        start_time = time.time()
-        experiment.begin_conversation(verbose=True)
-        output_path = file_util.generate_datetime_filename(
-            output_dir=output_dir, file_ending=".json"
-        )
-        logging.debug(f"Finished discussion in {(time.time() - start_time)} seconds.")
+    def __init__(
+        self,
+        topics: list[str],
+        context: str,
+        users: list[actors.LLMUser],
+        moderator: actors.LLMUser | None = None,
+        next_turn_manager: turn_manager.TurnManager | None = None,
+        history_ctx_len: int = 3,
+        num_turns: int = 10,
+        num_active_users: int = 2,
+        num_discussions: int = 5
+    ):
+        self.topics = topics
+        self.context = context
+        self.users = users
+        self.moderator = moderator
 
-        experiment.to_json_file(output_path)
-        logger.info(f"Conversation saved to {output_path}")
-    except Exception:
-        logger.exception("Experiment aborted due to error.")
-
-
-def _generate_discussion_experiments(
-    llm: model.BaseModel,
-    topics: list[str],
-    personas: list[backend.Persona],
-    user_instructions: str,
-    mod_instructions: str,
-    mod_attributes: list[str],
-    context: str,
-    turn_taking=None,
-    include_moderator: bool = True,
-    history_ctx_len: int = 3,
-    num_turns: int = 10,
-    num_users: int = 5,
-    num_experiments: int = 5,
-    random_weighted_response_prob: float = 0.5,
-) -> list[generation.Conversation]:
-    """Generate experiments from the basic configurations and wrap them into
-    Conversation objects.
-
-    :param yaml_data: the serialized experiment configurations
-    :type yaml_data: dict
-    :param llm: the wrapped LLM
-    :type llm: model.Model
-    :return: a list of Conversation objects containing the experiments
-    :rtype: _type_
-    """
-    turn_taking_dict = {
-        "conv_len": num_turns,
-        "history_ctx_len": history_ctx_len,
-        "turn_manager_type": turn_taking_config["turn_manager_type"],
-        "turn_manager_config": {
-            "respond_probability": turn_taking_config["respond_probability"]
-        },
-    }
-    mod_attributes = mod_attributes if include_moderator else None
-
-    experiments = []
-    for _ in range(num_experiments):
-        experiments.append(
-            _create_synthetic_discussion(
-                llm=llm,
-                topics=topics,
-                context=context,
-                all_personas=personas,
-                mod_attributes=mod_attributes,
-                user_instructions=user_instructions,
-                mod_instructions=mod_instructions,
-                turn_manager_type=turn_taking_dict["turn_manager_type"],
-                turn_manager_config=turn_taking_dict["turn_manager_config"],
-                num_users=num_users,
-                conv_len=turn_taking_dict["conv_len"],
-                history_ctx_len=turn_taking_dict["history_ctx_len"],
+        if next_turn_manager is None:
+            self.next_turn_manager = turn_manager.RoundRobbin(
+                [user.name for user in users]
             )
+        else:
+            self.next_turn_manager = next_turn_manager
+
+        self.history_ctx_len = history_ctx_len
+        self.num_active_users = num_active_users
+        self.num_discussions = num_discussions
+        self.num_turns = num_turns
+
+    def begin(self, discussions_output_dir: Path = Path("./output")) -> None:
+        """
+        Begin the experiment by generating and executing a set of discussions.
+        The results will be written as JSON files at the specified output directory
+        """
+        discussions = self._generate_discussion_experiments()
+        self._run_all_discussions(discussions, discussions_output_dir)
+
+    def _generate_discussion_experiments(self) -> list[generation.Conversation]:
+        """Generate experiments from the basic configurations and wrap them into
+        Conversation objects.
+
+        :param yaml_data: the serialized experiment configurations
+        :type yaml_data: dict
+        :param llm: the wrapped LLM
+        :type llm: model.Model
+        :return: a list of Conversation objects containing the experiments
+        :rtype: _type_
+        """
+        experiments = []
+        for _ in range(self.num_discussions):
+            experiments.append(self._create_synthetic_discussion())
+        return experiments
+
+    def _create_synthetic_discussion(self):
+        rand_topic = random.choice(self.topics)
+        rand_users = random.sample(self.users, k=self.num_active_users)
+
+        return generation.Conversation(
+            users=rand_users,
+            moderator=self.moderator,
+            history_context_len=self.history_ctx_len,
+            conv_len=self.num_turns,
+            seed_opinion=rand_topic,
+            seed_opinion_user=random.choice(rand_users).name,
+            next_turn_manager=self.next_turn_manager,
         )
-    return experiments
 
+    @output_util.timing
+    def _run_all_discussions(self, discussions: list[generation.Conversation], output_dir: Path) -> None:
+        """Creates experiments by combining the given input data, then runs each one sequentially.
 
-def _create_synthetic_discussion(
-    llm: model.BaseModel,
-    topics: list[str],
-    context: str,
-    all_personas: list[persona.LlmPersona],
-    mod_attributes: list[str] | None,
-    user_instructions: str,
-    mod_instructions: str | None,
-    turn_manager_type: str,
-    turn_manager_config: dict,
-    num_users: int,
-    conv_len: int,
-    history_ctx_len: int,
-) -> generation.Conversation:
-    """
-    Generate a synthetic discussion with users, a moderator, and a turn manager.
+        :param llm: The wrapped LLM
+        :type llm: model.Model
+        :param yaml_data: the serialized experiment configurations
+        :type yaml_data: dict
+        """
+        # Ensure output directory exists
+        os.makedirs(output_dir, exist_ok=True)
 
-    This function creates a conversation simulation using an LLM for a specified number of users
-    and a moderator, with topics, personas, and turn management strategies. The output is a
-    structured conversation object.
+        for i, discussion in enumerate(discussions):
+            logging.info(f"Running experiment {i+1}/{len(discussions)+1}...")
+            self._run_single_discussion(discussion=discussion, output_dir=output_dir)
 
-    :param llm: The language model used to generate user and moderator responses.
-    :type llm: model.Model
-    :param topics: A list of topics to seed the discussion.
-    :type topics: list[str]
-    :param context: Contextual information shared with users and the moderator.
-    :type context: str
-    :param all_personas: A list of all possible personas that define user attributes and behaviors.
-    :type all_personas: list[persona.LlmPersona]
-    :param mod_attributes: Attributes for the moderator persona, defaults to None.
-    :type mod_attributes: list[str] | None
-    :param user_instructions: Instructions provided to the users.
-    :type user_instructions: str
-    :param mod_instructions: Instructions provided to the moderator, defaults to None.
-    :type mod_instructions: str | None
-    :param turn_manager_type: The type of turn manager to control turn-taking.
-    :type turn_manager_type: str
-    :param turn_manager_config: Configuration dictionary for the turn manager.
-    :type turn_manager_config: dict
-    :param num_users: Number of users participating in the discussion.
-    :type num_users: int
-    :param conv_len: Length of the conversation in terms of the number of turns.
-    :type conv_len: int
-    :param history_ctx_len: Length of the context history shared during the conversation.
-    :type history_ctx_len: int
-    :return: A synthetic conversation object.
-    :rtype: generation.Conversation
+        logger.info("Finished synthetic discussion generation.")
 
-    :raises AssertionError: If the number of users exceeds the number of provided personas.
-    """
-    assert num_users <= len(
-        all_personas
-    ), "Number of users must be less or equal to the number of provided personas"
+    @output_util.timing
+    def _run_single_discussion(self, discussion: generation.Conversation, output_dir: Path) -> None:
+        """Run a single discussion, then save its output to a auto-generated file.
 
-    rand_personas = random.sample(all_personas, k=num_users)
-    rand_topic = random.choice(topics)
-    rand_user_names = [persona.username for persona in rand_personas]
-    rand_user_attributes = [persona.to_attribute_list() for persona in rand_personas]
+        :param discussion: A Conversation object.
+        :type discussion: generation.Conversation
+        """
+        try:
+            logger.info("Beginning conversation...")
+            logger.debug(f"Experiment parameters: {str(discussion)}")
 
-    users = _create_users(
-        llm=llm,
-        usernames=rand_user_names,
-        attributes=rand_user_attributes,
-        context=context,
-        instructions=user_instructions,
-    )
-    mod = _create_moderator(
-        llm=llm,
-        mod_attributes=mod_attributes,
-        instructions=mod_instructions,
-        context=context,
-    )
-
-    next_turn_manager = turn_manager.turn_manager_factory(
-        turn_manager_type, rand_user_names, config=turn_manager_config
-    )
-
-    return generation.Conversation(
-        users=users,
-        moderator=mod,
-        history_context_len=history_ctx_len,
-        conv_len=conv_len,
-        seed_opinion=rand_topic,
-        seed_opinion_user=random.choice(rand_user_names),
-        next_turn_manager=next_turn_manager,
-    )
-
-
-def _create_users(
-    llm: model.BaseModel,
-    usernames: list[str],
-    attributes: list[list[str]],
-    context: str,
-    instructions: str,
-) -> list[actors.LLMUser]:
-    """Create runtime LLMUser objects with the specified information.
-
-    :param llm: the wrapped LLM instance that the users will use to generate text
-    :type llm: model.Model
-    :param usernames: a list of usernames for each of the users
-    :type usernames: list[str]
-    :param attributes: a list containing a list of personality/mood attributes for each user
-    :type attributes: list[list[str]]
-    :param context: the global context of the experiment
-    :type context: str
-    :param instructions: the instructions given to all LLM users (not the moderator)
-    :type instructions: str
-    :return: a list of initialized runtime LLMUser objects
-    corresponding to the given characteristics
-    :rtype: list[actors.LLMUser]
-    """
-    user_list = []
-
-    assert len(usernames) == len(
-        attributes
-    ), "Number of usernames and user personality attribute lists must be the same"
-
-    for username, user_attributes in zip(usernames, attributes):
-        user_list.append(
-            actors.LLMUser(
-                model=llm,
-                name=username,
-                attributes=user_attributes,
-                context=context,
-                instructions=instructions,
+            start_time = time.time()
+            discussion.begin_conversation(verbose=True)
+            output_path = file_util.generate_datetime_filename(
+                output_dir=output_dir, file_ending=".json"
             )
-        )
-    return user_list
+            logging.debug(
+                f"Finished discussion in {(time.time() - start_time)} seconds."
+            )
 
-
-def _create_moderator(
-    llm: model.BaseModel | None,
-    mod_attributes: list[str] | None,
-    instructions: str | None,
-    context: str,
-) -> actors.LLMUser | None:
-    """Create a LLMUser instance, which will assume the role of moderator.
-    Returns None if any of the input arguments are set to None.
-
-    :param llm: the wrapped LLM instance that the moderator will use to generate text
-    :type llm: model.Model | None
-    :param mod_attributes: a list of personality/mood attributes for the moderator
-    :type mod_attributes: list[str] | None
-    :param instructions: the moderator-specific instructions
-    :type instructions: str | None
-    :param context: the global context of the experiment
-    :type context: str
-    :return: an initialized LLMUser instance which will assume the role of moderator,
-    or None if any of the fields above are set to None
-    :rtype: actors.LLMUser | None
-    """
-    if mod_attributes is not None and llm is not None and instructions is not None:
-        moderator = actors.LLMUser(
-            model=llm,
-            name="moderator",
-            attributes=mod_attributes,
-            context=context,
-            instructions=instructions,
-        )
-    else:
-        logger.warning("Warning: Generating conversation without moderator")
-        moderator = None
-    return moderator
+            discussion.to_json_file(output_path)
+            logger.info(f"Conversation saved to {output_path}")
+        except Exception:
+            logger.exception("Experiment aborted due to error.")
