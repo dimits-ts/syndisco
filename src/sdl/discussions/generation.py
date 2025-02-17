@@ -99,6 +99,7 @@ class Conversation:
                 attributes=[],
                 context="",
                 instructions="",
+                actor_type=actors.ActorType.USER
             )
             self._archive_response(seed_user, self.seed_opinion, verbose=verbose)
         else:
