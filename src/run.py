@@ -1,5 +1,4 @@
 """
-The main entry point for the library.
 Imports the configuration file, sets up logging, and directs calls for discussion generation, 
 annotation, and dataset export.
 """
@@ -14,8 +13,6 @@ import pandas as pd
 import sdl.util.logging_util
 import sdl.util.file_util
 import sdl.util.model_util
-import sdl.annotations.experiments
-import sdl.discussions.experiments
 import sdl.postprocessing.postprocessing
 import sdl.backend.model
 from synthetic_discussion_framework.src.sdl.backend import actors
@@ -63,10 +60,10 @@ def main():
         generate_annotations=generate_annotations,
         export_dataset=export_dataset,
     )
+
     if generate_discussions:
         discussion_exp = create_discussion_experiment(
-            llm=model_manager.get(), 
-            discussion_config=yaml_data["discussions"]
+            llm=model_manager.get(), discussion_config=yaml_data["discussions"]
         )
         run_discussion_experiment(
             experiment=discussion_exp,
@@ -75,8 +72,7 @@ def main():
 
     if generate_annotations:
         ann_exp = create_annotation_experiment(
-            llm=model_manager.get(), 
-            annotation_config=yaml_data["annotations"]
+            llm=model_manager.get(), annotation_config=yaml_data["annotations"]
         )
         run_annotation_experiment(
             ann_exp,
