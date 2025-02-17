@@ -175,11 +175,11 @@ class Conversation:
         self._log_comment(user, comment)
         self._add_comment_to_history(user, comment, verbose)
 
-    def _log_comment(self, user: actors.LlmActor, comment: str) -> None:
+    def _log_comment(self, user: actors.LLMActor, comment: str) -> None:
         """Save new comment to the output history.
 
         :param user: The user who created the new comment
-        :type user: actors.LlmActor
+        :type user: actors.LLMActor
         :param comment: The new comment
         :type comment: str
         """
@@ -188,13 +188,13 @@ class Conversation:
         self.conv_logs.append(artifact)
 
     def _add_comment_to_history(
-        self, user: actors.LlmActor, comment: str, verbose: bool
+        self, user: actors.LLMActor, comment: str, verbose: bool
     ) -> None:
         """Add new comment to the discussion history, 
         so it can be shown to the other participants in the future.
 
         :param user: The user who created the new comment
-        :type user: actors.LlmActor
+        :type user: actors.LLMActor
         :param comment: The new comment
         :type comment: str
         :param verbose: Whether to print the comment to stdout

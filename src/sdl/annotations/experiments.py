@@ -1,7 +1,7 @@
 import logging
 from pathlib import Path
 
-from sdl.backend import actors
+from ..backend import actors
 from ..util import file_util, output_util
 from . import generation
 
