@@ -4,7 +4,6 @@ Each experiment is packaged into a Conversation object (@see generation.py).
 Then runs each experiment sequentially, and saves the output to disk as an auto-generated file.
 """
 
-import os
 import random
 import logging
 import time
@@ -28,13 +27,13 @@ class DiscussionExperiment:
         self,
         topics: list[str],
         context: str,
-        users: list[actors.LLMUser],
-        moderator: actors.LLMUser | None = None,
+        users: list[actors.LLMActor],
+        moderator: actors.LLMActor | None = None,
         next_turn_manager: turn_manager.TurnManager | None = None,
         history_ctx_len: int = 3,
         num_turns: int = 10,
         num_active_users: int = 2,
-        num_discussions: int = 5
+        num_discussions: int = 5,
     ):
         self.topics = topics
         self.context = context
@@ -92,7 +91,9 @@ class DiscussionExperiment:
         )
 
     @output_util.timing
-    def _run_all_discussions(self, discussions: list[generation.Conversation], output_dir: Path) -> None:
+    def _run_all_discussions(
+        self, discussions: list[generation.Conversation], output_dir: Path
+    ) -> None:
         """Creates experiments by combining the given input data, then runs each one sequentially.
 
         :param llm: The wrapped LLM
@@ -100,8 +101,7 @@ class DiscussionExperiment:
         :param yaml_data: the serialized experiment configurations
         :type yaml_data: dict
         """
-        # Ensure output directory exists
-        os.makedirs(output_dir, exist_ok=True)
+        output_dir.mkdir(parents=True, exist_ok=True)
 
         for i, discussion in enumerate(discussions):
             logging.info(f"Running experiment {i+1}/{len(discussions)+1}...")
@@ -110,7 +110,9 @@ class DiscussionExperiment:
         logger.info("Finished synthetic discussion generation.")
 
     @output_util.timing
-    def _run_single_discussion(self, discussion: generation.Conversation, output_dir: Path) -> None:
+    def _run_single_discussion(
+        self, discussion: generation.Conversation, output_dir: Path
+    ) -> None:
         """Run a single discussion, then save its output to a auto-generated file.
 
         :param discussion: A Conversation object.

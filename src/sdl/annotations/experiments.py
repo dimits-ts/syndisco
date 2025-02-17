@@ -15,7 +15,7 @@ class AnnotationExperiment:
 
     def __init__(
         self,
-        annotators: list[actors.LLMAnnotator],
+        annotators: list[actors.LLMActor],
         history_ctx_len: int,
         include_mod_comments: bool,
     ):
@@ -23,20 +23,20 @@ class AnnotationExperiment:
         self.history_ctx_len = history_ctx_len
         self.include_mod_comments = include_mod_comments
 
-
     def begin(self, discussions_dir: Path, output_dir: Path) -> None:
         """
         Begin the annotation experiment by generating and executing annotation tasks.
         The results will be written as JSON files in the specified output directory.
         """
         if not discussions_dir.is_dir():
-            raise OSError(f"Discussions directory ({discussions_dir}) is not a directory") from None
+            raise OSError(
+                f"Discussions directory ({discussions_dir}) is not a directory"
+            ) from None
 
         output_dir.mkdir(parents=True, exist_ok=True)
 
         annotation_tasks = self._generate_annotation_tasks(discussions_dir)
         self._run_all_annotations(annotation_tasks, output_dir)
-
 
     def _generate_annotation_tasks(
         self, discussions_dir: Path
@@ -51,9 +51,8 @@ class AnnotationExperiment:
                 annotation_tasks.append(annotation_task)
         return annotation_tasks
 
-
     def _create_annotation_task(
-        self, annotator: actors.LLMAnnotator, conv_logs_path: Path
+        self, annotator: actors.LLMActor, conv_logs_path: Path
     ) -> generation.AnnotationConv:
         return generation.AnnotationConv(
             annotator=annotator,
@@ -61,7 +60,6 @@ class AnnotationExperiment:
             history_ctx_len=self.history_ctx_len,
             include_moderator_comments=self.include_mod_comments,
         )
-
 
     @output_util.timing
     def _run_all_annotations(
@@ -73,7 +71,6 @@ class AnnotationExperiment:
             self._run_single_annotation(annotation_task, output_dir)
 
         logger.info("Finished annotation generation.")
-
 
     @output_util.timing
     def _run_single_annotation(

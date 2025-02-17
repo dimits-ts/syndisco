@@ -26,8 +26,8 @@ class Conversation:
     def __init__(
         self,
         next_turn_manager: turn_manager.TurnManager,
-        users: list[actors.LLMUser],
-        moderator: Optional[actors.LLMUser] = None,
+        users: list[actors.LLMActor],
+        moderator: Optional[actors.LLMActor] = None,
         history_context_len: int = 5,
         conv_len: int = 5,
         seed_opinion: str = "",
@@ -93,7 +93,7 @@ class Conversation:
 
         if self.seed_opinion.strip() != "":
             # create first "seed" opinion
-            seed_user = actors.LLMUser(
+            seed_user = actors.LLMActor(
                 model=None,  # type: ignore
                 name=self.seed_opinion_user,
                 attributes=[],
@@ -160,13 +160,13 @@ class Conversation:
             json.dump(self.to_dict(), fout, indent=4)
 
     def _archive_response(
-        self, user: actors.LLMUser, comment: str, verbose: bool
+        self, user: actors.LLMActor, comment: str, verbose: bool
     ) -> None:
         """Save the new comment to discussion output, 
         to discussion history for other users to see, maybe print it on screen.
 
         :param user: The user who created the new comment.
-        :type user: actors.LLMUser
+        :type user: actors.LLMActor
         :param comment: The new comment.
         :type comment: str
         :param verbose: Whether to print the comment to stdout
