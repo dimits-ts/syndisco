@@ -1,7 +1,10 @@
 import abc
 import typing
+from pathlib import Path
 
 from . import model
+from . import persona
+from ..util import file_util
 
 
 class LlmActor(abc.ABC):
@@ -114,3 +117,72 @@ class LLMAnnotator(LlmActor):
             "role": "user",
             "content": "Conversation so far:\n\n" + "\n".join(history) + "\nOutput:",
         }
+
+
+def create_users_from_file(
+    llm: model.BaseModel, persona_path: Path, instruction_path: Path, context: str
+) -> list[LLMUser]:
+    """
+    Create a list of users by using information from files.
+
+    :param llm: The LLM
+    :type llm: model.BaseModel
+    :param persona_path: The path to the JSON file containing the personas
+    :type persona_path: Path
+    :param instruction_path: The path to the file containing the user's instructions
+    :type instruction_path: Path
+    :param context: The context of the experiment
+    :type context: str
+    :return: A list of initialized LLMUsers
+    :rtype: list[LLMUser]
+    """
+    personas = persona.from_json_file(persona_path)
+    instructions = file_util.read_file(instruction_path)
+    return create_users(
+        llm,
+        [persona.username for persona in personas],
+        [persona.to_attribute_list() for persona in personas],
+        context,
+        instructions,
+    )
+
+
+def create_users(
+    llm: model.BaseModel,
+    usernames: list[str],
+    attributes: list[list[str]],
+    context: str,
+    instructions: str,
+) -> list[LLMUser]:
+    """Create runtime LLMUser objects with the specified information.
+
+    :param llm: The LLM
+    :type llm: model.BaseModel
+    :param usernames: A list of usernames for each of the users
+    :type usernames: list[str]
+    :param attributes: A list containing a list of personality/mood attributes for each user
+    :type attributes: list[list[str]]
+    :param context: The context of the experiment
+    :type context: str
+    :param instructions: The instructions given to all LLM users (not the moderator)
+    :type instructions: str
+    :return: A list of initialized LLMUsers
+    :rtype: list[LLMUser]
+    """
+    user_list = []
+
+    assert len(usernames) == len(
+        attributes
+    ), "Number of usernames and user personality attribute lists must be the same"
+
+    for username, user_attributes in zip(usernames, attributes):
+        user_list.append(
+            LLMUser(
+                model=llm,
+                name=username,
+                attributes=user_attributes,
+                context=context,
+                instructions=instructions,
+            )
+        )
+    return user_list
