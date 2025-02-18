@@ -107,7 +107,7 @@ class Conversation:
 
         # begin generation
         for _ in range(self.conv_len):
-            speaker_name = self.next_turn_manager.next_turn_username()
+            speaker_name = self.next_turn_manager.next()
             actor = self.username_user_map[speaker_name]
             res = actor.speak(list(self.ctx_history))
 

@@ -1,26 +1,28 @@
+"""
+Module deciding which Actor will speak next.
+"""
 import abc
 import itertools
 import random
 import warnings
+import typing
 
-#TODO: make these into template methods
 
 class TurnManager(abc.ABC):
     """
     A class that handles which of a list of users gets to speak in the next dialogue turn.
     """
 
-    def __init__(self, config: dict[str, float] = {}):
+    def __init__(self):
         """
         Construct a new TurnManager.
 
         :param config: a dictionary of other configurations, defaults to {}
         :type config: dict[str, float], optional
         """
-        self.config = config
-        self.usernames_set = False
+        self.is_initialized = False
 
-    @abc.abstractmethod
+    @typing.final
     def initialize_names(self, usernames: list[str]) -> None:
         """
         Initialize the manager by providing the names of the users.
@@ -28,16 +30,29 @@ class TurnManager(abc.ABC):
         :param usernames: the usernames of the participants
         :type usernames: list[str]
         """
-        raise NotImplementedError("Abstract method called")
+        self.is_initialized = True
+        self._initialize_names_impl(usernames)
 
-    @abc.abstractmethod
-    def next_turn_username(self) -> str:
+    @typing.final
+    def next(self) -> str:
         """
         Get the username of the next speaker.
 
         :return: the next speaker's username
         :rtype: str
         """
+        if not self.is_initialized:
+            raise ValueError(
+                "No usernames have been provided for the turn manager. Use self.initialize_names()"
+            )
+        return self._next_impl()
+
+    @abc.abstractmethod
+    def _initialize_names_impl(self, usernames: list[str]) -> None:
+        raise NotImplementedError("Abstract method called")
+
+    @abc.abstractmethod
+    def _next_impl(self) -> str:
         raise NotImplementedError("Abstract method called")
 
 
@@ -46,15 +61,15 @@ class RoundRobbin(TurnManager):
     A simple turn manager which gives priority to the next user in the queue.
     """
 
-    def initialize_names(self, usernames: list[str]):
-        self.usernames_set = True
-        self.username_loop = itertools.cycle(usernames)
+    def __init__(self):
+        super().__init__()
+        self.username_loop = itertools.cycle([])
         self.curr_turn = 0
 
-    def next_turn_username(self) -> str:
-        if not self.usernames_set:
-            raise ValueError("No usernames have been provided for the turn manager. Use self.initialize_names()")
+    def _initialize_names_impl(self, usernames: list[str]):
+        self.username_loop = itertools.cycle(usernames)
 
+    def _next_impl(self) -> str:
         return next(self.username_loop)
 
 
@@ -65,8 +80,9 @@ class RandomWeighted(TurnManager):
 
     DEFAULT_RESPOND_PROBABILITY = 0.5
 
-    def __init__(self, config: dict[str, float] = {}):
-        super().__init__(config)
+    def __init__(self, config: dict[str, float] | None = None):
+        super().__init__()
+        config = config if config is not None else {}
 
         if config.get("respond_probability") is None:
             warnings.warn(
@@ -80,16 +96,12 @@ class RandomWeighted(TurnManager):
 
         self.second_to_last_speaker = None
         self.last_speaker = None
-    
-    def initialize_names(self, usernames: list[str]):
-        self.usernames_set= True 
+        self.usernames = {}
+
+    def _initialize_names_impl(self, usernames: list[str]):
         self.usernames = set(usernames)
 
-    def next_turn_username(self) -> str:
-        if not self.usernames_set:
-            raise ValueError("No usernames have been provided for the turn manager. Use self.initialize_names()")
-
-
+    def _next_impl(self) -> str:
         # If first time asking for a speaker, return random speaker
         if self.second_to_last_speaker is None:
             next_speaker = self._select_other_random_speaker()
@@ -120,7 +132,7 @@ class RandomWeighted(TurnManager):
 
 
 def turn_manager_factory(
-    turn_manager_type: str, config: dict[str, float] = {}
+    turn_manager_type: str, config: dict[str, float] | None = None
 ) -> TurnManager:
     """
     A factory which returns a instansiated TurnManager of the type specified by a string.
