@@ -22,7 +22,7 @@ class AnnotationConv:
 
     def __init__(
         self,
-        annotator: actors.LLMAnnotator,
+        annotator: actors.LLMActor,
         conv_logs_path: str | Path,
         include_moderator_comments: bool,
         history_ctx_len: int = 2

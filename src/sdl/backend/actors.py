@@ -1,10 +1,23 @@
 import abc
 import typing
+from pathlib import Path
+from enum import Enum, auto
 
 from . import model
+from . import persona
+from ..util import file_util
 
 
-class LlmActor(abc.ABC):
+class ActorType(Enum):
+    """
+    The purpose of the LLMActor, used to determine proper prompt structure
+    """
+
+    USER = auto()
+    ANNOTATOR = auto()
+
+
+class LLMActor:
     """
     An abstract class representing an actor which responds according to an underlying LLM instance.
     The LLM instance can be of any type.
@@ -17,6 +30,7 @@ class LlmActor(abc.ABC):
         attributes: list[str],
         context: str,
         instructions: str,
+        actor_type: ActorType,
     ) -> None:
         """
         Create a new actor based on an LLM instance.
@@ -33,20 +47,22 @@ class LlmActor(abc.ABC):
         :type context: str
         :param instructions: Special instructions for the actor.
         :type instructions: str
+        :param actor_type: The purpose of the actor
+        :type actor_type: ActorType
         """
         self.model = model
         self.name = name
         self.attributes = attributes
         self.context = context
         self.instructions = instructions
+        self.actor_type = actor_type
 
     def _system_prompt(self) -> dict:
         prompt = f"{self.context} Your name is {self.name}. Your traits: {', '.join(self.attributes)} Your instructions: {self.instructions}"
         return {"role": "system", "content": prompt}
 
-    @abc.abstractmethod
     def _message_prompt(self, history: list[str]) -> dict:
-        return {}
+        return _apply_template(self.actor_type, self.name, history)
 
     @typing.final
     def speak(self, history: list[str]) -> str:
@@ -90,27 +106,94 @@ class LlmActor(abc.ABC):
         return self.name
 
 
-class LLMUser(LlmActor):
-    """
-    A LLM actor with a modified message prompt to facilitate a conversation.
-    """
-
-    def _message_prompt(self, history: list[str]) -> dict:
+def _apply_template(
+    actor_type: ActorType, username: str, history: list[str]
+) -> dict[str, str]:
+    if actor_type == ActorType.USER:
         return {
             "role": "user",
-            "content": "\n".join(history) + f"\nUser {self.get_name()} posted:",
+            "content": "\n".join(history) + f"\nUser {username} posted:",
         }
-
-
-class LLMAnnotator(LlmActor):
-    """
-    A LLM actor with a modified message prompt to facilitate an annotation job.
-    """
-
-    def _message_prompt(self, history: list[str]) -> dict:
+    elif actor_type == ActorType.ANNOTATOR:
         # LLMActor asks the model to respond as its username
         # by modifying this protected method, we instead prompt it to write the annotation
         return {
             "role": "user",
             "content": "Conversation so far:\n\n" + "\n".join(history) + "\nOutput:",
         }
+
+
+def create_users_from_file(
+    llm: model.BaseModel,
+    persona_path: Path,
+    instruction_path: Path,
+    context: str,
+    actor_type: ActorType,
+) -> list[LLMActor]:
+    """
+    Create a list of users by using information from files.
+
+    :param llm: The LLM
+    :type llm: model.BaseModel
+    :param persona_path: The path to the JSON file containing the personas
+    :type persona_path: Path
+    :param instruction_path: The path to the file containing the user's instructions
+    :type instruction_path: Path
+    :param context: The context of the experiment
+    :type context: str
+    :return: A list of initialized LLMActors
+    :rtype: list[LLMActor]
+    """
+    personas = persona.from_json_file(persona_path)
+    instructions = file_util.read_file(instruction_path)
+    return create_users(
+        llm,
+        [persona.username for persona in personas],
+        [persona.to_attribute_list() for persona in personas],
+        context,
+        instructions,
+        actor_type,
+    )
+
+
+def create_users(
+    llm: model.BaseModel,
+    usernames: list[str],
+    attributes: list[list[str]],
+    context: str,
+    instructions: str,
+    actor_type: ActorType,
+) -> list[LLMActor]:
+    """Create runtime LLMActor objects with the specified information.
+
+    :param llm: The LLM
+    :type llm: model.BaseModel
+    :param usernames: A list of usernames for each of the users
+    :type usernames: list[str]
+    :param attributes: A list containing a list of personality/mood attributes for each user
+    :type attributes: list[list[str]]
+    :param context: The context of the experiment
+    :type context: str
+    :param instructions: The instructions given to all LLM users (not the moderator)
+    :type instructions: str
+    :return: A list of initialized LLMActors
+    :rtype: list[LLMActor]
+    """
+    user_list = []
+
+    assert len(usernames) == len(
+        attributes
+    ), "Number of usernames and user personality attribute lists must be the same"
+
+    for username, user_attributes in zip(usernames, attributes):
+        user_list.append(
+            LLMActor(
+                model=llm,
+                name=username,
+                attributes=user_attributes,
+                context=context,
+                instructions=instructions,
+                actor_type=actor_type,
+            )
+        )
+    return user_list

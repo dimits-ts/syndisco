@@ -26,8 +26,8 @@ class Conversation:
     def __init__(
         self,
         next_turn_manager: turn_manager.TurnManager,
-        users: list[actors.LLMUser],
-        moderator: Optional[actors.LLMUser] = None,
+        users: list[actors.LLMActor],
+        moderator: Optional[actors.LLMActor] = None,
         history_context_len: int = 5,
         conv_len: int = 5,
         seed_opinion: str = "",
@@ -93,12 +93,13 @@ class Conversation:
 
         if self.seed_opinion.strip() != "":
             # create first "seed" opinion
-            seed_user = actors.LLMUser(
+            seed_user = actors.LLMActor(
                 model=None,  # type: ignore
                 name=self.seed_opinion_user,
                 attributes=[],
                 context="",
                 instructions="",
+                actor_type=actors.ActorType.USER
             )
             self._archive_response(seed_user, self.seed_opinion, verbose=verbose)
         else:
@@ -106,7 +107,7 @@ class Conversation:
 
         # begin generation
         for _ in range(self.conv_len):
-            speaker_name = self.next_turn_manager.next_turn_username()
+            speaker_name = self.next_turn_manager.next()
             actor = self.username_user_map[speaker_name]
             res = actor.speak(list(self.ctx_history))
 
@@ -160,13 +161,13 @@ class Conversation:
             json.dump(self.to_dict(), fout, indent=4)
 
     def _archive_response(
-        self, user: actors.LLMUser, comment: str, verbose: bool
+        self, user: actors.LLMActor, comment: str, verbose: bool
     ) -> None:
         """Save the new comment to discussion output, 
         to discussion history for other users to see, maybe print it on screen.
 
         :param user: The user who created the new comment.
-        :type user: actors.LLMUser
+        :type user: actors.LLMActor
         :param comment: The new comment.
         :type comment: str
         :param verbose: Whether to print the comment to stdout
@@ -175,11 +176,11 @@ class Conversation:
         self._log_comment(user, comment)
         self._add_comment_to_history(user, comment, verbose)
 
-    def _log_comment(self, user: actors.LlmActor, comment: str) -> None:
+    def _log_comment(self, user: actors.LLMActor, comment: str) -> None:
         """Save new comment to the output history.
 
         :param user: The user who created the new comment
-        :type user: actors.LlmActor
+        :type user: actors.LLMActor
         :param comment: The new comment
         :type comment: str
         """
@@ -188,13 +189,13 @@ class Conversation:
         self.conv_logs.append(artifact)
 
     def _add_comment_to_history(
-        self, user: actors.LlmActor, comment: str, verbose: bool
+        self, user: actors.LLMActor, comment: str, verbose: bool
     ) -> None:
         """Add new comment to the discussion history, 
         so it can be shown to the other participants in the future.
 
         :param user: The user who created the new comment
-        :type user: actors.LlmActor
+        :type user: actors.LLMActor
         :param comment: The new comment
         :type comment: str
         :param verbose: Whether to print the comment to stdout
