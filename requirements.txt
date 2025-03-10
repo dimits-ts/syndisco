@@ -1,3 +1,4 @@
 pandas
 coloredlogs
 transformers
+bitsandbytes

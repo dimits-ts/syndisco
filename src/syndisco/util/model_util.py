@@ -1,4 +1,3 @@
-
 """
 SynDisco: Automated experiment creation and execution using only LLM agents
 Copyright (C) 2025 Dimitris Tsirmpas
@@ -19,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 You may contact the author at tsirbasdim@gmail.com
 """
 
-
 """
 Holds a utility class which helps manage initialization, loading and unloading of models on demand.
 """
@@ -35,20 +33,30 @@ logger = logging.getLogger(Path(__file__).name)
 
 class ModelManager:
     """
-    A Factory and Singleton class initializing and managing access to a single,
+    A Singleton class initializing and managing access to a single,
     unique instance of a model.
     """
 
-    def __init__(self, yaml_data: dict):
+    def __init__(
+        self,
+        model_path: str,
+        max_new_tokens: int,
+        disallowed_strings: list[str],
+        model_pseudoname: str | None = None,
+    ):
         """
         Initialize the manager without loading the model to the runtime.
 
         :param yaml_data: the experiment configuration
         :type yaml_data: dict
         """
-        # TODO: Write record classes for such configurations to be transferred
         self.model = None
-        self.yaml_data = yaml_data
+        self.model_path = model_path
+        self.max_new_tokens = max_new_tokens
+        self.disallowed_strings = disallowed_strings
+        self.model_pseudoname = (
+            model_path if model_pseudoname is None else model_pseudoname
+        )
 
     def get(self) -> model.BaseModel:
         """
@@ -66,7 +74,7 @@ class ModelManager:
             logger.info("Model loaded.")
         else:
             logger.info("Using already loaded model...")
-            
+
         return self.model
 
     def _initialize_model(self) -> model.BaseModel:
@@ -78,18 +86,10 @@ class ModelManager:
         :rtype: model.Model
         """
         # Extract values from the config
-        model_params = self.yaml_data["model_parameters"]
-        model_path = model_params["general"]["model_path"]
-        model_name = model_params["general"]["model_pseudoname"]
-        max_tokens = model_params["general"]["max_tokens"]
-        ctx_width_tokens = model_params["general"]["ctx_width_tokens"]
-        remove_str_list = model_params["general"]["disallowed_strings"]
 
-        llm = model.TransformersModel(
-            model_path=model_path,
-            name=model_name,
-            max_out_tokens=max_tokens,
-            remove_string_list=remove_str_list,
+        return model.TransformersModel(
+            model_path=self.model_path,
+            name=self.model_pseudoname,
+            max_out_tokens=self.max_new_tokens,
+            remove_string_list=self.disallowed_strings,
         )
-
-        return llm
