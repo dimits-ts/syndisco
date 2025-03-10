@@ -49,14 +49,5 @@ The code is currently tested for Linux only, but should run on any platform. The
 
 ## Usage
 
-* A YAML file containing the experiment configurations. [Example file](https://github.com/dimits-ts/synthetic_moderation_experiments/blob/master/data/server_config.yml).
+A sample file using the framework can be found [here](https://github.com/dimits-ts/synthetic_moderation_experiments/blob/master/run.py).
 
-* Two `.txt` files for user and moderator instructions respectively (`user_instruction_path`, `moderator_instruction_path`). Examples for [user instructions](https://github.com/dimits-ts/synthetic_moderation_experiments/blob/master/data/generated_discussions_input/modular_configurations/user_instructions/vanilla.txt) and [moderator instructions](https://github.com/dimits-ts/synthetic_moderation_experiments/blob/master/data/generated_discussions_input/modular_configurations/mod_instructions/no_instructions.txt).
-
-* A `.json` file containing general configurations for the conversation (`configs_path`). [Example file](https://github.com/dimits-ts/synthetic_moderation_experiments/blob/master/data/generated_discussions_input/modular_configurations/other_configs/standard_multi_user.json).
-
-* A directory containing `.txt` files, each containing a starting comment for the conversation (`topics_dir`). [Example file](https://github.com/dimits-ts/synthetic_moderation_experiments/blob/master/data/generated_discussions_input/modular_configurations/topics/polarized_3.txt).
-
-* A directory containing `.json` files representing the user personas (`persona_dir`). [Example file](https://github.com/dimits-ts/synthetic_moderation_experiments/blob/master/data/generated_discussions_input/modular_configurations/personas/chill_2.json).
-
-**This project is still in development. High-level documentation will soon be available**
