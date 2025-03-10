@@ -4,7 +4,10 @@ A lightweight, simple and specialized framework used for creating, storing, anno
 
 This framework is designed for academic use, mainly for simulating Social Science experiments with multiple participants. It is finetuned for heavy server-side use and multi-day computations with limited resources. It has been tested on both simulated debates and online fora.
 
-This repository only houses the source code for the framework. Input data, generated datasets, and analysis can be found in [this project](https://github.com/dimits-ts/synthetic_moderation_experiments).
+> ⚠ **Warning: Active Development**  
+> This project is currently in active development. The API is subject to change at any time without prior notice.  
+> We recommend keeping an eye on updates and version releases if you're using this project in your applications.
+> Any bug reports or feature requests are welcome at this stage in development.
 
 
 ## Features
@@ -21,9 +24,9 @@ SynDisco accepts an arbitrarily large number of LLM user-agent profiles and poss
 
 The researcher can create multiple LLM annotator-agent profiles. Each of these annotators will process each generated discussion at the comment-level, and annotate according to the provided instruction prompt, enabling an arbitrary selection of metrics to be used.
 
-#### Native Transformers and llama.cpp support
+#### Native Transformers support
 
-The framework natively accepts any model loaded with the libraries above. Extending the framework to accept models loaded with other libraries can be trivially achieved by extending the base [Model class](src/sdl/backend/model.py) and by overriding the two methods. 
+Extending the framework to accept models loaded with other libraries can be trivially achieved by extending the base [Model class](src/sdl/backend/model.py) and by overriding the two methods. 
 
 #### Native logging and fault tolerance
 
@@ -41,13 +44,8 @@ The project is structured as follows:
 
 ## Requirements
 
-### Environment & Dependencies
+The code is currently tested for Linux only, but should run on any platform. The environment can be installed using `pip install -r requirements.txt`.
 
-The code is tested for Linux only, but can run on any platform. The platform-specific (Linux x86 / NVIDIA CUDA) conda environment used in this project can be found up-to-date [here](https://github.com/dimits-ts/conda_auto_backup/blob/master/llm.yml).
-
-### Supported Models
-
-Currently the framework supports the `llama-cpp-python` and `transformers` libraries as a backend for loading and managing the underlying LLMs. Thus, any model supported by these libraries may be used. 
 
 ## Usage
 
