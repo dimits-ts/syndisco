@@ -14,6 +14,13 @@ requires-python = ">=3.8"
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
+    "Development Status :: 3 - Alpha",
+    "Environment :: GPU :: NVIDIA CUDA :: 11.8",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Version Control :: Git",
+    "Typing :: Typed"
 ]
 license = "GPL-3.0"
 license-files = ["LICEN[CS]E*"]
@@ -24,6 +31,7 @@ dependencies = [
   "bitsandbytes",
   "accelerate>=0.26.0",
 ]
+keywords = ["llms", "llm", "large language models", "llm agents", "synthetic", "discussion", "self-hosting", "local"]
 
 [project.urls]
 Homepage = "https://github.com/dimits-ts/synthetic_discussion_framework"
