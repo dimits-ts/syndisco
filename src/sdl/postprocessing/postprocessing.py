@@ -11,7 +11,7 @@ from pathlib import Path
 import pandas as pd
 
 
-def import_conversations(conv_dir: str | Path) -> pd.DataFrame:
+def import_conversations(conv_dir: Path) -> pd.DataFrame:
     """
     Import conversation data from JSON files in a directory and process it into a DataFrame.
 
@@ -108,7 +108,7 @@ def _read_annotations(annot_dir: str | Path) -> pd.DataFrame:
     return full_df
 
 
-def _read_conversations(conv_dir: str | Path) -> pd.DataFrame:
+def _read_conversations(conv_dir: Path) -> pd.DataFrame:
     """
     Read conversation data from JSON files and convert it into a DataFrame.
 
@@ -120,7 +120,13 @@ def _read_conversations(conv_dir: str | Path) -> pd.DataFrame:
     :return: A DataFrame containing raw conversation data.
     :rtype: pd.DataFrame
     """
+    if not conv_dir.is_dir():
+        raise ValueError(f"{conv_dir} is not a directory or does not exist") from None
+
     file_paths = _list_files_recursive(conv_dir)
+
+    if len(file_paths) == 0:
+        raise ValueError("No discussions found in directory ", conv_dir) from None
     rows = []
 
     for file_path in file_paths:
