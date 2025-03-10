@@ -17,6 +17,13 @@ classifiers = [
 ]
 license = "GPL-3.0"
 license-files = ["LICEN[CS]E*"]
+dependencies = [
+  "pandas",
+  "coloredlogs",
+  "transformers",
+  "bitsandbytes",
+  "accelerate>=0.26.0",
+]
 
 [project.urls]
 Homepage = "https://github.com/dimits-ts/synthetic_discussion_framework"
