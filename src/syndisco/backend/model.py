@@ -1,3 +1,25 @@
+
+"""
+SynDisco: Automated experiment creation and execution using only LLM agents
+Copyright (C) 2025 Dimitris Tsirmpas
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+You may contact the author at tsirbasdim@gmail.com
+"""
+
+
 """
 Module containing wrappers for local LLMs loaded with various Python libraries.
 """
@@ -7,7 +29,6 @@ import typing
 import logging
 from pathlib import Path
 
-import llama_cpp
 import transformers
 
 
@@ -61,82 +82,6 @@ class BaseModel(abc.ABC):
         :rtype: str
         """
         raise NotImplementedError("Abstract class call")
-
-
-class LlamaModel(BaseModel):
-    """
-    Wrapper for local LLMs loaded via the llama.cpp library.
-    Uses llama-cpp-python to manage the models
-    """
-
-    def __init__(
-        self,
-        model_path: Path,
-        name: str,
-        gpu_layers: int,
-        seed: int = 42,
-        ctx_width_tokens: int = 2048,
-        max_out_tokens: int = 400,
-        inference_threads: int = 3,
-        remove_string_list: list[str] | None = None,
-    ):
-        """
-        Initialize a new LLM wrapper.
-
-        :param model_path: the LLM to be used
-        :type model_path: llama_cpp.Llama
-        :param name: a shorthand name for the model used
-        :type name: str
-        :param max_out_tokens: the maximum number of tokens in the response
-        :type max_out_tokens: int
-        :param seed: random seed
-        :type seed: int
-        :param ctx_width_tokens: the number of tokens available for context
-        :type ctx_width_tokens: int
-        :param inference_threads: how many CPU threads will run on the RAM-allocated tensors
-        :type inference_threads: int
-        :param gpu_layers: how many layers will be offloaded to the GPU
-        :type gpu_layers: int
-        :param remove_string_list: a list of strings to be removed from the response.
-        Used to prevent model-specific conversational collapse, defaults to []
-        :type remove_string_list: list, optional
-        """
-        super().__init__(name, max_out_tokens, remove_string_list)
-
-        self.model = llama_cpp.Llama(
-            model_path=str(model_path),
-            seed=seed,
-            n_ctx=ctx_width_tokens,
-            n_threads=inference_threads,
-            n_gpu_layers=gpu_layers,
-            use_mmap=True,
-            chat_format="alpaca",
-            mlock=True,
-            verbose=False,
-        )
-        self.max_out_tokens = max_out_tokens
-        self.seed = seed
-
-    def generate_response(
-        self, json_prompt: tuple[typing.Any, typing.Any], stop_words: list[str]
-    ) -> str:
-        output = self.model.create_chat_completion(
-            messages=json_prompt,  # type: ignore
-            max_tokens=self.max_out_tokens,
-            seed=self.seed,
-            stop=stop_words,
-        )  # prevent model from generating the next actor's response
-
-        response = self._get_response_from_output(output)
-
-        return response
-
-    @staticmethod
-    def _get_response_from_output(json_output) -> str:
-        """
-        Extracts the model's response from the raw output as a string.
-        """
-        return json_output["choices"][0]["message"]["content"]
 
 
 class TransformersModel(BaseModel):
