@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+title: SynDisco
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Dimitris
+    family-names: Tsirmpas
+    email: tsirbasdim@gmail.com
+    affiliation: Athens University of Economics and Business
+    orcid: 'https://orcid.org/0000-0002-5675-3939'
+repository-code: 'https://github.com/dimits-ts/syndisco/'
+abstract: >-
+  A lightweight, simple and specialized framework used for
+  creating, storing, annotating and analyzing synthetic
+  discussions between LLM users in the context of online
+  discussions.
+
+
+  This framework is designed for academic use, mainly for
+  simulating Social Science experiments with multiple
+  participants. It is finetuned for heavy server-side use
+  and multi-day computations with limited resources. It has
+  been tested on both simulated debates and online fora.
+keywords:
+  - llms
+  - simulation
+  - dataset
+  - llm-annotation
+  - moderation
+  - online discussions
+license: GPL-3.0
