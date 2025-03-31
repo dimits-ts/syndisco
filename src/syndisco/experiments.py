@@ -288,7 +288,7 @@ class AnnotationExperiment:
         try:
             logger.info("Beginning annotation...")
             logger.debug(f"Experiment parameters: {str(annotation_task)}")
-            annotation_task.begin_annotation(verbose=True)
+            annotation_task.begin(verbose=True)
             output_path = util.file_util.generate_datetime_filename(
                 output_dir=output_dir, file_ending=".json"
             )
