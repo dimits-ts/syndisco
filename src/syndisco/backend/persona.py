@@ -26,7 +26,7 @@ from pathlib import Path
 
 
 @dataclasses.dataclass
-class LlmPersona:
+class LLMPersona:
 
     username: str
     age: int
@@ -68,7 +68,7 @@ class LlmPersona:
             return "non-binary"
 
 
-def from_json_file(file_path: Path) -> list[LlmPersona]:
+def from_json_file(file_path: Path) -> list[LLMPersona]:
     """
     Generate a list of personas from a properly formatted persona JSON file.
 
@@ -83,9 +83,9 @@ def from_json_file(file_path: Path) -> list[LlmPersona]:
     persona_objs = []
     for data_dict in all_personas:
         # code from https://stackoverflow.com/questions/68417319/initialize-python-dataclass-from-dictionary
-        field_set = {f.name for f in dataclasses.fields(LlmPersona) if f.init}
+        field_set = {f.name for f in dataclasses.fields(LLMPersona) if f.init}
         filtered_arg_dict = {k: v for k, v in data_dict.items() if k in field_set}
-        persona_obj = LlmPersona(**filtered_arg_dict)
+        persona_obj = LLMPersona(**filtered_arg_dict)
         persona_objs.append(persona_obj)
     
     return persona_objs
