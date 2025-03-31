@@ -23,9 +23,9 @@ import random
 import logging
 from pathlib import Path
 
-import backend
-import util
-import tasks
+from . import backend
+from . import util
+from . import jobs
 
 
 logger = logging.getLogger(Path(__file__).name)
@@ -80,7 +80,6 @@ class DiscussionExperiment:
         be generated and executed, defaults to 5
         :type num_discussions: int, optional
         """
-
         self.topics = topics
         self.users = users
         self.moderator = moderator
@@ -105,7 +104,7 @@ class DiscussionExperiment:
         discussions = self._generate_discussion_experiments()
         self._run_all_discussions(discussions, discussions_output_dir)
 
-    def _generate_discussion_experiments(self) -> list[tasks.Discussion]:
+    def _generate_discussion_experiments(self) -> list[jobs.Discussion]:
         """Generate experiments from the basic configurations and wrap them
         into Discussion objects.
 
@@ -131,7 +130,7 @@ class DiscussionExperiment:
             next_turn_manager = self.next_turn_manager
         next_turn_manager.initialize_names([user.name for user in rand_users])
 
-        return tasks.Discussion(
+        return jobs.Discussion(
             users=rand_users,
             moderator=self.moderator,
             history_context_len=self.history_ctx_len,
@@ -143,7 +142,7 @@ class DiscussionExperiment:
 
     @util.output_util.timing
     def _run_all_discussions(
-        self, discussions: list[tasks.Discussion], output_dir: Path
+        self, discussions: list[jobs.Discussion], output_dir: Path
     ) -> None:
         """
         Creates experiments by combining the given input data, then runs each
@@ -166,7 +165,7 @@ class DiscussionExperiment:
 
     @util.output_util.timing
     def _run_single_discussion(
-        self, discussion: tasks.Discussion, output_dir: Path
+        self, discussion: jobs.Discussion, output_dir: Path
     ) -> None:
         """
         Run a single discussion, then save its output to a auto-generated file.
@@ -202,17 +201,21 @@ class AnnotationExperiment:
     def __init__(
         self,
         annotators: list[backend.actors.LLMActor],
-        history_ctx_len: int,
-        include_mod_comments: bool,
+        history_ctx_len: int = 3,
+        include_mod_comments: bool = True,
     ):
         """
-        _summary_
+        Create an Experiment which annotates the logs of multiple 
+        synthetic discussions for each LLM annotator-agent.
 
-        :param annotators: _description_
+
+        :param annotators: The LLM annotator-agents.
         :type annotators: list[backend.actors.LLMActor]
-        :param history_ctx_len: _description_
+        :param history_ctx_len: How many past comments the annotator 
+        "remembers", defaults to 3
         :type history_ctx_len: int
-        :param include_mod_comments: _description_
+        :param include_mod_comments: Whether to include moderator comments both
+        for annotation and contexts, defaults to True.
         :type include_mod_comments: bool
         """
 
@@ -223,7 +226,7 @@ class AnnotationExperiment:
     def begin(self, discussions_dir: Path, output_dir: Path) -> None:
         """
         Begin the annotation experiment by generating and executing annotation
-        tasks. The results will be written as JSON files in the specified
+        jobs. The results will be written as JSON files in the specified
         output directory.
         """
         if not discussions_dir.is_dir():
@@ -238,7 +241,7 @@ class AnnotationExperiment:
 
     def _generate_annotation_tasks(
         self, discussions_dir: Path
-    ) -> list[tasks.Annotation]:
+    ) -> list[jobs.Annotation]:
         """
         Generate annotation experiments for each discussion and each annotator
         persona.
@@ -254,8 +257,8 @@ class AnnotationExperiment:
 
     def _create_annotation_task(
         self, annotator: backend.actors.LLMActor, conv_logs_path: Path
-    ) -> tasks.Annotation:
-        return tasks.Annotation(
+    ) -> jobs.Annotation:
+        return jobs.Annotation(
             annotator=annotator,
             conv_logs_path=conv_logs_path,
             history_ctx_len=self.history_ctx_len,
@@ -264,7 +267,7 @@ class AnnotationExperiment:
 
     @util.output_util.timing
     def _run_all_annotations(
-        self, annotation_tasks: list[tasks.Annotation], output_dir: Path
+        self, annotation_tasks: list[jobs.Annotation], output_dir: Path
     ) -> None:
         """
         Runs all annotation tasks sequentially and saves results.
@@ -277,7 +280,7 @@ class AnnotationExperiment:
 
     @util.output_util.timing
     def _run_single_annotation(
-        self, annotation_task: tasks.Annotation, output_dir: Path
+        self, annotation_task: jobs.Annotation, output_dir: Path
     ) -> None:
         """
         Executes a single annotation experiment and saves its output.
