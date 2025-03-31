@@ -37,7 +37,7 @@ from ..util import output_util, file_util
 # without impacting conversations.py at all
 
 
-class AnnotationConv:
+class Annotation:
     """
     An annotation job modelled as a conversation between the messages of a finished dialogue, and the LLM Annotator.
     """
@@ -70,7 +70,7 @@ class AnnotationConv:
             self.conv_data_dict = json.load(fin)
 
 
-    def begin_annotation(self, verbose=True) -> None:
+    def begin(self, verbose=True) -> None:
         """
         Begin the conversation-modelled annotation job.
 

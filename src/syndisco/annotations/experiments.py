@@ -62,7 +62,7 @@ class AnnotationExperiment:
 
     def _generate_annotation_tasks(
         self, discussions_dir: Path
-    ) -> list[generation.AnnotationConv]:
+    ) -> list[generation.Annotation]:
         """Generate annotation experiments for each discussion and each annotator persona."""
         annotation_tasks = []
         for annotator in self.annotators:
@@ -75,8 +75,8 @@ class AnnotationExperiment:
 
     def _create_annotation_task(
         self, annotator: actors.LLMActor, conv_logs_path: Path
-    ) -> generation.AnnotationConv:
-        return generation.AnnotationConv(
+    ) -> generation.Annotation:
+        return generation.Annotation(
             annotator=annotator,
             conv_logs_path=conv_logs_path,
             history_ctx_len=self.history_ctx_len,
@@ -85,7 +85,7 @@ class AnnotationExperiment:
 
     @output_util.timing
     def _run_all_annotations(
-        self, annotation_tasks: list[generation.AnnotationConv], output_dir: Path
+        self, annotation_tasks: list[generation.Annotation], output_dir: Path
     ) -> None:
         """Runs all annotation tasks sequentially and saves results."""
         for i, annotation_task in enumerate(annotation_tasks):
@@ -96,7 +96,7 @@ class AnnotationExperiment:
 
     @output_util.timing
     def _run_single_annotation(
-        self, annotation_task: generation.AnnotationConv, output_dir: Path
+        self, annotation_task: generation.Annotation, output_dir: Path
     ) -> None:
         """Executes a single annotation experiment and saves its output."""
         try:
