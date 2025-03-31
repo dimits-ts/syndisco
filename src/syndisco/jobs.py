@@ -1,4 +1,3 @@
-
 """
 SynDisco: Automated experiment creation and execution using only LLM agents
 Copyright (C) 2025 Dimitris Tsirmpas
@@ -24,19 +23,22 @@ import datetime
 import json
 import logging
 import uuid
+import textwrap
 from pathlib import Path
 from typing import Any, Optional
 
-from ..backend import actors, turn_manager
-from ..util import output_util, file_util
+from .backend import actors, turn_manager
+from .util import output_util, file_util
 
 
 logger = logging.getLogger(Path(__file__).name)
 
 
+# No superclass because the shared method names between the classes is coincidental
+
 class Discussion:
     """
-    A class conducting a discussion between different actors (:class:`actors.Actor`).
+    A job conducting a discussion between different actors (:class:`actors.Actor`).
     """
 
     def __init__(
@@ -56,23 +58,23 @@ class Discussion:
         :type turn_manager: turn_manager.TurnManager
         :param users: A list of discussion participants
         :type users: list[actors.Actor]
-        :param moderator: An actor tasked with moderation if not None, 
+        :param moderator: An actor tasked with moderation if not None,
         can speak at any point in the conversation,
          defaults to None
         :type moderator: actors.Actor | None, optional
-        :param history_context_len: How many prior messages are included 
+        :param history_context_len: How many prior messages are included
         to the LLMs prompt as context, defaults to 5
         :type history_context_len: int, optional
-        :param conv_len: The total length of the conversation 
+        :param conv_len: The total length of the conversation
         (how many times each actor will be prompted),
          defaults to 5
         :type conv_len: int, optional
-        :param seed_opinion: The first hardcoded comments to 
+        :param seed_opinion: The first hardcoded comments to
         start the conversation with
         :type seed_opinion: str, optional
         :param seed_opinion_user: The username for the seed opinion
         :type seed_opinion_user: int, optional
-        :raises ValueError: if the number of seed opinions and seed 
+        :raises ValueError: if the number of seed opinions and seed
         opinion users are different, or
         if the number of seed opinions exceeds history_context_len
         """
@@ -97,7 +99,7 @@ class Discussion:
     def begin(self, verbose: bool = True) -> None:
         """
         Begin the discussion between the actors.
-        :param verbose: whether to print the messages on the screen 
+        :param verbose: whether to print the messages on the screen
         as they are generated, defaults to True
         :type verbose: bool, optional
         :raises RuntimeError: if the object has already been used to generate a conversation
@@ -115,7 +117,7 @@ class Discussion:
                 attributes=[],
                 context="",
                 instructions="",
-                actor_type=actors.ActorType.USER
+                actor_type=actors.ActorType.USER,
             )
             self._archive_response(seed_user, self.seed_opinion, verbose=verbose)
         else:
@@ -179,7 +181,7 @@ class Discussion:
     def _archive_response(
         self, user: actors.LLMActor, comment: str, verbose: bool
     ) -> None:
-        """Save the new comment to discussion output, 
+        """Save the new comment to discussion output,
         to discussion history for other users to see, maybe print it on screen.
 
         :param user: The user who created the new comment.
@@ -207,7 +209,7 @@ class Discussion:
     def _add_comment_to_history(
         self, user: actors.LLMActor, comment: str, verbose: bool
     ) -> None:
-        """Add new comment to the discussion history, 
+        """Add new comment to the discussion history,
         so it can be shown to the other participants in the future.
 
         :param user: The user who created the new comment
@@ -222,6 +224,102 @@ class Discussion:
 
         if verbose:
             print(formatted_res, "\n")
+
+    def __str__(self) -> str:
+        return json.dumps(self.to_dict(), indent=4)
+
+
+class Annotation:
+    """
+    An annotation job modelled as a discussion between the system writing the logs of 
+    a finished discussion, and the LLM Annotator.
+    """
+
+    def __init__(
+        self,
+        annotator: actors.LLMActor,
+        conv_logs_path: str | Path,
+        include_moderator_comments: bool,
+        history_ctx_len: int = 2,
+    ):
+        """Create an annotation job.
+        The annotation is modelled as a conversation between the system and the annotator.
+
+        :param annotator: The annotator
+        :type annotator: actors.IActor
+        :param conv_logs_path: The path to the file containing the conversation logs in JSON format
+        :type conv_logs_path: str | Path
+        :param include_moderator_comments: Whether to annotate moderator comments, and include them 
+        in conversational context when annotating user responses.
+        :type include_moderator_comments: bool
+        :param history_ctx_len: How many previous comments the annotator will remember, defaults to 4
+        :type history_ctx_len: int, optional
+        """
+        self.annotator = annotator
+        self.history_ctx_len = history_ctx_len
+        self.include_moderator_comments = include_moderator_comments
+        self.annotation_logs = []
+
+        with open(conv_logs_path, "r", encoding="utf8") as fin:
+            self.conv_data_dict = json.load(fin)
+
+    def begin(self, verbose=True) -> None:
+        """
+        Begin the conversation-modelled annotation job.
+
+        :param verbose: whether to print the results of the annotation to the console, defaults to True
+        :type verbose: bool, optional
+        """
+        ctx_history = collections.deque(maxlen=self.history_ctx_len)
+
+        for message_data in self.conv_data_dict["logs"]:
+            username = message_data["name"]
+            message = message_data["text"]
+
+            # do not include moderator comments in annotation context if told so
+            if "moderator" in username:
+                if not self.include_moderator_comments:
+                    continue
+
+            formatted_message = output_util.format_chat_message(username, message)
+            ctx_history.append(formatted_message)
+            annotation = self.annotator.speak(list(ctx_history))
+            self.annotation_logs.append((message, annotation))
+
+            if verbose:
+                print(textwrap.fill(formatted_message))
+                print(annotation)
+
+    def to_dict(self, timestamp_format: str = "%y-%m-%d-%H-%M") -> dict[str, Any]:
+        """
+        Get a dictionary view of the data and metadata contained in the conversation.
+
+        :param timestamp_format: the format for the conversation's creation time, defaults to "%y-%m-%d-%H-%M"
+        :type timestamp_format: str, optional
+        :return: a dict representing the conversation
+        :rtype: dict[str, Any]
+        """
+        return {
+            "conv_id": str(self.conv_data_dict["id"]),
+            "timestamp": datetime.datetime.now().strftime(timestamp_format),
+            "annotator_model": self.annotator.model.name,
+            "annotator_prompt": self.annotator.describe(),
+            "ctx_length": self.history_ctx_len,
+            "logs": self.annotation_logs,
+        }
+
+    def to_json_file(self, output_path: str | Path) -> None:
+        """
+        Export the data and metadata of the conversation as a json file.
+        Convenience function equivalent to json.dump(self.to_dict(), output_path)
+
+        :param output_path: the path for the exported file
+        :type output_path: str
+        """
+        file_util.ensure_parent_directories_exist(output_path)
+
+        with open(output_path, "w", encoding="utf8") as fout:
+            json.dump(self.to_dict(), fout, indent=4)
 
     def __str__(self) -> str:
         return json.dumps(self.to_dict(), indent=4)

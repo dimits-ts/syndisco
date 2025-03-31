@@ -1,4 +1,3 @@
-
 """
 SynDisco: Automated experiment creation and execution using only LLM agents
 Copyright (C) 2025 Dimitris Tsirmpas
@@ -19,11 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 You may contact the author at tsirbasdim@gmail.com
 """
 
-
-"""
-Combine JSON output files for synthetic discussions and annotations into cohesive CSV files.
-"""
-
 import os
 import json
 import re
@@ -33,9 +27,9 @@ from pathlib import Path
 import pandas as pd
 
 
-def import_conversations(conv_dir: Path) -> pd.DataFrame:
+def import_discussions(conv_dir: Path) -> pd.DataFrame:
     """
-    Import conversation data from JSON files in a directory and process it into a DataFrame.
+    Import discussion output (logs) from JSON files in a directory and process it into a DataFrame.
 
     This function reads JSON files containing conversation data, processes the data to
     standardize columns, and adds derived attributes such as user traits and prompts.
