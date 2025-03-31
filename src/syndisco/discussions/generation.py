@@ -19,11 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 You may contact the author at tsirbasdim@gmail.com
 """
 
-
-"""
-Runtime class which saves synthetic discussion experiment 
-configs at runtime and is responsible for executing it.
-"""
 import collections
 import datetime
 import json
@@ -39,10 +34,9 @@ from ..util import output_util, file_util
 logger = logging.getLogger(Path(__file__).name)
 
 
-class Conversation:
+class Discussion:
     """
-    A class conducting a conversation between different actors (:class:`actors.Actor`).
-    Only one object should be used for a given conversation.
+    A class conducting a discussion between different actors (:class:`actors.Actor`).
     """
 
     def __init__(
@@ -100,9 +94,9 @@ class Conversation:
         self.seed_opinion_user = seed_opinion_user
         self.seed_opinion = seed_opinion
 
-    def begin_conversation(self, verbose: bool = True) -> None:
+    def begin(self, verbose: bool = True) -> None:
         """
-        Begin the conversation between the actors.
+        Begin the discussion between the actors.
         :param verbose: whether to print the messages on the screen 
         as they are generated, defaults to True
         :type verbose: bool, optional

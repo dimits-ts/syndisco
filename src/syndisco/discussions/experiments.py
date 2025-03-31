@@ -78,7 +78,7 @@ class DiscussionExperiment:
         discussions = self._generate_discussion_experiments()
         self._run_all_discussions(discussions, discussions_output_dir)
 
-    def _generate_discussion_experiments(self) -> list[generation.Conversation]:
+    def _generate_discussion_experiments(self) -> list[generation.Discussion]:
         """Generate experiments from the basic configurations and wrap them into
         Conversation objects.
 
@@ -104,7 +104,7 @@ class DiscussionExperiment:
             next_turn_manager = self.next_turn_manager
         next_turn_manager.initialize_names([user.name for user in rand_users])
 
-        return generation.Conversation(
+        return generation.Discussion(
             users=rand_users,
             moderator=self.moderator,
             history_context_len=self.history_ctx_len,
@@ -116,7 +116,7 @@ class DiscussionExperiment:
 
     @output_util.timing
     def _run_all_discussions(
-        self, discussions: list[generation.Conversation], output_dir: Path
+        self, discussions: list[generation.Discussion], output_dir: Path
     ) -> None:
         """Creates experiments by combining the given input data, then runs each one sequentially.
 
@@ -135,7 +135,7 @@ class DiscussionExperiment:
 
     @output_util.timing
     def _run_single_discussion(
-        self, discussion: generation.Conversation, output_dir: Path
+        self, discussion: generation.Discussion, output_dir: Path
     ) -> None:
         """Run a single discussion, then save its output to a auto-generated file.
 
@@ -147,7 +147,7 @@ class DiscussionExperiment:
             logger.debug(f"Experiment parameters: {str(discussion)}")
 
             start_time = time.time()
-            discussion.begin_conversation(verbose=True)
+            discussion.begin(verbose=True)
             output_path = file_util.generate_datetime_filename(
                 output_dir=output_dir, file_ending=".json"
             )
