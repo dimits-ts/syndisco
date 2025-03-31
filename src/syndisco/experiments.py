@@ -33,7 +33,8 @@ logger = logging.getLogger(Path(__file__).name)
 
 class DiscussionExperiment:
     """
-    An Experiment where multiple, randomized synthetic discussions will take place.
+    An Experiment which creates, manages and executes multiple synthetic
+    discussions.
     """
 
     def __init__(
@@ -47,12 +48,47 @@ class DiscussionExperiment:
         num_active_users: int = 2,
         num_discussions: int = 5,
     ):
+        """
+        Create an Experiment which will generate and run randomized synthetic
+        discussions.
+
+        :param topics: A list of discussion topics. The topics will be
+        presented as-is to the participants.
+        :type topics: list[str]
+        :param users: A list of all possible participants.
+        If len(users) > num_active users, a random subset of the users
+        will be selected for each discussion.
+        :type users: list[backend.actors.LLMActor]
+        :param moderator: A moderator agent, None if no moderator will be used,
+         defaults to None
+        :type moderator: backend.actors.LLMActor | None, optional
+        :param next_turn_manager: The turn manager used for dynamically
+        deciding which partipant will talk next, None to use default
+        (RoundRobbin), defaults to None
+        :type next_turn_manager: backend.turn_manager.TurnManager | None,
+         optional
+        :param history_ctx_len: How many comments in the past participants
+        will be given as context, defaults to 3
+        :type history_ctx_len: int, optional
+        :param num_turns: The total number of comments before a discussion
+        is concluded (ignoring moderator comments), defaults to 10
+        :type num_turns: int, optional
+        :param num_active_users: How many users are allowed to be active in a
+         single discussion, defaults to 2
+        :type num_active_users: int, optional
+        :param num_discussions: The total number of randomized discussions to
+        be generated and executed, defaults to 5
+        :type num_discussions: int, optional
+        """
+
         self.topics = topics
         self.users = users
         self.moderator = moderator
 
         if next_turn_manager is None:
-            logger.warning("No TurnManager selected: Defaulting to round-robin strategy.")
+            logger.warning(
+                "No TurnManager selected: Defaulting to round-robin strategy."
+            )
         self.next_turn_manager = next_turn_manager
 
         self.history_ctx_len = history_ctx_len
@@ -63,20 +99,21 @@ class DiscussionExperiment:
     def begin(self, discussions_output_dir: Path = Path("./output")) -> None:
         """
         Begin the experiment by generating and executing a set of discussions.
-        The results will be written as JSON files at the specified output directory
+        The results will be written as JSON files at the specified output
+        directory
         """
         discussions = self._generate_discussion_experiments()
         self._run_all_discussions(discussions, discussions_output_dir)
 
     def _generate_discussion_experiments(self) -> list[tasks.Discussion]:
-        """Generate experiments from the basic configurations and wrap them into
-        Conversation objects.
+        """Generate experiments from the basic configurations and wrap them
+        into Discussion objects.
 
         :param yaml_data: the serialized experiment configurations
         :type yaml_data: dict
         :param llm: the wrapped LLM
         :type llm: model.Model
-        :return: a list of Conversation objects containing the experiments
+        :return: a list of Discussion objects containing the experiments
         :rtype: _type_
         """
         experiments = []
@@ -108,7 +145,9 @@ class DiscussionExperiment:
     def _run_all_discussions(
         self, discussions: list[tasks.Discussion], output_dir: Path
     ) -> None:
-        """Creates experiments by combining the given input data, then runs each one sequentially.
+        """
+        Creates experiments by combining the given input data, then runs each
+        one sequentially.
 
         :param llm: The wrapped LLM
         :type llm: model.Model
@@ -119,7 +158,9 @@ class DiscussionExperiment:
 
         for i, discussion in enumerate(discussions):
             logging.info(f"Running experiment {i+1}/{len(discussions)+1}...")
-            self._run_single_discussion(discussion=discussion, output_dir=output_dir)
+            self._run_single_discussion(
+                discussion=discussion, output_dir=output_dir
+            )
 
         logger.info("Finished synthetic discussion generation.")
 
@@ -127,7 +168,8 @@ class DiscussionExperiment:
     def _run_single_discussion(
         self, discussion: tasks.Discussion, output_dir: Path
     ) -> None:
-        """Run a single discussion, then save its output to a auto-generated file.
+        """
+        Run a single discussion, then save its output to a auto-generated file.
 
         :param discussion: A Conversation object.
         :type discussion: generation.Conversation
@@ -153,7 +195,8 @@ class DiscussionExperiment:
 
 class AnnotationExperiment:
     """
-    An Experiment where multiple synthetic discussions are annotated by LLM-based annotators.
+    An Experiment where multiple synthetic discussions are annotated by
+    LLM-based annotators.
     """
 
     def __init__(
@@ -162,14 +205,26 @@ class AnnotationExperiment:
         history_ctx_len: int,
         include_mod_comments: bool,
     ):
+        """
+        _summary_
+
+        :param annotators: _description_
+        :type annotators: list[backend.actors.LLMActor]
+        :param history_ctx_len: _description_
+        :type history_ctx_len: int
+        :param include_mod_comments: _description_
+        :type include_mod_comments: bool
+        """
+
         self.annotators = annotators
         self.history_ctx_len = history_ctx_len
         self.include_mod_comments = include_mod_comments
 
     def begin(self, discussions_dir: Path, output_dir: Path) -> None:
         """
-        Begin the annotation experiment by generating and executing annotation tasks.
-        The results will be written as JSON files in the specified output directory.
+        Begin the annotation experiment by generating and executing annotation
+        tasks. The results will be written as JSON files in the specified
+        output directory.
         """
         if not discussions_dir.is_dir():
             raise OSError(
@@ -184,7 +239,10 @@ class AnnotationExperiment:
     def _generate_annotation_tasks(
         self, discussions_dir: Path
     ) -> list[tasks.Annotation]:
-        """Generate annotation experiments for each discussion and each annotator persona."""
+        """
+        Generate annotation experiments for each discussion and each annotator
+        persona.
+        """
         annotation_tasks = []
         for annotator in self.annotators:
             for discussion_path in discussions_dir.iterdir():
@@ -208,7 +266,9 @@ class AnnotationExperiment:
     def _run_all_annotations(
         self, annotation_tasks: list[tasks.Annotation], output_dir: Path
     ) -> None:
-        """Runs all annotation tasks sequentially and saves results."""
+        """
+        Runs all annotation tasks sequentially and saves results.
+        """
         for i, annotation_task in enumerate(annotation_tasks):
             logger.info(f"Running annotation {i+1}/{len(annotation_tasks)}...")
             self._run_single_annotation(annotation_task, output_dir)
@@ -219,7 +279,9 @@ class AnnotationExperiment:
     def _run_single_annotation(
         self, annotation_task: tasks.Annotation, output_dir: Path
     ) -> None:
-        """Executes a single annotation experiment and saves its output."""
+        """
+        Executes a single annotation experiment and saves its output.
+        """
         try:
             logger.info("Beginning annotation...")
             logger.debug(f"Experiment parameters: {str(annotation_task)}")
