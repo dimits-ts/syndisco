@@ -19,7 +19,6 @@ You may contact the author at tsirbasdim@gmail.com
 """
 
 import abc
-import itertools
 import random
 import warnings
 import typing
@@ -87,15 +86,12 @@ class RoundRobbin(TurnManager):
 
     def __init__(self, names: Iterable[str] | None = None):
         super().__init__(names)
-        self.username_loop = itertools.cycle(
-            [] if self.names is None else self.names
-        )
-
-    def _initialize_names_impl(self, names: Iterable[str]):
-        self.username_loop = itertools.cycle(names)
+        self.curr_turn = -1
 
     def _next_impl(self) -> str:
-        return next(self.username_loop)
+        self.curr_turn += 1
+        new_speaker_index = self.curr_turn % len(self.names)
+        return self.names[new_speaker_index]
 
 
 class RandomWeighted(TurnManager):

@@ -107,9 +107,9 @@ def timing(f: typing.Callable) -> typing.Any:
 
     @functools.wraps(f)
     def wrap(*args, **kw):
-        ts = time()
+        ts = time.time()
         result = f(*args, **kw)
-        te = time()
+        te = time.time()
         exec_time_mins = (te - ts) / 60
         logger.info(
             f"Procedure {f.__name__} executed in {exec_time_mins:2.4f} minutes"
