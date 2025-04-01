@@ -39,8 +39,8 @@ class DiscussionExperiment:
 
     def __init__(
         self,
-        topics: list[str],
         users: list[backend.actors.LLMActor],
+        seed_opinions: list[str] = [],
         moderator: backend.actors.LLMActor | None = None,
         next_turn_manager: backend.turn_manager.TurnManager | None = None,
         history_ctx_len: int = 3,
@@ -52,9 +52,10 @@ class DiscussionExperiment:
         Create an Experiment which will generate and run randomized synthetic
         discussions.
 
-        :param topics: A list of discussion topics. The topics will be
-        presented as-is to the participants.
-        :type topics: list[str]
+        :param seed_opinions: A list of hardcoded comments to be made by the
+        first (randomly selected) participant.
+        Each discussion picks a random seed opinion.
+        :type seed_opinions: list[str]
         :param users: A list of all possible participants.
         If len(users) > num_active users, a random subset of the users
         will be selected for each discussion.
@@ -80,7 +81,7 @@ class DiscussionExperiment:
         be generated and executed, defaults to 5
         :type num_discussions: int, optional
         """
-        self.topics = topics
+        self.seed_opinions = seed_opinions
         self.users = users
         self.moderator = moderator
 
@@ -121,7 +122,7 @@ class DiscussionExperiment:
         return experiments
 
     def _create_synthetic_discussion(self):
-        rand_topic = random.choice(self.topics)
+        rand_topic = random.choice(self.seed_opinions)
         rand_users = random.sample(self.users, k=self.num_active_users)
 
         if self.next_turn_manager is None:
@@ -205,13 +206,13 @@ class AnnotationExperiment:
         include_mod_comments: bool = True,
     ):
         """
-        Create an Experiment which annotates the logs of multiple 
+        Create an Experiment which annotates the logs of multiple
         synthetic discussions for each LLM annotator-agent.
 
 
         :param annotators: The LLM annotator-agents.
         :type annotators: list[backend.actors.LLMActor]
-        :param history_ctx_len: How many past comments the annotator 
+        :param history_ctx_len: How many past comments the annotator
         "remembers", defaults to 3
         :type history_ctx_len: int
         :param include_mod_comments: Whether to include moderator comments both
