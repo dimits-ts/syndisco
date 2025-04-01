@@ -21,7 +21,6 @@ You may contact the author at tsirbasdim@gmail.com
 import os
 import json
 import datetime
-import shutil
 import logging
 
 from typing import Any, Optional
@@ -141,25 +140,3 @@ def generate_datetime_filename(
         path.touch()
 
     return path
-
-
-def wipe_directory(directory_path: Path, auto_confirm: bool):
-    """
-    Wipes the directory after asking for user confirmation
-    (unless auto_confirm is True).
-    """
-    if (
-        auto_confirm
-        or input(
-            "Are you sure you want to wipe the contents of "
-            f" {directory_path}? [y|n]: "
-        )
-        .strip()
-        .lower()
-        == "y"
-    ):
-        shutil.rmtree(directory_path)
-        os.makedirs(directory_path)  # Recreate the directory after wiping
-        logger.info(f"Directory {directory_path} has been wiped.")
-    else:
-        logger.info(f"Skipping wipe of {directory_path}.")
