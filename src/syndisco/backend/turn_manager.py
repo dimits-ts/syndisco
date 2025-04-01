@@ -35,8 +35,8 @@ class TurnManager(Iterable):
         """
         Construct a new TurnManager.
 
-        :param names: The usernames of the participants. 
-        Can be left null if names are to be decided 
+        :param names: The usernames of the participants.
+        Can be left null if names are to be decided
         after this object's creation.
         :type config: dict[str, float], optional
         """
@@ -56,8 +56,8 @@ class TurnManager(Iterable):
     def next(self) -> str:
         """
         Get the username of the next speaker.
-        
-        :raises ValueError: if no names have been provided from the 
+
+        :raises ValueError: if no names have been provided from the
         constructor, or from the TurnManager.set() method
         :return: the next speaker's username
         :rtype: str
