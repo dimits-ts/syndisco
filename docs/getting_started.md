@@ -3,7 +3,9 @@
 
 ## Overview
 
-SynDisco is a Python library which creates, manages and stores the logs of synthetic `discussions` (discussions performed entirely by LLMs). Each synthetic discussion is performed by `actors`; actors can be `user-agents` (who simulate human users), `moderators` (who simulate human chat moderators) and `annotator-agents` (who judge the discussions after they have concluded).
+SynDisco is a Python library which creates, manages and stores the logs of synthetic `discussions` (discussions performed entirely by LLMs). 
+
+Each synthetic discussion is performed by `actors`; actors can be `user-agents` (who simulate human users), `moderators` (who simulate human chat moderators) and `annotator-agents` (who judge the discussions after they have concluded).
 
 > Example: A synthetic discussion takes place between Peter32 and Leo59 (user-agents) and is monitored by Moderator1 (moderator). Later on, we instruct George12 and JohnFX to tell us how toxic each comment in the discussion is (annotator-agents). 
 
@@ -14,6 +16,10 @@ Since social experiments are usually conducted at a large scale, SynDisco manage
 In general, each discussion goes through three phases: `generation` (according to the parameters of an experiment), `execution`, and `annotation`.
 
 
-## Installation
+## Guides
 
-Install the library using pip: `pip install syndisco`. That's it!
+Getting-started guides are available in the form of Jupyter Notebooks:
+
+1. [How to Create a Synthetic Discussion](guides/creating_discussions.ipynb)
+2. [How to Annotate your Synthetic Discussions](guides/creating_annotations.ipynb)
+3. [How to Use the Experiment API to Manage Large-Scale Studies](guides/creating_experiments.ipynb)
