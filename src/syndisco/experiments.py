@@ -129,7 +129,7 @@ class DiscussionExperiment:
             next_turn_manager = backend.turn_manager.RoundRobbin()
         else:
             next_turn_manager = self.next_turn_manager
-        next_turn_manager.initialize_names([user.name for user in rand_users])
+        next_turn_manager.set_names([user.name for user in rand_users])
 
         return jobs.Discussion(
             users=rand_users,
