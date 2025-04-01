@@ -141,7 +141,7 @@ class DiscussionExperiment:
             next_turn_manager=next_turn_manager,
         )
 
-    @util.output_util.timing
+    @util.logging_util.timing
     def _run_all_discussions(
         self, discussions: list[jobs.Discussion], output_dir: Path
     ) -> None:
@@ -164,7 +164,7 @@ class DiscussionExperiment:
 
         logger.info("Finished synthetic discussion generation.")
 
-    @util.output_util.timing
+    @util.logging_util.timing
     def _run_single_discussion(
         self, discussion: jobs.Discussion, output_dir: Path
     ) -> None:
@@ -266,7 +266,7 @@ class AnnotationExperiment:
             include_moderator_comments=self.include_mod_comments,
         )
 
-    @util.output_util.timing
+    @util.logging_util.timing
     def _run_all_annotations(
         self, annotation_tasks: list[jobs.Annotation], output_dir: Path
     ) -> None:
@@ -279,7 +279,7 @@ class AnnotationExperiment:
 
         logger.info("Finished annotation generation.")
 
-    @util.output_util.timing
+    @util.logging_util.timing
     def _run_single_annotation(
         self, annotation_task: jobs.Annotation, output_dir: Path
     ) -> None:
