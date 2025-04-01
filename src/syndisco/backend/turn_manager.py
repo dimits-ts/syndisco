@@ -31,11 +31,13 @@ class TurnManager(abc.ABC):
     A class that handles which handles turns between users.
     """
 
-    def __init__(self, names: Iterable[str] | None):
+    def __init__(self, names: Iterable[str] | None = None):
         """
         Construct a new TurnManager.
 
-        :param names: the usernames of the participants
+        :param names: The usernames of the participants. 
+        Can be left null if names are to be decided 
+        after this object's creation.
         :type config: dict[str, float], optional
         """
         self.names = names
@@ -54,7 +56,9 @@ class TurnManager(abc.ABC):
     def next(self) -> str:
         """
         Get the username of the next speaker.
-
+        
+        :raises ValueError: if no names have been provided from the 
+        constructor, or from the TurnManager.set() method
         :return: the next speaker's username
         :rtype: str
         """

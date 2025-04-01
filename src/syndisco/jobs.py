@@ -82,10 +82,10 @@ class Discussion:
         opinion users are different, or
         if the number of seed opinions exceeds history_context_len
         """
-        # just to satisfy the type checker
-        self.next_turn_manager = next_turn_manager
-
         self.username_user_map = {user.get_name(): user for user in users}
+
+        next_turn_manager.set_names([user.get_name() for user in users])
+        self.next_turn_manager = next_turn_manager
 
         # used only during export, tags underlying models
         self.user_types = [
