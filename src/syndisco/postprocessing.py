@@ -29,10 +29,13 @@ import pandas as pd
 
 def import_discussions(conv_dir: Path) -> pd.DataFrame:
     """
-    Import discussion output (logs) from JSON files in a directory and process it into a DataFrame.
+    Import discussion output (logs) from JSON files in a directory and process
+     it into a DataFrame.
 
-    This function reads JSON files containing conversation data, processes the data to
-    standardize columns, and adds derived attributes such as user traits and prompts.
+    This function reads JSON files containing conversation data, processes the
+     data to
+    standardize columns, and adds derived attributes such as user traits and
+     prompts.
 
     :param conv_dir: Directory containing JSON files with conversation data.
     :type conv_dir: str | Path
@@ -69,10 +72,12 @@ def import_discussions(conv_dir: Path) -> pd.DataFrame:
 
 def import_annotations(annot_dir: str | Path) -> pd.DataFrame:
     """
-    Import annotation data from JSON files in a directory and process it into a DataFrame.
+    Import annotation data from JSON files in a directory and process it
+    into a DataFrame.
 
-    This function reads JSON files containing annotation data, processes the data to
-    standardize columns, and optionally includes SDB information for annotators.
+    This function reads JSON files containing annotation data, processes the
+    data to standardize columns, and optionally includes SDB information for
+    annotators.
 
     :param annot_dir: Directory containing JSON files with annotation data.
     :type annot_dir: str | Path
@@ -96,8 +101,8 @@ def _read_annotations(annot_dir: str | Path) -> pd.DataFrame:
     """
     Read annotation data from JSON files and convert it into a DataFrame.
 
-    This function recursively reads all JSON files in the specified directory, extracts
-    annotation data in raw form, and formats it into a DataFrame.
+    This function recursively reads all JSON files in the specified directory,
+    extracts annotation data in raw form, and formats it into a DataFrame.
 
     :param annot_dir: Directory containing JSON files with annotation data.
     :type annot_dir: str | Path
@@ -113,7 +118,9 @@ def _read_annotations(annot_dir: str | Path) -> pd.DataFrame:
 
         conv = pd.json_normalize(conv)
         conv = conv.explode("logs")
-        conv["annotation_variant"] = os.path.basename(os.path.dirname(file_path))
+        conv["annotation_variant"] = os.path.basename(
+            os.path.dirname(file_path)
+        )
         conv["message"] = conv.logs.apply(lambda x: x[0])
         conv["annotation"] = conv.logs.apply(lambda x: x[1])
 
@@ -128,8 +135,8 @@ def _read_conversations(conv_dir: Path) -> pd.DataFrame:
     """
     Read conversation data from JSON files and convert it into a DataFrame.
 
-    This function recursively reads all JSON files in the specified directory, extracts
-    conversation data in raw form, and formats it into a DataFrame.
+    This function recursively reads all JSON files in the specified directory,
+    extracts conversation data in raw form, and formats it into a DataFrame.
 
     :param conv_dir: Directory containing JSON files with conversation data.
     :type conv_dir: str | Path
@@ -137,12 +144,16 @@ def _read_conversations(conv_dir: Path) -> pd.DataFrame:
     :rtype: pd.DataFrame
     """
     if not conv_dir.is_dir():
-        raise ValueError(f"{conv_dir} is not a directory or does not exist") from None
+        raise ValueError(
+            f"{conv_dir} is not a directory or does not exist"
+        ) from None
 
     file_paths = _list_files_recursive(conv_dir)
 
     if len(file_paths) == 0:
-        raise ValueError("No discussions found in directory ", conv_dir) from None
+        raise ValueError(
+            "No discussions found in directory ", conv_dir
+        ) from None
     rows = []
 
     for file_path in file_paths:
@@ -203,12 +214,14 @@ def _select_user_prompt(df: pd.DataFrame) -> list[str]:
     """
     selected_user_prompts = []
     for row in df.itertuples():
-        prompt = _extract_user_prompt(row.user_prompts, row.user)  # type: ignore
+        prompt = _extract_user_prompt(row.user_prompts, row.user)
         selected_user_prompts.append(prompt)
     return selected_user_prompts
 
 
-def _extract_user_prompt(user_prompts: list[str], username: str | None) -> str | None:
+def _extract_user_prompt(
+    user_prompts: list[str], username: str | None
+) -> str | None:
     """
     Extract the prompt associated with a specific username.
 
