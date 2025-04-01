@@ -195,7 +195,7 @@ class Discussion:
         :param output_path: the path for the exported file
         :type output_path: str
         """
-        _dict_to_json(self.to_dict(), output_path)
+        file_util.dict_to_json(self.to_dict(), output_path)
 
     def _archive_response(
         self, user: actors.LLMActor, comment: str, verbose: bool
@@ -348,14 +348,7 @@ class Annotation:
         :param output_path: the path for the exported file
         :type output_path: str
         """
-        _dict_to_json(self.to_dict(), output_path)
+        file_util.dict_to_json(self.to_dict(), output_path)
 
     def __str__(self) -> str:
         return json.dumps(self.to_dict(), indent=4)
-
-
-def _dict_to_json(dictionary: dict[str, Any], output_path: str | Path) -> None:
-    file_util.ensure_parent_directories_exist(output_path)
-
-    with open(output_path, "w", encoding="utf8") as fout:
-        json.dump(dictionary, fout, indent=4)

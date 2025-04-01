@@ -1,4 +1,3 @@
-
 """
 SynDisco: Automated experiment creation and execution using only LLM agents
 Copyright (C) 2025 Dimitris Tsirmpas
@@ -19,41 +18,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 You may contact the author at tsirbasdim@gmail.com
 """
 
-
-"""
-Module deciding which Actor will speak next.
-"""
 import abc
 import itertools
 import random
 import warnings
 import typing
+from collections.abc import Iterable
 
 
 class TurnManager(abc.ABC):
     """
-    A class that handles which of a list of users gets to speak in the next dialogue turn.
+    A class that handles which handles turns between users.
     """
 
-    def __init__(self):
+    def __init__(self, names: Iterable[str] | None):
         """
         Construct a new TurnManager.
 
-        :param config: a dictionary of other configurations, defaults to {}
+        :param names: the usernames of the participants
         :type config: dict[str, float], optional
         """
-        self.is_initialized = False
+        self.names = names
 
     @typing.final
-    def initialize_names(self, usernames: list[str]) -> None:
+    def set_names(self, names: Iterable[str]) -> None:
         """
         Initialize the manager by providing the names of the users.
 
-        :param usernames: the usernames of the participants
-        :type usernames: list[str]
+        :param names: the usernames of the participants
+        :type names: list[str]
         """
-        self.is_initialized = True
-        self._initialize_names_impl(usernames)
+        self.names = names
 
     @typing.final
     def next(self) -> str:
@@ -63,15 +58,12 @@ class TurnManager(abc.ABC):
         :return: the next speaker's username
         :rtype: str
         """
-        if not self.is_initialized:
+        if self.names is None:
             raise ValueError(
-                "No usernames have been provided for the turn manager. Use self.initialize_names()"
+                "No usernames have been provided for the turn manager. "
+                "Use self.initialize_names()"
             )
         return self._next_impl()
-
-    @abc.abstractmethod
-    def _initialize_names_impl(self, usernames: list[str]) -> None:
-        raise NotImplementedError("Abstract method called")
 
     @abc.abstractmethod
     def _next_impl(self) -> str:
@@ -83,10 +75,9 @@ class RoundRobbin(TurnManager):
     A simple turn manager which gives priority to the next user in the queue.
     """
 
-    def __init__(self):
-        super().__init__()
-        self.username_loop = itertools.cycle([])
-        self.curr_turn = 0
+    def __init__(self, names: Iterable[str] | None = None):
+        super().__init__(names)
+        self.username_loop = itertools.cycle(self.names)
 
     def _initialize_names_impl(self, usernames: list[str]):
         self.username_loop = itertools.cycle(usernames)
@@ -97,31 +88,31 @@ class RoundRobbin(TurnManager):
 
 class RandomWeighted(TurnManager):
     """
-    Enable a participant to reply with a set probability, else randomly select other participant.
+    Enable a participant to reply with a set probability, else randomly select
+    another participant.
     """
 
     DEFAULT_RESPOND_PROBABILITY = 0.5
 
-    def __init__(self, config: dict[str, float] | None = None):
-        super().__init__()
-        config = config if config is not None else {}
+    def __init__(
+        self, p_respond: float = -1, names: Iterable[str] | None = None
+    ):
+        super().__init__(names)
 
-        if config.get("respond_probability") is None:
+        if p_respond == -1:
             warnings.warn(
-                "Warning: No respond_probability set in RandomWeighted TurnManager instance, "
+                "Warning: No p_respond set in RandomWeighted instance, "
                 + f"defaulting to {RandomWeighted.DEFAULT_RESPOND_PROBABILITY}"
             )
             self.chance_to_respond = RandomWeighted.DEFAULT_RESPOND_PROBABILITY
         else:
-            self.chance_to_respond = config["respond_probability"]
-            assert 0 < self.chance_to_respond < 1
+            self.chance_to_respond = p_respond
+            assert (
+                0 < self.chance_to_respond < 1
+            ), f"p_respond must be between 0 and 1, but is {p_respond}"
 
         self.second_to_last_speaker = None
         self.last_speaker = None
-        self.usernames = {}
-
-    def _initialize_names_impl(self, usernames: list[str]):
-        self.usernames = set(usernames)
 
     def _next_impl(self) -> str:
         # If first time asking for a speaker, return random speaker
@@ -130,7 +121,7 @@ class RandomWeighted(TurnManager):
             self.last_speaker = next_speaker
             return next_speaker
 
-        # Check if the last speaker will respond based on the weighted coin flip
+        # Check if the last speaker will respond based on weighted coin flip
         if self._weighted_coin_flip():
             next_speaker = self.last_speaker
         else:
@@ -148,33 +139,8 @@ class RandomWeighted(TurnManager):
 
     def _select_other_random_speaker(self) -> str:
         other_usernames = [
-            username for username in self.usernames if username != self.last_speaker
+            username
+            for username in self.names
+            if username != self.last_speaker
         ]
         return random.choice(other_usernames)
-
-
-def turn_manager_factory(
-    turn_manager_type: str, config: dict[str, float] | None = None
-) -> TurnManager:
-    """
-    A factory which returns a instansiated TurnManager of the type specified by a string.
-
-    :param turn_manager_type: the string specifying the concrete TurnManager class.
-    Can be of one of "round_robbin", "random_weighted"
-    :type turn_manager_type: TurnManager
-    :param usernames: a list of all usernames of each participant in the conversation
-    :type usernames: list[str]
-    :raises ValueError: if turn_manager_type does not match any classes
-    :return: the instansiated TurnManager of the specified type
-    :rtype: TurnManager
-    """
-    turn_manager_type = turn_manager_type.lower()
-    if turn_manager_type == "round_robin":
-        return RoundRobbin()
-    elif turn_manager_type == "random_weighted":
-        return RandomWeighted(config=config)
-    else:
-        raise ValueError(
-            f"There is no turn manager option called {turn_manager_type}\n"
-            + "Valid values: round_robin, random_weighted"
-        )
