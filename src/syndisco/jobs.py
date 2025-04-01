@@ -308,9 +308,7 @@ class Annotation:
                 if not self.include_moderator_comments:
                     continue
 
-            formatted_message = _format_chat_message(
-                username, message
-            )
+            formatted_message = _format_chat_message(username, message)
             ctx_history.append(formatted_message)
             annotation = self.annotator.speak(list(ctx_history))
             self.annotation_logs.append((message, annotation))
@@ -368,7 +366,7 @@ def _format_chat_message(username: str, message: str) -> str:
     """
     if len(message.strip()) != 0:
         # append name of actor to his response
-        # "user x posted" important for the model to not confuse it 
+        # "user x posted" important for the model to not confuse it
         # with the instruction prompt
         wrapped_res = textwrap.fill(message, 70)
         formatted_res = f"User {username} posted:\n{wrapped_res}"
