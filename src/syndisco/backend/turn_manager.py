@@ -26,7 +26,7 @@ import typing
 from collections.abc import Iterable
 
 
-class TurnManager(abc.ABC):
+class TurnManager(Iterable):
     """
     A class that handles which handles turns between users.
     """
@@ -68,6 +68,12 @@ class TurnManager(abc.ABC):
                 "Use self.initialize_names()"
             )
         return self._next_impl()
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        return self.next()
 
     @abc.abstractmethod
     def _next_impl(self) -> str:
