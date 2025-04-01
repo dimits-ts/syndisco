@@ -87,10 +87,12 @@ class RoundRobbin(TurnManager):
 
     def __init__(self, names: Iterable[str] | None = None):
         super().__init__(names)
-        self.username_loop = itertools.cycle(self.names)
+        self.username_loop = itertools.cycle(
+            [] if self.names is None else self.names
+        )
 
-    def _initialize_names_impl(self, usernames: list[str]):
-        self.username_loop = itertools.cycle(usernames)
+    def _initialize_names_impl(self, names: Iterable[str]):
+        self.username_loop = itertools.cycle(names)
 
     def _next_impl(self) -> str:
         return next(self.username_loop)
