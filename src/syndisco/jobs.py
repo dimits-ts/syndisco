@@ -34,13 +34,13 @@ from .util import output_util, file_util
 logger = logging.getLogger(Path(__file__).name)
 
 
-# No superclass because the shared method names between the classes 
+# No superclass because the shared method names between the classes
 # is coincidental
 
 
 class Discussion:
     """
-    A job conducting a discussion between different actors 
+    A job conducting a discussion between different actors
     (:class:`actors.Actor`).
     """
 
@@ -112,7 +112,7 @@ class Discussion:
         :param verbose: whether to print the messages on the screen
         as they are generated, defaults to True
         :type verbose: bool, optional
-        :raises RuntimeError: if the object has already been used to generate 
+        :raises RuntimeError: if the object has already been used to generate
         a conversation
         """
         if len(self.conv_logs) != 0:
@@ -156,10 +156,10 @@ class Discussion:
         self, timestamp_format: str = "%y-%m-%d-%H-%M"
     ) -> dict[str, Any]:
         """
-        Get a dictionary view of the data and metadata contained in the 
+        Get a dictionary view of the data and metadata contained in the
         discussion.
 
-        :param timestamp_format: the format for the conversation's creation 
+        :param timestamp_format: the format for the conversation's creation
         time, defaults to "%y-%m-%d-%H-%M"
         :type timestamp_format: str, optional
         :return: a dict representing the conversation
@@ -195,15 +195,13 @@ class Discussion:
         :param output_path: the path for the exported file
         :type output_path: str
         """
-        file_util.ensure_parent_directories_exist(output_path)
-
-        with open(output_path, "w", encoding="utf8") as fout:
-            json.dump(self.to_dict(), fout, indent=4)
+        _dict_to_json(self.to_dict(), output_path)
 
     def _archive_response(
         self, user: actors.LLMActor, comment: str, verbose: bool
     ) -> None:
-        """Save the new comment to discussion output,
+        """
+        Save the new comment to discussion output,
         to discussion history for other users to see, maybe print it on screen.
 
         :param user: The user who created the new comment.
@@ -217,7 +215,8 @@ class Discussion:
         self._add_comment_to_history(user, comment, verbose)
 
     def _log_comment(self, user: actors.LLMActor, comment: str) -> None:
-        """Save new comment to the output history.
+        """
+        Save new comment to the output history.
 
         :param user: The user who created the new comment
         :type user: actors.LLMActor
@@ -231,7 +230,8 @@ class Discussion:
     def _add_comment_to_history(
         self, user: actors.LLMActor, comment: str, verbose: bool
     ) -> None:
-        """Add new comment to the discussion history,
+        """
+        Add new comment to the discussion history,
         so it can be shown to the other participants in the future.
 
         :param user: The user who created the new comment
@@ -265,19 +265,19 @@ class Annotation:
         history_ctx_len: int = 2,
     ):
         """Create an annotation job.
-        The annotation is modelled as a conversation between the system and 
+        The annotation is modelled as a conversation between the system and
         the annotator.
 
         :param annotator: The annotator
         :type annotator: actors.IActor
-        :param conv_logs_path: The path to the file containing the 
+        :param conv_logs_path: The path to the file containing the
         discussion logs in JSON format
         :type conv_logs_path: str | Path
-        :param include_moderator_comments: Whether to annotate moderator 
+        :param include_moderator_comments: Whether to annotate moderator
         comments, and include them
         in conversational context when annotating user responses.
         :type include_moderator_comments: bool
-        :param history_ctx_len: How many previous comments the annotator will 
+        :param history_ctx_len: How many previous comments the annotator will
         remember, defaults to 4
         :type history_ctx_len: int, optional
         """
@@ -293,7 +293,7 @@ class Annotation:
         """
         Begin the conversation-modelled annotation job.
 
-        :param verbose: whether to print the results of the annotation to the 
+        :param verbose: whether to print the results of the annotation to the
         console, defaults to True
         :type verbose: bool, optional
         """
@@ -323,10 +323,10 @@ class Annotation:
         self, timestamp_format: str = "%y-%m-%d-%H-%M"
     ) -> dict[str, Any]:
         """
-        Get a dictionary view of the data and metadata contained in 
+        Get a dictionary view of the data and metadata contained in
         the annotation.
 
-        :param timestamp_format: the format for the conversation's creation 
+        :param timestamp_format: the format for the conversation's creation
         time, defaults to "%y-%m-%d-%H-%M"
         :type timestamp_format: str, optional
         :return: a dict representing the conversation
@@ -348,10 +348,14 @@ class Annotation:
         :param output_path: the path for the exported file
         :type output_path: str
         """
-        file_util.ensure_parent_directories_exist(output_path)
-
-        with open(output_path, "w", encoding="utf8") as fout:
-            json.dump(self.to_dict(), fout, indent=4)
+        _dict_to_json(self.to_dict(), output_path)
 
     def __str__(self) -> str:
         return json.dumps(self.to_dict(), indent=4)
+
+
+def _dict_to_json(dictionary: dict[str, Any], output_path: str | Path) -> None:
+    file_util.ensure_parent_directories_exist(output_path)
+
+    with open(output_path, "w", encoding="utf8") as fout:
+        json.dump(dictionary, fout, indent=4)
