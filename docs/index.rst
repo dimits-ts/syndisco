@@ -3,13 +3,17 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to syndisco's documentation!
+Welcome to SynDisco's documentation!
 ====================================
 
+
+Introduction
+====================================
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
+   general_readme_link.md
+   docs_readme_link.md
 
 
 Indices and tables
