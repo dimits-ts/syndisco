@@ -1,5 +1,7 @@
+python==3.12 # due to sphinx import errors
 pandas
 coloredlogs
 transformers
 bitsandbytes
 accelerate>=0.26.0
+torch
