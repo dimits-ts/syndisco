@@ -1,4 +1,4 @@
-python==3.12 # due to sphinx import errors
+python<=3.12 # due to sphinx import errors
 pandas
 coloredlogs
 transformers
