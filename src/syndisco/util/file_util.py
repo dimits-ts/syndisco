@@ -34,7 +34,7 @@ def read_files_from_directory(directory: str | Path) -> list[str]:
     """Reads all files from a given directory.
 
     :param directory: the root directory from which to load files
-    (NOT recursively!)
+        (NOT recursively!)
     :type directory: str | Path
 
     :raises ValueError: if the directory does not exist
@@ -86,7 +86,7 @@ def dict_to_json(dictionary: dict[str, Any], output_path: str | Path) -> None:
     :param dictionary: The dictionary to be serialized
     :type dictionary: dict[str, Any]
     :param output_path: The output path to the file. If the parent directories
-    do not exist, they will be created.
+        do not exist, they will be created.
     :type output_path: str | Path
     """
     ensure_parent_directories_exist(output_path)

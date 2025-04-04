@@ -109,11 +109,12 @@ class Discussion:
     def begin(self, verbose: bool = True) -> None:
         """
         Begin the discussion between the actors.
+
         :param verbose: whether to print the messages on the screen
-        as they are generated, defaults to True
+            as they are generated, defaults to True
         :type verbose: bool, optional
         :raises RuntimeError: if the object has already been used to generate
-        a conversation
+            a conversation
         """
         if len(self.conv_logs) != 0:
             raise RuntimeError(
@@ -160,7 +161,7 @@ class Discussion:
         discussion.
 
         :param timestamp_format: the format for the conversation's creation
-        time, defaults to "%y-%m-%d-%H-%M"
+            time, defaults to "%y-%m-%d-%H-%M"
         :type timestamp_format: str, optional
         :return: a dict representing the conversation
         :rtype: dict[str, Any]
@@ -232,7 +233,7 @@ class Discussion:
     ) -> None:
         """
         Add new comment to the discussion history,
-        so it can be shown to the other participants in the future.
+            so it can be shown to the other participants in the future.
 
         :param user: The user who created the new comment
         :type user: actors.LLMActor
@@ -264,7 +265,8 @@ class Annotation:
         include_moderator_comments: bool,
         history_ctx_len: int = 2,
     ):
-        """Create an annotation job.
+        """
+        Create an annotation job.
         The annotation is modelled as a conversation between the system and
         the annotator.
 
@@ -294,7 +296,7 @@ class Annotation:
         Begin the conversation-modelled annotation job.
 
         :param verbose: whether to print the results of the annotation to the
-        console, defaults to True
+            console, defaults to True
         :type verbose: bool, optional
         """
         ctx_history = collections.deque(maxlen=self.history_ctx_len)
@@ -325,7 +327,7 @@ class Annotation:
         the annotation.
 
         :param timestamp_format: the format for the conversation's creation
-        time, defaults to "%y-%m-%d-%H-%M"
+            time, defaults to "%y-%m-%d-%H-%M"
         :type timestamp_format: str, optional
         :return: a dict representing the conversation
         :rtype: dict[str, Any]

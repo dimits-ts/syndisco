@@ -47,10 +47,10 @@ def logging_setup(
     :param print_to_terminal: whether to print logs to the screen
     :type print_to_terminal: bool
     :param write_to_file: whether to write logs to a file.
-    Needs logs_dir to be specified.
+        Needs logs_dir to be specified.
     :type write_to_file: bool
     :param logs_dir: the directory where the logs will be placed,
-    defaults to None
+        defaults to None
     :type logs_dir: typing.Optional[str  |  Path], optional
     :param level: the logging level, defaults to logging.DEBUG
     :param use_colors: whether to color the output.

@@ -23,8 +23,8 @@ import random
 import logging
 from pathlib import Path
 
-from . import backend
-from . import util
+from .backend import actors, turn_manager
+from .util import logging_util, file_util
 from . import jobs
 
 
@@ -39,10 +39,10 @@ class DiscussionExperiment:
 
     def __init__(
         self,
-        users: list[backend.actors.LLMActor],
+        users: list[actors.LLMActor],
         seed_opinions: list[str] = [],
-        moderator: backend.actors.LLMActor | None = None,
-        next_turn_manager: backend.turn_manager.TurnManager | None = None,
+        moderator: actors.LLMActor | None = None,
+        next_turn_manager: turn_manager.TurnManager | None = None,
         history_ctx_len: int = 3,
         num_turns: int = 10,
         num_active_users: int = 2,
@@ -126,7 +126,7 @@ class DiscussionExperiment:
         rand_users = random.sample(self.users, k=self.num_active_users)
 
         if self.next_turn_manager is None:
-            next_turn_manager = backend.turn_manager.RoundRobbin()
+            next_turn_manager = turn_manager.RoundRobbin()
         else:
             next_turn_manager = self.next_turn_manager
         next_turn_manager.set_names([user.name for user in rand_users])
@@ -141,7 +141,7 @@ class DiscussionExperiment:
             next_turn_manager=next_turn_manager,
         )
 
-    @util.logging_util.timing
+    @logging_util.timing
     def _run_all_discussions(
         self, discussions: list[jobs.Discussion], output_dir: Path
     ) -> None:
@@ -164,7 +164,7 @@ class DiscussionExperiment:
 
         logger.info("Finished synthetic discussion generation.")
 
-    @util.logging_util.timing
+    @logging_util.timing
     def _run_single_discussion(
         self, discussion: jobs.Discussion, output_dir: Path
     ) -> None:
@@ -180,7 +180,7 @@ class DiscussionExperiment:
 
             start_time = time.time()
             discussion.begin(verbose=True)
-            output_path = util.file_util.generate_datetime_filename(
+            output_path = file_util.generate_datetime_filename(
                 output_dir=output_dir, file_ending=".json"
             )
             logging.debug(
@@ -201,7 +201,7 @@ class AnnotationExperiment:
 
     def __init__(
         self,
-        annotators: list[backend.actors.LLMActor],
+        annotators: list[actors.LLMActor],
         history_ctx_len: int = 3,
         include_mod_comments: bool = True,
     ):
@@ -257,7 +257,7 @@ class AnnotationExperiment:
         return annotation_tasks
 
     def _create_annotation_task(
-        self, annotator: backend.actors.LLMActor, conv_logs_path: Path
+        self, annotator: actors.LLMActor, conv_logs_path: Path
     ) -> jobs.Annotation:
         return jobs.Annotation(
             annotator=annotator,
@@ -266,7 +266,7 @@ class AnnotationExperiment:
             include_moderator_comments=self.include_mod_comments,
         )
 
-    @util.logging_util.timing
+    @logging_util.timing
     def _run_all_annotations(
         self, annotation_tasks: list[jobs.Annotation], output_dir: Path
     ) -> None:
@@ -279,7 +279,7 @@ class AnnotationExperiment:
 
         logger.info("Finished annotation generation.")
 
-    @util.logging_util.timing
+    @logging_util.timing
     def _run_single_annotation(
         self, annotation_task: jobs.Annotation, output_dir: Path
     ) -> None:
@@ -290,7 +290,7 @@ class AnnotationExperiment:
             logger.info("Beginning annotation...")
             logger.debug(f"Experiment parameters: {str(annotation_task)}")
             annotation_task.begin(verbose=True)
-            output_path = util.file_util.generate_datetime_filename(
+            output_path = file_util.generate_datetime_filename(
                 output_dir=output_dir, file_ending=".json"
             )
             annotation_task.to_json_file(output_path)
