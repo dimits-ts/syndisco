@@ -7,3 +7,5 @@ torch
 
 sphinx
 myst-parser
+nbsphinx
+ipykernel
