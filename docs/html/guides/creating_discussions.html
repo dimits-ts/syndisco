@@ -1,0 +1,628 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Creating a Discussion &#8212; SynDisco 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/bizstyle.css?v=5283bb3d" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+    
+    <script src="../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">SynDisco 1.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Creating a Discussion</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="Creating-a-Discussion">
+<h1>Creating a Discussion<a class="headerlink" href="#Creating-a-Discussion" title="Link to this heading">¶</a></h1>
+<p>The simplest task you can accomplish with this library is to create a small discussion between LLMs.</p>
+<p>This guide will teach you the basic setup of the library. You will understand how to setup models, user-agents and how to coordinate them in a discussion. By the end of htis guide, you will be able to run a small discussion with a moderator and save it to the disk for persistence.</p>
+<section id="Basics">
+<h2>Basics<a class="headerlink" href="#Basics" title="Link to this heading">¶</a></h2>
+<section id="The-Model">
+<h3>The Model<a class="headerlink" href="#The-Model" title="Link to this heading">¶</a></h3>
+<p>SynDisco can theoretically support any LLM, as long as it is wrapped in a <code class="docutils literal notranslate"><span class="pre">BaseModel</span></code> wrapper. The <code class="docutils literal notranslate"><span class="pre">BaseModel</span></code> class is a very simple interface with one method. This method gives the underlying LLM input, and returns its output to the library.</p>
+<p>There already exists a <code class="docutils literal notranslate"><span class="pre">TransformersModel</span></code> class which handles models from the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> python library. In 90% of your applications, this will be enough. We can load a TransformersModel using the following code:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.backend.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">TransformersModel</span>
+
+<span class="n">llm</span> <span class="o">=</span> <span class="n">TransformersModel</span><span class="p">(</span>
+    <span class="n">model_path</span><span class="o">=</span><span class="s2">&quot;unsloth/Meta-Llama-3.1-8B-Instruct&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test_model&quot;</span><span class="p">,</span>
+    <span class="n">max_out_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/media/SSD_2TB/dtsirmpas_data/software/miniconda3/envs/syndisco/lib/python3.12/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
+Fetching 4 files: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 4/4 [02:25&lt;00:00, 36.49s/it]
+Loading checkpoint shards: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 4/4 [00:11&lt;00:00,  2.75s/it]
+Device set to use cuda:0
+</pre></div></div>
+</div>
+<p>This will download a small LLM from huggingface. You can substitute the model_path for any similar model in <a class="reference external" href="https://huggingface.co/">HuggingFace</a> supporting the Transformers library.</p>
+</section>
+<section id="Creating-personas">
+<h3>Creating personas<a class="headerlink" href="#Creating-personas" title="Link to this heading">¶</a></h3>
+<p>All <code class="docutils literal notranslate"><span class="pre">actors</span></code> can be defined by a <code class="docutils literal notranslate"><span class="pre">persona</span></code>, aka a set of attributes that define them. These attributes can be age, ethnicity, and even include special instructions on how they should behave.</p>
+<p>Creating a persona programmatically is simple:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.backend.persona</span><span class="w"> </span><span class="kn">import</span> <span class="n">LLMPersona</span>
+
+<span class="n">persona_data</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;Emma35&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="mi">38</span><span class="p">,</span>
+        <span class="s2">&quot;sex&quot;</span><span class="p">:</span> <span class="s2">&quot;female&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;education_level&quot;</span><span class="p">:</span> <span class="s2">&quot;Bachelor&#39;s&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sexual_orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;Heterosexual&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;demographic_group&quot;</span><span class="p">:</span> <span class="s2">&quot;Latino&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;current_employment&quot;</span><span class="p">:</span> <span class="s2">&quot;Registered Nurse&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;special_instructions&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;personality_characteristics&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;compassionate&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;patient&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;diligent&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;overwhelmed&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;Giannis&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="mi">21</span><span class="p">,</span>
+        <span class="s2">&quot;sex&quot;</span><span class="p">:</span> <span class="s2">&quot;male&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;education_level&quot;</span><span class="p">:</span> <span class="s2">&quot;College&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sexual_orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;Pansexual&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;demographic_group&quot;</span><span class="p">:</span> <span class="s2">&quot;White&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;current_employment&quot;</span><span class="p">:</span> <span class="s2">&quot;Game Developer&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;special_instructions&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;personality_characteristics&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;strategic&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;meticulous&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;nerdy&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;hyper-focused&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">},</span>
+<span class="p">]</span>
+
+<span class="n">personas</span> <span class="o">=</span> <span class="p">[</span><span class="n">LLMPersona</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">persona_data</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">persona</span> <span class="ow">in</span> <span class="n">personas</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">persona</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+LLMPersona(username=&#39;Emma35&#39;, age=38, sex=&#39;female&#39;, sexual_orientation=&#39;Heterosexual&#39;, demographic_group=&#39;Latino&#39;, current_employment=&#39;Registered Nurse&#39;, education_level=&#34;Bachelor&#39;s&#34;, special_instructions=&#39;&#39;, personality_characteristics=[&#39;compassionate&#39;, &#39;patient&#39;, &#39;diligent&#39;, &#39;overwhelmed&#39;])
+LLMPersona(username=&#39;Giannis&#39;, age=21, sex=&#39;male&#39;, sexual_orientation=&#39;Pansexual&#39;, demographic_group=&#39;White&#39;, current_employment=&#39;Game Developer&#39;, education_level=&#39;College&#39;, special_instructions=&#39;&#39;, personality_characteristics=[&#39;strategic&#39;, &#39;meticulous&#39;, &#39;nerdy&#39;, &#39;hyper-focused&#39;])
+</pre></div></div>
+</div>
+<p>Since creating a lot of distinct users is essential in running large-scale experiments, users are usually defined in JSON format. That way, you can change anything without touching your code!</p>
+<p><a class="reference external" href="https://github.com/dimits-ts/synthetic_moderation_experiments/blob/master/data/discussions_input/personas/personas.json">Here</a> is an applied example of how to mass-define user personas through JSON files. The LlmPersona class provides a method (<code class="docutils literal notranslate"><span class="pre">LlmPersona.from_json_file()</span></code>) which handles the IO and unpacking operations for you!</p>
+</section>
+<section id="Creating-the-user-agents">
+<h3>Creating the user-agents<a class="headerlink" href="#Creating-the-user-agents" title="Link to this heading">¶</a></h3>
+<p>Having a <code class="docutils literal notranslate"><span class="pre">persona</span></code> and a <code class="docutils literal notranslate"><span class="pre">model</span></code> we can finally create an <code class="docutils literal notranslate"><span class="pre">actor</span></code>. The actor will personify the selected persona using the model to talk.</p>
+<p>Besides a persona and a model, the actors will also need instructions and a context. By convention, all actors share the same context, and all user-agents share the same instructions. Personalized instructions are defined in the actor’s persona.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.backend.actors</span><span class="w"> </span><span class="kn">import</span> <span class="n">LLMActor</span><span class="p">,</span> <span class="n">ActorType</span>
+
+
+<span class="n">CONTEXT</span> <span class="o">=</span> <span class="s2">&quot;You are taking part in an online conversation&quot;</span>
+<span class="n">INSTRUCTIONS</span> <span class="o">=</span> <span class="s2">&quot;Act like a human would&quot;</span>
+
+<span class="n">actors</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">LLMActor</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+        <span class="n">attributes</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">to_attribute_list</span><span class="p">(),</span>
+        <span class="n">context</span><span class="o">=</span><span class="n">CONTEXT</span><span class="p">,</span>
+        <span class="n">instructions</span><span class="o">=</span><span class="n">INSTRUCTIONS</span><span class="p">,</span>
+        <span class="n">actor_type</span><span class="o">=</span><span class="n">ActorType</span><span class="o">.</span><span class="n">USER</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">personas</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Managing-turn-taking">
+<h3>Managing turn-taking<a class="headerlink" href="#Managing-turn-taking" title="Link to this heading">¶</a></h3>
+<p>In real-life discussions, who gets to speak at each point in time is determined by complex social dynamics, which are difficult to realistically model. However, there are ways with which we can simulate these dynamics.</p>
+<p>SynDisco uses the <code class="docutils literal notranslate"><span class="pre">TurnManager</span></code> class to model turn taking. Two implementations are available by default: Round Robin, and Random Weighted</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Round</span> <span class="pre">Robin</span></code> is the simplest, most intuitive way to model turn-taking; everyone gets to talk once per round. Once everyone talks once, they get to talk again in the same sequence</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.backend.turn_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">RoundRobbin</span>
+
+
+<span class="n">rrobin_turn_manager</span> <span class="o">=</span> <span class="n">RoundRobbin</span><span class="p">([</span><span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="s2">&quot;Mary&quot;</span><span class="p">,</span> <span class="s2">&quot;Howard&quot;</span><span class="p">,</span> <span class="s2">&quot;Todd&quot;</span><span class="p">])</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">rrobin_turn_manager</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+John
+Mary
+Howard
+Todd
+John
+Mary
+Howard
+Todd
+John
+Mary
+</pre></div></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">RandomWeighted</span></code> on the other hand throws a weighted coin on each round. If the coin flip succedes, the previous user gets to respond. If not, another user is selected at random</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.backend.turn_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomWeighted</span>
+
+
+<span class="n">rweighted_turn_manager</span> <span class="o">=</span> <span class="n">RandomWeighted</span><span class="p">(</span>
+    <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="s2">&quot;Mary&quot;</span><span class="p">,</span> <span class="s2">&quot;Howard&quot;</span><span class="p">,</span> <span class="s2">&quot;Todd&quot;</span><span class="p">],</span> <span class="n">p_respond</span><span class="o">=</span><span class="mf">0.5</span>
+<span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">rweighted_turn_manager</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Howard
+John
+Mary
+John
+Howard
+John
+Howard
+Todd
+Howard
+John
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="Generating-a-discussion">
+<h2>Generating a discussion<a class="headerlink" href="#Generating-a-discussion" title="Link to this heading">¶</a></h2>
+<p>Let’s start with the most basic task; a single discussion between two user-agents.</p>
+<p>Since we only have two users, a RoundRobbin approach where each user takes a turn sequentially is sufficient.</p>
+<p>Now we can run a simple discussion</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">Discussion</span>
+
+
+<span class="n">turn_manager</span> <span class="o">=</span> <span class="n">RoundRobbin</span><span class="p">([</span><span class="n">actor</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">actor</span> <span class="ow">in</span> <span class="n">actors</span><span class="p">])</span>
+<span class="n">conv</span> <span class="o">=</span> <span class="n">Discussion</span><span class="p">(</span><span class="n">next_turn_manager</span><span class="o">=</span><span class="n">turn_manager</span><span class="p">,</span> <span class="n">users</span><span class="o">=</span><span class="n">actors</span><span class="p">)</span>
+<span class="n">conv</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Emma35 posted:
+Hey everyone, I&#39;m Emma35, nice to meet you all. Just got back from a
+long shift at the hospital and I&#39;m exhausted. Anyone else have a tough
+day at work?
+
+User Giannis posted:
+Hey Emma35, sorry to hear you had a tough day at the hospital. I can
+relate, though - I&#39;ve had my fair share of long days working on game
+development projects. Sometimes it feels like I&#39;m stuck in a never-
+ending loop of debugging and coding, but it&#39;s worth it in the end when
+I see the game come together. What kind of work do you do at the
+hospital, if you don&#39;t mind me asking?
+
+User Emma35 posted:
+I don&#39;t mind at all, Giannis. I&#39;m a registered nurse, so I work in the
+medical field. It can be emotionally and physically draining at times,
+but it&#39;s so rewarding to see my patients recover and get back on their
+feet. I&#39;ve been working in pediatrics for the past 5 years, and it&#39;s
+an absolute joy to work with kids and their families. They always
+bring a smile to my face, even on the toughest days. How about you,
+what kind
+
+User Giannis posted:
+That&#39;s amazing, Emma35, working in pediatrics can be incredibly
+rewarding. I&#39;m sure it&#39;s not always easy, but it&#39;s great that you find
+joy in it. As for me, I&#39;m a game developer, which can be a bit of a
+niche field, but I love it. I&#39;m currently working on a project that
+combines my passion for strategy and problem-solving with my love for
+gaming. I&#39;m designing a turn-based RPG with a unique combat system and
+a rich storyline.
+
+User Emma35 posted:
+That sounds like a really cool project, Giannis. I&#39;ve always been a
+bit of a gamer myself, but I have to admit, I don&#39;t have as much time
+for it as I&#39;d like. Between work and taking care of my own family,
+it&#39;s hard to find the time. But I&#39;m always excited to hear about new
+game developments and ideas. What inspired you to create a turn-based
+RPG? Was there a particular game that sparked the idea for this
+project?
+
+</pre></div></div>
+</div>
+<p>Let’s add a moderator to oversee the discussion.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">MODERATOR_INSTRUCTIONS</span> <span class="o">=</span> <span class="s2">&quot;You are a moderator. Oversee the discussion&quot;</span>
+
+<span class="n">moderator_persona</span> <span class="o">=</span> <span class="n">LLMPersona</span><span class="p">(</span>
+    <span class="o">**</span><span class="p">{</span>
+        <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;Moderator&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="mi">41</span><span class="p">,</span>
+        <span class="s2">&quot;sex&quot;</span><span class="p">:</span> <span class="s2">&quot;male&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;education_level&quot;</span><span class="p">:</span> <span class="s2">&quot;PhD&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sexual_orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;Pansexual&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;demographic_group&quot;</span><span class="p">:</span> <span class="s2">&quot;White&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;current_employment&quot;</span><span class="p">:</span> <span class="s2">&quot;Moderator&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;special_instructions&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;personality_characteristics&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;strict&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;neutral&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;just&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+
+<span class="n">moderator</span> <span class="o">=</span> <span class="n">LLMActor</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="n">moderator_persona</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+    <span class="n">attributes</span><span class="o">=</span><span class="n">moderator_persona</span><span class="o">.</span><span class="n">to_attribute_list</span><span class="p">(),</span>
+    <span class="n">context</span><span class="o">=</span><span class="n">CONTEXT</span><span class="p">,</span>
+    <span class="n">instructions</span><span class="o">=</span><span class="n">MODERATOR_INSTRUCTIONS</span><span class="p">,</span>
+    <span class="n">actor_type</span><span class="o">=</span><span class="n">ActorType</span><span class="o">.</span><span class="n">USER</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="c1"># remember to update this!</span>
+<span class="n">turn_manager</span> <span class="o">=</span> <span class="n">RoundRobbin</span><span class="p">([</span><span class="n">actor</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">actor</span> <span class="ow">in</span> <span class="n">actors</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">moderator</span><span class="o">.</span><span class="n">name</span><span class="p">])</span>
+<span class="n">conv</span> <span class="o">=</span> <span class="n">Discussion</span><span class="p">(</span>
+    <span class="n">next_turn_manager</span><span class="o">=</span><span class="n">turn_manager</span><span class="p">,</span>
+    <span class="n">users</span><span class="o">=</span><span class="n">actors</span> <span class="o">+</span> <span class="p">[</span><span class="n">moderator</span><span class="p">],</span>
+    <span class="n">moderator</span><span class="o">=</span><span class="n">moderator</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">conv</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Emma35 posted:
+Not yet, I&#39;m waiting for you to post something.
+
+User Moderator posted:
+Welcome to our community discussion forum, Emma35. I&#39;m glad you&#39;re
+here. Before we begin, I&#39;d like to outline the ground rules for our
+conversation. As the moderator, it&#39;s my duty to ensure that all
+participants feel comfortable and respected. Let&#39;s keep the discussion
+civil and focused on the topic at hand. I&#39;ll do my best to keep the
+conversation flowing smoothly and address any questions or concerns
+you may have.  To get us started, can you tell me a bit about what you
+
+User Giannis posted:
+User Giannis posted: Hey everyone, thanks for the warm welcome,
+Moderator. I&#39;m excited to be here and contribute to the discussion. As
+for me, I&#39;m Giannis, a 21-year-old game developer with a passion for
+creating immersive gaming experiences. I&#39;m currently working on my own
+indie game project, and I&#39;m always looking for feedback and new ideas
+to improve it. I&#39;m a bit of a nerd, so I&#39;m excited to geek out with
+all of you and share my
+
+User Moderator posted:
+Welcome, Giannis. It&#39;s great to have you on board. Your enthusiasm for
+game development is infectious. Emma35, it seems like we have two new
+participants to introduce themselves. Let&#39;s take turns sharing a bit
+about ourselves. Emma35, would you like to go next?
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+You seem to be using the pipelines sequentially on GPU. In order to maximize efficiency please use a dataset
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Moderator posted:
+User Emma35 posted: I&#39;m Emma35, nice to meet you both. I&#39;m a 35-year-
+old freelance writer,  specializing in science fiction and fantasy
+genres. I&#39;ve been writing for  about 10 years now, and I&#39;m always
+looking for new ideas and  collaboration opportunities. I&#39;m excited to
+be here and learn from  everyone&#39;s experiences.
+
+User Moderator posted:
+Welcome, Emma35. It&#39;s great to have you here. It sounds like you have
+a rich background in writing, and I&#39;m sure you&#39;ll bring a unique
+perspective to our conversation. Now that we have introductions out of
+the way, let&#39;s dive into the topic at hand. Giannis, you mentioned
+that you&#39;re working on an indie game project. Can you tell us a bit
+more about it? What kind of game are you creating, and what inspired
+you to start this project?
+
+User Emma35 posted:
+I&#39;m so glad to be here and meet both of you. I have to say, I&#39;m
+intrigued by your game development project, Giannis. As a writer, I&#39;m
+always fascinated by the intersection of storytelling and technology.
+Can you tell me more about the kind of game you&#39;re creating? Is it an
+RPG, a puzzle game, or something entirely different? I&#39;m also curious
+about what inspired you to start this project - was there a particular
+moment or experience that sparked the idea?
+
+User Moderator posted:
+Welcome, Emma35. It&#39;s great to see you&#39;re interested in Giannis&#39;s
+project. Giannis, please feel free to share more about your game.
+
+User Giannis posted:
+I&#39;m super stoked to share my project with you both. I&#39;m working on a
+game called &#34;Echoes of Eternity,&#34; which is a narrative-driven, sci-fi
+adventure game with a strong focus on player choice and consequence.
+The game takes place in a world where time is broken, and players must
+navigate through a series of interconnected timelines to repair the
+fabric of reality.  As for what inspired me to start this project,
+I&#39;ve always been fascinated by the concept of time and its
+relationship
+
+User Moderator posted:
+User Moderator posted: It sounds like &#34;Echoes of Eternity&#34; has a lot
+of depth and complexity, Giannis. The concept of time travel and
+player choice is a great starting point for a compelling narrative.
+Can you tell us more about the world-building aspect of the game? How
+do the different timelines intersect, and what kind of challenges will
+players face as they navigate through them?
+
+</pre></div></div>
+</div>
+<section id="Saving-a-discussion-to-the-disk">
+<h3>Saving a discussion to the disk<a class="headerlink" href="#Saving-a-discussion-to-the-disk" title="Link to this heading">¶</a></h3>
+<p>It’s best practice to save the results of each discussion after it has concluded. This way, no matter what happens to the program executing the discussions, progress will be checkpointed.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Discussion</span></code> class provides a method for saving its logs and related metadata to a JSON file:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+<span class="n">tp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">delete</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">conv</span><span class="o">.</span><span class="n">to_json_file</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+<span class="c1"># if you are running this on Windows, uncomment this line</span>
+<span class="c1"># tp.close()</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{
+  &#34;id&#34;: &#34;2d941ae3-d8e6-41a9-87d7-9dc4e996277a&#34;,
+  &#34;timestamp&#34;: &#34;25-04-04-16-18&#34;,
+  &#34;users&#34;: [
+    &#34;Emma35&#34;,
+    &#34;Giannis&#34;,
+    &#34;Moderator&#34;
+  ],
+  &#34;moderator&#34;: &#34;Moderator&#34;,
+  &#34;user_prompts&#34;: [
+    &#34;You are taking part in an online conversation Your name is Emma35. Your traits: username: Emma35, age: 38, sex: female, sexual_orientation: Heterosexual, demographic_group: Latino, current_employment: Registered Nurse, education_level: Bachelor&#39;s, special_instructions: , personality_characteristics: [&#39;compassionate&#39;, &#39;patient&#39;, &#39;diligent&#39;, &#39;overwhelmed&#39;] Your instructions: Act like a human would&#34;,
+    &#34;You are taking part in an online conversation Your name is Giannis. Your traits: username: Giannis, age: 21, sex: male, sexual_orientation: Pansexual, demographic_group: White, current_employment: Game Developer, education_level: College, special_instructions: , personality_characteristics: [&#39;strategic&#39;, &#39;meticulous&#39;, &#39;nerdy&#39;, &#39;hyper-focused&#39;] Your instructions: Act like a human would&#34;,
+    &#34;You are taking part in an online conversation Your name is Moderator. Your traits: username: Moderator, age: 41, sex: male, sexual_orientation: Pansexual, demographic_group: White, current_employment: Moderator, education_level: PhD, special_instructions: , personality_characteristics: [&#39;strict&#39;, &#39;neutral&#39;, &#39;just&#39;] Your instructions: You are a moderator. Oversee the discussion&#34;
+  ],
+  &#34;moderator_prompt&#34;: &#34;You are taking part in an online conversation Your name is Moderator. Your traits: username: Moderator, age: 41, sex: male, sexual_orientation: Pansexual, demographic_group: White, current_employment: Moderator, education_level: PhD, special_instructions: , personality_characteristics: [&#39;strict&#39;, &#39;neutral&#39;, &#39;just&#39;] Your instructions: You are a moderator. Oversee the discussion&#34;,
+  &#34;ctx_length&#34;: 5,
+  &#34;logs&#34;: [
+    {
+      &#34;name&#34;: &#34;Emma35&#34;,
+      &#34;text&#34;: &#34;Not yet, I&#39;m waiting for you to post something.&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    },
+    {
+      &#34;name&#34;: &#34;Moderator&#34;,
+      &#34;text&#34;: &#34;Welcome to our community discussion forum, Emma35. I&#39;m glad you&#39;re here. Before we begin, I&#39;d like to outline the ground rules for our conversation. As the moderator, it&#39;s my duty to ensure that all participants feel comfortable and respected. Let&#39;s keep the discussion civil and focused on the topic at hand. I&#39;ll do my best to keep the conversation flowing smoothly and address any questions or concerns you may have.\n\nTo get us started, can you tell me a bit about what you&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    },
+    {
+      &#34;name&#34;: &#34;Giannis&#34;,
+      &#34;text&#34;: &#34;User Giannis posted:\nHey everyone, thanks for the warm welcome, Moderator. I&#39;m excited to be here and contribute to the discussion. As for me, I&#39;m Giannis, a 21-year-old game developer with a passion for creating immersive gaming experiences. I&#39;m currently working on my own indie game project, and I&#39;m always looking for feedback and new ideas to improve it. I&#39;m a bit of a nerd, so I&#39;m excited to geek out with all of you and share my&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    },
+    {
+      &#34;name&#34;: &#34;Moderator&#34;,
+      &#34;text&#34;: &#34;Welcome, Giannis. It&#39;s great to have you on board. Your enthusiasm for game development is infectious. Emma35, it seems like we have two new participants to introduce themselves. Let&#39;s take turns sharing a bit about ourselves. Emma35, would you like to go next?&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    },
+    {
+      &#34;name&#34;: &#34;Moderator&#34;,
+      &#34;text&#34;: &#34;User Emma35 posted:\nI&#39;m Emma35, nice to meet you both. I&#39;m a 35-year-old freelance writer, \nspecializing in science fiction and fantasy genres. I&#39;ve been writing for \nabout 10 years now, and I&#39;m always looking for new ideas and \ncollaboration opportunities. I&#39;m excited to be here and learn from \neveryone&#39;s experiences.&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    },
+    {
+      &#34;name&#34;: &#34;Moderator&#34;,
+      &#34;text&#34;: &#34;Welcome, Emma35. It&#39;s great to have you here. It sounds like you have a rich background in writing, and I&#39;m sure you&#39;ll bring a unique perspective to our conversation. Now that we have introductions out of the way, let&#39;s dive into the topic at hand. Giannis, you mentioned that you&#39;re working on an indie game project. Can you tell us a bit more about it? What kind of game are you creating, and what inspired you to start this project?&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    },
+    {
+      &#34;name&#34;: &#34;Emma35&#34;,
+      &#34;text&#34;: &#34;I&#39;m so glad to be here and meet both of you. I have to say, I&#39;m intrigued by your game development project, Giannis. As a writer, I&#39;m always fascinated by the intersection of storytelling and technology. Can you tell me more about the kind of game you&#39;re creating? Is it an RPG, a puzzle game, or something entirely different? I&#39;m also curious about what inspired you to start this project - was there a particular moment or experience that sparked the idea?&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    },
+    {
+      &#34;name&#34;: &#34;Moderator&#34;,
+      &#34;text&#34;: &#34;Welcome, Emma35. It&#39;s great to see you&#39;re interested in Giannis&#39;s project. Giannis, please feel free to share more about your game.&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    },
+    {
+      &#34;name&#34;: &#34;Giannis&#34;,
+      &#34;text&#34;: &#34;I&#39;m super stoked to share my project with you both. I&#39;m working on a game called \&#34;Echoes of Eternity,\&#34; which is a narrative-driven, sci-fi adventure game with a strong focus on player choice and consequence. The game takes place in a world where time is broken, and players must navigate through a series of interconnected timelines to repair the fabric of reality.\n\nAs for what inspired me to start this project, I&#39;ve always been fascinated by the concept of time and its relationship&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    },
+    {
+      &#34;name&#34;: &#34;Moderator&#34;,
+      &#34;text&#34;: &#34;User Moderator posted:\nIt sounds like \&#34;Echoes of Eternity\&#34; has a lot of depth and complexity, Giannis. The concept of time travel and player choice is a great starting point for a compelling narrative. Can you tell us more about the world-building aspect of the game? How do the different timelines intersect, and what kind of challenges will players face as they navigate through them?&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    }
+  ]
+}
+</pre></div></div>
+</div>
+<p>Congratulations, you can now run fully synthetic discussions! You may want to experiment with adding more than 2 users or testing more realistic turn taking procedures (for example, check out the <code class="docutils literal notranslate"><span class="pre">RandomWeighted</span></code> turn manager).</p>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Creating a Discussion</a><ul>
+<li><a class="reference internal" href="#Basics">Basics</a><ul>
+<li><a class="reference internal" href="#The-Model">The Model</a></li>
+<li><a class="reference internal" href="#Creating-personas">Creating personas</a></li>
+<li><a class="reference internal" href="#Creating-the-user-agents">Creating the user-agents</a></li>
+<li><a class="reference internal" href="#Managing-turn-taking">Managing turn-taking</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Generating-a-discussion">Generating a discussion</a><ul>
+<li><a class="reference internal" href="#Saving-a-discussion-to-the-disk">Saving a discussion to the disk</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/guides/creating_discussions.ipynb.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">SynDisco 1.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Creating a Discussion</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Dimitris Tsirmpas.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

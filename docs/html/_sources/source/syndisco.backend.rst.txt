@@ -1,0 +1,45 @@
+syndisco.backend package
+========================
+
+Submodules
+----------
+
+syndisco.backend.actors module
+------------------------------
+
+.. automodule:: syndisco.backend.actors
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+syndisco.backend.model module
+-----------------------------
+
+.. automodule:: syndisco.backend.model
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+syndisco.backend.persona module
+-------------------------------
+
+.. automodule:: syndisco.backend.persona
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+syndisco.backend.turn\_manager module
+-------------------------------------
+
+.. automodule:: syndisco.backend.turn_manager
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Module contents
+---------------
+
+.. automodule:: syndisco.backend
+   :members:
+   :show-inheritance:
+   :undoc-members:

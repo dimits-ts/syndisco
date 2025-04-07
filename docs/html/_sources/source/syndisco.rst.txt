@@ -1,0 +1,46 @@
+syndisco package
+================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   syndisco.backend
+   syndisco.util
+
+Submodules
+----------
+
+syndisco.experiments module
+---------------------------
+
+.. automodule:: syndisco.experiments
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+syndisco.jobs module
+--------------------
+
+.. automodule:: syndisco.jobs
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+syndisco.postprocessing module
+------------------------------
+
+.. automodule:: syndisco.postprocessing
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Module contents
+---------------
+
+.. automodule:: syndisco
+   :members:
+   :show-inheritance:
+   :undoc-members:
