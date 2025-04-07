@@ -11,7 +11,7 @@ models/
 devenv
 
 # sphinx
-#html/
+sphinx/source/
 docs/source/
 doctrees/
 
