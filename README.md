@@ -11,7 +11,8 @@ This framework is designed for academic use, mainly for simulating Social Scienc
 
 
 ## Usage
-Have a look in the [SynDisco docs section](todo) for practical guides and high-level documentation.
+
+Have a look at the [online documentation](https://dimits-ts.github.io/syndisco/) for high-level descriptions, API documentation and tutorials.
 
 
 ## Features
