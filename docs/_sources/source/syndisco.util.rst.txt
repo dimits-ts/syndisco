@@ -1,0 +1,37 @@
+syndisco.util package
+=====================
+
+Submodules
+----------
+
+syndisco.util.file\_util module
+-------------------------------
+
+.. automodule:: syndisco.util.file_util
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+syndisco.util.logging\_util module
+----------------------------------
+
+.. automodule:: syndisco.util.logging_util
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+syndisco.util.model\_util module
+--------------------------------
+
+.. automodule:: syndisco.util.model_util
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Module contents
+---------------
+
+.. automodule:: syndisco.util
+   :members:
+   :show-inheritance:
+   :undoc-members:

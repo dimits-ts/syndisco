@@ -18,10 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 You may contact the author at tsirbasdim@gmail.com
 """
 
-"""
-Holds a utility class which helps manage initialization, loading and unloading of models on demand.
-"""
-
 from pathlib import Path
 import logging
 

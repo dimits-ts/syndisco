@@ -1,4 +1,3 @@
-
 """
 SynDisco: Automated experiment creation and execution using only LLM agents
 Copyright (C) 2025 Dimitris Tsirmpas
@@ -19,8 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 You may contact the author at tsirbasdim@gmail.com
 """
 
-
-import abc
 import typing
 from pathlib import Path
 from enum import Enum, auto
@@ -80,7 +77,8 @@ class LLMActor:
         self.actor_type = actor_type
 
     def _system_prompt(self) -> dict:
-        prompt = f"{self.context} Your name is {self.name}. Your traits: {', '.join(self.attributes)} Your instructions: {self.instructions}"
+        prompt = f"{self.context} Your name is {self.name}. Your traits: {', '.join(self.attributes)} " + \
+        f"Your instructions: {self.instructions}"
         return {"role": "system", "content": prompt}
 
     def _message_prompt(self, history: list[str]) -> dict:

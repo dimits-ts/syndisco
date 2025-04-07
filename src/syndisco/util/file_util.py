@@ -1,4 +1,3 @@
-
 """
 SynDisco: Automated experiment creation and execution using only LLM agents
 Copyright (C) 2025 Dimitris Tsirmpas
@@ -19,11 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 You may contact the author at tsirbasdim@gmail.com
 """
 
-
 import os
 import json
 import datetime
-import shutil
 import logging
 
 from typing import Any, Optional
@@ -36,7 +33,8 @@ logger = logging.getLogger(Path(__file__).name)
 def read_files_from_directory(directory: str | Path) -> list[str]:
     """Reads all files from a given directory.
 
-    :param directory: the root directory from which to load files (NOT recursively!)
+    :param directory: the root directory from which to load files
+        (NOT recursively!)
     :type directory: str | Path
 
     :raises ValueError: if the directory does not exist
@@ -60,11 +58,11 @@ def read_files_from_directory(directory: str | Path) -> list[str]:
 
 def read_file(path: str | Path) -> str:
     """Return the contents of a file
-    
+
     :param path: the path of the file
     :type path: str | Path
     :return: the file's contents
-    :rtype: str 
+    :rtype: str
     """
     with open(path, "r", encoding="utf-8") as file:
         return file.read()
@@ -79,6 +77,22 @@ def read_json_file(path: str | Path) -> dict[str, Any]:
     """
     with open(path, "r", encoding="utf-8") as file:
         return json.load(file)
+
+
+def dict_to_json(dictionary: dict[str, Any], output_path: str | Path) -> None:
+    """
+    Write a python dictionary to a file in JSON format.
+
+    :param dictionary: The dictionary to be serialized
+    :type dictionary: dict[str, Any]
+    :param output_path: The output path to the file. If the parent directories
+        do not exist, they will be created.
+    :type output_path: str | Path
+    """
+    ensure_parent_directories_exist(output_path)
+
+    with open(output_path, "w", encoding="utf8") as fout:
+        json.dump(dictionary, fout, indent=4)
 
 
 def ensure_parent_directories_exist(output_path: str | Path) -> None:
@@ -112,25 +126,17 @@ def generate_datetime_filename(
     :return: the full path for the generated file
     :rtype: str
     """
-    datetime_name = datetime.datetime.now().strftime(timestamp_format) + file_ending
+    datetime_name = (
+        datetime.datetime.now().strftime(timestamp_format) + file_ending
+    )
     path = ""
     if output_dir is None:
         path = Path(datetime_name)
     else:
         path = Path(os.path.join(output_dir, datetime_name))
-    
+
     if not path.exists():
         path.parent.mkdir(parents=True, exist_ok=True)
         path.touch()
 
     return path
-
-
-def wipe_directory(directory_path: Path, auto_confirm: bool):
-    """Wipes the directory after asking for user confirmation (unless auto_confirm is True)."""
-    if auto_confirm or input(f"Are you sure you want to wipe the contents of {directory_path}? [y|n]: ").strip().lower() == "y":
-        shutil.rmtree(directory_path)
-        os.makedirs(directory_path)  # Recreate the directory after wiping
-        logger.info(f"Directory {directory_path} has been wiped.")
-    else:
-        logger.info(f"Skipping wipe of {directory_path}.")

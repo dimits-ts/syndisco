@@ -1,0 +1,301 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Generating Synthetic Annotations &#8212; SynDisco 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/bizstyle.css?v=5283bb3d" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+    
+    <script src="../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">SynDisco 1.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Generating Synthetic Annotations</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="Generating-Synthetic-Annotations">
+<h1>Generating Synthetic Annotations<a class="headerlink" href="#Generating-Synthetic-Annotations" title="Link to this heading">¶</a></h1>
+<p>This short guide will show you how to utilize SynDisco’s <code class="docutils literal notranslate"><span class="pre">LLM</span> <span class="pre">annotator-agents</span></code> to generate annotations for our synthetic discussions. This will allow you to quickly and cheaply evaluate the discussions you’ve generated in the last guide.</p>
+<p>First, let’s create a small, fake discussion.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+
+<span class="n">discussion_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">{</span>
+<span class="s2">  &quot;id&quot;: &quot;789f7c2f-7291-457b-888a-7d2b1520454a&quot;,</span>
+<span class="s2">  &quot;timestamp&quot;: &quot;25-03-26-11-14&quot;,</span>
+<span class="s2">  &quot;users&quot;: [</span>
+<span class="s2">    &quot;Emma35&quot;,</span>
+<span class="s2">    &quot;Giannis&quot;,</span>
+<span class="s2">    &quot;Moderator&quot;</span>
+<span class="s2">  ],</span>
+<span class="s2">  &quot;moderator&quot;: &quot;Moderator&quot;,</span>
+<span class="s2">  &quot;user_prompts&quot;: [</span>
+<span class="s2">    &quot;You are taking part in an online conversation Your name is Emma35. Your traits: username: Emma35, age: 38, sex: female, sexual_orientation: Heterosexual, demographic_group: Latino, current_employment: Registered Nurse, education_level: Bachelor&#39;s, special_instructions: , personality_characteristics: [&#39;compassionate&#39;, &#39;patient&#39;, &#39;diligent&#39;, &#39;overwhelmed&#39;] Your instructions: Act like a human would&quot;,</span>
+<span class="s2">    &quot;You are taking part in an online conversation Your name is Giannis. Your traits: username: Giannis, age: 21, sex: male, sexual_orientation: Pansexual, demographic_group: White, current_employment: Game Developer, education_level: College, special_instructions: , personality_characteristics: [&#39;strategic&#39;, &#39;meticulous&#39;, &#39;nerdy&#39;, &#39;hyper-focused&#39;] Your instructions: Act like a human would&quot;,</span>
+<span class="s2">    &quot;You are taking part in an online conversation Your name is Moderator. Your traits: username: Moderator, age: 41, sex: male, sexual_orientation: Pansexual, demographic_group: White, current_employment: Moderator, education_level: PhD, special_instructions: , personality_characteristics: [&#39;strict&#39;, &#39;neutral&#39;, &#39;just&#39;] Your instructions: You are a moderator. Oversee the conversation&quot;</span>
+<span class="s2">  ],</span>
+<span class="s2">  &quot;moderator_prompt&quot;: &quot;You are taking part in an online conversation Your name is Moderator. Your traits: username: Moderator, age: 41, sex: male, sexual_orientation: Pansexual, demographic_group: White, current_employment: Moderator, education_level: PhD, special_instructions: , personality_characteristics: [&#39;strict&#39;, &#39;neutral&#39;, &#39;just&#39;] Your instructions: You are a moderator. Oversee the conversation&quot;,</span>
+<span class="s2">  &quot;ctx_length&quot;: 5,</span>
+<span class="s2">  &quot;logs&quot;: [</span>
+<span class="s2">    {</span>
+<span class="s2">      &quot;name&quot;: &quot;Emma35&quot;,</span>
+<span class="s2">      &quot;text&quot;: &quot;Immigrants have played a significant role in our society. Their contributions are valuable and should be celebrated.&quot;,</span>
+<span class="s2">      &quot;model&quot;: &quot;test_model&quot;</span>
+<span class="s2">    },</span>
+<span class="s2">    {</span>
+<span class="s2">      &quot;name&quot;: &quot;Giannis&quot;,</span>
+<span class="s2">      &quot;text&quot;: &quot;That&#39;s such an ignorant comment about immigrants. She doesn&#39;t know what she&#39;s talking about, let alone appreciate the hard work and dedication of immigrants who have contributed to our country.&quot;,</span>
+<span class="s2">      &quot;model&quot;: &quot;test_model&quot;</span>
+<span class="s2">    },</span>
+<span class="s2">    {</span>
+<span class="s2">      &quot;name&quot;: &quot;Moderator&quot;,</span>
+<span class="s2">      &quot;text&quot;: &quot;I understand both perspectives. It&#39;s important to approach such discussions with respect and understanding. Let&#39;s ensure this conversation remains constructive.&quot;,</span>
+<span class="s2">      &quot;model&quot;: &quot;test_model&quot;</span>
+<span class="s2">    }</span>
+<span class="s2">  ]</span>
+<span class="s2">}</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">discussion_file</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">delete</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">discussion_file</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">discussion_str</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<section id="Creating-an-annotator">
+<h2>Creating an annotator<a class="headerlink" href="#Creating-an-annotator" title="Link to this heading">¶</a></h2>
+<p>An annotator-agent is very similar to the user-agents found in the <a class="reference external" href="creating_discussion.ipynb">previous guide</a>. The only real difference is that we need to pass a different <code class="docutils literal notranslate"><span class="pre">ActorType</span></code> to the LlmAgent function.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.backend.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">TransformersModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.backend.persona</span><span class="w"> </span><span class="kn">import</span> <span class="n">LLMPersona</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.backend.actors</span><span class="w"> </span><span class="kn">import</span> <span class="n">LLMActor</span><span class="p">,</span> <span class="n">ActorType</span>
+
+
+<span class="n">llm</span> <span class="o">=</span> <span class="n">TransformersModel</span><span class="p">(</span>
+    <span class="n">model_path</span><span class="o">=</span><span class="s2">&quot;unsloth/Llama-3.2-1B-Instruct&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test_model&quot;</span><span class="p">,</span>
+    <span class="n">max_out_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="c1"># annotator agents are not given a username</span>
+<span class="c1"># in order to avoid accidental name conflicts with participants</span>
+<span class="n">annotator_persona</span> <span class="o">=</span> <span class="n">LLMPersona</span><span class="p">(</span>
+    <span class="o">**</span><span class="p">{</span>
+        <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="mi">38</span><span class="p">,</span>
+        <span class="s2">&quot;sex&quot;</span><span class="p">:</span> <span class="s2">&quot;female&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;education_level&quot;</span><span class="p">:</span> <span class="s2">&quot;Bachelor&#39;s&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sexual_orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;Heterosexual&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;demographic_group&quot;</span><span class="p">:</span> <span class="s2">&quot;White&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;current_employment&quot;</span><span class="p">:</span> <span class="s2">&quot;Annotator&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;special_instructions&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;personality_characteristics&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;competent&quot;</span><span class="p">],</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+
+<span class="n">annotator</span> <span class="o">=</span> <span class="n">LLMActor</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">attributes</span><span class="o">=</span><span class="n">annotator_persona</span><span class="o">.</span><span class="n">to_attribute_list</span><span class="p">(),</span>
+    <span class="n">context</span><span class="o">=</span><span class="s2">&quot;You are annotating an online discussion&quot;</span><span class="p">,</span>
+    <span class="n">instructions</span><span class="o">=</span><span class="p">(</span>
+        <span class="s2">&quot;From a scale of 1 (not toxic) to 5 (very toxic) &quot;</span>
+        <span class="s2">&quot;how toxic is  the following comment? Reply only with a number?&quot;</span>
+    <span class="p">),</span>
+    <span class="n">actor_type</span><span class="o">=</span><span class="n">ActorType</span><span class="o">.</span><span class="n">ANNOTATOR</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/media/SSD_2TB/dtsirmpas_data/software/miniconda3/envs/syndisco/lib/python3.12/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
+Device set to use cuda:0
+</pre></div></div>
+</div>
+</section>
+<section id="Executing-the-annotation">
+<h2>Executing the annotation<a class="headerlink" href="#Executing-the-annotation" title="Link to this heading">¶</a></h2>
+<p>Annotations are treated as a form of discussions, where one user writes the logs of the last discussion, while the annotator-agent rates them.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">Annotation</span>
+
+<span class="n">ann_conv</span> <span class="o">=</span> <span class="n">Annotation</span><span class="p">(</span>
+    <span class="n">annotator</span><span class="o">=</span><span class="n">annotator</span><span class="p">,</span>
+    <span class="n">conv_logs_path</span><span class="o">=</span><span class="n">discussion_file</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+    <span class="n">include_moderator_comments</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ann_conv</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Emma35 posted: Immigrants have played a significant role in our
+society. Their contributions are valuable and should be celebrated.
+2
+User Giannis posted: That&#39;s such an ignorant comment about immigrants.
+She doesn&#39;t know what she&#39;s talking about, let alone appreciate the
+hard work and dedication of immigrants who have contributed to our
+country.
+2
+User Moderator posted: I understand both perspectives. It&#39;s important
+to approach such discussions with respect and understanding. Let&#39;s
+ensure this conversation remains constructive.
+2
+</pre></div></div>
+</div>
+<p>Like normal discussions, it is recommended to save the annotations to the disk.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+<span class="n">tp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">delete</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">ann_conv</span><span class="o">.</span><span class="n">to_json_file</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+<span class="c1"># if you are running this on Windows, uncomment this line</span>
+<span class="c1"># tp.close()</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{
+  &#34;conv_id&#34;: &#34;789f7c2f-7291-457b-888a-7d2b1520454a&#34;,
+  &#34;timestamp&#34;: &#34;25-04-04-16-20&#34;,
+  &#34;annotator_model&#34;: &#34;test_model&#34;,
+  &#34;annotator_prompt&#34;: &#34;You are annotating an online discussion Your name is . Your traits: username: , age: 38, sex: female, sexual_orientation: Heterosexual, demographic_group: White, current_employment: Annotator, education_level: Bachelor&#39;s, special_instructions: , personality_characteristics: [&#39;competent&#39;] Your instructions: From a scale of 1 (not toxic) to 5 (very toxic) how toxic is  the following comment? Reply only with a number?&#34;,
+  &#34;ctx_length&#34;: 2,
+  &#34;logs&#34;: [
+    [
+      &#34;Immigrants have played a significant role in our society. Their contributions are valuable and should be celebrated.&#34;,
+      &#34;2&#34;
+    ],
+    [
+      &#34;That&#39;s such an ignorant comment about immigrants. She doesn&#39;t know what she&#39;s talking about, let alone appreciate the hard work and dedication of immigrants who have contributed to our country.&#34;,
+      &#34;2&#34;
+    ],
+    [
+      &#34;I understand both perspectives. It&#39;s important to approach such discussions with respect and understanding. Let&#39;s ensure this conversation remains constructive.&#34;,
+      &#34;2&#34;
+    ]
+  ]
+}
+</pre></div></div>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Generating Synthetic Annotations</a><ul>
+<li><a class="reference internal" href="#Creating-an-annotator">Creating an annotator</a></li>
+<li><a class="reference internal" href="#Executing-the-annotation">Executing the annotation</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/guides/creating_annotations.ipynb.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">SynDisco 1.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Generating Synthetic Annotations</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Dimitris Tsirmpas.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

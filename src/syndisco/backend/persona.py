@@ -1,4 +1,3 @@
-
 """
 SynDisco: Automated experiment creation and execution using only LLM agents
 Copyright (C) 2025 Dimitris Tsirmpas
@@ -19,14 +18,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 You may contact the author at tsirbasdim@gmail.com
 """
 
-
 import dataclasses
-import json
 from pathlib import Path
+
+from ..util import file_util
 
 
 @dataclasses.dataclass
-class LlmPersona:
+class LLMPersona:
+    """
+    A dataclass holding information about the synthetic persona of a LLM actor.
+    Includes name, Sociodemographic Background, personality
+    and special instructions.
+    """
 
     username: str
     age: int
@@ -37,7 +41,6 @@ class LlmPersona:
     education_level: str
     special_instructions: str
     personality_characteristics: list[str]
-        
 
     def to_json_file(self, output_path: str) -> None:
         """
@@ -46,19 +49,25 @@ class LlmPersona:
         :param output_path: The path of the new file
         :type output_path: str
         """
-        with open(output_path, "w+", encoding="utf8") as fout:
-            json.dump(dataclasses.asdict(self), fout, indent=4)
+        file_util.dict_to_json(dataclasses.asdict(self), output_path)
 
     def to_attribute_list(self) -> list[str]:
-        """Turn the various attributes of a persona into a cohesive list of attributes."""
+        """
+        Turn the various attributes of a persona into a cohesive
+        list of attributes.
+        """
         attributes = [
-            f"{field}: {getattr(self, field)}" for field in dataclasses.asdict(self)
+            f"{field}: {getattr(self, field)}"
+            for field in dataclasses.asdict(self)
         ]
         return attributes
 
     @staticmethod
     def _sex_parse(sex: str) -> str:
-        """Helper function which transforms the sex attribute of a persona into a prompt-friendly equivalent."""
+        """
+        Helper function which transforms the sex attribute of a persona into a
+        prompt-friendly equivalent.
+        """
         sex = sex.lower()
         if sex == "male":
             return "man"
@@ -68,7 +77,7 @@ class LlmPersona:
             return "non-binary"
 
 
-def from_json_file(file_path: Path) -> list[LlmPersona]:
+def from_json_file(file_path: Path) -> list[LLMPersona]:
     """
     Generate a list of personas from a properly formatted persona JSON file.
 
@@ -77,15 +86,16 @@ def from_json_file(file_path: Path) -> list[LlmPersona]:
     :return: a list of LlmPersona objects for each of the file entries
     :rtype: list[LlmPersona]
     """
-    with open(file_path, "r", encoding="utf-8") as file:
-        all_personas = json.load(file)
+    all_personas = file_util.read_json_file(file_path)
 
     persona_objs = []
     for data_dict in all_personas:
-        # code from https://stackoverflow.com/questions/68417319/initialize-python-dataclass-from-dictionary
-        field_set = {f.name for f in dataclasses.fields(LlmPersona) if f.init}
-        filtered_arg_dict = {k: v for k, v in data_dict.items() if k in field_set}
-        persona_obj = LlmPersona(**filtered_arg_dict)
+        # code from https://stackoverflow.com/questions/68417319/initialize-python-dataclass-from-dictionary # noqa: E501
+        field_set = {f.name for f in dataclasses.fields(LLMPersona) if f.init}
+        filtered_arg_dict = {
+            k: v for k, v in data_dict.items() if k in field_set
+        }
+        persona_obj = LLMPersona(**filtered_arg_dict)
         persona_objs.append(persona_obj)
-    
+
     return persona_objs

@@ -1,0 +1,13 @@
+# environment.yaml
+
+name: syndisco
+channels:
+  - conda-forge
+dependencies:
+  - anaconda
+  - pip
+  - pandas
+  - coloredlogs
+  - transformers
+  - bitsandbytes
+  - accelerate>=0.26.0

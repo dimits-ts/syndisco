@@ -7,6 +7,14 @@ models/
 # dont include lock files
 *.~lock.*
 
+# venv
+devenv
+
+# sphinx
+sphinx/source/
+docs/source/
+docs/doctrees/
+
 .idea/
 
 # drawio

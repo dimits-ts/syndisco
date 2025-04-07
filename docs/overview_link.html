@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Overview &#8212; SynDisco 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
+    
+    <script src="_static/documentation_options.js?v=8d563738"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Guides" href="guides_link.html" />
+    <link rel="prev" title="Welcome to SynDisco’s documentation!" href="index.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="guides_link.html" title="Guides"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to SynDisco’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SynDisco 1.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Overview</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="overview">
+<h1>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h1>
+<p>SynDisco is a Python library which creates, manages and stores the logs of synthetic <code class="docutils literal notranslate"><span class="pre">discussions</span></code> (discussions performed entirely by LLMs).</p>
+<p>Each synthetic discussion is performed by <code class="docutils literal notranslate"><span class="pre">actors</span></code>; actors can be <code class="docutils literal notranslate"><span class="pre">user-agents</span></code> (who simulate human users), <code class="docutils literal notranslate"><span class="pre">moderators</span></code> (who simulate human chat moderators) and <code class="docutils literal notranslate"><span class="pre">annotator-agents</span></code> (who judge the discussions after they have concluded).</p>
+<blockquote>
+<div><p>Example: A synthetic discussion takes place between Peter32 and Leo59 (user-agents) and is monitored by Moderator1 (moderator). Later on, we instruct George12 and JohnFX to tell us how toxic each comment in the discussion is (annotator-agents).</p>
+</div></blockquote>
+<p>Since social experiments are usually conducted at a large scale, SynDisco manages discussions through <code class="docutils literal notranslate"><span class="pre">experiments</span></code>. Each experiment is composed of numerous discussions. Most of the variables in an experiment are randomized to simulate real-world variation, while some are pinned in place by us.</p>
+<blockquote>
+<div><p>Example: We want to test whether the presence of a moderator impacts synthetic discussions. We create Experiment1 and Experiment2, where Exp1 has a moderator and Exp2 does not. Both experiments will generate 100 discussions using randomly selected users. In the end, we compare the toxicity between the discussions to resolve our hypothesis.</p>
+</div></blockquote>
+<p>In general, each discussion goes through three phases: <code class="docutils literal notranslate"><span class="pre">generation</span></code> (according to the parameters of an experiment), <code class="docutils literal notranslate"><span class="pre">execution</span></code>, and <code class="docutils literal notranslate"><span class="pre">annotation</span></code>.</p>
+<p>See how you can easily use these concepts programmatically in the <a class="reference internal" href="guides.html"><span class="std std-doc">Guides section</span></a>.</p>
+</section>
+<section id="features">
+<h1>Features<a class="headerlink" href="#features" title="Link to this heading">¶</a></h1>
+<ul class="simple">
+<li><p><strong>Automated Experiment Generation</strong><br />
+SynDisco generates a randomized set of discussion templates. With only a handful of configurations, the researcher can run hundreds or thousands of unique experiments.</p></li>
+<li><p><strong>Synthetic Group Discussion Generation</strong><br />
+SynDisco accepts an arbitrarily large number of LLM user-agent profiles and possible Original Posts (OPs). Each experiment involves a random selection of these user-agents replying to a randomly selected OP. The researcher can determine how these participants behave, whether there is a moderator present and even how the turn-taking is determined.</p></li>
+<li><p><strong>Synthetic Annotation Generation with multiple annotators</strong><br />
+The researcher can create multiple LLM annotator-agent profiles. Each of these annotators will process each generated discussion at the comment-level, and annotate according to the provided instruction prompt, enabling an arbitrary selection of metrics to be used.</p></li>
+<li><p><strong>Native Transformers support</strong><br />
+The framework supports most Hugging Face Transformer models out-of-the-box. Support for models managed by other libraries can be easily achieved by extending a single class.</p></li>
+<li><p><strong>Native logging and fault tolerance</strong><br />
+Since SynDisco is expected to possibly run for days at a time in remote servers, it keeps detailed logs both on-screen and on-disk. Should any experiment fail, the next one will be loaded with no intermittent delays. Results are intermittently saved to the disk, ensuring no data loss or corruption on even catastrophic errors.</p></li>
+</ul>
+</section>
+<section id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h1>
+<p>You can download the package from PIP:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>syndisco
+</pre></div>
+</div>
+<p>Or build from source:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/dimits-ts/syndisco.git
+pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+pip<span class="w"> </span>install<span class="w"> </span>.
+</pre></div>
+</div>
+<p>If you want to contribute to the project, or modify the library’s code you may use:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/dimits-ts/syndisco.git
+pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.dev.txt
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+</pre></div>
+</div>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Overview</a></li>
+<li><a class="reference internal" href="#features">Features</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="index.html"
+                          title="previous chapter">Welcome to SynDisco’s documentation!</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="guides_link.html"
+                          title="next chapter">Guides</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/overview_link.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="guides_link.html" title="Guides"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to SynDisco’s documentation!"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">SynDisco 1.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Overview</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Dimitris Tsirmpas.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>
