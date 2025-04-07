@@ -13,6 +13,7 @@ devenv
 # sphinx
 html/
 docs/source/
+doctrees/
 
 .idea/
 
