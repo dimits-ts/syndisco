@@ -11,15 +11,7 @@ This framework is designed for academic use, mainly for simulating Social Scienc
 
 
 ## Usage
-Have a look in the [SynDisco docs section](docs/README.md) for practical guides and high-level documentation.
-
-
-## Installation
-You can download the package from PIP:
-
-```bash
-pip install syndisco
-```
+Have a look in the [SynDisco docs section](todo) for practical guides and high-level documentation.
 
 
 ## Features
@@ -43,3 +35,26 @@ The framework supports most Hugging Face Transformer models out-of-the-box. Supp
 #### Native logging and fault tolerance
 
 Since SynDisco is expected to possibly run for days at a time in remote servers, it keeps detailed logs both on-screen and on-disk. Should any experiment fail, the next one will be loaded with no intermittent delays. Results are intermittently saved to the disk, ensuring no data loss or corruption on even catastrophic errors.
+
+
+## Installation
+
+You can download the package from PIP:
+
+```bash
+pip install syndisco
+```
+
+Or build from source:
+```bash
+git clone https://github.com/dimits-ts/syndisco.git
+pip install -r requirements.txt
+pip install .
+```
+
+If you want to contribute to the project, or modify the library's code you may use:
+```bash
+git clone https://github.com/dimits-ts/syndisco.git
+pip install -r requirements.dev.txt
+pip install -e .
+```
