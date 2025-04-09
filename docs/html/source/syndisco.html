@@ -1,0 +1,469 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>syndisco package &#8212; SynDisco 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/bizstyle.css?v=5283bb3d" />
+    
+    <script src="../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">SynDisco 1.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">syndisco package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="syndisco-package">
+<h1>syndisco package<a class="headerlink" href="#syndisco-package" title="Link to this heading">¶</a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="syndisco.backend.html">syndisco.backend package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="syndisco.backend.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syndisco.backend.html#module-syndisco.backend.actors">syndisco.backend.actors module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.actors.ActorType"><code class="docutils literal notranslate"><span class="pre">ActorType</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.actors.ActorType.ANNOTATOR"><code class="docutils literal notranslate"><span class="pre">ActorType.ANNOTATOR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.actors.ActorType.USER"><code class="docutils literal notranslate"><span class="pre">ActorType.USER</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.actors.LLMActor"><code class="docutils literal notranslate"><span class="pre">LLMActor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.actors.LLMActor.describe"><code class="docutils literal notranslate"><span class="pre">LLMActor.describe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.actors.LLMActor.get_name"><code class="docutils literal notranslate"><span class="pre">LLMActor.get_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.actors.LLMActor.speak"><code class="docutils literal notranslate"><span class="pre">LLMActor.speak()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.actors.create_users"><code class="docutils literal notranslate"><span class="pre">create_users()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.actors.create_users_from_file"><code class="docutils literal notranslate"><span class="pre">create_users_from_file()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="syndisco.backend.html#module-syndisco.backend.model">syndisco.backend.model module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.model.BaseModel"><code class="docutils literal notranslate"><span class="pre">BaseModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.model.BaseModel.generate_response"><code class="docutils literal notranslate"><span class="pre">BaseModel.generate_response()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.model.BaseModel.prompt"><code class="docutils literal notranslate"><span class="pre">BaseModel.prompt()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.model.TransformersModel"><code class="docutils literal notranslate"><span class="pre">TransformersModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.model.TransformersModel.generate_response"><code class="docutils literal notranslate"><span class="pre">TransformersModel.generate_response()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="syndisco.backend.html#module-syndisco.backend.persona">syndisco.backend.persona module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.persona.LLMPersona"><code class="docutils literal notranslate"><span class="pre">LLMPersona</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.persona.LLMPersona.age"><code class="docutils literal notranslate"><span class="pre">LLMPersona.age</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.persona.LLMPersona.current_employment"><code class="docutils literal notranslate"><span class="pre">LLMPersona.current_employment</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.persona.LLMPersona.demographic_group"><code class="docutils literal notranslate"><span class="pre">LLMPersona.demographic_group</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.persona.LLMPersona.education_level"><code class="docutils literal notranslate"><span class="pre">LLMPersona.education_level</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.persona.LLMPersona.personality_characteristics"><code class="docutils literal notranslate"><span class="pre">LLMPersona.personality_characteristics</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.persona.LLMPersona.sex"><code class="docutils literal notranslate"><span class="pre">LLMPersona.sex</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.persona.LLMPersona.sexual_orientation"><code class="docutils literal notranslate"><span class="pre">LLMPersona.sexual_orientation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.persona.LLMPersona.special_instructions"><code class="docutils literal notranslate"><span class="pre">LLMPersona.special_instructions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.persona.LLMPersona.to_attribute_list"><code class="docutils literal notranslate"><span class="pre">LLMPersona.to_attribute_list()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.persona.LLMPersona.to_json_file"><code class="docutils literal notranslate"><span class="pre">LLMPersona.to_json_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.persona.LLMPersona.username"><code class="docutils literal notranslate"><span class="pre">LLMPersona.username</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.persona.from_json_file"><code class="docutils literal notranslate"><span class="pre">from_json_file()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="syndisco.backend.html#module-syndisco.backend.turn_manager">syndisco.backend.turn_manager module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.turn_manager.RandomWeighted"><code class="docutils literal notranslate"><span class="pre">RandomWeighted</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.turn_manager.RandomWeighted.DEFAULT_RESPOND_PROBABILITY"><code class="docutils literal notranslate"><span class="pre">RandomWeighted.DEFAULT_RESPOND_PROBABILITY</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.turn_manager.RoundRobbin"><code class="docutils literal notranslate"><span class="pre">RoundRobbin</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.turn_manager.TurnManager"><code class="docutils literal notranslate"><span class="pre">TurnManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.turn_manager.TurnManager.next"><code class="docutils literal notranslate"><span class="pre">TurnManager.next()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.turn_manager.TurnManager.set_names"><code class="docutils literal notranslate"><span class="pre">TurnManager.set_names()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="syndisco.backend.html#module-syndisco.backend">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="syndisco.util.html">syndisco.util package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="syndisco.util.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syndisco.util.html#module-syndisco.util.file_util">syndisco.util.file_util module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="syndisco.util.html#syndisco.util.file_util.dict_to_json"><code class="docutils literal notranslate"><span class="pre">dict_to_json()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="syndisco.util.html#syndisco.util.file_util.ensure_parent_directories_exist"><code class="docutils literal notranslate"><span class="pre">ensure_parent_directories_exist()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="syndisco.util.html#syndisco.util.file_util.generate_datetime_filename"><code class="docutils literal notranslate"><span class="pre">generate_datetime_filename()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="syndisco.util.html#syndisco.util.file_util.read_file"><code class="docutils literal notranslate"><span class="pre">read_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="syndisco.util.html#syndisco.util.file_util.read_files_from_directory"><code class="docutils literal notranslate"><span class="pre">read_files_from_directory()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="syndisco.util.html#syndisco.util.file_util.read_json_file"><code class="docutils literal notranslate"><span class="pre">read_json_file()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="syndisco.util.html#module-syndisco.util.logging_util">syndisco.util.logging_util module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="syndisco.util.html#syndisco.util.logging_util.logging_setup"><code class="docutils literal notranslate"><span class="pre">logging_setup()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="syndisco.util.html#syndisco.util.logging_util.timing"><code class="docutils literal notranslate"><span class="pre">timing()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="syndisco.util.html#module-syndisco.util.model_util">syndisco.util.model_util module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="syndisco.util.html#syndisco.util.model_util.ModelManager"><code class="docutils literal notranslate"><span class="pre">ModelManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="syndisco.util.html#syndisco.util.model_util.ModelManager.get"><code class="docutils literal notranslate"><span class="pre">ModelManager.get()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="syndisco.util.html#module-syndisco.util">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-syndisco.experiments">
+<span id="syndisco-experiments-module"></span><h2>syndisco.experiments module<a class="headerlink" href="#module-syndisco.experiments" title="Link to this heading">¶</a></h2>
+<p>SynDisco: Automated experiment creation and execution using only LLM agents
+Copyright (C) 2025 Dimitris Tsirmpas</p>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<p>You may contact the author at <a class="reference external" href="mailto:tsirbasdim&#37;&#52;&#48;gmail&#46;com">tsirbasdim<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="syndisco.experiments.AnnotationExperiment">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">syndisco.experiments.</span></span><span class="sig-name descname"><span class="pre">AnnotationExperiment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annotators</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="syndisco.backend.html#syndisco.backend.actors.LLMActor" title="syndisco.backend.actors.LLMActor"><span class="pre">LLMActor</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">history_ctx_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_mod_comments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#syndisco.experiments.AnnotationExperiment" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>An Experiment where multiple synthetic discussions are annotated by
+LLM-based annotators.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="syndisco.experiments.AnnotationExperiment.begin">
+<span class="sig-name descname"><span class="pre">begin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">discussions_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#syndisco.experiments.AnnotationExperiment.begin" title="Link to this definition">¶</a></dt>
+<dd><p>Begin the annotation experiment by generating and executing annotation
+jobs. The results will be written as JSON files in the specified
+output directory.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="syndisco.experiments.DiscussionExperiment">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">syndisco.experiments.</span></span><span class="sig-name descname"><span class="pre">DiscussionExperiment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">users</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="syndisco.backend.html#syndisco.backend.actors.LLMActor" title="syndisco.backend.actors.LLMActor"><span class="pre">LLMActor</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed_opinions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moderator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.actors.LLMActor" title="syndisco.backend.actors.LLMActor"><span class="pre">LLMActor</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_turn_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.turn_manager.TurnManager" title="syndisco.backend.turn_manager.TurnManager"><span class="pre">TurnManager</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">history_ctx_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_turns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_active_users</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_discussions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#syndisco.experiments.DiscussionExperiment" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>An Experiment which creates, manages and executes multiple synthetic
+discussions.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="syndisco.experiments.DiscussionExperiment.begin">
+<span class="sig-name descname"><span class="pre">begin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">discussions_output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">PosixPath('output')</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#syndisco.experiments.DiscussionExperiment.begin" title="Link to this definition">¶</a></dt>
+<dd><p>Begin the experiment by generating and executing a set of discussions.
+The results will be written as JSON files at the specified output
+directory</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-syndisco.jobs">
+<span id="syndisco-jobs-module"></span><h2>syndisco.jobs module<a class="headerlink" href="#module-syndisco.jobs" title="Link to this heading">¶</a></h2>
+<p>SynDisco: Automated experiment creation and execution using only LLM agents
+Copyright (C) 2025 Dimitris Tsirmpas</p>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<p>You may contact the author at <a class="reference external" href="mailto:tsirbasdim&#37;&#52;&#48;gmail&#46;com">tsirbasdim<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="syndisco.jobs.Annotation">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">syndisco.jobs.</span></span><span class="sig-name descname"><span class="pre">Annotation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annotator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.actors.LLMActor" title="syndisco.backend.actors.LLMActor"><span class="pre">LLMActor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">conv_logs_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_moderator_comments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">history_ctx_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#syndisco.jobs.Annotation" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>An annotation job modelled as a discussion between the system writing the
+logs of a finished discussion, and the LLM Annotator.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="syndisco.jobs.Annotation.begin">
+<span class="sig-name descname"><span class="pre">begin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#syndisco.jobs.Annotation.begin" title="Link to this definition">¶</a></dt>
+<dd><p>Begin the conversation-modelled annotation job.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – whether to print the results of the annotation to the
+console, defaults to True</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="syndisco.jobs.Annotation.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timestamp_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'%y-%m-%d-%H-%M'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#syndisco.jobs.Annotation.to_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Get a dictionary view of the data and metadata contained in
+the annotation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>timestamp_format</strong> (<em>str</em><em>, </em><em>optional</em>) – the format for the conversation’s creation
+time, defaults to “%y-%m-%d-%H-%M”</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a dict representing the conversation</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, Any]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="syndisco.jobs.Annotation.to_json_file">
+<span class="sig-name descname"><span class="pre">to_json_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#syndisco.jobs.Annotation.to_json_file" title="Link to this definition">¶</a></dt>
+<dd><p>Export the data and metadata of the conversation as a json file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>output_path</strong> (<em>str</em>) – the path for the exported file</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="syndisco.jobs.Discussion">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">syndisco.jobs.</span></span><span class="sig-name descname"><span class="pre">Discussion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">next_turn_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.turn_manager.TurnManager" title="syndisco.backend.turn_manager.TurnManager"><span class="pre">TurnManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">users</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="syndisco.backend.html#syndisco.backend.actors.LLMActor" title="syndisco.backend.actors.LLMActor"><span class="pre">LLMActor</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moderator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.actors.LLMActor" title="syndisco.backend.actors.LLMActor"><span class="pre">LLMActor</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">history_context_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conv_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed_opinion</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed_opinion_user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#syndisco.jobs.Discussion" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A job conducting a discussion between different actors
+(<code class="xref py py-class docutils literal notranslate"><span class="pre">actors.Actor</span></code>).</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="syndisco.jobs.Discussion.begin">
+<span class="sig-name descname"><span class="pre">begin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#syndisco.jobs.Discussion.begin" title="Link to this definition">¶</a></dt>
+<dd><p>Begin the discussion between the actors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – whether to print the messages on the screen
+as they are generated, defaults to True</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>RuntimeError</strong> – if the object has already been used to generate
+a conversation</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="syndisco.jobs.Discussion.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timestamp_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'%y-%m-%d-%H-%M'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#syndisco.jobs.Discussion.to_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Get a dictionary view of the data and metadata contained in the
+discussion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>timestamp_format</strong> (<em>str</em><em>, </em><em>optional</em>) – the format for the conversation’s creation
+time, defaults to “%y-%m-%d-%H-%M”</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a dict representing the conversation</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, Any]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="syndisco.jobs.Discussion.to_json_file">
+<span class="sig-name descname"><span class="pre">to_json_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#syndisco.jobs.Discussion.to_json_file" title="Link to this definition">¶</a></dt>
+<dd><p>Export the data and metadata of the conversation as a json file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>output_path</strong> (<em>str</em>) – the path for the exported file</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-syndisco.postprocessing">
+<span id="syndisco-postprocessing-module"></span><h2>syndisco.postprocessing module<a class="headerlink" href="#module-syndisco.postprocessing" title="Link to this heading">¶</a></h2>
+<p>SynDisco: Automated experiment creation and execution using only LLM agents
+Copyright (C) 2025 Dimitris Tsirmpas</p>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<p>You may contact the author at <a class="reference external" href="mailto:tsirbasdim&#37;&#52;&#48;gmail&#46;com">tsirbasdim<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="syndisco.postprocessing.import_annotations">
+<span class="sig-prename descclassname"><span class="pre">syndisco.postprocessing.</span></span><span class="sig-name descname"><span class="pre">import_annotations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annot_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#syndisco.postprocessing.import_annotations" title="Link to this definition">¶</a></dt>
+<dd><p>Import annotation data from JSON files in a directory and process it
+into a DataFrame.</p>
+<p>This function reads JSON files containing annotation data, processes the
+data to standardize columns, and optionally includes SDB information for
+annotators.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>annot_dir</strong> (<em>str</em><em> | </em><em>Path</em>) – Directory containing JSON files with annotation data.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A DataFrame containing processed annotation data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="syndisco.postprocessing.import_discussions">
+<span class="sig-prename descclassname"><span class="pre">syndisco.postprocessing.</span></span><span class="sig-name descname"><span class="pre">import_discussions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conv_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#syndisco.postprocessing.import_discussions" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Import discussion output (logs) from JSON files in a directory and process</dt><dd><p>it into a DataFrame.</p>
+</dd>
+<dt>This function reads JSON files containing conversation data, processes the</dt><dd><p>data to</p>
+</dd>
+<dt>standardize columns, and adds derived attributes such as user traits and</dt><dd><p>prompts.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>conv_dir</strong> (<em>str</em><em> | </em><em>Path</em>) – Directory containing JSON files with conversation data.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A DataFrame containing processed conversation data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-syndisco">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-syndisco" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">syndisco package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-syndisco.experiments">syndisco.experiments module</a><ul>
+<li><a class="reference internal" href="#syndisco.experiments.AnnotationExperiment"><code class="docutils literal notranslate"><span class="pre">AnnotationExperiment</span></code></a><ul>
+<li><a class="reference internal" href="#syndisco.experiments.AnnotationExperiment.begin"><code class="docutils literal notranslate"><span class="pre">AnnotationExperiment.begin()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#syndisco.experiments.DiscussionExperiment"><code class="docutils literal notranslate"><span class="pre">DiscussionExperiment</span></code></a><ul>
+<li><a class="reference internal" href="#syndisco.experiments.DiscussionExperiment.begin"><code class="docutils literal notranslate"><span class="pre">DiscussionExperiment.begin()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-syndisco.jobs">syndisco.jobs module</a><ul>
+<li><a class="reference internal" href="#syndisco.jobs.Annotation"><code class="docutils literal notranslate"><span class="pre">Annotation</span></code></a><ul>
+<li><a class="reference internal" href="#syndisco.jobs.Annotation.begin"><code class="docutils literal notranslate"><span class="pre">Annotation.begin()</span></code></a></li>
+<li><a class="reference internal" href="#syndisco.jobs.Annotation.to_dict"><code class="docutils literal notranslate"><span class="pre">Annotation.to_dict()</span></code></a></li>
+<li><a class="reference internal" href="#syndisco.jobs.Annotation.to_json_file"><code class="docutils literal notranslate"><span class="pre">Annotation.to_json_file()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#syndisco.jobs.Discussion"><code class="docutils literal notranslate"><span class="pre">Discussion</span></code></a><ul>
+<li><a class="reference internal" href="#syndisco.jobs.Discussion.begin"><code class="docutils literal notranslate"><span class="pre">Discussion.begin()</span></code></a></li>
+<li><a class="reference internal" href="#syndisco.jobs.Discussion.to_dict"><code class="docutils literal notranslate"><span class="pre">Discussion.to_dict()</span></code></a></li>
+<li><a class="reference internal" href="#syndisco.jobs.Discussion.to_json_file"><code class="docutils literal notranslate"><span class="pre">Discussion.to_json_file()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-syndisco.postprocessing">syndisco.postprocessing module</a><ul>
+<li><a class="reference internal" href="#syndisco.postprocessing.import_annotations"><code class="docutils literal notranslate"><span class="pre">import_annotations()</span></code></a></li>
+<li><a class="reference internal" href="#syndisco.postprocessing.import_discussions"><code class="docutils literal notranslate"><span class="pre">import_discussions()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-syndisco">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/source/syndisco.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">SynDisco 1.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">syndisco package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Dimitris Tsirmpas.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>
