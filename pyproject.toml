@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "syndisco"
-version = "1.0.0"
+version = "1.0.1"
 authors = [
   { name="Dimitris Tsirmpas", email="tsirbasdim@gmail.com" },
 ]
@@ -31,6 +31,7 @@ dependencies = [
   "transformers",
   "bitsandbytes",
   "accelerate>=0.26.0",
+  "torch"
 ]
 keywords = ["llms", "llm", "large language models", "llm agents", "synthetic", "discussion", "self-hosting", "local"]
 

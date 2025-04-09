@@ -12,8 +12,8 @@ devenv
 
 # sphinx
 sphinx/source/
-docs/source/
 docs/doctrees/
+docs/html/_sources
 
 .idea/
 

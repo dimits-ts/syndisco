@@ -1,0 +1,336 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>syndisco.util package &#8212; SynDisco 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/bizstyle.css?v=5283bb3d" />
+    
+    <script src="../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">SynDisco 1.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">syndisco.util package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="syndisco-util-package">
+<h1>syndisco.util package<a class="headerlink" href="#syndisco-util-package" title="Link to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-syndisco.util.file_util">
+<span id="syndisco-util-file-util-module"></span><h2>syndisco.util.file_util module<a class="headerlink" href="#module-syndisco.util.file_util" title="Link to this heading">¶</a></h2>
+<p>SynDisco: Automated experiment creation and execution using only LLM agents
+Copyright (C) 2025 Dimitris Tsirmpas</p>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<p>You may contact the author at <a class="reference external" href="mailto:tsirbasdim&#37;&#52;&#48;gmail&#46;com">tsirbasdim<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="syndisco.util.file_util.dict_to_json">
+<span class="sig-prename descclassname"><span class="pre">syndisco.util.file_util.</span></span><span class="sig-name descname"><span class="pre">dict_to_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dictionary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#syndisco.util.file_util.dict_to_json" title="Link to this definition">¶</a></dt>
+<dd><p>Write a python dictionary to a file in JSON format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dictionary</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) – The dictionary to be serialized</p></li>
+<li><p><strong>output_path</strong> (<em>str</em><em> | </em><em>Path</em>) – The output path to the file. If the parent directories
+do not exist, they will be created.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="syndisco.util.file_util.ensure_parent_directories_exist">
+<span class="sig-prename descclassname"><span class="pre">syndisco.util.file_util.</span></span><span class="sig-name descname"><span class="pre">ensure_parent_directories_exist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#syndisco.util.file_util.ensure_parent_directories_exist" title="Link to this definition">¶</a></dt>
+<dd><p>Create all parent directories if they do not exist.
+:param output_path: the path for which parent dirs will be generated
+:type output_path: str | Path</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="syndisco.util.file_util.generate_datetime_filename">
+<span class="sig-prename descclassname"><span class="pre">syndisco.util.file_util.</span></span><span class="sig-name descname"><span class="pre">generate_datetime_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'%y-%m-%d-%H-%M'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_ending</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Path</span></span></span><a class="headerlink" href="#syndisco.util.file_util.generate_datetime_filename" title="Link to this definition">¶</a></dt>
+<dd><p>Generate a filename based on the current date and time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_dir</strong> (<em>str</em><em> | </em><em>Path</em><em>, </em><em>optional</em>) – The path to the generated file, defaults to None</p></li>
+<li><p><strong>timestamp_format</strong> (<em>str</em><em>, </em><em>optional</em>) – strftime format, defaults to “%y-%m-%d-%H-%M”</p></li>
+<li><p><strong>file_ending</strong> (<em>str</em>) – The ending of the file (e.g ‘.json’)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the full path for the generated file</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="syndisco.util.file_util.read_file">
+<span class="sig-prename descclassname"><span class="pre">syndisco.util.file_util.</span></span><span class="sig-name descname"><span class="pre">read_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#syndisco.util.file_util.read_file" title="Link to this definition">¶</a></dt>
+<dd><p>Return the contents of a file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>str</em><em> | </em><em>Path</em>) – the path of the file</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the file’s contents</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="syndisco.util.file_util.read_files_from_directory">
+<span class="sig-prename descclassname"><span class="pre">syndisco.util.file_util.</span></span><span class="sig-name descname"><span class="pre">read_files_from_directory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#syndisco.util.file_util.read_files_from_directory" title="Link to this definition">¶</a></dt>
+<dd><p>Reads all files from a given directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>directory</strong> (<em>str</em><em> | </em><em>Path</em>) – the root directory from which to load files
+(NOT recursively!)</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – if the directory does not exist</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Returns a list of parsed file content.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[str | dict]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="syndisco.util.file_util.read_json_file">
+<span class="sig-prename descclassname"><span class="pre">syndisco.util.file_util.</span></span><span class="sig-name descname"><span class="pre">read_json_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#syndisco.util.file_util.read_json_file" title="Link to this definition">¶</a></dt>
+<dd><p>Read a JSON file
+:param path: the path of the file
+:type path: str | Path
+:return: the file’s contents
+:rtype: dict[str, Any]</p>
+</dd></dl>
+
+</section>
+<section id="module-syndisco.util.logging_util">
+<span id="syndisco-util-logging-util-module"></span><h2>syndisco.util.logging_util module<a class="headerlink" href="#module-syndisco.util.logging_util" title="Link to this heading">¶</a></h2>
+<p>SynDisco: Automated experiment creation and execution using only LLM agents
+Copyright (C) 2025 Dimitris Tsirmpas</p>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<p>You may contact the author at <a class="reference external" href="mailto:tsirbasdim&#37;&#52;&#48;gmail&#46;com">tsirbasdim<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="syndisco.util.logging_util.logging_setup">
+<span class="sig-prename descclassname"><span class="pre">syndisco.util.logging_util.</span></span><span class="sig-name descname"><span class="pre">logging_setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">print_to_terminal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_to_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logs_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'debug'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_colors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_warnings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#syndisco.util.logging_util.logging_setup" title="Link to this definition">¶</a></dt>
+<dd><p>Create the logger configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>print_to_terminal</strong> (<em>bool</em>) – whether to print logs to the screen</p></li>
+<li><p><strong>write_to_file</strong> (<em>bool</em>) – whether to write logs to a file.
+Needs logs_dir to be specified.</p></li>
+<li><p><strong>logs_dir</strong> (<em>Optional</em><em>[</em><em>str</em><em>  |  </em><em>Path</em><em>]</em><em>, </em><em>optional</em>) – the directory where the logs will be placed,
+defaults to None</p></li>
+<li><p><strong>level</strong> – the logging level, defaults to logging.DEBUG</p></li>
+<li><p><strong>use_colors</strong> (<em>bool</em><em>, </em><em>defaults to True</em>) – whether to color the output.</p></li>
+<li><p><strong>log_warnings</strong> (<em>bool</em><em>, </em><em>defaults to True</em>) – whether to log library warnings</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="syndisco.util.logging_util.timing">
+<span class="sig-prename descclassname"><span class="pre">syndisco.util.logging_util.</span></span><span class="sig-name descname"><span class="pre">timing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#syndisco.util.logging_util.timing" title="Link to this definition">¶</a></dt>
+<dd><p>Decorator which logs the execution time of a function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>f</strong> (<em>Function</em>) – the function to be timed</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the result of the function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>_type_</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-syndisco.util.model_util">
+<span id="syndisco-util-model-util-module"></span><h2>syndisco.util.model_util module<a class="headerlink" href="#module-syndisco.util.model_util" title="Link to this heading">¶</a></h2>
+<p>SynDisco: Automated experiment creation and execution using only LLM agents
+Copyright (C) 2025 Dimitris Tsirmpas</p>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<p>You may contact the author at <a class="reference external" href="mailto:tsirbasdim&#37;&#52;&#48;gmail&#46;com">tsirbasdim<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="syndisco.util.model_util.ModelManager">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">syndisco.util.model_util.</span></span><span class="sig-name descname"><span class="pre">ModelManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_new_tokens</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disallowed_strings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_pseudoname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#syndisco.util.model_util.ModelManager" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A Singleton class initializing and managing access to a single,
+unique instance of a model.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="syndisco.util.model_util.ModelManager.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="syndisco.backend.html#syndisco.backend.model.BaseModel" title="syndisco.backend.model.BaseModel"><span class="pre">BaseModel</span></a></span></span><a class="headerlink" href="#syndisco.util.model_util.ModelManager.get" title="Link to this definition">¶</a></dt>
+<dd><p>Get a reference to the protected model instance.
+First invocation loads the instance to runtime.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>NotImplementedError</strong> – if an incompatible library_type
+is given in the yaml_data of the constructor</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The initialized model instance.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>model.Model</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-syndisco.util">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-syndisco.util" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">syndisco.util package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-syndisco.util.file_util">syndisco.util.file_util module</a><ul>
+<li><a class="reference internal" href="#syndisco.util.file_util.dict_to_json"><code class="docutils literal notranslate"><span class="pre">dict_to_json()</span></code></a></li>
+<li><a class="reference internal" href="#syndisco.util.file_util.ensure_parent_directories_exist"><code class="docutils literal notranslate"><span class="pre">ensure_parent_directories_exist()</span></code></a></li>
+<li><a class="reference internal" href="#syndisco.util.file_util.generate_datetime_filename"><code class="docutils literal notranslate"><span class="pre">generate_datetime_filename()</span></code></a></li>
+<li><a class="reference internal" href="#syndisco.util.file_util.read_file"><code class="docutils literal notranslate"><span class="pre">read_file()</span></code></a></li>
+<li><a class="reference internal" href="#syndisco.util.file_util.read_files_from_directory"><code class="docutils literal notranslate"><span class="pre">read_files_from_directory()</span></code></a></li>
+<li><a class="reference internal" href="#syndisco.util.file_util.read_json_file"><code class="docutils literal notranslate"><span class="pre">read_json_file()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-syndisco.util.logging_util">syndisco.util.logging_util module</a><ul>
+<li><a class="reference internal" href="#syndisco.util.logging_util.logging_setup"><code class="docutils literal notranslate"><span class="pre">logging_setup()</span></code></a></li>
+<li><a class="reference internal" href="#syndisco.util.logging_util.timing"><code class="docutils literal notranslate"><span class="pre">timing()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-syndisco.util.model_util">syndisco.util.model_util module</a><ul>
+<li><a class="reference internal" href="#syndisco.util.model_util.ModelManager"><code class="docutils literal notranslate"><span class="pre">ModelManager</span></code></a><ul>
+<li><a class="reference internal" href="#syndisco.util.model_util.ModelManager.get"><code class="docutils literal notranslate"><span class="pre">ModelManager.get()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-syndisco.util">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/source/syndisco.util.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">SynDisco 1.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">syndisco.util package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Dimitris Tsirmpas.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>
