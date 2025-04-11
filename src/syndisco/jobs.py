@@ -87,7 +87,6 @@ class Discussion:
         self.username_user_map = {user.get_name(): user for user in users}
 
         self.next_turn_manager = next_turn_manager
-        self.next_turn_manager.set_names(list(self.username_user_map.keys()))
 
         # used only during export, tags underlying models
         self.user_types = [
@@ -118,7 +117,9 @@ class Discussion:
         :raises RuntimeError: if the object has already been used to generate
             a conversation
         """
-        logger.debug(self.next_turn_manager.names)
+        logger.debug(self.username_user_map)
+        self.next_turn_manager.set_names(list(self.username_user_map.keys()))
+
         if len(self.conv_logs) != 0:
             raise RuntimeError(
                 "This conversation has already been concluded, "

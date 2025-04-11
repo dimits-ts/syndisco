@@ -126,6 +126,7 @@ class DiscussionExperiment:
     def _create_synthetic_discussion(self):
         rand_topic = random.choice(self.seed_opinions)
         rand_users = list(random.sample(self.users, k=self.num_active_users))
+        logger.error(rand_users)
 
         return jobs.Discussion(
             users=rand_users,
