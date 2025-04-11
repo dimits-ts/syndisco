@@ -79,7 +79,7 @@ class TurnManager(Iterable):
         raise NotImplementedError("Abstract method called")
 
 
-class RoundRobbin(TurnManager):
+class RoundRobin(TurnManager):
     """
     A simple turn manager which gives priority to the next user in the queue.
     """
