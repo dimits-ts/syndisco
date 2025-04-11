@@ -84,8 +84,9 @@ class Discussion:
         """
         self.username_user_map = {user.get_name(): user for user in users}
 
-        next_turn_manager.set_names([user.get_name() for user in users])
         self.next_turn_manager = next_turn_manager
+        logger.debug([user.get_name() for user in users])
+        self.next_turn_manager.set_names([user.get_name() for user in users])
 
         # used only during export, tags underlying models
         self.user_types = [

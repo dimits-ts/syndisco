@@ -127,9 +127,6 @@ class DiscussionExperiment:
         rand_topic = random.choice(self.seed_opinions)
         rand_users = random.sample(self.users, k=self.num_active_users)
 
-        # not thread-safe
-        self.next_turn_manager.set_names([user.name for user in rand_users])
-
         return jobs.Discussion(
             users=rand_users,
             moderator=self.moderator,
