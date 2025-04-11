@@ -87,7 +87,7 @@ class DiscussionExperiment:
 
         if next_turn_manager is None:
             logger.warning(
-                "No TurnManager selected: Defaulting to round-robin strategy."
+                "No TurnManager selected: Defaulting to round robin strategy."
             )
             self.next_turn_manager = turn_manager.RoundRobin()
         else:
@@ -104,10 +104,10 @@ class DiscussionExperiment:
         The results will be written as JSON files at the specified output
         directory
         """
-        discussions = self._generate_discussion_experiments()
+        discussions = self._generate_discussions()
         self._run_all_discussions(discussions, discussions_output_dir)
 
-    def _generate_discussion_experiments(self) -> list[jobs.Discussion]:
+    def _generate_discussions(self) -> list[jobs.Discussion]:
         """Generate experiments from the basic configurations and wrap them
         into Discussion objects.
 
@@ -125,7 +125,7 @@ class DiscussionExperiment:
 
     def _create_synthetic_discussion(self):
         rand_topic = random.choice(self.seed_opinions)
-        rand_users = random.sample(self.users, k=self.num_active_users)
+        rand_users = list(random.sample(self.users, k=self.num_active_users))
 
         return jobs.Discussion(
             users=rand_users,
