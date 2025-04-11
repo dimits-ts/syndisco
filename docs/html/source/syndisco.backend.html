@@ -63,7 +63,7 @@ along with this program.  If not, see &lt;<a class="reference external" href="ht
 <p>You may contact the author at <a class="reference external" href="mailto:tsirbasdim&#37;&#52;&#48;gmail&#46;com">tsirbasdim<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
 <dl class="py class">
 <dt class="sig sig-object py" id="syndisco.backend.actors.ActorType">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">syndisco.backend.actors.</span></span><span class="sig-name descname"><span class="pre">ActorType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#syndisco.backend.actors.ActorType" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">syndisco.backend.actors.</span></span><span class="sig-name descname"><span class="pre">ActorType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#syndisco.backend.actors.ActorType" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
 <p>The purpose of the LLMActor, used to determine proper prompt structure</p>
 <dl class="py attribute">
@@ -396,8 +396,8 @@ another participant.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="syndisco.backend.turn_manager.RoundRobbin">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">syndisco.backend.turn_manager.</span></span><span class="sig-name descname"><span class="pre">RoundRobbin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#syndisco.backend.turn_manager.RoundRobbin" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="syndisco.backend.turn_manager.RoundRobin">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">syndisco.backend.turn_manager.</span></span><span class="sig-name descname"><span class="pre">RoundRobin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#syndisco.backend.turn_manager.RoundRobin" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#syndisco.backend.turn_manager.TurnManager" title="syndisco.backend.turn_manager.TurnManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">TurnManager</span></code></a></p>
 <p>A simple turn manager which gives priority to the next user in the queue.</p>
 </dd></dl>
@@ -431,7 +431,7 @@ constructor, or from the TurnManager.set() method</p>
 <dd><p>Initialize the manager by providing the names of the users.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>names</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – the usernames of the participants</p>
+<dd class="field-odd"><p><strong>names</strong> (<em>Iterable</em><em>[</em><em>str</em><em>]</em>) – the usernames of the participants</p>
 </dd>
 </dl>
 </dd></dl>
@@ -507,7 +507,7 @@ constructor, or from the TurnManager.set() method</p>
 <li><a class="reference internal" href="#syndisco.backend.turn_manager.RandomWeighted.DEFAULT_RESPOND_PROBABILITY"><code class="docutils literal notranslate"><span class="pre">RandomWeighted.DEFAULT_RESPOND_PROBABILITY</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#syndisco.backend.turn_manager.RoundRobbin"><code class="docutils literal notranslate"><span class="pre">RoundRobbin</span></code></a></li>
+<li><a class="reference internal" href="#syndisco.backend.turn_manager.RoundRobin"><code class="docutils literal notranslate"><span class="pre">RoundRobin</span></code></a></li>
 <li><a class="reference internal" href="#syndisco.backend.turn_manager.TurnManager"><code class="docutils literal notranslate"><span class="pre">TurnManager</span></code></a><ul>
 <li><a class="reference internal" href="#syndisco.backend.turn_manager.TurnManager.next"><code class="docutils literal notranslate"><span class="pre">TurnManager.next()</span></code></a></li>
 <li><a class="reference internal" href="#syndisco.backend.turn_manager.TurnManager.set_names"><code class="docutils literal notranslate"><span class="pre">TurnManager.set_names()</span></code></a></li>

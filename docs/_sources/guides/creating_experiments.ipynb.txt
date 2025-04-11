@@ -141,7 +141,7 @@
     }
    ],
    "source": [
-    "from syndisco.backend.turn_manager import RoundRobbin\n",
+    "from syndisco.backend.turn_manager import RoundRobin\n",
     "from syndisco.backend.actors import LLMActor, ActorType\n",
     "from syndisco.backend.model import TransformersModel\n",
     "from syndisco.backend.persona import LLMPersona\n",
@@ -202,7 +202,7 @@
     "    )\n",
     "    for p in personas\n",
     "]\n",
-    "turn_manager = RoundRobbin([actor.name for actor in actors])"
+    "turn_manager = RoundRobin([actor.name for actor in actors])"
    ]
   },
   {
