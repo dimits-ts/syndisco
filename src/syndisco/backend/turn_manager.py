@@ -39,7 +39,7 @@ class TurnManager(Iterable):
             after this object's creation.
         :type config: dict[str, float], optional
         """
-        self.names = names
+        self.names = None if names is None else list(names)
 
     @typing.final
     def set_names(self, names: Iterable[str]) -> None:
@@ -47,9 +47,9 @@ class TurnManager(Iterable):
         Initialize the manager by providing the names of the users.
 
         :param names: the usernames of the participants
-        :type names: list[str]
+        :type names: Iterable[str]
         """
-        self.names = names
+        self.names = list(names)
 
     @typing.final
     def next(self) -> str:
