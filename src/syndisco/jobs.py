@@ -117,7 +117,6 @@ class Discussion:
         :raises RuntimeError: if the object has already been used to generate
             a conversation
         """
-        logger.debug(self.username_user_map)
         self.next_turn_manager.set_names(list(self.username_user_map.keys()))
 
         if len(self.conv_logs) != 0:
