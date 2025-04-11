@@ -65,7 +65,7 @@ class DiscussionExperiment:
         :type moderator: backend.actors.LLMActor | None, optional
         :param next_turn_manager: The turn manager used for dynamically
         deciding which partipant will talk next, None to use default
-        (RoundRobbin), defaults to None
+        (RoundRobin), defaults to None
         :type next_turn_manager: backend.turn_manager.TurnManager | None,
          optional
         :param history_ctx_len: How many comments in the past participants
@@ -89,7 +89,9 @@ class DiscussionExperiment:
             logger.warning(
                 "No TurnManager selected: Defaulting to round-robin strategy."
             )
-        self.next_turn_manager = next_turn_manager
+            self.next_turn_manager = turn_manager.RoundRobin()
+        else:
+            self.next_turn_manager = next_turn_manager
 
         self.history_ctx_len = history_ctx_len
         self.num_active_users = num_active_users
@@ -125,11 +127,8 @@ class DiscussionExperiment:
         rand_topic = random.choice(self.seed_opinions)
         rand_users = random.sample(self.users, k=self.num_active_users)
 
-        if self.next_turn_manager is None:
-            next_turn_manager = turn_manager.RoundRobbin()
-        else:
-            next_turn_manager = self.next_turn_manager
-        next_turn_manager.set_names([user.name for user in rand_users])
+        # not thread-safe
+        self.next_turn_manager.set_names([user.name for user in rand_users])
 
         return jobs.Discussion(
             users=rand_users,
@@ -138,7 +137,7 @@ class DiscussionExperiment:
             conv_len=self.num_turns,
             seed_opinion=rand_topic,
             seed_opinion_user=random.choice(rand_users).name,
-            next_turn_manager=next_turn_manager,
+            next_turn_manager=self.next_turn_manager,
         )
 
     @logging_util.timing

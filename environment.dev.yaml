@@ -16,3 +16,5 @@ dependencies:
   - nbsphinx
   - ipykernel
   - sphinx-autobuild
+  - build
+  - twine
