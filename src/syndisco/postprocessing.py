@@ -1,5 +1,5 @@
 """
-Module responsible for exporting discussions and their annotations in CSV 
+Module responsible for exporting discussions and their annotations in CSV
 format.
 """
 
@@ -230,7 +230,8 @@ def _list_files_recursive(start_path: str | Path) -> list[str]:
 
 def _select_user_prompt(df: pd.DataFrame) -> list[str]:
     """
-    Select the relevant user prompt for each conversation entry based on matching username.
+    Select the relevant user prompt for each conversation entry based
+    on matching username.
 
     :param df: DataFrame containing 'user' and 'user_prompts' columns.
     :return: A list of selected user prompts.

@@ -105,14 +105,18 @@ class DiscussionExperiment:
         self.num_discussions = num_discussions
         self.num_turns = num_turns
 
-    def begin(self, discussions_output_dir: Path = Path("./output")) -> None:
+    def begin(
+        self,
+        discussions_output_dir: Path = Path("./output"),
+        verbose: bool = True,
+    ) -> None:
         """
         Begin the experiment by generating and executing a set of discussions.
         The results will be written as JSON files at the specified output
         directory
         """
         discussions = self._generate_discussions()
-        self._run_all_discussions(discussions, discussions_output_dir)
+        self._run_all_discussions(discussions, discussions_output_dir, verbose)
 
     def _generate_discussions(self) -> list[jobs.Discussion]:
         """Generate experiments from the basic configurations and wrap them
@@ -146,7 +150,10 @@ class DiscussionExperiment:
 
     @logging_util.timing
     def _run_all_discussions(
-        self, discussions: list[jobs.Discussion], output_dir: Path
+        self,
+        discussions: list[jobs.Discussion],
+        output_dir: Path,
+        verbose: bool,
     ) -> None:
         """
         Creates experiments by combining the given input data, then runs each
@@ -164,14 +171,14 @@ class DiscussionExperiment:
                 f"Running experiment {i + 1}/{len(discussions) + 1}..."
             )
             self._run_single_discussion(
-                discussion=discussion, output_dir=output_dir
+                discussion=discussion, output_dir=output_dir, verbose=verbose
             )
 
         logger.info("Finished synthetic discussion generation.")
 
     @logging_util.timing
     def _run_single_discussion(
-        self, discussion: jobs.Discussion, output_dir: Path
+        self, discussion: jobs.Discussion, output_dir: Path, verbose: bool
     ) -> None:
         """
         Run a single discussion, then save its output to a auto-generated file.
@@ -184,7 +191,7 @@ class DiscussionExperiment:
             logger.debug(f"Experiment parameters: {str(discussion)}")
 
             start_time = time.time()
-            discussion.begin(verbose=True)
+            discussion.begin(verbose=verbose)
             output_path = _file_util.generate_datetime_filename(
                 output_dir=output_dir, file_ending=".json"
             )
@@ -224,12 +231,13 @@ class AnnotationExperiment:
         for annotation and contexts, defaults to True.
         :type include_mod_comments: bool
         """
-
         self.annotators = annotators
         self.history_ctx_len = history_ctx_len
         self.include_mod_comments = include_mod_comments
 
-    def begin(self, discussions_dir: Path, output_dir: Path) -> None:
+    def begin(
+        self, discussions_dir: Path, output_dir: Path, verbose: bool
+    ) -> None:
         """
         Begin the annotation experiment by generating and executing annotation
         jobs. The results will be written as JSON files in the specified
@@ -243,7 +251,7 @@ class AnnotationExperiment:
         output_dir.mkdir(parents=True, exist_ok=True)
 
         annotation_tasks = self._generate_annotation_tasks(discussions_dir)
-        self._run_all_annotations(annotation_tasks, output_dir)
+        self._run_all_annotations(annotation_tasks, output_dir, verbose)
 
     def _generate_annotation_tasks(
         self, discussions_dir: Path
@@ -273,7 +281,10 @@ class AnnotationExperiment:
 
     @logging_util.timing
     def _run_all_annotations(
-        self, annotation_tasks: list[jobs.Annotation], output_dir: Path
+        self,
+        annotation_tasks: list[jobs.Annotation],
+        output_dir: Path,
+        verbose: bool,
     ) -> None:
         """
         Runs all annotation tasks sequentially and saves results.
@@ -282,13 +293,13 @@ class AnnotationExperiment:
             logger.info(
                 f"Running annotation {i + 1}/{len(annotation_tasks)}..."
             )
-            self._run_single_annotation(annotation_task, output_dir)
+            self._run_single_annotation(annotation_task, output_dir, verbose)
 
         logger.info("Finished annotation generation.")
 
     @logging_util.timing
     def _run_single_annotation(
-        self, annotation_task: jobs.Annotation, output_dir: Path
+        self, annotation_task: jobs.Annotation, output_dir: Path, verbose: bool
     ) -> None:
         """
         Executes a single annotation experiment and saves its output.
@@ -296,7 +307,7 @@ class AnnotationExperiment:
         try:
             logger.info("Beginning annotation...")
             logger.debug(f"Experiment parameters: {str(annotation_task)}")
-            annotation_task.begin(verbose=True)
+            annotation_task.begin(verbose=verbose)
             output_path = _file_util.generate_datetime_filename(
                 output_dir=output_dir, file_ending=".json"
             )
