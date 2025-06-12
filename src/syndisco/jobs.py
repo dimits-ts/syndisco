@@ -227,8 +227,14 @@ class Discussion:
         :param comment: The new comment
         :type comment: str
         """
-        model_name = user.model.name if user.model is not None else "hardcoded"
-        artifact = {"name": user.name, "text": comment, "model": model_name}
+        model_name = (
+            user.model.get_name() if user.model is not None else "hardcoded"
+        )
+        artifact = {
+            "name": user.get_name(),
+            "text": comment,
+            "model": model_name,
+        }
         self.conv_logs.append(artifact)
 
     def _add_comment_to_history(
@@ -245,7 +251,7 @@ class Discussion:
         :param verbose: Whether to print the comment to stdout
         :type verbose: bool
         """
-        formatted_res = _format_chat_message(user.name, comment)
+        formatted_res = _format_chat_message(user.get_name(), comment)
         self.ctx_history.append(formatted_res)
 
         if verbose:
@@ -338,7 +344,7 @@ class Annotation:
         return {
             "conv_id": str(self.conv_data_dict["id"]),
             "timestamp": datetime.datetime.now().strftime(timestamp_format),
-            "annotator_model": self.annotator.model.name,
+            "annotator_model": self.annotator.model.get_name(),
             "annotator_prompt": self.annotator.describe(),
             "ctx_length": self.history_ctx_len,
             "logs": self.annotation_logs,

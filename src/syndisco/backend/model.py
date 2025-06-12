@@ -1,4 +1,3 @@
-
 """
 SynDisco: Automated experiment creation and execution using only LLM agents
 Copyright (C) 2025 Dimitris Tsirmpas
@@ -18,7 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 You may contact the author at tsirbasdim@gmail.com
 """
-
 
 """
 Module containing wrappers for local LLMs loaded with various Python libraries.
@@ -40,7 +38,12 @@ class BaseModel(abc.ABC):
     Interface for all local LLM wrappers
     """
 
-    def __init__(self, name: str, max_out_tokens: int, stop_list: list[str] | None = None):
+    def __init__(
+        self,
+        name: str,
+        max_out_tokens: int,
+        stop_list: list[str] | None = None,
+    ):
         self.name = name
         self.max_out_tokens = max_out_tokens
         # avoid mutable default value problem
@@ -48,9 +51,7 @@ class BaseModel(abc.ABC):
 
     @typing.final
     def prompt(
-        self,
-        json_prompt: tuple[typing.Any, typing.Any],
-        stop_words: list[str]
+        self, json_prompt: tuple[typing.Any, typing.Any], stop_words: list[str]
     ) -> str:
         """Generate the model's response based on a prompt.
 
@@ -69,26 +70,42 @@ class BaseModel(abc.ABC):
         return response
 
     @abc.abstractmethod
-    def generate_response(self,
-        json_prompt: tuple[typing.Any, typing.Any],
-        stop_words) -> str:
+    def generate_response(
+        self, json_prompt: tuple[typing.Any, typing.Any], stop_words
+    ) -> str:
         """Model-specific method which generates the LLM's response
 
-        :param json_prompt: A tuple containing the system and user prompt. Could be strings, or a dictionary.
-        :type json_prompt: tuple[typing.Any, typing.Any]
-        :param stop_words: Strings where the model should stop generating
-        :type stop_words: list[str]
-        :return: the model's response
+        :param json_prompt:
+            A tuple containing the system and user prompt.
+            Could be strings, or a dictionary.
+        :type json_prompt:
+            tuple[typing.Any, typing.Any]
+        :param stop_words:
+            Strings where the model should stop generating
+        :type stop_words:
+            list[str]
+        :return: 
+            The model's response
         :rtype: str
         """
         raise NotImplementedError("Abstract class call")
+
+    @typing.final
+    def get_name(self) -> str:
+        """
+        Get the model's assigned pseudoname.
+
+        :return: The name of the model.
+        :rtype: str
+        """
+        return self.name
 
 
 class TransformersModel(BaseModel):
     """
     A class encapsulating Transformers HuggingFace models.
     """
-    
+
     def __init__(
         self,
         model_path: str | Path,
@@ -142,7 +159,11 @@ class TransformersModel(BaseModel):
             )
 
         response = self.generator(
-            formatted_prompt, max_new_tokens=self.max_out_tokens, return_full_text=False
-        )[0]["generated_text"]  # type: ignore
+            formatted_prompt,
+            max_new_tokens=self.max_out_tokens,
+            return_full_text=False,
+        )[0][
+            "generated_text"
+        ]  # type: ignore
 
         return response  # type: ignore

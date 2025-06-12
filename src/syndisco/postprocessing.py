@@ -20,10 +20,9 @@ You may contact the author at tsirbasdim@gmail.com
 
 import os
 import json
-import re
-import ast
 from pathlib import Path
 from typing import Iterable
+from io import StringIO
 
 import pandas as pd
 
@@ -46,27 +45,29 @@ def import_discussions(conv_dir: Path) -> pd.DataFrame:
     df = _read_conversations(conv_dir)
     df = df.reset_index(drop=True)
 
-    # Remove unused columns
-    del df["users"]
-
     # Select relevant user prompts
     selected_prompt = _select_user_prompt(df)
     df["user_prompt"] = selected_prompt
-    del df["user_prompts"]
 
     # Merge moderator and user prompts
     df["is_moderator"] = _is_moderator(df.moderator, df.user)
     df.user_prompt = df.moderator_prompt.where(df.is_moderator, df.user_prompt)
-    del df["moderator"], df["moderator_prompt"]
 
     df["message_id"] = _generate_message_hash(df.id, df.message)
     df["message_order"] = _add_message_order(df)
 
-    # Extract user traits and add them as attributes
-    df2 = _process_traits(df.user_prompt.apply(_extract_traits)).reset_index()
-    del df2["username"]
-    df = pd.concat([df, df2], axis=1)
-    return df
+    traits_df = pd.concat(df.user_prompt.apply(_process_traits))
+
+    # Remove unused columns
+    del df["user_prompts"]
+    del df["users"]
+    del df["moderator"]
+    del df["moderator_prompt"]
+    del traits_df["username"]
+
+    full_df = pd.concat([df, traits_df], axis=1)
+
+    return full_df
 
 
 def import_annotations(annot_dir: str | Path) -> pd.DataFrame:
@@ -83,19 +84,17 @@ def import_annotations(annot_dir: str | Path) -> pd.DataFrame:
     :return: A DataFrame containing processed annotation data.
     :rtype: pd.DataFrame
     """
+    annot_dir = Path(annot_dir)
     annot_df = _read_annotations(annot_dir)
     annot_df = annot_df.reset_index(drop=True)
 
     # Add annotator traits
-    traits_df = _process_traits(
-        annot_df.annotator_prompt.apply(_extract_traits)
-    ).reset_index()
+    traits_df = pd.concat(annot_df.user_prompt.apply(_process_traits))
     annot_df = pd.concat([annot_df, traits_df], axis=1)
     annot_df["message_id"] = _generate_message_hash(
         annot_df.conv_id, annot_df.message
     )
     annot_df["message_order"] = _add_message_order(annot_df)
-    del annot_df["special_instructions"]
 
     return annot_df
 
@@ -244,7 +243,7 @@ def _extract_user_prompt(
     return None
 
 
-def _process_traits(series: pd.Series) -> pd.DataFrame:
+def _process_traits(user_prompt: str) -> pd.DataFrame:
     """
     Process traits extracted from messages into a structured DataFrame.
 
@@ -253,48 +252,8 @@ def _process_traits(series: pd.Series) -> pd.DataFrame:
     :return: A DataFrame with extracted traits as columns.
     :rtype: pd.DataFrame
     """
-    traits_list = series
-    return pd.DataFrame(traits_list.tolist())
-
-
-def _extract_traits(message: str | None) -> dict:
-    """
-    Extract traits from a message's 'traits' section.
-
-    :param message: The input message containing traits.
-    :type message: str | None
-    :return: A dictionary of extracted traits.
-    :rtype: dict
-    """
-    if message is None:
-        return {}
-
-    traits_match = re.search(
-        r"Your traits: (.+?) Your instructions:", message, re.DOTALL
-    )
-    if not traits_match:
-        return {}
-
-    traits_section = traits_match.group(1).strip()
-
-    traits = {}
-    for match in re.finditer(
-        r'(\w+):\s*(".*?"|\[.*?\]|[\w\s]+)(?=,|$)', traits_section
-    ):
-        key = match.group(1)
-        value = match.group(2).strip()
-
-        try:
-            if value.startswith("[") and value.endswith("]"):
-                value = ast.literal_eval(value)
-            elif value.startswith(("'", '"')) and value.endswith(("'", '"')):
-                value = value.strip("'\"")
-        except ValueError:
-            pass
-
-        traits[key] = value
-
-    return traits
+    prompt_file = StringIO(user_prompt)
+    return pd.read_json(prompt_file)
 
 
 def _generate_message_hash(

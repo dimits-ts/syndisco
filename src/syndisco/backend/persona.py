@@ -20,6 +20,7 @@ You may contact the author at tsirbasdim@gmail.com
 
 import dataclasses
 from pathlib import Path
+import json
 
 from ..util import file_util
 
@@ -51,17 +52,6 @@ class LLMPersona:
         """
         file_util.dict_to_json(dataclasses.asdict(self), output_path)
 
-    def to_attribute_list(self) -> list[str]:
-        """
-        Turn the various attributes of a persona into a cohesive
-        list of attributes.
-        """
-        attributes = [
-            f"{field}: {getattr(self, field)}"
-            for field in dataclasses.asdict(self)
-        ]
-        return attributes
-
     @staticmethod
     def _sex_parse(sex: str) -> str:
         """
@@ -74,7 +64,10 @@ class LLMPersona:
         elif sex == "female":
             return "woman"
         else:
-            return "non-binary"
+            return "other"
+
+    def __str__(self):
+        return json.dumps(dataclasses.asdict(self))
 
 
 def from_json_file(file_path: Path) -> list[LLMPersona]:
