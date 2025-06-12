@@ -24,10 +24,9 @@ import typing
 import warnings
 import functools
 from pathlib import Path
+from logging.handlers import TimedRotatingFileHandler
 
 import coloredlogs
-
-from . import file_util
 
 
 logger = logging.getLogger(Path(__file__).name)
@@ -76,10 +75,7 @@ def logging_setup(
                 "Disabling logging to file."
             )
         else:
-            filename = file_util.generate_datetime_filename(
-                logs_dir, file_ending=".log", timestamp_format="%y-%m-%d"
-            )
-            handlers.append(logging.FileHandler(filename))
+            handlers.append(_get_file_handler(Path(logs_dir)))
 
     logging.basicConfig(
         handlers=handlers,
@@ -140,3 +136,17 @@ def _str_to_log_level(level_str: str):
                 f"Unrecognized log level {level_str}. Defaulting to NOT_SET"
             )
             return logging.NOTSET
+
+
+def _get_file_handler(logs_dir: Path):
+    logfile_path = logs_dir / "log"  # base filename, extension gets added
+    file_handler = TimedRotatingFileHandler(
+        filename=logfile_path,
+        when="midnight",
+        interval=1,
+        backupCount=7,
+        encoding="utf-8",
+        utc=True,
+    )
+    file_handler.suffix = "%y-%m-%d.log"
+    return file_handler
