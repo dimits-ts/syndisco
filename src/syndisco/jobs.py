@@ -28,7 +28,7 @@ import textwrap
 from pathlib import Path
 from typing import Any, Optional
 
-from . import actors, turn_manager, persona
+from . import actors, turn_manager
 from . import file_util
 
 
@@ -130,7 +130,7 @@ class Discussion:
             # create first "seed" opinion
             seed_user = actors.Actor(
                 model=None,  # type: ignore
-                persona=persona.Persona(
+                persona=actors.Persona(
                     username=self.seed_opinion_username
                 ),
                 context="",

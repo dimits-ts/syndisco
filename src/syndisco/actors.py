@@ -19,10 +19,13 @@ You may contact the author at tsirbasdim@gmail.com
 """
 
 import typing
+import dataclasses
+from pathlib import Path
+import json
 from enum import Enum, auto
 
 from . import model
-from . import persona
+from . import file_util
 
 
 class ActorType(str, Enum):
@@ -34,6 +37,67 @@ class ActorType(str, Enum):
     ANNOTATOR = auto()
 
 
+@dataclasses.dataclass
+class Persona:
+    """
+    A dataclass holding information about the synthetic persona of a LLM actor.
+    Includes name, Sociodemographic Background, personality
+    and special instructions.
+    """
+
+    username: str = ""
+    age: int = -1
+    sex: str = ""
+    sexual_orientation: str = ""
+    demographic_group: str = ""
+    current_employment: str = ""
+    education_level: str = ""
+    special_instructions: str = ""
+    personality_characteristics: list[str] = dataclasses.field(
+        default_factory=list
+    )
+
+    @classmethod
+    def from_json_file(file_path: Path) -> list:
+        """
+        Generate a list of personas from a properly formatted persona JSON 
+        file.
+
+        :param file_path: the path to the JSON file containing the personas
+        :type file_path: Path
+        :return: a list of LlmPersona objects for each of the file entries
+        :rtype: list[LlmPersona]
+        """
+        all_personas = file_util.read_json_file(file_path)
+
+        persona_objs = []
+        for data_dict in all_personas:
+            # code from https://stackoverflow.com/questions/68417319/initialize-python-dataclass-from-dictionary # noqa: E501
+            field_set = {f.name for f in dataclasses.fields(Persona) if f.init}
+            filtered_arg_dict = {
+                k: v for k, v in data_dict.items() if k in field_set
+            }
+            persona_obj = Persona(**filtered_arg_dict)
+            persona_objs.append(persona_obj)
+
+        return persona_objs
+
+    def to_dict(self):
+        return dataclasses.asdict(self)
+
+    def to_json_file(self, output_path: str) -> None:
+        """
+        Serialize the data to a .json file.
+
+        :param output_path: The path of the new file
+        :type output_path: str
+        """
+        file_util.dict_to_json(self.to_dict(), output_path)
+
+    def __str__(self):
+        return json.dumps(self.to_dict())
+
+
 class Actor:
     """
     An abstract class representing an actor which responds according to an
@@ -43,7 +107,7 @@ class Actor:
     def __init__(
         self,
         model: model.BaseModel,
-        persona: persona.Persona,
+        persona: Persona,
         context: str,
         instructions: str,
         actor_type: ActorType,
@@ -147,3 +211,5 @@ def _apply_template(
             + "\n".join(history)
             + "\nOutput:",
         }
+
+
