@@ -45,19 +45,30 @@ class Persona:
         default_factory=list
     )
 
-    @staticmethod
-    def _sex_parse(sex: str) -> str:
+
+    @classmethod
+    def from_json_file(file_path: Path) -> list:
         """
-        Helper function which transforms the sex attribute of a persona into a
-        prompt-friendly equivalent.
+        Generate a list of personas from a properly formatted persona JSON file.
+
+        :param file_path: the path to the JSON file containing the personas
+        :type file_path: Path
+        :return: a list of LlmPersona objects for each of the file entries
+        :rtype: list[LlmPersona]
         """
-        sex = sex.lower()
-        if sex == "male":
-            return "man"
-        elif sex == "female":
-            return "woman"
-        else:
-            return "other"
+        all_personas = file_util.read_json_file(file_path)
+
+        persona_objs = []
+        for data_dict in all_personas:
+            # code from https://stackoverflow.com/questions/68417319/initialize-python-dataclass-from-dictionary # noqa: E501
+            field_set = {f.name for f in dataclasses.fields(Persona) if f.init}
+            filtered_arg_dict = {
+                k: v for k, v in data_dict.items() if k in field_set
+            }
+            persona_obj = Persona(**filtered_arg_dict)
+            persona_objs.append(persona_obj)
+
+        return persona_objs
 
     def to_dict(self):
         return dataclasses.asdict(self)
@@ -73,27 +84,3 @@ class Persona:
 
     def __str__(self):
         return json.dumps(self.to_dict())
-
-
-def from_json_file(file_path: Path) -> list:
-    """
-    Generate a list of personas from a properly formatted persona JSON file.
-
-    :param file_path: the path to the JSON file containing the personas
-    :type file_path: Path
-    :return: a list of LlmPersona objects for each of the file entries
-    :rtype: list[LlmPersona]
-    """
-    all_personas = file_util.read_json_file(file_path)
-
-    persona_objs = []
-    for data_dict in all_personas:
-        # code from https://stackoverflow.com/questions/68417319/initialize-python-dataclass-from-dictionary # noqa: E501
-        field_set = {f.name for f in dataclasses.fields(Persona) if f.init}
-        filtered_arg_dict = {
-            k: v for k, v in data_dict.items() if k in field_set
-        }
-        persona_obj = Persona(**filtered_arg_dict)
-        persona_objs.append(persona_obj)
-
-    return persona_objs
