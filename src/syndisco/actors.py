@@ -19,12 +19,10 @@ You may contact the author at tsirbasdim@gmail.com
 """
 
 import typing
-from pathlib import Path
 from enum import Enum, auto
 
 from . import model
 from . import persona
-from . import file_util
 
 
 class ActorType(str, Enum):
@@ -149,86 +147,3 @@ def _apply_template(
             + "\n".join(history)
             + "\nOutput:",
         }
-
-
-def create_users_from_file(
-    llm: model.BaseModel,
-    persona_path: Path,
-    instruction_path: Path,
-    context: str,
-    actor_type: ActorType,
-) -> list[LLMActor]:
-    """
-    Create a list of users by using information from files.
-
-    :param llm:
-        The LLM
-    :type llm: model.BaseModel
-    :param persona_path:
-        The path to the JSON file containing the personas
-    :type persona_path: Path
-    :param instruction_path:
-        The path to the file containing the user's instructions
-    :type instruction_path: Path
-    :param context:
-        The context of the experiment
-    :type context: str
-    :return: A list of initialized LLMActors
-    :rtype: list[LLMActor]
-    """
-    personas = persona.from_json_file(persona_path)
-    instructions = file_util.read_file(instruction_path)
-    return create_users(
-        llm,
-        [persona.username for persona in personas],
-        [persona.to_attribute_list() for persona in personas],
-        context,
-        instructions,
-        actor_type,
-    )
-
-
-def create_users(
-    llm: model.BaseModel,
-    usernames: list[str],
-    attributes: list[list[str]],
-    context: str,
-    instructions: str,
-    actor_type: ActorType,
-) -> list[LLMActor]:
-    """Create runtime LLMActor objects with the specified information.
-
-    :param llm: The LLM
-    :type llm: model.BaseModel
-    :param usernames: A list of usernames for each of the users
-    :type usernames: list[str]
-    :param attributes:
-        A list containing a list of personality/mood attributes for each user
-    :type attributes: list[list[str]]
-    :param context: The context of the experiment
-    :type context: str
-    :param instructions:
-        The instructions given to all LLM users (not the moderator)
-    :type instructions: str
-    :return: A list of initialized LLMActors
-    :rtype: list[LLMActor]
-    """
-    user_list = []
-
-    assert len(usernames) == len(
-        attributes
-    ), "Number of usernames and user personality attribute lists"
-    " must be the same"
-
-    for username, user_attributes in zip(usernames, attributes):
-        user_list.append(
-            LLMActor(
-                model=llm,
-                name=username,
-                attributes=user_attributes,
-                context=context,
-                instructions=instructions,
-                actor_type=actor_type,
-            )
-        )
-    return user_list
