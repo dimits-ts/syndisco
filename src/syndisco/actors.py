@@ -64,7 +64,7 @@ class Persona:
     @classmethod
     def from_json_file(file_path: Path) -> list:
         """
-        Generate a list of personas from a properly formatted persona JSON 
+        Generate a list of personas from a properly formatted persona JSON
         file.
 
         :param file_path: the path to the JSON file containing the personas
@@ -184,7 +184,7 @@ class Actor:
         :return: A brief description of the actor
         :rtype: dict
         """
-        return self._system_prompt()['content']
+        return self._system_prompt()["content"]
 
     @typing.final
     def get_name(self) -> str:
@@ -215,5 +215,3 @@ def _apply_template(
             + "\n".join(history)
             + "\nOutput:",
         }
-
-
