@@ -22,7 +22,7 @@ import dataclasses
 from pathlib import Path
 import json
 
-from ..util import file_util
+from . import file_util
 
 
 @dataclasses.dataclass

@@ -24,7 +24,7 @@ from enum import Enum, auto
 
 from . import model
 from . import persona
-from ..util import file_util
+from . import file_util
 
 
 class ActorType(str, Enum):

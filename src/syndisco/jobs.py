@@ -28,8 +28,8 @@ import textwrap
 from pathlib import Path
 from typing import Any, Optional
 
-from .backend import actors, turn_manager, persona
-from .util import file_util
+from . import actors, turn_manager, persona
+from . import file_util
 
 
 logger = logging.getLogger(Path(__file__).name)

@@ -23,8 +23,8 @@ import random
 import logging
 from pathlib import Path
 
-from .backend import actors, turn_manager
-from .util import logging_util, file_util
+from . import actors, turn_manager
+from . import logging_util, file_util
 from . import jobs
 
 

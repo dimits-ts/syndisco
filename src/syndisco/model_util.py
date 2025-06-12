@@ -21,7 +21,7 @@ You may contact the author at tsirbasdim@gmail.com
 from pathlib import Path
 import logging
 
-from ..backend import model
+from . import model
 
 
 logger = logging.getLogger(Path(__file__).name)

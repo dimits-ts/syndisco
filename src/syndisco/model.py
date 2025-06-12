@@ -21,7 +21,6 @@ You may contact the author at tsirbasdim@gmail.com
 """
 Module containing wrappers for local LLMs loaded with various Python libraries.
 """
-
 import abc
 import typing
 import logging
