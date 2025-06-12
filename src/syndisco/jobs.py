@@ -48,8 +48,8 @@ class Discussion:
     def __init__(
         self,
         next_turn_manager: turn_manager.TurnManager,
-        users: list[actors.LLMActor],
-        moderator: Optional[actors.LLMActor] = None,
+        users: list[actors.Actor],
+        moderator: Optional[actors.Actor] = None,
         history_context_len: int = 5,
         conv_len: int = 5,
         seed_opinion: str = "",
@@ -128,9 +128,9 @@ class Discussion:
 
         if self.seed_opinion.strip() != "":
             # create first "seed" opinion
-            seed_user = actors.LLMActor(
+            seed_user = actors.Actor(
                 model=None,  # type: ignore
-                persona=persona.LLMPersona(
+                persona=persona.Persona(
                     username=self.seed_opinion_username
                 ),
                 context="",
@@ -204,7 +204,7 @@ class Discussion:
         file_util.dict_to_json(self.to_dict(), output_path)
 
     def _archive_response(
-        self, user: actors.LLMActor, comment: str, verbose: bool
+        self, user: actors.Actor, comment: str, verbose: bool
     ) -> None:
         """
         Save the new comment to discussion output,
@@ -220,7 +220,7 @@ class Discussion:
         self._log_comment(user, comment)
         self._add_comment_to_history(user, comment, verbose)
 
-    def _log_comment(self, user: actors.LLMActor, comment: str) -> None:
+    def _log_comment(self, user: actors.Actor, comment: str) -> None:
         """
         Save new comment to the output history.
 
@@ -240,7 +240,7 @@ class Discussion:
         self.conv_logs.append(artifact)
 
     def _add_comment_to_history(
-        self, user: actors.LLMActor, comment: str, verbose: bool
+        self, user: actors.Actor, comment: str, verbose: bool
     ) -> None:
         """
         Add new comment to the discussion history,
@@ -271,7 +271,7 @@ class Annotation:
 
     def __init__(
         self,
-        annotator: actors.LLMActor,
+        annotator: actors.Actor,
         conv_logs_path: str | Path,
         include_moderator_comments: bool,
         history_ctx_len: int = 2,

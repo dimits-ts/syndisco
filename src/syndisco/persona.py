@@ -26,7 +26,7 @@ from . import file_util
 
 
 @dataclasses.dataclass
-class LLMPersona:
+class Persona:
     """
     A dataclass holding information about the synthetic persona of a LLM actor.
     Includes name, Sociodemographic Background, personality
@@ -89,11 +89,11 @@ def from_json_file(file_path: Path) -> list:
     persona_objs = []
     for data_dict in all_personas:
         # code from https://stackoverflow.com/questions/68417319/initialize-python-dataclass-from-dictionary # noqa: E501
-        field_set = {f.name for f in dataclasses.fields(LLMPersona) if f.init}
+        field_set = {f.name for f in dataclasses.fields(Persona) if f.init}
         filtered_arg_dict = {
             k: v for k, v in data_dict.items() if k in field_set
         }
-        persona_obj = LLMPersona(**filtered_arg_dict)
+        persona_obj = Persona(**filtered_arg_dict)
         persona_objs.append(persona_obj)
 
     return persona_objs

@@ -39,9 +39,9 @@ class DiscussionExperiment:
 
     def __init__(
         self,
-        users: list[actors.LLMActor],
+        users: list[actors.Actor],
         seed_opinions: list[str] = [],
-        moderator: actors.LLMActor | None = None,
+        moderator: actors.Actor | None = None,
         next_turn_manager: turn_manager.TurnManager | None = None,
         history_ctx_len: int = 3,
         num_turns: int = 10,
@@ -197,7 +197,7 @@ class AnnotationExperiment:
 
     def __init__(
         self,
-        annotators: list[actors.LLMActor],
+        annotators: list[actors.Actor],
         history_ctx_len: int = 3,
         include_mod_comments: bool = True,
     ):
@@ -253,7 +253,7 @@ class AnnotationExperiment:
         return annotation_tasks
 
     def _create_annotation_task(
-        self, annotator: actors.LLMActor, conv_logs_path: Path
+        self, annotator: actors.Actor, conv_logs_path: Path
     ) -> jobs.Annotation:
         return jobs.Annotation(
             annotator=annotator,

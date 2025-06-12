@@ -34,7 +34,7 @@ class ActorType(str, Enum):
     ANNOTATOR = auto()
 
 
-class LLMActor:
+class Actor:
     """
     An abstract class representing an actor which responds according to an
     underlying LLM instance.
@@ -43,7 +43,7 @@ class LLMActor:
     def __init__(
         self,
         model: model.BaseModel,
-        persona: persona.LLMPersona,
+        persona: persona.Persona,
         context: str,
         instructions: str,
         actor_type: ActorType,
