@@ -1,4 +1,8 @@
 """
+Module defining LLM users in discussions and their characteristics.
+"""
+
+"""
 SynDisco: Automated experiment creation and execution using only LLM agents
 Copyright (C) 2025 Dimitris Tsirmpas
 

@@ -1,4 +1,8 @@
 """
+Module containing wrappers for local LLMs loaded with various Python libraries.
+"""
+
+"""
 SynDisco: Automated experiment creation and execution using only LLM agents
 Copyright (C) 2025 Dimitris Tsirmpas
 
@@ -16,10 +20,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 You may contact the author at tsirbasdim@gmail.com
-"""
-
-"""
-Module containing wrappers for local LLMs loaded with various Python libraries.
 """
 import abc
 import typing

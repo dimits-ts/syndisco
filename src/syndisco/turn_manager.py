@@ -1,4 +1,8 @@
 """
+Module handling the turn order of LLM participants in discussions.
+"""
+
+"""
 SynDisco: Automated experiment creation and execution using only LLM agents
 Copyright (C) 2025 Dimitris Tsirmpas
 

@@ -1,4 +1,9 @@
 """
+Module automating and managing batches of discussion/annotation tasks defined
+in the syndisco.jobs module.
+"""
+
+"""
 SynDisco: Automated experiment creation and execution using only LLM agents
 Copyright (C) 2025 Dimitris Tsirmpas
 
@@ -286,7 +291,7 @@ class AnnotationExperiment:
             logger.info("Beginning annotation...")
             logger.debug(f"Experiment parameters: {str(annotation_task)}")
             annotation_task.begin(verbose=True)
-            output_path = file_util.generate_datetime_filename(
+            output_path = _file_util.generate_datetime_filename(
                 output_dir=output_dir, file_ending=".json"
             )
             annotation_task.to_json_file(output_path)

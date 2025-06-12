@@ -1,4 +1,8 @@
 """
+Module handling logging for LLM discussion and annotation tasks.
+"""
+
+"""
 SynDisco: Automated experiment creation and execution using only LLM agents
 Copyright (C) 2025 Dimitris Tsirmpas
 
