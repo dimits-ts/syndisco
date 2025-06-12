@@ -64,15 +64,17 @@ def import_discussions(conv_dir: Path) -> pd.DataFrame:
     df["message_id"] = _generate_message_hash(df.conv_id, df.message)
     df["message_order"] = _add_message_order(df)
 
+    traits_df = pd.concat(
+        list(df.user_prompt.apply(_process_traits))
+    ).reset_index(drop=True)
+    del traits_df["username"]
+
     # Remove unused columns
     del df["user_prompts"]
     del df["user_prompt"]
     del df["users"]
     del df["moderator"]
     del df["moderator_prompt"]
-
-    traits_df = pd.concat(list(df.user_prompt.apply(_process_traits))).reset_index(drop=True)
-    del traits_df["username"]
 
     full_df = pd.concat([df, traits_df], axis=1)
     return full_df
@@ -84,8 +86,7 @@ def import_annotations(annot_dir: str | Path) -> pd.DataFrame:
     into a DataFrame.
 
     This function reads JSON files containing annotation data, processes the
-    data to standardize columns, and optionally includes SDB information for
-    annotators.
+    data to standardize columns, and includes structured user traits.
 
     :param annot_dir: Directory containing JSON files with annotation data.
     :type annot_dir: str | Path
@@ -93,18 +94,15 @@ def import_annotations(annot_dir: str | Path) -> pd.DataFrame:
     :rtype: pd.DataFrame
     """
     annot_dir = Path(annot_dir)
-    annot_df = _read_annotations(annot_dir)
-    annot_df = annot_df.reset_index(drop=True)
+    df = _read_annotations(annot_dir)
+    df = df.reset_index(drop=True)
+    df = _rename_annot_df_columns(df)
 
-    # Add annotator traits
-    traits_df = pd.concat(annot_df.user_prompt.apply(_process_traits))
-    annot_df = pd.concat([annot_df, traits_df], axis=1)
-    annot_df["message_id"] = _generate_message_hash(
-        annot_df.conv_id, annot_df.message
-    )
-    annot_df["message_order"] = _add_message_order(annot_df)
-
-    return annot_df
+    # Generate unique message ID and message order
+    df["message_id"] = _generate_message_hash(df.conv_id, df.message)
+    df["message_order"] = _add_message_order(df)
+    df = _group_all_but_one(df, "annot_personality_characteristics")
+    return df
 
 
 def _read_annotations(annot_dir: Path) -> pd.DataFrame:
@@ -139,6 +137,18 @@ def _read_annotations(annot_dir: Path) -> pd.DataFrame:
 
     full_df = pd.concat(rows)
     return full_df
+
+
+def _rename_annot_df_columns(df):
+    # Identify persona columns
+    persona_prefix = "annotator_prompt.persona."
+    rename_map = {
+        col: "annot_" + col.replace(persona_prefix, "")
+        for col in df.columns
+        if col.startswith(persona_prefix)
+    }
+    # Apply renaming
+    return df.rename(columns=rename_map)
 
 
 def _read_conversations(conv_dir: Path) -> pd.DataFrame:
@@ -250,12 +260,17 @@ def _process_traits(user_prompt: dict) -> pd.DataFrame:
     """
     prompt_file = StringIO(json.dumps(user_prompt))
     df = pd.read_json(prompt_file)
-    grouping_columns = [
-        col for col in df.columns if col != "personality_characteristics"
-    ]
-    aggregated_df = df.groupby(grouping_columns, as_index=False).agg(
-        {"personality_characteristics": list}
-    ).reset_index(drop=True)
+    aggregated_df = _group_all_but_one(df, "personality_characteristics")
+    return aggregated_df
+
+
+def _group_all_but_one(df: pd.DataFrame, to_list_col: str) -> pd.DataFrame:
+    grouping_columns = [col for col in df.columns if col != to_list_col]
+    aggregated_df = (
+        df.groupby(grouping_columns, as_index=False)
+        .agg({to_list_col: list})
+        .reset_index(drop=True)
+    )
     return aggregated_df
 
 
