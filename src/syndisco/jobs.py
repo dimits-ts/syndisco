@@ -23,6 +23,7 @@ import datetime
 import json
 import logging
 import uuid
+import copy
 import textwrap
 from pathlib import Path
 from typing import Any, Optional
@@ -82,9 +83,9 @@ class Discussion:
         opinion users are different, or
         if the number of seed opinions exceeds history_context_len
         """
+        users = copy.copy(users)
         self.username_user_map = {user.get_name(): user for user in users}
 
-        next_turn_manager.set_names([user.get_name() for user in users])
         self.next_turn_manager = next_turn_manager
 
         # used only during export, tags underlying models
@@ -116,6 +117,8 @@ class Discussion:
         :raises RuntimeError: if the object has already been used to generate
             a conversation
         """
+        self.next_turn_manager.set_names(list(self.username_user_map.keys()))
+
         if len(self.conv_logs) != 0:
             raise RuntimeError(
                 "This conversation has already been concluded, "

@@ -10,3 +10,6 @@ myst-parser
 nbsphinx
 ipykernel
 sphinx-autobuild
+
+build 
+twine

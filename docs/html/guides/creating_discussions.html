@@ -184,10 +184,10 @@ LLMPersona(username=&#39;Giannis&#39;, age=21, sex=&#39;male&#39;, sexual_orient
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.backend.turn_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">RoundRobbin</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.backend.turn_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">RoundRobin</span>
 
 
-<span class="n">rrobin_turn_manager</span> <span class="o">=</span> <span class="n">RoundRobbin</span><span class="p">([</span><span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="s2">&quot;Mary&quot;</span><span class="p">,</span> <span class="s2">&quot;Howard&quot;</span><span class="p">,</span> <span class="s2">&quot;Todd&quot;</span><span class="p">])</span>
+<span class="n">rrobin_turn_manager</span> <span class="o">=</span> <span class="n">RoundRobin</span><span class="p">([</span><span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="s2">&quot;Mary&quot;</span><span class="p">,</span> <span class="s2">&quot;Howard&quot;</span><span class="p">,</span> <span class="s2">&quot;Todd&quot;</span><span class="p">])</span>
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">rrobin_turn_manager</span><span class="p">))</span>
@@ -252,7 +252,7 @@ John
 <section id="Generating-a-discussion">
 <h2>Generating a discussion<a class="headerlink" href="#Generating-a-discussion" title="Link to this heading">¶</a></h2>
 <p>Let’s start with the most basic task; a single discussion between two user-agents.</p>
-<p>Since we only have two users, a RoundRobbin approach where each user takes a turn sequentially is sufficient.</p>
+<p>Since we only have two users, a RoundRobin approach where each user takes a turn sequentially is sufficient.</p>
 <p>Now we can run a simple discussion</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
@@ -261,7 +261,7 @@ John
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">Discussion</span>
 
 
-<span class="n">turn_manager</span> <span class="o">=</span> <span class="n">RoundRobbin</span><span class="p">([</span><span class="n">actor</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">actor</span> <span class="ow">in</span> <span class="n">actors</span><span class="p">])</span>
+<span class="n">turn_manager</span> <span class="o">=</span> <span class="n">RoundRobin</span><span class="p">([</span><span class="n">actor</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">actor</span> <span class="ow">in</span> <span class="n">actors</span><span class="p">])</span>
 <span class="n">conv</span> <span class="o">=</span> <span class="n">Discussion</span><span class="p">(</span><span class="n">next_turn_manager</span><span class="o">=</span><span class="n">turn_manager</span><span class="p">,</span> <span class="n">users</span><span class="o">=</span><span class="n">actors</span><span class="p">)</span>
 <span class="n">conv</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
 </pre></div>
@@ -350,7 +350,7 @@ project?
 
 
 <span class="c1"># remember to update this!</span>
-<span class="n">turn_manager</span> <span class="o">=</span> <span class="n">RoundRobbin</span><span class="p">([</span><span class="n">actor</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">actor</span> <span class="ow">in</span> <span class="n">actors</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">moderator</span><span class="o">.</span><span class="n">name</span><span class="p">])</span>
+<span class="n">turn_manager</span> <span class="o">=</span> <span class="n">RoundRobin</span><span class="p">([</span><span class="n">actor</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">actor</span> <span class="ow">in</span> <span class="n">actors</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">moderator</span><span class="o">.</span><span class="n">name</span><span class="p">])</span>
 <span class="n">conv</span> <span class="o">=</span> <span class="n">Discussion</span><span class="p">(</span>
     <span class="n">next_turn_manager</span><span class="o">=</span><span class="n">turn_manager</span><span class="p">,</span>
     <span class="n">users</span><span class="o">=</span><span class="n">actors</span> <span class="o">+</span> <span class="p">[</span><span class="n">moderator</span><span class="p">],</span>
