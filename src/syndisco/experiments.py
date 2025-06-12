@@ -24,7 +24,7 @@ import logging
 from pathlib import Path
 
 from . import actors, turn_manager
-from . import logging_util, file_util
+from . import logging_util, _file_util
 from . import jobs
 
 
@@ -176,7 +176,7 @@ class DiscussionExperiment:
 
             start_time = time.time()
             discussion.begin(verbose=True)
-            output_path = file_util.generate_datetime_filename(
+            output_path = _file_util.generate_datetime_filename(
                 output_dir=output_dir, file_ending=".json"
             )
             logging.debug(

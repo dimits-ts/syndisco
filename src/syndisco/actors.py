@@ -25,7 +25,7 @@ import json
 from enum import Enum, auto
 
 from . import model
-from . import file_util
+from . import _file_util
 
 
 class ActorType(str, Enum):
@@ -68,7 +68,7 @@ class Persona:
         :return: a list of LlmPersona objects for each of the file entries
         :rtype: list[LlmPersona]
         """
-        all_personas = file_util.read_json_file(file_path)
+        all_personas = _file_util.read_json_file(file_path)
 
         persona_objs = []
         for data_dict in all_personas:
@@ -92,7 +92,7 @@ class Persona:
         :param output_path: The path of the new file
         :type output_path: str
         """
-        file_util.dict_to_json(self.to_dict(), output_path)
+        _file_util.dict_to_json(self.to_dict(), output_path)
 
     def __str__(self):
         return json.dumps(self.to_dict())

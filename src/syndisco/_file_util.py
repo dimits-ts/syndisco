@@ -1,4 +1,7 @@
 """
+Internal module that 
+"""
+"""
 SynDisco: Automated experiment creation and execution using only LLM agents
 Copyright (C) 2025 Dimitris Tsirmpas
 

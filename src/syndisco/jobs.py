@@ -29,7 +29,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 from . import actors, turn_manager
-from . import file_util
+from . import _file_util
 
 
 logger = logging.getLogger(Path(__file__).name)
@@ -201,7 +201,7 @@ class Discussion:
         :param output_path: the path for the exported file
         :type output_path: str
         """
-        file_util.dict_to_json(self.to_dict(), output_path)
+        _file_util.dict_to_json(self.to_dict(), output_path)
 
     def _archive_response(
         self, user: actors.Actor, comment: str, verbose: bool
@@ -359,7 +359,7 @@ class Annotation:
         :param output_path: the path for the exported file
         :type output_path: str
         """
-        file_util.dict_to_json(self.to_dict(), output_path)
+        _file_util.dict_to_json(self.to_dict(), output_path)
 
     def __str__(self) -> str:
         return json.dumps(self.to_dict(), indent=4)
