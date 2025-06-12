@@ -23,6 +23,7 @@ import json
 import re
 import ast
 from pathlib import Path
+from typing import Iterable
 
 import pandas as pd
 
@@ -58,9 +59,7 @@ def import_discussions(conv_dir: Path) -> pd.DataFrame:
     df.user_prompt = df.moderator_prompt.where(df.is_moderator, df.user_prompt)
     del df["moderator"], df["moderator_prompt"]
 
-    df["message_id"] = df.apply(
-        lambda row: _generate_message_hash(row["id"], row["message"]), axis=1
-    )
+    df["message_id"] = _generate_message_hash(df.id, df.message)
     df["message_order"] = _add_message_order(df)
 
     # Extract user traits and add them as attributes
@@ -92,8 +91,8 @@ def import_annotations(annot_dir: str | Path) -> pd.DataFrame:
         annot_df.annotator_prompt.apply(_extract_traits)
     ).reset_index()
     annot_df = pd.concat([annot_df, traits_df], axis=1)
-    annot_df["message_id"] = annot_df.apply(
-        lambda row: _generate_message_hash(row["id"], row["message"]), axis=1
+    annot_df["message_id"] = _generate_message_hash(
+        annot_df.conv_id, annot_df.message
     )
     annot_df["message_order"] = _add_message_order(annot_df)
     del annot_df["special_instructions"]
@@ -101,7 +100,7 @@ def import_annotations(annot_dir: str | Path) -> pd.DataFrame:
     return annot_df
 
 
-def _read_annotations(annot_dir: str | Path) -> pd.DataFrame:
+def _read_annotations(annot_dir: Path) -> pd.DataFrame:
     """
     Read annotation data from JSON files and convert it into a DataFrame.
 
@@ -109,7 +108,7 @@ def _read_annotations(annot_dir: str | Path) -> pd.DataFrame:
     extracts annotation data in raw form, and formats it into a DataFrame.
 
     :param annot_dir: Directory containing JSON files with annotation data.
-    :type annot_dir: str | Path
+    :type annot_dir: Path
     :return: A DataFrame containing raw annotation data.
     :rtype: pd.DataFrame
     """
@@ -298,8 +297,13 @@ def _extract_traits(message: str | None) -> dict:
     return traits
 
 
-def _generate_message_hash(conv_id: str, message: str, hash_func=hash) -> str:
-    return hash_func(hash_func(conv_id) + hash_func(message))
+def _generate_message_hash(
+    conv_ids: Iterable[str], messages: Iterable[str], hash_func=hash
+) -> list[str]:
+    ls = []
+    for conv_id, message in zip(conv_ids, messages):
+        ls.append(hash_func(hash_func(conv_id) + hash_func(message)))
+    return ls
 
 
 def _add_message_order(df: pd.DataFrame) -> pd.Series:
@@ -309,7 +313,7 @@ def _add_message_order(df: pd.DataFrame) -> pd.Series:
     numbers = []
 
     for _, row in df.iterrows():
-        new_conv_id = row["id"]
+        new_conv_id = row["conv_id"]
         new_message_id = row["message_id"]
 
         if new_conv_id != last_conv_id:
