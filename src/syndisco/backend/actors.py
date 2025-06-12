@@ -47,6 +47,7 @@ class LLMActor:
         model: model.BaseModel,
         persona: persona.LLMPersona,
         context: str,
+        instructions: str,
         actor_type: ActorType,
     ) -> None:
         """
@@ -61,8 +62,12 @@ class LLMActor:
         :type persona:
             persona.LLMPersona
         :param context:
-            The context of the conversation, including topic and participants.
+            The context of the discussion.
         :type context:
+            str
+        :param instructions:
+            The actor instructions for the discussion.
+        :type instructions:
             str
         :param actor_type:
             Whether the actor is an annotator or participant.
@@ -72,11 +77,13 @@ class LLMActor:
         self.model = model
         self.persona = persona
         self.context = context
+        self.instructions = instructions
         self.actor_type = actor_type
 
     def _system_prompt(self) -> dict:
         prompt = {
             "context": self.context,
+            "instructions": self.instructions,
             "type": self.actor_type,
             "persona": self.persona.to_dict(),
         }
