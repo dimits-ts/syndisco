@@ -114,7 +114,7 @@ class RandomWeighted(TurnManager):
         if p_respond == -1:
             warnings.warn(
                 "Warning: No p_respond set in RandomWeighted instance, "
-                + f"defaulting to {RandomWeighted.DEFAULT_RESPOND_PROBABILITY}"
+                f"defaulting to {RandomWeighted.DEFAULT_RESPOND_PROBABILITY}"
             )
             self.chance_to_respond = RandomWeighted.DEFAULT_RESPOND_PROBABILITY
         else:
