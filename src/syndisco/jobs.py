@@ -32,6 +32,8 @@ import textwrap
 from pathlib import Path
 from typing import Any, Optional
 
+from tqdm.auto import tqdm
+
 from . import actors, turn_manager
 from . import _file_util
 
@@ -148,7 +150,7 @@ class Discussion:
             logger.info("No seed opinion provided.")
 
         # begin generation
-        for _ in range(self.conv_len):
+        for _ in tqdm(range(self.conv_len)):
             speaker_name = self.next_turn_manager.next()
             actor = self.username_user_map[speaker_name]
             res = actor.speak(list(self.ctx_history))
@@ -316,7 +318,7 @@ class Annotation:
         """
         ctx_history = collections.deque(maxlen=self.history_ctx_len)
 
-        for message_data in self.conv_data_dict["logs"]:
+        for message_data in tqdm(self.conv_data_dict["logs"]):
             username = message_data["name"]
             message = message_data["text"]
 

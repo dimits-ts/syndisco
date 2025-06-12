@@ -28,6 +28,8 @@ import random
 import logging
 from pathlib import Path
 
+from tqdm.auto import tqdm
+
 from . import actors, turn_manager
 from . import logging_util, _file_util
 from . import jobs
@@ -157,8 +159,10 @@ class DiscussionExperiment:
         """
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        for i, discussion in enumerate(discussions):
-            logging.info(f"Running experiment {i+1}/{len(discussions)+1}...")
+        for i, discussion in tqdm(enumerate(discussions)):
+            logging.info(
+                f"Running experiment {i + 1}/{len(discussions) + 1}..."
+            )
             self._run_single_discussion(
                 discussion=discussion, output_dir=output_dir
             )
@@ -274,8 +278,10 @@ class AnnotationExperiment:
         """
         Runs all annotation tasks sequentially and saves results.
         """
-        for i, annotation_task in enumerate(annotation_tasks):
-            logger.info(f"Running annotation {i+1}/{len(annotation_tasks)}...")
+        for i, annotation_task in tqdm(enumerate(annotation_tasks)):
+            logger.info(
+                f"Running annotation {i + 1}/{len(annotation_tasks)}..."
+            )
             self._run_single_annotation(annotation_task, output_dir)
 
         logger.info("Finished annotation generation.")

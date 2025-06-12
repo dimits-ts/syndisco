@@ -4,6 +4,7 @@ transformers
 bitsandbytes
 accelerate>=0.26.0
 torch
+tqdm
 
 sphinx
 myst-parser

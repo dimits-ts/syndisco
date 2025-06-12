@@ -54,7 +54,9 @@ class BaseModel(abc.ABC):
     ) -> str:
         """Generate the model's response based on a prompt.
 
-        :param json_prompt: A tuple containing the system and user prompt. Could be strings, or a dictionary.
+        :param json_prompt: 
+            A tuple containing the system and user prompt. 
+            Could be strings, or a dictionary.
         :type json_prompt: tuple[typing.Any, typing.Any]
         :param stop_words: Strings where the model should stop generating
         :type stop_words: list[str]
@@ -115,10 +117,14 @@ class TransformersModel(BaseModel):
         """
         Initialize a new LLM wrapper.
 
-        :param model_path: the full path to the GGUF model file e.g. 'openai-community/gpt2'
-        :param name: your own name for the model e.g. 'GPT-2'
-        :param max_out_tokens: the maximum number of tokens in the response
-        :param remove_string_list: a list of strings to be removed from the response.
+        :param model_path: 
+            The full path to the GGUF model file e.g.'openai-community/gpt2'
+        :param name: 
+            Your own name for the model e.g. 'GPT-2'
+        :param max_out_tokens: 
+            The maximum number of tokens in the response
+        :param remove_string_list: A
+            A list of strings to be removed from the response.
         """
         super().__init__(name, max_out_tokens, remove_string_list)
 

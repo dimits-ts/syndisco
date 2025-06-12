@@ -18,3 +18,4 @@ dependencies:
   - sphinx-autobuild
   - build
   - twine
+  - tqdm

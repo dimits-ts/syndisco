@@ -31,7 +31,8 @@ dependencies = [
   "transformers",
   "bitsandbytes",
   "accelerate>=0.26.0",
-  "torch"
+  "torch",
+  "tqdm"
 ]
 keywords = ["llms", "llm", "large language models", "llm agents", "synthetic", "discussion", "self-hosting", "local"]
 
