@@ -27,7 +27,7 @@ from . import persona
 from ..util import file_util
 
 
-class ActorType(Enum):
+class ActorType(str, Enum):
     """
     The purpose of the LLMActor, used to determine proper prompt structure
     """
@@ -75,7 +75,11 @@ class LLMActor:
         self.actor_type = actor_type
 
     def _system_prompt(self) -> dict:
-        prompt = self.context + str(self.persona)
+        prompt = {
+            "context": self.context,
+            "type": self.actor_type,
+            "persona": self.persona.to_dict(),
+        }
         return {"role": "system", "content": prompt}
 
     def _message_prompt(self, history: list[str]) -> dict:
@@ -95,18 +99,19 @@ class LLMActor:
         system_prompt = self._system_prompt()
         message_prompt = self._message_prompt(history)
         response = self.model.prompt(
-            (system_prompt, message_prompt), stop_words=["###", "\n\n", "User"]
+            (system_prompt, message_prompt),
+            stop_words=["###", "\n\n", "User"],
         )
         return response
 
-    def describe(self):
+    def describe(self) -> dict:
         """
         Get a description of the actor's internals.
 
         :return: A brief description of the actor
-        :rtype: str
+        :rtype: dict
         """
-        return f"{self._system_prompt()['content']}"
+        return self._system_prompt()['content']
 
     @typing.final
     def get_name(self) -> str:

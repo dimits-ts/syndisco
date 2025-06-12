@@ -43,15 +43,6 @@ class LLMPersona:
     special_instructions: str
     personality_characteristics: list[str]
 
-    def to_json_file(self, output_path: str) -> None:
-        """
-        Serialize the data to a .json file.
-
-        :param output_path: The path of the new file
-        :type output_path: str
-        """
-        file_util.dict_to_json(dataclasses.asdict(self), output_path)
-
     @staticmethod
     def _sex_parse(sex: str) -> str:
         """
@@ -66,11 +57,23 @@ class LLMPersona:
         else:
             return "other"
 
+    def to_dict(self):
+        return dataclasses.asdict(self)
+
+    def to_json_file(self, output_path: str) -> None:
+        """
+        Serialize the data to a .json file.
+
+        :param output_path: The path of the new file
+        :type output_path: str
+        """
+        file_util.dict_to_json(self.to_dict(), output_path)
+
     def __str__(self):
-        return json.dumps(dataclasses.asdict(self))
+        return json.dumps(self.to_dict())
 
 
-def from_json_file(file_path: Path) -> list[LLMPersona]:
+def from_json_file(file_path: Path) -> list:
     """
     Generate a list of personas from a properly formatted persona JSON file.
 
