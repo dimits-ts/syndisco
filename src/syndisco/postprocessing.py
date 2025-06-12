@@ -92,6 +92,10 @@ def import_annotations(annot_dir: str | Path) -> pd.DataFrame:
         annot_df.annotator_prompt.apply(_extract_traits)
     ).reset_index()
     annot_df = pd.concat([annot_df, traits_df], axis=1)
+    annot_df["message_id"] = annot_df.apply(
+        lambda row: _generate_message_hash(row["id"], row["message"]), axis=1
+    )
+    annot_df["message_order"] = _add_message_order(annot_df)
     del annot_df["special_instructions"]
 
     return annot_df
