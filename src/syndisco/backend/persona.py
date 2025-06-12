@@ -33,15 +33,17 @@ class LLMPersona:
     and special instructions.
     """
 
-    username: str
-    age: int
-    sex: str
-    sexual_orientation: str
-    demographic_group: str
-    current_employment: str
-    education_level: str
-    special_instructions: str
-    personality_characteristics: list[str]
+    username: str = ""
+    age: int = -1
+    sex: str = ""
+    sexual_orientation: str = ""
+    demographic_group: str = ""
+    current_employment: str = ""
+    education_level: str = ""
+    special_instructions: str = ""
+    personality_characteristics: list[str] = dataclasses.field(
+        default_factory=list
+    )
 
     @staticmethod
     def _sex_parse(sex: str) -> str:

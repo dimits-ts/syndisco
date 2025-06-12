@@ -133,7 +133,7 @@ class DiscussionExperiment:
             history_context_len=self.history_ctx_len,
             conv_len=self.num_turns,
             seed_opinion=rand_topic,
-            seed_opinion_user=random.choice(rand_users).name,
+            seed_opinion_username=random.choice(rand_users).get_name(),
             next_turn_manager=self.next_turn_manager,
         )
 

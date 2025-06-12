@@ -28,7 +28,7 @@ import textwrap
 from pathlib import Path
 from typing import Any, Optional
 
-from .backend import actors, turn_manager
+from .backend import actors, turn_manager, persona
 from .util import file_util
 
 
@@ -53,7 +53,7 @@ class Discussion:
         history_context_len: int = 5,
         conv_len: int = 5,
         seed_opinion: str = "",
-        seed_opinion_user: str = "",
+        seed_opinion_username: str = "",
     ) -> None:
         """
         Construct the framework for a conversation to take place.
@@ -77,8 +77,9 @@ class Discussion:
         :param seed_opinion: The first hardcoded comments to
         start the conversation with
         :type seed_opinion: str, optional
-        :param seed_opinion_user: The username for the seed opinion
-        :type seed_opinion_user: int, optional
+        :param seed_opinion_username: The username for the seed opinion
+        :type seed_opinion_username:
+            str, optional
         :raises ValueError: if the number of seed opinions and seed
         opinion users are different, or
         if the number of seed opinions exceeds history_context_len
@@ -104,7 +105,7 @@ class Discussion:
         self.ctx_history = collections.deque(maxlen=history_context_len)
         self.conv_logs = []
 
-        self.seed_opinion_user = seed_opinion_user
+        self.seed_opinion_username = seed_opinion_username
         self.seed_opinion = seed_opinion
 
     def begin(self, verbose: bool = True) -> None:
@@ -129,8 +130,9 @@ class Discussion:
             # create first "seed" opinion
             seed_user = actors.LLMActor(
                 model=None,  # type: ignore
-                name=self.seed_opinion_user,
-                attributes=[],
+                persona=persona.LLMPersona(
+                    username=self.seed_opinion_username
+                ),
                 context="",
                 instructions="",
                 actor_type=actors.ActorType.USER,

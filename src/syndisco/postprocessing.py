@@ -44,29 +44,37 @@ def import_discussions(conv_dir: Path) -> pd.DataFrame:
     """
     df = _read_conversations(conv_dir)
     df = df.reset_index(drop=True)
+    df = df.rename(columns={"id": "conv_id"})
 
-    # Select relevant user prompts
-    selected_prompt = _select_user_prompt(df)
-    df["user_prompt"] = selected_prompt
+    # Filter out non-persona information
+    # assumes context and instructions are shared across participants
+    df.user_prompts = df.user_prompts.apply(
+        lambda user_prompts: [
+            user_prompt["persona"] for user_prompt in user_prompts
+        ]
+    )
+
+    # Select only current user prompt
+    df["user_prompt"] = _select_user_prompt(df)
 
     # Merge moderator and user prompts
     df["is_moderator"] = _is_moderator(df.moderator, df.user)
     df.user_prompt = df.moderator_prompt.where(df.is_moderator, df.user_prompt)
 
-    df["message_id"] = _generate_message_hash(df.id, df.message)
+    df["message_id"] = _generate_message_hash(df.conv_id, df.message)
     df["message_order"] = _add_message_order(df)
-
-    traits_df = pd.concat(df.user_prompt.apply(_process_traits))
 
     # Remove unused columns
     del df["user_prompts"]
+    del df["user_prompt"]
     del df["users"]
     del df["moderator"]
     del df["moderator_prompt"]
+
+    traits_df = pd.concat(list(df.user_prompt.apply(_process_traits))).reset_index(drop=True)
     del traits_df["username"]
 
     full_df = pd.concat([df, traits_df], axis=1)
-
     return full_df
 
 
@@ -207,43 +215,31 @@ def _list_files_recursive(start_path: str | Path) -> list[str]:
 
 def _select_user_prompt(df: pd.DataFrame) -> list[str]:
     """
-    Select relevant user prompts for each conversation entry.
+    Select the relevant user prompt for each conversation entry based on matching username.
 
-    :param df: DataFrame containing user prompts and usernames.
-    :type df: pd.DataFrame
+    :param df: DataFrame containing 'user' and 'user_prompts' columns.
     :return: A list of selected user prompts.
-    :rtype: list[str]
     """
     selected_user_prompts = []
-    for row in df.itertuples():
-        prompt = _extract_user_prompt(row.user_prompts, row.user)
-        selected_user_prompts.append(prompt)
+
+    for _, row in df.iterrows():
+        curr_username = row["user"]
+        user_prompts = row["user_prompts"]
+        matched_prompt = next(
+            (p for p in user_prompts if p["username"] == curr_username),
+            None,
+        )
+        if matched_prompt is None:
+            raise ValueError(
+                f"No matching prompt found for username: {curr_username}"
+            )
+
+        selected_user_prompts.append(matched_prompt)
+
     return selected_user_prompts
 
 
-def _extract_user_prompt(
-    user_prompts: list[str], username: str | None
-) -> str | None:
-    """
-    Extract the prompt associated with a specific username.
-
-    :param user_prompts: List of user prompts.
-    :type user_prompts: list[str]
-    :param username: The username for which to extract the prompt.
-    :type username: str | None
-    :return: The relevant user prompt, or None if not found.
-    :rtype: str | None
-    """
-    if username is None:
-        return None
-
-    for user_prompt in user_prompts:
-        if username in user_prompt:
-            return user_prompt
-    return None
-
-
-def _process_traits(user_prompt: str) -> pd.DataFrame:
+def _process_traits(user_prompt: dict) -> pd.DataFrame:
     """
     Process traits extracted from messages into a structured DataFrame.
 
@@ -252,8 +248,15 @@ def _process_traits(user_prompt: str) -> pd.DataFrame:
     :return: A DataFrame with extracted traits as columns.
     :rtype: pd.DataFrame
     """
-    prompt_file = StringIO(user_prompt)
-    return pd.read_json(prompt_file)
+    prompt_file = StringIO(json.dumps(user_prompt))
+    df = pd.read_json(prompt_file)
+    grouping_columns = [
+        col for col in df.columns if col != "personality_characteristics"
+    ]
+    aggregated_df = df.groupby(grouping_columns, as_index=False).agg(
+        {"personality_characteristics": list}
+    ).reset_index(drop=True)
+    return aggregated_df
 
 
 def _generate_message_hash(
