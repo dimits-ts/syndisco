@@ -28,7 +28,7 @@ import textwrap
 from pathlib import Path
 from typing import Any, Optional
 
-from .backend import actors, turn_manager
+from .backend import actors, turn_manager, persona
 from .util import file_util
 
 
@@ -53,7 +53,7 @@ class Discussion:
         history_context_len: int = 5,
         conv_len: int = 5,
         seed_opinion: str = "",
-        seed_opinion_user: str = "",
+        seed_opinion_username: str = "",
     ) -> None:
         """
         Construct the framework for a conversation to take place.
@@ -77,8 +77,9 @@ class Discussion:
         :param seed_opinion: The first hardcoded comments to
         start the conversation with
         :type seed_opinion: str, optional
-        :param seed_opinion_user: The username for the seed opinion
-        :type seed_opinion_user: int, optional
+        :param seed_opinion_username: The username for the seed opinion
+        :type seed_opinion_username:
+            str, optional
         :raises ValueError: if the number of seed opinions and seed
         opinion users are different, or
         if the number of seed opinions exceeds history_context_len
@@ -104,7 +105,7 @@ class Discussion:
         self.ctx_history = collections.deque(maxlen=history_context_len)
         self.conv_logs = []
 
-        self.seed_opinion_user = seed_opinion_user
+        self.seed_opinion_username = seed_opinion_username
         self.seed_opinion = seed_opinion
 
     def begin(self, verbose: bool = True) -> None:
@@ -129,8 +130,9 @@ class Discussion:
             # create first "seed" opinion
             seed_user = actors.LLMActor(
                 model=None,  # type: ignore
-                name=self.seed_opinion_user,
-                attributes=[],
+                persona=persona.LLMPersona(
+                    username=self.seed_opinion_username
+                ),
                 context="",
                 instructions="",
                 actor_type=actors.ActorType.USER,
@@ -227,8 +229,14 @@ class Discussion:
         :param comment: The new comment
         :type comment: str
         """
-        model_name = user.model.name if user.model is not None else "hardcoded"
-        artifact = {"name": user.name, "text": comment, "model": model_name}
+        model_name = (
+            user.model.get_name() if user.model is not None else "hardcoded"
+        )
+        artifact = {
+            "name": user.get_name(),
+            "text": comment,
+            "model": model_name,
+        }
         self.conv_logs.append(artifact)
 
     def _add_comment_to_history(
@@ -245,7 +253,7 @@ class Discussion:
         :param verbose: Whether to print the comment to stdout
         :type verbose: bool
         """
-        formatted_res = _format_chat_message(user.name, comment)
+        formatted_res = _format_chat_message(user.get_name(), comment)
         self.ctx_history.append(formatted_res)
 
         if verbose:
@@ -338,7 +346,7 @@ class Annotation:
         return {
             "conv_id": str(self.conv_data_dict["id"]),
             "timestamp": datetime.datetime.now().strftime(timestamp_format),
-            "annotator_model": self.annotator.model.name,
+            "annotator_model": self.annotator.model.get_name(),
             "annotator_prompt": self.annotator.describe(),
             "ctx_length": self.history_ctx_len,
             "logs": self.annotation_logs,

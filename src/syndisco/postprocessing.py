@@ -20,9 +20,9 @@ You may contact the author at tsirbasdim@gmail.com
 
 import os
 import json
-import re
-import ast
 from pathlib import Path
+from typing import Iterable
+from io import StringIO
 
 import pandas as pd
 
@@ -44,30 +44,40 @@ def import_discussions(conv_dir: Path) -> pd.DataFrame:
     """
     df = _read_conversations(conv_dir)
     df = df.reset_index(drop=True)
+    df = df.rename(columns={"id": "conv_id"})
 
-    # Remove unused columns
-    del df["users"]
+    # Filter out non-persona information
+    # assumes context and instructions are shared across participants
+    df.user_prompts = df.user_prompts.apply(
+        lambda user_prompts: [
+            user_prompt["persona"] for user_prompt in user_prompts
+        ]
+    )
 
-    # Select relevant user prompts
-    selected_prompt = _select_user_prompt(df)
-    df["user_prompt"] = selected_prompt
-    del df["user_prompts"]
+    # Select only current user prompt
+    df["user_prompt"] = _select_user_prompt(df)
 
     # Merge moderator and user prompts
     df["is_moderator"] = _is_moderator(df.moderator, df.user)
     df.user_prompt = df.moderator_prompt.where(df.is_moderator, df.user_prompt)
-    del df["moderator"], df["moderator_prompt"]
 
-    df["message_id"] = df.apply(
-        lambda row: _generate_message_hash(row["id"], row["message"]), axis=1
-    )
+    df["message_id"] = _generate_message_hash(df.conv_id, df.message)
     df["message_order"] = _add_message_order(df)
 
-    # Extract user traits and add them as attributes
-    df2 = _process_traits(df.user_prompt.apply(_extract_traits)).reset_index()
-    del df2["username"]
-    df = pd.concat([df, df2], axis=1)
-    return df
+    traits_df = pd.concat(
+        list(df.user_prompt.apply(_process_traits))
+    ).reset_index(drop=True)
+    del traits_df["username"]
+
+    # Remove unused columns
+    del df["user_prompts"]
+    del df["user_prompt"]
+    del df["users"]
+    del df["moderator"]
+    del df["moderator_prompt"]
+
+    full_df = pd.concat([df, traits_df], axis=1)
+    return full_df
 
 
 def import_annotations(annot_dir: str | Path) -> pd.DataFrame:
@@ -76,28 +86,26 @@ def import_annotations(annot_dir: str | Path) -> pd.DataFrame:
     into a DataFrame.
 
     This function reads JSON files containing annotation data, processes the
-    data to standardize columns, and optionally includes SDB information for
-    annotators.
+    data to standardize columns, and includes structured user traits.
 
     :param annot_dir: Directory containing JSON files with annotation data.
     :type annot_dir: str | Path
     :return: A DataFrame containing processed annotation data.
     :rtype: pd.DataFrame
     """
-    annot_df = _read_annotations(annot_dir)
-    annot_df = annot_df.reset_index(drop=True)
+    annot_dir = Path(annot_dir)
+    df = _read_annotations(annot_dir)
+    df = df.reset_index(drop=True)
+    df = _rename_annot_df_columns(df)
 
-    # Add annotator traits
-    traits_df = _process_traits(
-        annot_df.annotator_prompt.apply(_extract_traits)
-    ).reset_index()
-    annot_df = pd.concat([annot_df, traits_df], axis=1)
-    del annot_df["special_instructions"]
-
-    return annot_df
+    # Generate unique message ID and message order
+    df["message_id"] = _generate_message_hash(df.conv_id, df.message)
+    df["message_order"] = _add_message_order(df)
+    df = _group_all_but_one(df, "annot_personality_characteristics")
+    return df
 
 
-def _read_annotations(annot_dir: str | Path) -> pd.DataFrame:
+def _read_annotations(annot_dir: Path) -> pd.DataFrame:
     """
     Read annotation data from JSON files and convert it into a DataFrame.
 
@@ -105,7 +113,7 @@ def _read_annotations(annot_dir: str | Path) -> pd.DataFrame:
     extracts annotation data in raw form, and formats it into a DataFrame.
 
     :param annot_dir: Directory containing JSON files with annotation data.
-    :type annot_dir: str | Path
+    :type annot_dir: Path
     :return: A DataFrame containing raw annotation data.
     :rtype: pd.DataFrame
     """
@@ -129,6 +137,18 @@ def _read_annotations(annot_dir: str | Path) -> pd.DataFrame:
 
     full_df = pd.concat(rows)
     return full_df
+
+
+def _rename_annot_df_columns(df):
+    # Identify persona columns
+    persona_prefix = "annotator_prompt.persona."
+    rename_map = {
+        col: "annot_" + col.replace(persona_prefix, "")
+        for col in df.columns
+        if col.startswith(persona_prefix)
+    }
+    # Apply renaming
+    return df.rename(columns=rename_map)
 
 
 def _read_conversations(conv_dir: Path) -> pd.DataFrame:
@@ -205,43 +225,31 @@ def _list_files_recursive(start_path: str | Path) -> list[str]:
 
 def _select_user_prompt(df: pd.DataFrame) -> list[str]:
     """
-    Select relevant user prompts for each conversation entry.
+    Select the relevant user prompt for each conversation entry based on matching username.
 
-    :param df: DataFrame containing user prompts and usernames.
-    :type df: pd.DataFrame
+    :param df: DataFrame containing 'user' and 'user_prompts' columns.
     :return: A list of selected user prompts.
-    :rtype: list[str]
     """
     selected_user_prompts = []
-    for row in df.itertuples():
-        prompt = _extract_user_prompt(row.user_prompts, row.user)
-        selected_user_prompts.append(prompt)
+
+    for _, row in df.iterrows():
+        curr_username = row["user"]
+        user_prompts = row["user_prompts"]
+        matched_prompt = next(
+            (p for p in user_prompts if p["username"] == curr_username),
+            None,
+        )
+        if matched_prompt is None:
+            raise ValueError(
+                f"No matching prompt found for username: {curr_username}"
+            )
+
+        selected_user_prompts.append(matched_prompt)
+
     return selected_user_prompts
 
 
-def _extract_user_prompt(
-    user_prompts: list[str], username: str | None
-) -> str | None:
-    """
-    Extract the prompt associated with a specific username.
-
-    :param user_prompts: List of user prompts.
-    :type user_prompts: list[str]
-    :param username: The username for which to extract the prompt.
-    :type username: str | None
-    :return: The relevant user prompt, or None if not found.
-    :rtype: str | None
-    """
-    if username is None:
-        return None
-
-    for user_prompt in user_prompts:
-        if username in user_prompt:
-            return user_prompt
-    return None
-
-
-def _process_traits(series: pd.Series) -> pd.DataFrame:
+def _process_traits(user_prompt: dict) -> pd.DataFrame:
     """
     Process traits extracted from messages into a structured DataFrame.
 
@@ -250,52 +258,29 @@ def _process_traits(series: pd.Series) -> pd.DataFrame:
     :return: A DataFrame with extracted traits as columns.
     :rtype: pd.DataFrame
     """
-    traits_list = series
-    return pd.DataFrame(traits_list.tolist())
+    prompt_file = StringIO(json.dumps(user_prompt))
+    df = pd.read_json(prompt_file)
+    aggregated_df = _group_all_but_one(df, "personality_characteristics")
+    return aggregated_df
 
 
-def _extract_traits(message: str | None) -> dict:
-    """
-    Extract traits from a message's 'traits' section.
-
-    :param message: The input message containing traits.
-    :type message: str | None
-    :return: A dictionary of extracted traits.
-    :rtype: dict
-    """
-    if message is None:
-        return {}
-
-    traits_match = re.search(
-        r"Your traits: (.+?) Your instructions:", message, re.DOTALL
+def _group_all_but_one(df: pd.DataFrame, to_list_col: str) -> pd.DataFrame:
+    grouping_columns = [col for col in df.columns if col != to_list_col]
+    aggregated_df = (
+        df.groupby(grouping_columns, as_index=False)
+        .agg({to_list_col: list})
+        .reset_index(drop=True)
     )
-    if not traits_match:
-        return {}
-
-    traits_section = traits_match.group(1).strip()
-
-    traits = {}
-    for match in re.finditer(
-        r'(\w+):\s*(".*?"|\[.*?\]|[\w\s]+)(?=,|$)', traits_section
-    ):
-        key = match.group(1)
-        value = match.group(2).strip()
-
-        try:
-            if value.startswith("[") and value.endswith("]"):
-                value = ast.literal_eval(value)
-            elif value.startswith(("'", '"')) and value.endswith(("'", '"')):
-                value = value.strip("'\"")
-        except ValueError:
-            pass
-
-        traits[key] = value
-
-    return traits
+    return aggregated_df
 
 
-def _generate_message_hash(conv_id: str, message: str, hash_func=hash) -> str:
-    return hash_func(hash_func(conv_id) + hash_func(message))
+def _generate_message_hash(
+    conv_ids: Iterable[str], messages: Iterable[str], hash_func=hash
+) -> list[str]:
+    ls = []
+    for conv_id, message in zip(conv_ids, messages):
+        ls.append(hash_func(hash_func(conv_id) + hash_func(message)))
+    return ls
 
 
 def _add_message_order(df: pd.DataFrame) -> pd.Series:
@@ -305,7 +290,7 @@ def _add_message_order(df: pd.DataFrame) -> pd.Series:
     numbers = []
 
     for _, row in df.iterrows():
-        new_conv_id = row["id"]
+        new_conv_id = row["conv_id"]
         new_message_id = row["message_id"]
 
         if new_conv_id != last_conv_id:

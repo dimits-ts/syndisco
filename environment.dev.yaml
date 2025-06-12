@@ -5,10 +5,10 @@ dependencies:
   - anaconda
   - pip
   - pandas
-  - python<=3.12
+  - python
   - coloredlogs
-  - transformers
-  - bitsandbytes
+  - transformers>=4.44.2
+  - bitsandbytes>=0.39.0
   - accelerate>=0.26.0
   - pytorch
   - sphinx
