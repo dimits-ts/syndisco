@@ -161,7 +161,7 @@ class DiscussionExperiment:
         """
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        for i, discussion in tqdm(enumerate(discussions)):
+        for i, discussion in tqdm(list(enumerate(discussions))):
             logging.info(
                 f"Running experiment {i + 1}/{len(discussions) + 1}..."
             )
@@ -311,7 +311,7 @@ class AnnotationExperiment:
         :param verbose: Whether to log intermediate steps.
         :type verbose: bool
         """
-        for i, annotation_task in tqdm(enumerate(annotation_tasks)):
+        for i, annotation_task in tqdm(list(enumerate(annotation_tasks))):
             logger.info(
                 f"Running annotation {i + 1}/{len(annotation_tasks)}..."
             )
