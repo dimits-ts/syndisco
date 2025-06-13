@@ -11,6 +11,7 @@ myst-parser
 nbsphinx
 sphinx-autobuild
 notebook
+pandoc
 
 build 
 twine
