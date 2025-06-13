@@ -1,4 +1,8 @@
 """
+Module handling the execution of LLM discussion and annotation tasks.
+"""
+
+"""
 SynDisco: Automated experiment creation and execution using only LLM agents
 Copyright (C) 2025 Dimitris Tsirmpas
 
@@ -28,8 +32,10 @@ import textwrap
 from pathlib import Path
 from typing import Any, Optional
 
-from .backend import actors, turn_manager, persona
-from .util import file_util
+from tqdm.auto import tqdm
+
+from . import actors, turn_manager
+from . import _file_util
 
 
 logger = logging.getLogger(Path(__file__).name)
@@ -48,8 +54,8 @@ class Discussion:
     def __init__(
         self,
         next_turn_manager: turn_manager.TurnManager,
-        users: list[actors.LLMActor],
-        moderator: Optional[actors.LLMActor] = None,
+        users: list[actors.Actor],
+        moderator: Optional[actors.Actor] = None,
         history_context_len: int = 5,
         conv_len: int = 5,
         seed_opinion: str = "",
@@ -128,9 +134,9 @@ class Discussion:
 
         if self.seed_opinion.strip() != "":
             # create first "seed" opinion
-            seed_user = actors.LLMActor(
+            seed_user = actors.Actor(
                 model=None,  # type: ignore
-                persona=persona.LLMPersona(
+                persona=actors.Persona(
                     username=self.seed_opinion_username
                 ),
                 context="",
@@ -144,7 +150,7 @@ class Discussion:
             logger.info("No seed opinion provided.")
 
         # begin generation
-        for _ in range(self.conv_len):
+        for _ in tqdm(range(self.conv_len)):
             speaker_name = self.next_turn_manager.next()
             actor = self.username_user_map[speaker_name]
             res = actor.speak(list(self.ctx_history))
@@ -201,10 +207,10 @@ class Discussion:
         :param output_path: the path for the exported file
         :type output_path: str
         """
-        file_util.dict_to_json(self.to_dict(), output_path)
+        _file_util.dict_to_json(self.to_dict(), output_path)
 
     def _archive_response(
-        self, user: actors.LLMActor, comment: str, verbose: bool
+        self, user: actors.Actor, comment: str, verbose: bool
     ) -> None:
         """
         Save the new comment to discussion output,
@@ -220,7 +226,7 @@ class Discussion:
         self._log_comment(user, comment)
         self._add_comment_to_history(user, comment, verbose)
 
-    def _log_comment(self, user: actors.LLMActor, comment: str) -> None:
+    def _log_comment(self, user: actors.Actor, comment: str) -> None:
         """
         Save new comment to the output history.
 
@@ -240,7 +246,7 @@ class Discussion:
         self.conv_logs.append(artifact)
 
     def _add_comment_to_history(
-        self, user: actors.LLMActor, comment: str, verbose: bool
+        self, user: actors.Actor, comment: str, verbose: bool
     ) -> None:
         """
         Add new comment to the discussion history,
@@ -271,7 +277,7 @@ class Annotation:
 
     def __init__(
         self,
-        annotator: actors.LLMActor,
+        annotator: actors.Actor,
         conv_logs_path: str | Path,
         include_moderator_comments: bool,
         history_ctx_len: int = 2,
@@ -312,7 +318,7 @@ class Annotation:
         """
         ctx_history = collections.deque(maxlen=self.history_ctx_len)
 
-        for message_data in self.conv_data_dict["logs"]:
+        for message_data in tqdm(self.conv_data_dict["logs"]):
             username = message_data["name"]
             message = message_data["text"]
 
@@ -359,7 +365,7 @@ class Annotation:
         :param output_path: the path for the exported file
         :type output_path: str
         """
-        file_util.dict_to_json(self.to_dict(), output_path)
+        _file_util.dict_to_json(self.to_dict(), output_path)
 
     def __str__(self) -> str:
         return json.dumps(self.to_dict(), indent=4)

@@ -15,6 +15,8 @@
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -47,7 +49,7 @@
 <p>This short guide will show you how to utilize SynDisco’s <code class="docutils literal notranslate"><span class="pre">LLM</span> <span class="pre">annotator-agents</span></code> to generate annotations for our synthetic discussions. This will allow you to quickly and cheaply evaluate the discussions you’ve generated in the last guide.</p>
 <p>First, let’s create a small, fake discussion.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
@@ -99,16 +101,15 @@
 <h2>Creating an annotator<a class="headerlink" href="#Creating-an-annotator" title="Link to this heading">¶</a></h2>
 <p>An annotator-agent is very similar to the user-agents found in the <a class="reference external" href="creating_discussion.ipynb">previous guide</a>. The only real difference is that we need to pass a different <code class="docutils literal notranslate"><span class="pre">ActorType</span></code> to the LlmAgent function.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.backend.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">TransformersModel</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.backend.persona</span><span class="w"> </span><span class="kn">import</span> <span class="n">LLMPersona</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.backend.actors</span><span class="w"> </span><span class="kn">import</span> <span class="n">LLMActor</span><span class="p">,</span> <span class="n">ActorType</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">TransformersModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.actors</span><span class="w"> </span><span class="kn">import</span> <span class="n">Actor</span><span class="p">,</span> <span class="n">ActorType</span><span class="p">,</span> <span class="n">Persona</span>
 
 
 <span class="n">llm</span> <span class="o">=</span> <span class="n">TransformersModel</span><span class="p">(</span>
-    <span class="n">model_path</span><span class="o">=</span><span class="s2">&quot;unsloth/Llama-3.2-1B-Instruct&quot;</span><span class="p">,</span>
+    <span class="n">model_path</span><span class="o">=</span><span class="s2">&quot;unsloth/Llama-3.2-3B-Instruct-bnb-4bit&quot;</span><span class="p">,</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test_model&quot;</span><span class="p">,</span>
     <span class="n">max_out_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
 <span class="p">)</span>
@@ -116,7 +117,7 @@
 
 <span class="c1"># annotator agents are not given a username</span>
 <span class="c1"># in order to avoid accidental name conflicts with participants</span>
-<span class="n">annotator_persona</span> <span class="o">=</span> <span class="n">LLMPersona</span><span class="p">(</span>
+<span class="n">annotator_persona</span> <span class="o">=</span> <span class="n">Persona</span><span class="p">(</span>
     <span class="o">**</span><span class="p">{</span>
         <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
         <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="mi">38</span><span class="p">,</span>
@@ -130,10 +131,9 @@
     <span class="p">}</span>
 <span class="p">)</span>
 
-<span class="n">annotator</span> <span class="o">=</span> <span class="n">LLMActor</span><span class="p">(</span>
+<span class="n">annotator</span> <span class="o">=</span> <span class="n">Actor</span><span class="p">(</span>
     <span class="n">model</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="n">attributes</span><span class="o">=</span><span class="n">annotator_persona</span><span class="o">.</span><span class="n">to_attribute_list</span><span class="p">(),</span>
+    <span class="n">persona</span><span class="o">=</span><span class="n">annotator_persona</span><span class="p">,</span>
     <span class="n">context</span><span class="o">=</span><span class="s2">&quot;You are annotating an online discussion&quot;</span><span class="p">,</span>
     <span class="n">instructions</span><span class="o">=</span><span class="p">(</span>
         <span class="s2">&quot;From a scale of 1 (not toxic) to 5 (very toxic) &quot;</span>
@@ -149,7 +149,7 @@
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-/media/SSD_2TB/dtsirmpas_data/software/miniconda3/envs/syndisco/lib/python3.12/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+/home/dimits/anaconda3/envs/syndisco-dev/lib/python3.13/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
   from .autonotebook import tqdm as notebook_tqdm
 Device set to use cuda:0
 </pre></div></div>
@@ -159,7 +159,7 @@ Device set to use cuda:0
 <h2>Executing the annotation<a class="headerlink" href="#Executing-the-annotation" title="Link to this heading">¶</a></h2>
 <p>Annotations are treated as a form of discussions, where one user writes the logs of the last discussion, while the annotator-agent rates them.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">Annotation</span>
@@ -173,28 +173,59 @@ Device set to use cuda:0
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+ 67%|██████▋   | 2/3 [00:00&lt;00:00,  3.96it/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 User Emma35 posted: Immigrants have played a significant role in our
 society. Their contributions are valuable and should be celebrated.
-2
+1
 User Giannis posted: That&#39;s such an ignorant comment about immigrants.
 She doesn&#39;t know what she&#39;s talking about, let alone appreciate the
 hard work and dedication of immigrants who have contributed to our
 country.
-2
+3
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+100%|██████████| 3/3 [00:00&lt;00:00,  4.44it/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
 User Moderator posted: I understand both perspectives. It&#39;s important
 to approach such discussions with respect and understanding. Let&#39;s
 ensure this conversation remains constructive.
-2
+1
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
 </pre></div></div>
 </div>
 <p>Like normal discussions, it is recommended to save the annotations to the disk.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
@@ -217,22 +248,39 @@ ensure this conversation remains constructive.
 <div class="highlight"><pre>
 {
   &#34;conv_id&#34;: &#34;789f7c2f-7291-457b-888a-7d2b1520454a&#34;,
-  &#34;timestamp&#34;: &#34;25-04-04-16-20&#34;,
+  &#34;timestamp&#34;: &#34;25-06-13-11-13&#34;,
   &#34;annotator_model&#34;: &#34;test_model&#34;,
-  &#34;annotator_prompt&#34;: &#34;You are annotating an online discussion Your name is . Your traits: username: , age: 38, sex: female, sexual_orientation: Heterosexual, demographic_group: White, current_employment: Annotator, education_level: Bachelor&#39;s, special_instructions: , personality_characteristics: [&#39;competent&#39;] Your instructions: From a scale of 1 (not toxic) to 5 (very toxic) how toxic is  the following comment? Reply only with a number?&#34;,
+  &#34;annotator_prompt&#34;: {
+    &#34;context&#34;: &#34;You are annotating an online discussion&#34;,
+    &#34;instructions&#34;: &#34;From a scale of 1 (not toxic) to 5 (very toxic) how toxic is  the following comment? Reply only with a number?&#34;,
+    &#34;type&#34;: &#34;2&#34;,
+    &#34;persona&#34;: {
+      &#34;username&#34;: &#34;&#34;,
+      &#34;age&#34;: 38,
+      &#34;sex&#34;: &#34;female&#34;,
+      &#34;sexual_orientation&#34;: &#34;Heterosexual&#34;,
+      &#34;demographic_group&#34;: &#34;White&#34;,
+      &#34;current_employment&#34;: &#34;Annotator&#34;,
+      &#34;education_level&#34;: &#34;Bachelor&#39;s&#34;,
+      &#34;special_instructions&#34;: &#34;&#34;,
+      &#34;personality_characteristics&#34;: [
+        &#34;competent&#34;
+      ]
+    }
+  },
   &#34;ctx_length&#34;: 2,
   &#34;logs&#34;: [
     [
       &#34;Immigrants have played a significant role in our society. Their contributions are valuable and should be celebrated.&#34;,
-      &#34;2&#34;
+      &#34;1&#34;
     ],
     [
       &#34;That&#39;s such an ignorant comment about immigrants. She doesn&#39;t know what she&#39;s talking about, let alone appreciate the hard work and dedication of immigrants who have contributed to our country.&#34;,
-      &#34;2&#34;
+      &#34;3&#34;
     ],
     [
       &#34;I understand both perspectives. It&#39;s important to approach such discussions with respect and understanding. Let&#39;s ensure this conversation remains constructive.&#34;,
-      &#34;2&#34;
+      &#34;1&#34;
     ]
   ]
 }
@@ -295,7 +343,7 @@ ensure this conversation remains constructive.
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2025, Dimitris Tsirmpas.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
     </div>
   </body>
 </html>

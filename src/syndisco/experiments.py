@@ -1,4 +1,9 @@
 """
+Module automating and managing batches of discussion/annotation tasks defined
+in the syndisco.jobs module.
+"""
+
+"""
 SynDisco: Automated experiment creation and execution using only LLM agents
 Copyright (C) 2025 Dimitris Tsirmpas
 
@@ -23,8 +28,10 @@ import random
 import logging
 from pathlib import Path
 
-from .backend import actors, turn_manager
-from .util import logging_util, file_util
+from tqdm.auto import tqdm
+
+from . import actors, turn_manager
+from . import logging_util, _file_util
 from . import jobs
 
 
@@ -33,15 +40,15 @@ logger = logging.getLogger(Path(__file__).name)
 
 class DiscussionExperiment:
     """
-    An Experiment which creates, manages and executes multiple synthetic
-    discussions.
+    An experiment that creates, manages, and executes multiple synthetic
+    discussions using LLM-based agents.
     """
 
     def __init__(
         self,
-        users: list[actors.LLMActor],
+        users: list[actors.Actor],
         seed_opinions: list[str] = [],
-        moderator: actors.LLMActor | None = None,
+        moderator: actors.Actor | None = None,
         next_turn_manager: turn_manager.TurnManager | None = None,
         history_ctx_len: int = 3,
         num_turns: int = 10,
@@ -49,37 +56,26 @@ class DiscussionExperiment:
         num_discussions: int = 5,
     ):
         """
-        Create an Experiment which will generate and run randomized synthetic
-        discussions.
+        Initialize a synthetic discussion experiment.
 
-        :param seed_opinions: A list of hardcoded comments to be made by the
-        first (randomly selected) participant.
-        Each discussion picks a random seed opinion.
+        :param users: List of all possible participants (LLM agents).
+        :type users: list[actors.Actor]
+        :param seed_opinions: Optional list of hardcoded seed comments to
+            initiate discussions. One will be selected randomly for each.
         :type seed_opinions: list[str]
-        :param users: A list of all possible participants.
-        If len(users) > num_active users, a random subset of the users
-        will be selected for each discussion.
-        :type users: list[backend.actors.LLMActor]
-        :param moderator: A moderator agent, None if no moderator will be used,
-         defaults to None
-        :type moderator: backend.actors.LLMActor | None, optional
-        :param next_turn_manager: The turn manager used for dynamically
-        deciding which partipant will talk next, None to use default
-        (RoundRobin), defaults to None
-        :type next_turn_manager: backend.turn_manager.TurnManager | None,
-         optional
-        :param history_ctx_len: How many comments in the past participants
-        will be given as context, defaults to 3
-        :type history_ctx_len: int, optional
-        :param num_turns: The total number of comments before a discussion
-        is concluded (ignoring moderator comments), defaults to 10
-        :type num_turns: int, optional
-        :param num_active_users: How many users are allowed to be active in a
-         single discussion, defaults to 2
-        :type num_active_users: int, optional
-        :param num_discussions: The total number of randomized discussions to
-        be generated and executed, defaults to 5
-        :type num_discussions: int, optional
+        :param moderator: Optional moderator agent, or None to omit moderation.
+        :type moderator: actors.Actor or None
+        :param next_turn_manager: Strategy for selecting the next speaker.
+            Defaults to round-robin if None.
+        :type next_turn_manager: turn_manager.TurnManager or None
+        :param history_ctx_len: Number of past comments visible as context.
+        :type history_ctx_len: int
+        :param num_turns: Number of user (non-moderator) turns per discussion.
+        :type num_turns: int
+        :param num_active_users: Number of active participants per discussion.
+        :type num_active_users: int
+        :param num_discussions: Total number of synthetic discussions to run.
+        :type num_discussions: int
         """
         self.seed_opinions = seed_opinions
         self.users = users
@@ -98,25 +94,28 @@ class DiscussionExperiment:
         self.num_discussions = num_discussions
         self.num_turns = num_turns
 
-    def begin(self, discussions_output_dir: Path = Path("./output")) -> None:
+    def begin(
+        self,
+        discussions_output_dir: Path = Path("./output"),
+        verbose: bool = True,
+    ) -> None:
         """
-        Begin the experiment by generating and executing a set of discussions.
-        The results will be written as JSON files at the specified output
-        directory
+        Generate and run all configured discussions.
+
+        :param discussions_output_dir: Directory to write output JSON files.
+        :type discussions_output_dir: Path
+        :param verbose: Whether to print intermediate progress and outputs.
+        :type verbose: bool
         """
         discussions = self._generate_discussions()
-        self._run_all_discussions(discussions, discussions_output_dir)
+        self._run_all_discussions(discussions, discussions_output_dir, verbose)
 
     def _generate_discussions(self) -> list[jobs.Discussion]:
-        """Generate experiments from the basic configurations and wrap them
-        into Discussion objects.
+        """
+        Internal helper to generate Discussion objects from configuration.
 
-        :param yaml_data: the serialized experiment configurations
-        :type yaml_data: dict
-        :param llm: the wrapped LLM
-        :type llm: model.Model
-        :return: a list of Discussion objects containing the experiments
-        :rtype: _type_
+        :return: A list of configured Discussion objects.
+        :rtype: list[jobs.Discussion]
         """
         experiments = []
         for _ in range(self.num_discussions):
@@ -124,6 +123,12 @@ class DiscussionExperiment:
         return experiments
 
     def _create_synthetic_discussion(self):
+        """
+        Create and return a single randomized Discussion instance.
+
+        :return: A synthetic Discussion object.
+        :rtype: jobs.Discussion
+        """
         rand_topic = random.choice(self.seed_opinions)
         rand_users = list(random.sample(self.users, k=self.num_active_users))
 
@@ -139,44 +144,54 @@ class DiscussionExperiment:
 
     @logging_util.timing
     def _run_all_discussions(
-        self, discussions: list[jobs.Discussion], output_dir: Path
+        self,
+        discussions: list[jobs.Discussion],
+        output_dir: Path,
+        verbose: bool,
     ) -> None:
         """
-        Creates experiments by combining the given input data, then runs each
-        one sequentially.
+        Execute all generated discussions and write their outputs to disk.
 
-        :param llm: The wrapped LLM
-        :type llm: model.Model
-        :param yaml_data: the serialized experiment configurations
-        :type yaml_data: dict
+        :param discussions: List of Discussion instances to run.
+        :type discussions: list[jobs.Discussion]
+        :param output_dir: Directory to save output JSON files.
+        :type output_dir: Path
+        :param verbose: Whether to print discussion progress.
+        :type verbose: bool
         """
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        for i, discussion in enumerate(discussions):
-            logging.info(f"Running experiment {i+1}/{len(discussions)+1}...")
+        for i, discussion in tqdm(list(enumerate(discussions))):
+            logging.info(
+                f"Running experiment {i + 1}/{len(discussions) + 1}..."
+            )
             self._run_single_discussion(
-                discussion=discussion, output_dir=output_dir
+                discussion=discussion, output_dir=output_dir, verbose=verbose
             )
 
         logger.info("Finished synthetic discussion generation.")
 
     @logging_util.timing
     def _run_single_discussion(
-        self, discussion: jobs.Discussion, output_dir: Path
+        self, discussion: jobs.Discussion, output_dir: Path, verbose: bool
     ) -> None:
         """
-        Run a single discussion, then save its output to a auto-generated file.
+        Run a single Discussion and store its results.
 
-        :param discussion: A Conversation object.
-        :type discussion: generation.Conversation
+        :param discussion: The Discussion object to execute.
+        :type discussion: jobs.Discussion
+        :param output_dir: Directory to write the result file.
+        :type output_dir: Path
+        :param verbose: Whether to show detailed logging output.
+        :type verbose: bool
         """
         try:
             logger.info("Beginning conversation...")
             logger.debug(f"Experiment parameters: {str(discussion)}")
 
             start_time = time.time()
-            discussion.begin(verbose=True)
-            output_path = file_util.generate_datetime_filename(
+            discussion.begin(verbose=verbose)
+            output_path = _file_util.generate_datetime_filename(
                 output_dir=output_dir, file_ending=".json"
             )
             logging.debug(
@@ -191,40 +206,43 @@ class DiscussionExperiment:
 
 class AnnotationExperiment:
     """
-    An Experiment where multiple synthetic discussions are annotated by
-    LLM-based annotators.
+    An experiment that uses LLM annotators to label synthetic discussion logs.
     """
 
     def __init__(
         self,
-        annotators: list[actors.LLMActor],
+        annotators: list[actors.Actor],
         history_ctx_len: int = 3,
         include_mod_comments: bool = True,
     ):
         """
-        Create an Experiment which annotates the logs of multiple
-        synthetic discussions for each LLM annotator-agent.
+        Initialize an annotation experiment using LLM-based annotators.
 
-
-        :param annotators: The LLM annotator-agents.
-        :type annotators: list[backend.actors.LLMActor]
-        :param history_ctx_len: How many past comments the annotator
-        "remembers", defaults to 3
+        :param annotators: List of annotator agents.
+        :type annotators: list[actors.Actor]
+        :param history_ctx_len: Number of previous comments visible to the
+            annotator.
         :type history_ctx_len: int
-        :param include_mod_comments: Whether to include moderator comments both
-        for annotation and contexts, defaults to True.
+        :param include_mod_comments: Whether to include moderator comments
+            during annotation.
         :type include_mod_comments: bool
         """
-
         self.annotators = annotators
         self.history_ctx_len = history_ctx_len
         self.include_mod_comments = include_mod_comments
 
-    def begin(self, discussions_dir: Path, output_dir: Path) -> None:
+    def begin(
+        self, discussions_dir: Path, output_dir: Path, verbose: bool = True
+    ) -> None:
         """
-        Begin the annotation experiment by generating and executing annotation
-        jobs. The results will be written as JSON files in the specified
-        output directory.
+        Start the annotation process over all discussion logs in a directory.
+
+        :param discussions_dir: Directory containing discussion logs.
+        :type discussions_dir: Path
+        :param output_dir: Directory to write annotation outputs.
+        :type output_dir: Path
+        :param verbose: Whether to display annotation progress.
+        :type verbose: bool, defaults to True
         """
         if not discussions_dir.is_dir():
             raise OSError(
@@ -234,14 +252,18 @@ class AnnotationExperiment:
         output_dir.mkdir(parents=True, exist_ok=True)
 
         annotation_tasks = self._generate_annotation_tasks(discussions_dir)
-        self._run_all_annotations(annotation_tasks, output_dir)
+        self._run_all_annotations(annotation_tasks, output_dir, verbose)
 
     def _generate_annotation_tasks(
         self, discussions_dir: Path
     ) -> list[jobs.Annotation]:
         """
-        Generate annotation experiments for each discussion and each annotator
-        persona.
+        Create annotation tasks by pairing each annotator with each discussion.
+
+        :param discussions_dir: Path to discussion log files.
+        :type discussions_dir: Path
+        :return: List of Annotation tasks.
+        :rtype: list[jobs.Annotation]
         """
         annotation_tasks = []
         for annotator in self.annotators:
@@ -253,8 +275,18 @@ class AnnotationExperiment:
         return annotation_tasks
 
     def _create_annotation_task(
-        self, annotator: actors.LLMActor, conv_logs_path: Path
+        self, annotator: actors.Actor, conv_logs_path: Path
     ) -> jobs.Annotation:
+        """
+        Construct a single Annotation task.
+
+        :param annotator: The LLM-based annotator.
+        :type annotator: actors.Actor
+        :param conv_logs_path: Path to the discussion log file.
+        :type conv_logs_path: Path
+        :return: Configured Annotation task.
+        :rtype: jobs.Annotation
+        """
         return jobs.Annotation(
             annotator=annotator,
             conv_logs_path=conv_logs_path,
@@ -264,29 +296,48 @@ class AnnotationExperiment:
 
     @logging_util.timing
     def _run_all_annotations(
-        self, annotation_tasks: list[jobs.Annotation], output_dir: Path
+        self,
+        annotation_tasks: list[jobs.Annotation],
+        output_dir: Path,
+        verbose: bool = True,
     ) -> None:
         """
-        Runs all annotation tasks sequentially and saves results.
+        Execute and store all annotation tasks.
+
+        :param annotation_tasks: List of Annotation objects.
+        :type annotation_tasks: list[jobs.Annotation]
+        :param output_dir: Directory to save results.
+        :type output_dir: Path
+        :param verbose: Whether to log intermediate steps.
+        :type verbose: bool, defaults to true
         """
-        for i, annotation_task in enumerate(annotation_tasks):
-            logger.info(f"Running annotation {i+1}/{len(annotation_tasks)}...")
-            self._run_single_annotation(annotation_task, output_dir)
+        for i, annotation_task in tqdm(list(enumerate(annotation_tasks))):
+            logger.info(
+                f"Running annotation {i + 1}/{len(annotation_tasks)}..."
+            )
+            self._run_single_annotation(annotation_task, output_dir, verbose)
 
         logger.info("Finished annotation generation.")
 
     @logging_util.timing
     def _run_single_annotation(
-        self, annotation_task: jobs.Annotation, output_dir: Path
+        self, annotation_task: jobs.Annotation, output_dir: Path, verbose: bool
     ) -> None:
         """
-        Executes a single annotation experiment and saves its output.
+        Execute one annotation task and write its output.
+
+        :param annotation_task: Single Annotation object to run.
+        :type annotation_task: jobs.Annotation
+        :param output_dir: Directory for output file.
+        :type output_dir: Path
+        :param verbose: Whether to show debug output.
+        :type verbose: bool
         """
         try:
             logger.info("Beginning annotation...")
             logger.debug(f"Experiment parameters: {str(annotation_task)}")
-            annotation_task.begin(verbose=True)
-            output_path = file_util.generate_datetime_filename(
+            annotation_task.begin(verbose=verbose)
+            output_path = _file_util.generate_datetime_filename(
                 output_dir=output_dir, file_ending=".json"
             )
             annotation_task.to_json_file(output_path)

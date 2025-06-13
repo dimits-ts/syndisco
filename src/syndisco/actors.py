@@ -1,4 +1,8 @@
 """
+Module defining LLM users in discussions and their characteristics.
+"""
+
+"""
 SynDisco: Automated experiment creation and execution using only LLM agents
 Copyright (C) 2025 Dimitris Tsirmpas
 
@@ -19,12 +23,13 @@ You may contact the author at tsirbasdim@gmail.com
 """
 
 import typing
+import dataclasses
 from pathlib import Path
+import json
 from enum import Enum, auto
 
 from . import model
-from . import persona
-from ..util import file_util
+from . import _file_util
 
 
 class ActorType(str, Enum):
@@ -36,7 +41,68 @@ class ActorType(str, Enum):
     ANNOTATOR = auto()
 
 
-class LLMActor:
+@dataclasses.dataclass
+class Persona:
+    """
+    A dataclass holding information about the synthetic persona of a LLM actor.
+    Includes name, Sociodemographic Background, personality
+    and special instructions.
+    """
+
+    username: str = ""
+    age: int = -1
+    sex: str = ""
+    sexual_orientation: str = ""
+    demographic_group: str = ""
+    current_employment: str = ""
+    education_level: str = ""
+    special_instructions: str = ""
+    personality_characteristics: list[str] = dataclasses.field(
+        default_factory=list
+    )
+
+    @classmethod
+    def from_json_file(file_path: Path) -> list:
+        """
+        Generate a list of personas from a properly formatted persona JSON
+        file.
+
+        :param file_path: the path to the JSON file containing the personas
+        :type file_path: Path
+        :return: a list of LlmPersona objects for each of the file entries
+        :rtype: list[LlmPersona]
+        """
+        all_personas = _file_util.read_json_file(file_path)
+
+        persona_objs = []
+        for data_dict in all_personas:
+            # code from https://stackoverflow.com/questions/68417319/initialize-python-dataclass-from-dictionary # noqa: E501
+            field_set = {f.name for f in dataclasses.fields(Persona) if f.init}
+            filtered_arg_dict = {
+                k: v for k, v in data_dict.items() if k in field_set
+            }
+            persona_obj = Persona(**filtered_arg_dict)
+            persona_objs.append(persona_obj)
+
+        return persona_objs
+
+    def to_dict(self):
+        return dataclasses.asdict(self)
+
+    def to_json_file(self, output_path: str) -> None:
+        """
+        Serialize the data to a .json file.
+
+        :param output_path: The path of the new file
+        :type output_path: str
+        """
+        _file_util.dict_to_json(self.to_dict(), output_path)
+
+    def __str__(self):
+        return json.dumps(self.to_dict())
+
+
+class Actor:
     """
     An abstract class representing an actor which responds according to an
     underlying LLM instance.
@@ -45,7 +111,7 @@ class LLMActor:
     def __init__(
         self,
         model: model.BaseModel,
-        persona: persona.LLMPersona,
+        persona: Persona,
         context: str,
         instructions: str,
         actor_type: ActorType,
@@ -118,7 +184,7 @@ class LLMActor:
         :return: A brief description of the actor
         :rtype: dict
         """
-        return self._system_prompt()['content']
+        return self._system_prompt()["content"]
 
     @typing.final
     def get_name(self) -> str:
@@ -149,86 +215,3 @@ def _apply_template(
             + "\n".join(history)
             + "\nOutput:",
         }
-
-
-def create_users_from_file(
-    llm: model.BaseModel,
-    persona_path: Path,
-    instruction_path: Path,
-    context: str,
-    actor_type: ActorType,
-) -> list[LLMActor]:
-    """
-    Create a list of users by using information from files.
-
-    :param llm:
-        The LLM
-    :type llm: model.BaseModel
-    :param persona_path:
-        The path to the JSON file containing the personas
-    :type persona_path: Path
-    :param instruction_path:
-        The path to the file containing the user's instructions
-    :type instruction_path: Path
-    :param context:
-        The context of the experiment
-    :type context: str
-    :return: A list of initialized LLMActors
-    :rtype: list[LLMActor]
-    """
-    personas = persona.from_json_file(persona_path)
-    instructions = file_util.read_file(instruction_path)
-    return create_users(
-        llm,
-        [persona.username for persona in personas],
-        [persona.to_attribute_list() for persona in personas],
-        context,
-        instructions,
-        actor_type,
-    )
-
-
-def create_users(
-    llm: model.BaseModel,
-    usernames: list[str],
-    attributes: list[list[str]],
-    context: str,
-    instructions: str,
-    actor_type: ActorType,
-) -> list[LLMActor]:
-    """Create runtime LLMActor objects with the specified information.
-
-    :param llm: The LLM
-    :type llm: model.BaseModel
-    :param usernames: A list of usernames for each of the users
-    :type usernames: list[str]
-    :param attributes:
-        A list containing a list of personality/mood attributes for each user
-    :type attributes: list[list[str]]
-    :param context: The context of the experiment
-    :type context: str
-    :param instructions:
-        The instructions given to all LLM users (not the moderator)
-    :type instructions: str
-    :return: A list of initialized LLMActors
-    :rtype: list[LLMActor]
-    """
-    user_list = []
-
-    assert len(usernames) == len(
-        attributes
-    ), "Number of usernames and user personality attribute lists"
-    " must be the same"
-
-    for username, user_attributes in zip(usernames, attributes):
-        user_list.append(
-            LLMActor(
-                model=llm,
-                name=username,
-                attributes=user_attributes,
-                context=context,
-                instructions=instructions,
-                actor_type=actor_type,
-            )
-        )
-    return user_list

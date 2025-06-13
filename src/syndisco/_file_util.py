@@ -1,4 +1,8 @@
 """
+Internal module that handles common file operations.
+"""
+
+"""
 SynDisco: Automated experiment creation and execution using only LLM agents
 Copyright (C) 2025 Dimitris Tsirmpas
 
