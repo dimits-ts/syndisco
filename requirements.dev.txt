@@ -9,8 +9,8 @@ tqdm
 sphinx
 myst-parser
 nbsphinx
-ipykernel
 sphinx-autobuild
+notebook
 
 build 
 twine
