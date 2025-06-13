@@ -232,7 +232,7 @@ class AnnotationExperiment:
         self.include_mod_comments = include_mod_comments
 
     def begin(
-        self, discussions_dir: Path, output_dir: Path, verbose: bool
+        self, discussions_dir: Path, output_dir: Path, verbose: bool = True
     ) -> None:
         """
         Start the annotation process over all discussion logs in a directory.
@@ -242,7 +242,7 @@ class AnnotationExperiment:
         :param output_dir: Directory to write annotation outputs.
         :type output_dir: Path
         :param verbose: Whether to display annotation progress.
-        :type verbose: bool
+        :type verbose: bool, defaults to True
         """
         if not discussions_dir.is_dir():
             raise OSError(
@@ -299,7 +299,7 @@ class AnnotationExperiment:
         self,
         annotation_tasks: list[jobs.Annotation],
         output_dir: Path,
-        verbose: bool,
+        verbose: bool = True,
     ) -> None:
         """
         Execute and store all annotation tasks.
@@ -309,7 +309,7 @@ class AnnotationExperiment:
         :param output_dir: Directory to save results.
         :type output_dir: Path
         :param verbose: Whether to log intermediate steps.
-        :type verbose: bool
+        :type verbose: bool, defaults to true
         """
         for i, annotation_task in tqdm(list(enumerate(annotation_tasks))):
             logger.info(
