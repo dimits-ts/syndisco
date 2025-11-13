@@ -1,17 +1,16 @@
 syndisco package
 ================
 
-Subpackages
------------
-
-.. toctree::
-   :maxdepth: 4
-
-   syndisco.backend
-   syndisco.util
-
 Submodules
 ----------
+
+syndisco.actors module
+----------------------
+
+.. automodule:: syndisco.actors
+   :members:
+   :show-inheritance:
+   :undoc-members:
 
 syndisco.experiments module
 ---------------------------
@@ -29,10 +28,34 @@ syndisco.jobs module
    :show-inheritance:
    :undoc-members:
 
+syndisco.logging\_util module
+-----------------------------
+
+.. automodule:: syndisco.logging_util
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+syndisco.model module
+---------------------
+
+.. automodule:: syndisco.model
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 syndisco.postprocessing module
 ------------------------------
 
 .. automodule:: syndisco.postprocessing
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+syndisco.turn\_manager module
+-----------------------------
+
+.. automodule:: syndisco.turn_manager
    :members:
    :show-inheritance:
    :undoc-members:

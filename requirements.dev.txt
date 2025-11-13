@@ -10,8 +10,7 @@ sphinx
 myst-parser
 nbsphinx
 sphinx-autobuild
-notebook
-pandoc
+sphinx-rtd-theme
 
 build 
 twine
