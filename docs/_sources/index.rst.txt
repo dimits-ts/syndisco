@@ -26,6 +26,7 @@ Introduction
 
    overview_link.md
    guides_link.md
+   source/syndisco
 
 
 Indices and tables
