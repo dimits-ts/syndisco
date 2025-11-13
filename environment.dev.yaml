@@ -1,6 +1,7 @@
 name: syndisco-dev
 channels:
   - conda-forge
+  - defaults
 dependencies:
   - notebook
   - sphinx

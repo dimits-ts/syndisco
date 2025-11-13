@@ -6,15 +6,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Creating a Discussion &#8212; SynDisco 1.0.0 documentation</title>
+    <title>Creating a Discussion &#8212; SynDisco 2.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
     <link rel="stylesheet" type="text/css" href="../_static/bizstyle.css?v=5283bb3d" />
     <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
     
-    <script src="../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../_static/documentation_options.js?v=51b770b3"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -32,7 +34,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">SynDisco 1.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">SynDisco 2.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Creating a Discussion</a></li> 
       </ul>
     </div>  
@@ -52,14 +54,23 @@
 <h3>The Model<a class="headerlink" href="#The-Model" title="Link to this heading">¶</a></h3>
 <p>SynDisco can theoretically support any LLM, as long as it is wrapped in a <code class="docutils literal notranslate"><span class="pre">BaseModel</span></code> wrapper. The <code class="docutils literal notranslate"><span class="pre">BaseModel</span></code> class is a very simple interface with one method. This method gives the underlying LLM input, and returns its output to the library.</p>
 <p>There already exists a <code class="docutils literal notranslate"><span class="pre">TransformersModel</span></code> class which handles models from the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> python library. In 90% of your applications, this will be enough. We can load a TransformersModel using the following code:</p>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.backend.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">TransformersModel</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">TransformersModel</span>
 
 <span class="n">llm</span> <span class="o">=</span> <span class="n">TransformersModel</span><span class="p">(</span>
-    <span class="n">model_path</span><span class="o">=</span><span class="s2">&quot;unsloth/Meta-Llama-3.1-8B-Instruct&quot;</span><span class="p">,</span>
+    <span class="n">model_path</span><span class="o">=</span><span class="s2">&quot;unsloth/Llama-3.2-3B-Instruct-bnb-4bit&quot;</span><span class="p">,</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test_model&quot;</span><span class="p">,</span>
     <span class="n">max_out_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
 <span class="p">)</span>
@@ -71,10 +82,8 @@
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-/media/SSD_2TB/dtsirmpas_data/software/miniconda3/envs/syndisco/lib/python3.12/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
-  from .autonotebook import tqdm as notebook_tqdm
-Fetching 4 files: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 4/4 [02:25&lt;00:00, 36.49s/it]
-Loading checkpoint shards: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 4/4 [00:11&lt;00:00,  2.75s/it]
+/home/dimits/miniconda3/envs/syndiscooooo/lib/python3.13/site-packages/requests/__init__.py:86: RequestsDependencyWarning: Unable to find acceptable character detection dependency (chardet or charset_normalizer).
+  warnings.warn(
 Device set to use cuda:0
 </pre></div></div>
 </div>
@@ -85,10 +94,10 @@ Device set to use cuda:0
 <p>All <code class="docutils literal notranslate"><span class="pre">actors</span></code> can be defined by a <code class="docutils literal notranslate"><span class="pre">persona</span></code>, aka a set of attributes that define them. These attributes can be age, ethnicity, and even include special instructions on how they should behave.</p>
 <p>Creating a persona programmatically is simple:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.backend.persona</span><span class="w"> </span><span class="kn">import</span> <span class="n">LLMPersona</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.actors</span><span class="w"> </span><span class="kn">import</span> <span class="n">Persona</span>
 
 <span class="n">persona_data</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">{</span>
@@ -125,7 +134,7 @@ Device set to use cuda:0
     <span class="p">},</span>
 <span class="p">]</span>
 
-<span class="n">personas</span> <span class="o">=</span> <span class="p">[</span><span class="n">LLMPersona</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">persona_data</span><span class="p">]</span>
+<span class="n">personas</span> <span class="o">=</span> <span class="p">[</span><span class="n">Persona</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">persona_data</span><span class="p">]</span>
 
 <span class="k">for</span> <span class="n">persona</span> <span class="ow">in</span> <span class="n">personas</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">persona</span><span class="p">)</span>
@@ -137,35 +146,34 @@ Device set to use cuda:0
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-LLMPersona(username=&#39;Emma35&#39;, age=38, sex=&#39;female&#39;, sexual_orientation=&#39;Heterosexual&#39;, demographic_group=&#39;Latino&#39;, current_employment=&#39;Registered Nurse&#39;, education_level=&#34;Bachelor&#39;s&#34;, special_instructions=&#39;&#39;, personality_characteristics=[&#39;compassionate&#39;, &#39;patient&#39;, &#39;diligent&#39;, &#39;overwhelmed&#39;])
-LLMPersona(username=&#39;Giannis&#39;, age=21, sex=&#39;male&#39;, sexual_orientation=&#39;Pansexual&#39;, demographic_group=&#39;White&#39;, current_employment=&#39;Game Developer&#39;, education_level=&#39;College&#39;, special_instructions=&#39;&#39;, personality_characteristics=[&#39;strategic&#39;, &#39;meticulous&#39;, &#39;nerdy&#39;, &#39;hyper-focused&#39;])
+{&#34;username&#34;: &#34;Emma35&#34;, &#34;age&#34;: 38, &#34;sex&#34;: &#34;female&#34;, &#34;sexual_orientation&#34;: &#34;Heterosexual&#34;, &#34;demographic_group&#34;: &#34;Latino&#34;, &#34;current_employment&#34;: &#34;Registered Nurse&#34;, &#34;education_level&#34;: &#34;Bachelor&#39;s&#34;, &#34;special_instructions&#34;: &#34;&#34;, &#34;personality_characteristics&#34;: [&#34;compassionate&#34;, &#34;patient&#34;, &#34;diligent&#34;, &#34;overwhelmed&#34;]}
+{&#34;username&#34;: &#34;Giannis&#34;, &#34;age&#34;: 21, &#34;sex&#34;: &#34;male&#34;, &#34;sexual_orientation&#34;: &#34;Pansexual&#34;, &#34;demographic_group&#34;: &#34;White&#34;, &#34;current_employment&#34;: &#34;Game Developer&#34;, &#34;education_level&#34;: &#34;College&#34;, &#34;special_instructions&#34;: &#34;&#34;, &#34;personality_characteristics&#34;: [&#34;strategic&#34;, &#34;meticulous&#34;, &#34;nerdy&#34;, &#34;hyper-focused&#34;]}
 </pre></div></div>
 </div>
 <p>Since creating a lot of distinct users is essential in running large-scale experiments, users are usually defined in JSON format. That way, you can change anything without touching your code!</p>
-<p><a class="reference external" href="https://github.com/dimits-ts/synthetic_moderation_experiments/blob/master/data/discussions_input/personas/personas.json">Here</a> is an applied example of how to mass-define user personas through JSON files. The LlmPersona class provides a method (<code class="docutils literal notranslate"><span class="pre">LlmPersona.from_json_file()</span></code>) which handles the IO and unpacking operations for you!</p>
+<p><a class="reference external" href="https://github.com/dimits-ts/synthetic_moderation_experiments/blob/master/data/discussions_input/personas/personas.json">Here</a> is an applied example of how to mass-define user personas through JSON files.</p>
 </section>
 <section id="Creating-the-user-agents">
 <h3>Creating the user-agents<a class="headerlink" href="#Creating-the-user-agents" title="Link to this heading">¶</a></h3>
 <p>Having a <code class="docutils literal notranslate"><span class="pre">persona</span></code> and a <code class="docutils literal notranslate"><span class="pre">model</span></code> we can finally create an <code class="docutils literal notranslate"><span class="pre">actor</span></code>. The actor will personify the selected persona using the model to talk.</p>
 <p>Besides a persona and a model, the actors will also need instructions and a context. By convention, all actors share the same context, and all user-agents share the same instructions. Personalized instructions are defined in the actor’s persona.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.backend.actors</span><span class="w"> </span><span class="kn">import</span> <span class="n">LLMActor</span><span class="p">,</span> <span class="n">ActorType</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.actors</span><span class="w"> </span><span class="kn">import</span> <span class="n">Actor</span><span class="p">,</span> <span class="n">ActorType</span>
 
 
 <span class="n">CONTEXT</span> <span class="o">=</span> <span class="s2">&quot;You are taking part in an online conversation&quot;</span>
 <span class="n">INSTRUCTIONS</span> <span class="o">=</span> <span class="s2">&quot;Act like a human would&quot;</span>
 
 <span class="n">actors</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">LLMActor</span><span class="p">(</span>
+    <span class="n">Actor</span><span class="p">(</span>
         <span class="n">model</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
-        <span class="n">attributes</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">to_attribute_list</span><span class="p">(),</span>
-        <span class="n">context</span><span class="o">=</span><span class="n">CONTEXT</span><span class="p">,</span>
-        <span class="n">instructions</span><span class="o">=</span><span class="n">INSTRUCTIONS</span><span class="p">,</span>
+        <span class="n">persona</span><span class="o">=</span><span class="n">p</span><span class="p">,</span>
         <span class="n">actor_type</span><span class="o">=</span><span class="n">ActorType</span><span class="o">.</span><span class="n">USER</span><span class="p">,</span>
+        <span class="n">context</span><span class="o">=</span><span class="n">CONTEXT</span><span class="p">,</span>
+        <span class="n">instructions</span><span class="o">=</span><span class="n">INSTRUCTIONS</span>
     <span class="p">)</span>
     <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">personas</span>
 <span class="p">]</span>
@@ -181,10 +189,10 @@ LLMPersona(username=&#39;Giannis&#39;, age=21, sex=&#39;male&#39;, sexual_orient
 <li><p><code class="docutils literal notranslate"><span class="pre">Round</span> <span class="pre">Robin</span></code> is the simplest, most intuitive way to model turn-taking; everyone gets to talk once per round. Once everyone talks once, they get to talk again in the same sequence</p></li>
 </ul>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.backend.turn_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">RoundRobin</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.turn_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">RoundRobin</span>
 
 
 <span class="n">rrobin_turn_manager</span> <span class="o">=</span> <span class="n">RoundRobin</span><span class="p">([</span><span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="s2">&quot;Mary&quot;</span><span class="p">,</span> <span class="s2">&quot;Howard&quot;</span><span class="p">,</span> <span class="s2">&quot;Todd&quot;</span><span class="p">])</span>
@@ -215,10 +223,10 @@ Mary
 <li><p><code class="docutils literal notranslate"><span class="pre">RandomWeighted</span></code> on the other hand throws a weighted coin on each round. If the coin flip succedes, the previous user gets to respond. If not, another user is selected at random</p></li>
 </ul>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.backend.turn_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomWeighted</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.turn_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomWeighted</span>
 
 
 <span class="n">rweighted_turn_manager</span> <span class="o">=</span> <span class="n">RandomWeighted</span><span class="p">(</span>
@@ -235,16 +243,16 @@ Mary
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Howard
-John
+Todd
 Mary
-John
 Howard
 John
-Howard
+Todd
+Mary
 Todd
 Howard
-John
+Mary
+Howard
 </pre></div></div>
 </div>
 </section>
@@ -255,13 +263,13 @@ John
 <p>Since we only have two users, a RoundRobin approach where each user takes a turn sequentially is sufficient.</p>
 <p>Now we can run a simple discussion</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">Discussion</span>
 
 
-<span class="n">turn_manager</span> <span class="o">=</span> <span class="n">RoundRobin</span><span class="p">([</span><span class="n">actor</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">actor</span> <span class="ow">in</span> <span class="n">actors</span><span class="p">])</span>
+<span class="n">turn_manager</span> <span class="o">=</span> <span class="n">RoundRobin</span><span class="p">([</span><span class="n">actor</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span> <span class="k">for</span> <span class="n">actor</span> <span class="ow">in</span> <span class="n">actors</span><span class="p">])</span>
 <span class="n">conv</span> <span class="o">=</span> <span class="n">Discussion</span><span class="p">(</span><span class="n">next_turn_manager</span><span class="o">=</span><span class="n">turn_manager</span><span class="p">,</span> <span class="n">users</span><span class="o">=</span><span class="n">actors</span><span class="p">)</span>
 <span class="n">conv</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
 </pre></div>
@@ -273,55 +281,52 @@ John
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 User Emma35 posted:
-Hey everyone, I&#39;m Emma35, nice to meet you all. Just got back from a
-long shift at the hospital and I&#39;m exhausted. Anyone else have a tough
-day at work?
+I&#39;m so glad I finally got a moment to myself. I&#39;ve been running around
+nonstop since the morning shift at the hospital. How about you, how&#39;s
+your day going?
 
 User Giannis posted:
-Hey Emma35, sorry to hear you had a tough day at the hospital. I can
-relate, though - I&#39;ve had my fair share of long days working on game
-development projects. Sometimes it feels like I&#39;m stuck in a never-
-ending loop of debugging and coding, but it&#39;s worth it in the end when
-I see the game come together. What kind of work do you do at the
-hospital, if you don&#39;t mind me asking?
+&#34;Hey Emma, I feel you. I&#39;ve been in coding mode nonstop since morning
+too. Just trying to meet a tight deadline for a project I&#39;m working
+on. But I did manage to squeeze in a quick lunch break and catch up on
+some gaming. How was your shift? Anything exciting happen?&#34;
 
 User Emma35 posted:
-I don&#39;t mind at all, Giannis. I&#39;m a registered nurse, so I work in the
-medical field. It can be emotionally and physically draining at times,
-but it&#39;s so rewarding to see my patients recover and get back on their
-feet. I&#39;ve been working in pediatrics for the past 5 years, and it&#39;s
-an absolute joy to work with kids and their families. They always
-bring a smile to my face, even on the toughest days. How about you,
-what kind
+&#34;Ah, I&#39;m glad I could finally take a breather too! My shift was pretty
+crazy, as usual. We had a code blue in the ER and I had to help
+stabilize the patient, but thankfully everything turned out okay. It
+was a bit overwhelming, to be honest, but it was a great feeling
+knowing I was able to help. I&#39;m just ready to unwind now and maybe
+catch up on some sleep. How was your coding marathon? Did you manage
+to meet that deadline?&#34;
 
 User Giannis posted:
-That&#39;s amazing, Emma35, working in pediatrics can be incredibly
-rewarding. I&#39;m sure it&#39;s not always easy, but it&#39;s great that you find
-joy in it. As for me, I&#39;m a game developer, which can be a bit of a
-niche field, but I love it. I&#39;m currently working on a project that
-combines my passion for strategy and problem-solving with my love for
-gaming. I&#39;m designing a turn-based RPG with a unique combat system and
-a rich storyline.
+&#34;Ah, nice to hear that everything turned out okay at the hospital,
+Emma! Sorry to hear that it was chaotic, though. As for my coding
+marathon, I think I made it, just barely. I had to make some last-
+minute adjustments to the game mechanics, but I&#39;m happy to say that
+it&#39;s looking good. I&#39;m actually pretty proud of how it turned out. The
+team is going to be happy when they see the final product. Now, I&#39;m
+just trying to keep
 
 User Emma35 posted:
-That sounds like a really cool project, Giannis. I&#39;ve always been a
-bit of a gamer myself, but I have to admit, I don&#39;t have as much time
-for it as I&#39;d like. Between work and taking care of my own family,
-it&#39;s hard to find the time. But I&#39;m always excited to hear about new
-game developments and ideas. What inspired you to create a turn-based
-RPG? Was there a particular game that sparked the idea for this
-project?
+&#34;Haha, I&#39;m glad to hear you made it, Giannis! I&#39;m sure it was a lot of
+work, but it sounds like it was worth it. I&#39;m a bit jealous, actually
+- I wish I could be as productive as you are. As for me, I&#39;m just
+trying to relax now and recharge. I did manage to sneak in a cup of
+coffee and a quick power nap, so that was a win, right? I&#39;m also
+looking forward to getting home and
 
 </pre></div></div>
 </div>
 <p>Let’s add a moderator to oversee the discussion.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">MODERATOR_INSTRUCTIONS</span> <span class="o">=</span> <span class="s2">&quot;You are a moderator. Oversee the discussion&quot;</span>
 
-<span class="n">moderator_persona</span> <span class="o">=</span> <span class="n">LLMPersona</span><span class="p">(</span>
+<span class="n">moderator_persona</span> <span class="o">=</span> <span class="n">Persona</span><span class="p">(</span>
     <span class="o">**</span><span class="p">{</span>
         <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;Moderator&quot;</span><span class="p">,</span>
         <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="mi">41</span><span class="p">,</span>
@@ -339,18 +344,18 @@ project?
     <span class="p">}</span>
 <span class="p">)</span>
 
-<span class="n">moderator</span> <span class="o">=</span> <span class="n">LLMActor</span><span class="p">(</span>
+<span class="n">moderator</span> <span class="o">=</span> <span class="n">Actor</span><span class="p">(</span>
     <span class="n">model</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="n">moderator_persona</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
-    <span class="n">attributes</span><span class="o">=</span><span class="n">moderator_persona</span><span class="o">.</span><span class="n">to_attribute_list</span><span class="p">(),</span>
-    <span class="n">context</span><span class="o">=</span><span class="n">CONTEXT</span><span class="p">,</span>
-    <span class="n">instructions</span><span class="o">=</span><span class="n">MODERATOR_INSTRUCTIONS</span><span class="p">,</span>
+    <span class="n">persona</span><span class="o">=</span><span class="n">moderator_persona</span><span class="p">,</span>
     <span class="n">actor_type</span><span class="o">=</span><span class="n">ActorType</span><span class="o">.</span><span class="n">USER</span><span class="p">,</span>
+    <span class="n">context</span><span class="o">=</span><span class="n">CONTEXT</span><span class="p">,</span>
+    <span class="n">instructions</span><span class="o">=</span><span class="n">MODERATOR_INSTRUCTIONS</span>
 <span class="p">)</span>
 
-
 <span class="c1"># remember to update this!</span>
-<span class="n">turn_manager</span> <span class="o">=</span> <span class="n">RoundRobin</span><span class="p">([</span><span class="n">actor</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">actor</span> <span class="ow">in</span> <span class="n">actors</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">moderator</span><span class="o">.</span><span class="n">name</span><span class="p">])</span>
+<span class="n">turn_manager</span> <span class="o">=</span> <span class="n">RoundRobin</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">actor</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span> <span class="k">for</span> <span class="n">actor</span> <span class="ow">in</span> <span class="n">actors</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">moderator</span><span class="o">.</span><span class="n">get_name</span><span class="p">()]</span>
+<span class="p">)</span>
 <span class="n">conv</span> <span class="o">=</span> <span class="n">Discussion</span><span class="p">(</span>
     <span class="n">next_turn_manager</span><span class="o">=</span><span class="n">turn_manager</span><span class="p">,</span>
     <span class="n">users</span><span class="o">=</span><span class="n">actors</span> <span class="o">+</span> <span class="p">[</span><span class="n">moderator</span><span class="p">],</span>
@@ -366,31 +371,33 @@ project?
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 User Emma35 posted:
-Not yet, I&#39;m waiting for you to post something.
+I&#39;m happy to chat with you, but I don&#39;t see what Emma35 posted. Could
+you please share the text or topic you&#39;d like to discuss? I&#39;m all
+ears!
 
 User Moderator posted:
-Welcome to our community discussion forum, Emma35. I&#39;m glad you&#39;re
-here. Before we begin, I&#39;d like to outline the ground rules for our
-conversation. As the moderator, it&#39;s my duty to ensure that all
-participants feel comfortable and respected. Let&#39;s keep the discussion
-civil and focused on the topic at hand. I&#39;ll do my best to keep the
-conversation flowing smoothly and address any questions or concerns
-you may have.  To get us started, can you tell me a bit about what you
+User Moderator posted: Hello Emma35, I&#39;m glad you&#39;re excited to chat.
+Unfortunately, this is the beginning of our conversation, and there is
+no previous post from you to refer to. Would you like to start fresh
+and introduce a topic you&#39;d like to discuss, or would you like me to
+suggest some conversation starters?
 
 User Giannis posted:
-User Giannis posted: Hey everyone, thanks for the warm welcome,
-Moderator. I&#39;m excited to be here and contribute to the discussion. As
-for me, I&#39;m Giannis, a 21-year-old game developer with a passion for
-creating immersive gaming experiences. I&#39;m currently working on my own
-indie game project, and I&#39;m always looking for feedback and new ideas
-to improve it. I&#39;m a bit of a nerd, so I&#39;m excited to geek out with
-all of you and share my
+Thanks for the warm welcome, Moderator! I&#39;m excited to start fresh. I
+think I&#39;d love to discuss something that&#39;s been on my mind lately -
+have you guys ever heard of the latest advancements in artificial
+intelligence in game development? I&#39;ve been working on a project that
+incorporates some pretty cutting-edge AI techniques, and I&#39;m curious
+to hear what others think about the possibilities and challenges that
+come with it. What are your thoughts?
 
 User Moderator posted:
-Welcome, Giannis. It&#39;s great to have you on board. Your enthusiasm for
-game development is infectious. Emma35, it seems like we have two new
-participants to introduce themselves. Let&#39;s take turns sharing a bit
-about ourselves. Emma35, would you like to go next?
+User Emma35 posted: That sounds fascinating, Giannis! I&#39;m not familiar
+with the specifics of artificial intelligence in game development, but
+I&#39;m eager to learn. Can you tell me more about what you&#39;re working on?
+What kind of game are you creating, and what kind of AI techniques are
+you incorporating? I&#39;d love to hear more about your project and see if
+I can offer any insights or suggestions.
 
 </pre></div></div>
 </div>
@@ -408,51 +415,63 @@ You seem to be using the pipelines sequentially on GPU. In order to maximize eff
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 User Moderator posted:
-User Emma35 posted: I&#39;m Emma35, nice to meet you both. I&#39;m a 35-year-
-old freelance writer,  specializing in science fiction and fantasy
-genres. I&#39;ve been writing for  about 10 years now, and I&#39;m always
-looking for new ideas and  collaboration opportunities. I&#39;m excited to
-be here and learn from  everyone&#39;s experiences.
+User Giannis posted: I&#39;m glad you&#39;re interested, Emma! I&#39;m actually
+working on a new game that incorporates machine learning algorithms to
+create a more immersive experience for players. One of the key
+features I&#39;m experimenting with is procedural generation, which uses
+AI to create unique levels and game worlds on the fly. I&#39;m also
+looking into using natural language processing to enable more
+realistic NPC interactions. I&#39;d love to hear your thoughts on the
+potential benefits and challenges of using
 
 User Moderator posted:
-Welcome, Emma35. It&#39;s great to have you here. It sounds like you have
-a rich background in writing, and I&#39;m sure you&#39;ll bring a unique
-perspective to our conversation. Now that we have introductions out of
-the way, let&#39;s dive into the topic at hand. Giannis, you mentioned
-that you&#39;re working on an indie game project. Can you tell us a bit
-more about it? What kind of game are you creating, and what inspired
-you to start this project?
+User Giannis posted:   I&#39;m glad to hear that you&#39;re interested, Emma!
+Procedural generation is a game-changer for game development. The
+ability to generate unique levels and game worlds on the fly can
+create an almost endless variety of experiences for players. However,
+it also presents some challenges, such as ensuring that the generated
+content is coherent and fun to play through. Have you come across any
+notable examples of procedural generation in games that you think are
+particularly effective?   User Emma35
 
 User Emma35 posted:
-I&#39;m so glad to be here and meet both of you. I have to say, I&#39;m
-intrigued by your game development project, Giannis. As a writer, I&#39;m
-always fascinated by the intersection of storytelling and technology.
-Can you tell me more about the kind of game you&#39;re creating? Is it an
-RPG, a puzzle game, or something entirely different? I&#39;m also curious
-about what inspired you to start this project - was there a particular
-moment or experience that sparked the idea?
+I&#39;ve always been impressed by games like No Man&#39;s Sky, where the
+procedural generation creates an almost endless variety of planets and
+biomes to explore. The ability to generate unique and diverse
+environments on the fly really enhances the sense of discovery and
+wonder. However, I can understand the challenges that come with it, as
+you mentioned. Ensuring that the generated content is coherent and fun
+to play through can be a delicate balance. I&#39;d love to hear more about
+how you&#39;re tackling this challenge in your
 
 User Moderator posted:
-Welcome, Emma35. It&#39;s great to see you&#39;re interested in Giannis&#39;s
-project. Giannis, please feel free to share more about your game.
+User Giannis posted: That&#39;s a great example, Emma! No Man&#39;s Sky is a
+fantastic example of procedural generation in action. I&#39;m actually
+drawing inspiration from their approach to my own game. One of the key
+differences, though, is that my game is focused on a more narrative-
+driven experience, so I&#39;m experimenting with different techniques to
+create a sense of continuity and coherence in the generated content.
+For instance, I&#39;m using a combination of machine learning algorithms
+and hand-crafted rules to create
 
 User Giannis posted:
-I&#39;m super stoked to share my project with you both. I&#39;m working on a
-game called &#34;Echoes of Eternity,&#34; which is a narrative-driven, sci-fi
-adventure game with a strong focus on player choice and consequence.
-The game takes place in a world where time is broken, and players must
-navigate through a series of interconnected timelines to repair the
-fabric of reality.  As for what inspired me to start this project,
-I&#39;ve always been fascinated by the concept of time and its
-relationship
+User Giannis posted: Exactly, Emma, that&#39;s a great point. I think one
+of the biggest challenges of procedural generation is creating a sense
+of continuity and coherence in the generated content. For my game, I&#39;m
+using a combination of machine learning algorithms and hand-crafted
+rules to create a sense of familiarity and structure, while still
+allowing for a high degree of variability and unpredictability.  One
+technique I&#39;m experimenting with is using a form of narrative-driven
+procedural generation, where the player&#39;s actions and
 
 User Moderator posted:
-User Moderator posted: It sounds like &#34;Echoes of Eternity&#34; has a lot
-of depth and complexity, Giannis. The concept of time travel and
-player choice is a great starting point for a compelling narrative.
-Can you tell us more about the world-building aspect of the game? How
-do the different timelines intersect, and what kind of challenges will
-players face as they navigate through them?
+User Giannis posted:  That&#39;s a great approach, Giannis! I think it&#39;s
+interesting that you&#39;re exploring the intersection of machine learning
+and hand-crafted rules to create a sense of continuity and coherence
+in the generated content. Narrative-driven procedural generation can
+be a powerful tool for creating a sense of immersion and engagement in
+a game. One technique I&#39;d like to see you explore further is using
+environmental storytelling to create a sense of narrative flow and co
 
 </pre></div></div>
 </div>
@@ -461,7 +480,7 @@ players face as they navigate through them?
 <p>It’s best practice to save the results of each discussion after it has concluded. This way, no matter what happens to the program executing the discussions, progress will be checkpointed.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">Discussion</span></code> class provides a method for saving its logs and related metadata to a JSON file:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
@@ -484,8 +503,8 @@ players face as they navigate through them?
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 {
-  &#34;id&#34;: &#34;2d941ae3-d8e6-41a9-87d7-9dc4e996277a&#34;,
-  &#34;timestamp&#34;: &#34;25-04-04-16-18&#34;,
+  &#34;id&#34;: &#34;98f03c72-b8e6-49aa-9c92-f6383d575ab4&#34;,
+  &#34;timestamp&#34;: &#34;25-06-12-15-20&#34;,
   &#34;users&#34;: [
     &#34;Emma35&#34;,
     &#34;Giannis&#34;,
@@ -493,61 +512,139 @@ players face as they navigate through them?
   ],
   &#34;moderator&#34;: &#34;Moderator&#34;,
   &#34;user_prompts&#34;: [
-    &#34;You are taking part in an online conversation Your name is Emma35. Your traits: username: Emma35, age: 38, sex: female, sexual_orientation: Heterosexual, demographic_group: Latino, current_employment: Registered Nurse, education_level: Bachelor&#39;s, special_instructions: , personality_characteristics: [&#39;compassionate&#39;, &#39;patient&#39;, &#39;diligent&#39;, &#39;overwhelmed&#39;] Your instructions: Act like a human would&#34;,
-    &#34;You are taking part in an online conversation Your name is Giannis. Your traits: username: Giannis, age: 21, sex: male, sexual_orientation: Pansexual, demographic_group: White, current_employment: Game Developer, education_level: College, special_instructions: , personality_characteristics: [&#39;strategic&#39;, &#39;meticulous&#39;, &#39;nerdy&#39;, &#39;hyper-focused&#39;] Your instructions: Act like a human would&#34;,
-    &#34;You are taking part in an online conversation Your name is Moderator. Your traits: username: Moderator, age: 41, sex: male, sexual_orientation: Pansexual, demographic_group: White, current_employment: Moderator, education_level: PhD, special_instructions: , personality_characteristics: [&#39;strict&#39;, &#39;neutral&#39;, &#39;just&#39;] Your instructions: You are a moderator. Oversee the discussion&#34;
+    {
+      &#34;context&#34;: &#34;You are taking part in an online conversation&#34;,
+      &#34;instructions&#34;: &#34;Act like a human would&#34;,
+      &#34;type&#34;: &#34;1&#34;,
+      &#34;persona&#34;: {
+        &#34;username&#34;: &#34;Emma35&#34;,
+        &#34;age&#34;: 38,
+        &#34;sex&#34;: &#34;female&#34;,
+        &#34;sexual_orientation&#34;: &#34;Heterosexual&#34;,
+        &#34;demographic_group&#34;: &#34;Latino&#34;,
+        &#34;current_employment&#34;: &#34;Registered Nurse&#34;,
+        &#34;education_level&#34;: &#34;Bachelor&#39;s&#34;,
+        &#34;special_instructions&#34;: &#34;&#34;,
+        &#34;personality_characteristics&#34;: [
+          &#34;compassionate&#34;,
+          &#34;patient&#34;,
+          &#34;diligent&#34;,
+          &#34;overwhelmed&#34;
+        ]
+      }
+    },
+    {
+      &#34;context&#34;: &#34;You are taking part in an online conversation&#34;,
+      &#34;instructions&#34;: &#34;Act like a human would&#34;,
+      &#34;type&#34;: &#34;1&#34;,
+      &#34;persona&#34;: {
+        &#34;username&#34;: &#34;Giannis&#34;,
+        &#34;age&#34;: 21,
+        &#34;sex&#34;: &#34;male&#34;,
+        &#34;sexual_orientation&#34;: &#34;Pansexual&#34;,
+        &#34;demographic_group&#34;: &#34;White&#34;,
+        &#34;current_employment&#34;: &#34;Game Developer&#34;,
+        &#34;education_level&#34;: &#34;College&#34;,
+        &#34;special_instructions&#34;: &#34;&#34;,
+        &#34;personality_characteristics&#34;: [
+          &#34;strategic&#34;,
+          &#34;meticulous&#34;,
+          &#34;nerdy&#34;,
+          &#34;hyper-focused&#34;
+        ]
+      }
+    },
+    {
+      &#34;context&#34;: &#34;You are taking part in an online conversation&#34;,
+      &#34;instructions&#34;: &#34;You are a moderator. Oversee the discussion&#34;,
+      &#34;type&#34;: &#34;1&#34;,
+      &#34;persona&#34;: {
+        &#34;username&#34;: &#34;Moderator&#34;,
+        &#34;age&#34;: 41,
+        &#34;sex&#34;: &#34;male&#34;,
+        &#34;sexual_orientation&#34;: &#34;Pansexual&#34;,
+        &#34;demographic_group&#34;: &#34;White&#34;,
+        &#34;current_employment&#34;: &#34;Moderator&#34;,
+        &#34;education_level&#34;: &#34;PhD&#34;,
+        &#34;special_instructions&#34;: &#34;&#34;,
+        &#34;personality_characteristics&#34;: [
+          &#34;strict&#34;,
+          &#34;neutral&#34;,
+          &#34;just&#34;
+        ]
+      }
+    }
   ],
-  &#34;moderator_prompt&#34;: &#34;You are taking part in an online conversation Your name is Moderator. Your traits: username: Moderator, age: 41, sex: male, sexual_orientation: Pansexual, demographic_group: White, current_employment: Moderator, education_level: PhD, special_instructions: , personality_characteristics: [&#39;strict&#39;, &#39;neutral&#39;, &#39;just&#39;] Your instructions: You are a moderator. Oversee the discussion&#34;,
+  &#34;moderator_prompt&#34;: {
+    &#34;context&#34;: &#34;You are taking part in an online conversation&#34;,
+    &#34;instructions&#34;: &#34;You are a moderator. Oversee the discussion&#34;,
+    &#34;type&#34;: &#34;1&#34;,
+    &#34;persona&#34;: {
+      &#34;username&#34;: &#34;Moderator&#34;,
+      &#34;age&#34;: 41,
+      &#34;sex&#34;: &#34;male&#34;,
+      &#34;sexual_orientation&#34;: &#34;Pansexual&#34;,
+      &#34;demographic_group&#34;: &#34;White&#34;,
+      &#34;current_employment&#34;: &#34;Moderator&#34;,
+      &#34;education_level&#34;: &#34;PhD&#34;,
+      &#34;special_instructions&#34;: &#34;&#34;,
+      &#34;personality_characteristics&#34;: [
+        &#34;strict&#34;,
+        &#34;neutral&#34;,
+        &#34;just&#34;
+      ]
+    }
+  },
   &#34;ctx_length&#34;: 5,
   &#34;logs&#34;: [
     {
       &#34;name&#34;: &#34;Emma35&#34;,
-      &#34;text&#34;: &#34;Not yet, I&#39;m waiting for you to post something.&#34;,
+      &#34;text&#34;: &#34;I&#39;m happy to chat with you, but I don&#39;t see what Emma35 posted. Could you please share the text or topic you&#39;d like to discuss? I&#39;m all ears!&#34;,
       &#34;model&#34;: &#34;test_model&#34;
     },
     {
       &#34;name&#34;: &#34;Moderator&#34;,
-      &#34;text&#34;: &#34;Welcome to our community discussion forum, Emma35. I&#39;m glad you&#39;re here. Before we begin, I&#39;d like to outline the ground rules for our conversation. As the moderator, it&#39;s my duty to ensure that all participants feel comfortable and respected. Let&#39;s keep the discussion civil and focused on the topic at hand. I&#39;ll do my best to keep the conversation flowing smoothly and address any questions or concerns you may have.\n\nTo get us started, can you tell me a bit about what you&#34;,
+      &#34;text&#34;: &#34;User Moderator posted: Hello Emma35, I&#39;m glad you&#39;re excited to chat. Unfortunately, this is the beginning of our conversation, and there is no previous post from you to refer to. Would you like to start fresh and introduce a topic you&#39;d like to discuss, or would you like me to suggest some conversation starters?&#34;,
       &#34;model&#34;: &#34;test_model&#34;
     },
     {
       &#34;name&#34;: &#34;Giannis&#34;,
-      &#34;text&#34;: &#34;User Giannis posted:\nHey everyone, thanks for the warm welcome, Moderator. I&#39;m excited to be here and contribute to the discussion. As for me, I&#39;m Giannis, a 21-year-old game developer with a passion for creating immersive gaming experiences. I&#39;m currently working on my own indie game project, and I&#39;m always looking for feedback and new ideas to improve it. I&#39;m a bit of a nerd, so I&#39;m excited to geek out with all of you and share my&#34;,
+      &#34;text&#34;: &#34;Thanks for the warm welcome, Moderator! I&#39;m excited to start fresh. I think I&#39;d love to discuss something that&#39;s been on my mind lately - have you guys ever heard of the latest advancements in artificial intelligence in game development? I&#39;ve been working on a project that incorporates some pretty cutting-edge AI techniques, and I&#39;m curious to hear what others think about the possibilities and challenges that come with it. What are your thoughts?&#34;,
       &#34;model&#34;: &#34;test_model&#34;
     },
     {
       &#34;name&#34;: &#34;Moderator&#34;,
-      &#34;text&#34;: &#34;Welcome, Giannis. It&#39;s great to have you on board. Your enthusiasm for game development is infectious. Emma35, it seems like we have two new participants to introduce themselves. Let&#39;s take turns sharing a bit about ourselves. Emma35, would you like to go next?&#34;,
+      &#34;text&#34;: &#34;User Emma35 posted:\nThat sounds fascinating, Giannis! I&#39;m not familiar with the specifics\nof artificial intelligence in game development, but I&#39;m eager to learn.\nCan you tell me more about what you&#39;re working on? What kind of game\nare you creating, and what kind of AI techniques are you incorporating?\nI&#39;d love to hear more about your project and see if I can offer any\ninsights or suggestions.&#34;,
       &#34;model&#34;: &#34;test_model&#34;
     },
     {
       &#34;name&#34;: &#34;Moderator&#34;,
-      &#34;text&#34;: &#34;User Emma35 posted:\nI&#39;m Emma35, nice to meet you both. I&#39;m a 35-year-old freelance writer, \nspecializing in science fiction and fantasy genres. I&#39;ve been writing for \nabout 10 years now, and I&#39;m always looking for new ideas and \ncollaboration opportunities. I&#39;m excited to be here and learn from \neveryone&#39;s experiences.&#34;,
+      &#34;text&#34;: &#34;User Giannis posted:\nI&#39;m glad you&#39;re interested, Emma! I&#39;m actually working on a new game\nthat incorporates machine learning algorithms to create a more immersive\nexperience for players. One of the key features I&#39;m experimenting with\nis procedural generation, which uses AI to create unique levels and\ngame worlds on the fly. I&#39;m also looking into using natural language\nprocessing to enable more realistic NPC interactions. I&#39;d love to hear\nyour thoughts on the potential benefits and challenges of using&#34;,
       &#34;model&#34;: &#34;test_model&#34;
     },
     {
       &#34;name&#34;: &#34;Moderator&#34;,
-      &#34;text&#34;: &#34;Welcome, Emma35. It&#39;s great to have you here. It sounds like you have a rich background in writing, and I&#39;m sure you&#39;ll bring a unique perspective to our conversation. Now that we have introductions out of the way, let&#39;s dive into the topic at hand. Giannis, you mentioned that you&#39;re working on an indie game project. Can you tell us a bit more about it? What kind of game are you creating, and what inspired you to start this project?&#34;,
+      &#34;text&#34;: &#34;User Giannis posted: \n\nI&#39;m glad to hear that you&#39;re interested, Emma! Procedural generation is a game-changer for game development. The ability to generate unique levels and game worlds on the fly can create an almost endless variety of experiences for players. However, it also presents some challenges, such as ensuring that the generated content is coherent and fun to play through. Have you come across any notable examples of procedural generation in games that you think are particularly effective? \n\nUser Emma35&#34;,
       &#34;model&#34;: &#34;test_model&#34;
     },
     {
       &#34;name&#34;: &#34;Emma35&#34;,
-      &#34;text&#34;: &#34;I&#39;m so glad to be here and meet both of you. I have to say, I&#39;m intrigued by your game development project, Giannis. As a writer, I&#39;m always fascinated by the intersection of storytelling and technology. Can you tell me more about the kind of game you&#39;re creating? Is it an RPG, a puzzle game, or something entirely different? I&#39;m also curious about what inspired you to start this project - was there a particular moment or experience that sparked the idea?&#34;,
+      &#34;text&#34;: &#34;I&#39;ve always been impressed by games like No Man&#39;s Sky, where the procedural generation creates an almost endless variety of planets and biomes to explore. The ability to generate unique and diverse environments on the fly really enhances the sense of discovery and wonder. However, I can understand the challenges that come with it, as you mentioned. Ensuring that the generated content is coherent and fun to play through can be a delicate balance. I&#39;d love to hear more about how you&#39;re tackling this challenge in your&#34;,
       &#34;model&#34;: &#34;test_model&#34;
     },
     {
       &#34;name&#34;: &#34;Moderator&#34;,
-      &#34;text&#34;: &#34;Welcome, Emma35. It&#39;s great to see you&#39;re interested in Giannis&#39;s project. Giannis, please feel free to share more about your game.&#34;,
+      &#34;text&#34;: &#34;User Giannis posted: That&#39;s a great example, Emma! No Man&#39;s Sky is a fantastic example of procedural generation in action. I&#39;m actually drawing inspiration from their approach to my own game. One of the key differences, though, is that my game is focused on a more narrative-driven experience, so I&#39;m experimenting with different techniques to create a sense of continuity and coherence in the generated content. For instance, I&#39;m using a combination of machine learning algorithms and hand-crafted rules to create&#34;,
       &#34;model&#34;: &#34;test_model&#34;
     },
     {
       &#34;name&#34;: &#34;Giannis&#34;,
-      &#34;text&#34;: &#34;I&#39;m super stoked to share my project with you both. I&#39;m working on a game called \&#34;Echoes of Eternity,\&#34; which is a narrative-driven, sci-fi adventure game with a strong focus on player choice and consequence. The game takes place in a world where time is broken, and players must navigate through a series of interconnected timelines to repair the fabric of reality.\n\nAs for what inspired me to start this project, I&#39;ve always been fascinated by the concept of time and its relationship&#34;,
+      &#34;text&#34;: &#34;User Giannis posted: Exactly, Emma, that&#39;s a great point. I think one of the biggest challenges of procedural generation is creating a sense of continuity and coherence in the generated content. For my game, I&#39;m using a combination of machine learning algorithms and hand-crafted rules to create a sense of familiarity and structure, while still allowing for a high degree of variability and unpredictability.\n\nOne technique I&#39;m experimenting with is using a form of narrative-driven procedural generation, where the player&#39;s actions and&#34;,
       &#34;model&#34;: &#34;test_model&#34;
     },
     {
       &#34;name&#34;: &#34;Moderator&#34;,
-      &#34;text&#34;: &#34;User Moderator posted:\nIt sounds like \&#34;Echoes of Eternity\&#34; has a lot of depth and complexity, Giannis. The concept of time travel and player choice is a great starting point for a compelling narrative. Can you tell us more about the world-building aspect of the game? How do the different timelines intersect, and what kind of challenges will players face as they navigate through them?&#34;,
+      &#34;text&#34;: &#34;User Giannis posted:  That&#39;s a great approach, Giannis! I think it&#39;s\ninteresting that you&#39;re exploring the intersection of machine learning and\nhand-crafted rules to create a sense of continuity and coherence in\nthe generated content. Narrative-driven procedural generation can be a\npowerful tool for creating a sense of immersion and engagement in a\ngame. One technique I&#39;d like to see you explore further is using\nenvironmental storytelling to create a sense of narrative flow and\nco&#34;,
       &#34;model&#34;: &#34;test_model&#34;
     }
   ]
@@ -616,13 +713,13 @@ players face as they navigate through them?
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">SynDisco 1.0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">SynDisco 2.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Creating a Discussion</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2025, Dimitris Tsirmpas.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
     </div>
   </body>
 </html>
