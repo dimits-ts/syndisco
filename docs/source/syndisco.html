@@ -19,7 +19,8 @@
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Guides" href="../guides_link.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -41,11 +42,107 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul>
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../overview_link.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../overview_link.html#features">Features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../overview_link.html#installation">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../guides_link.html">Guides</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">syndisco package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-syndisco.actors">syndisco.actors module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#syndisco.actors.Actor"><code class="docutils literal notranslate"><span class="pre">Actor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.actors.Actor.describe"><code class="docutils literal notranslate"><span class="pre">Actor.describe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.actors.Actor.get_name"><code class="docutils literal notranslate"><span class="pre">Actor.get_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.actors.Actor.speak"><code class="docutils literal notranslate"><span class="pre">Actor.speak()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#syndisco.actors.ActorType"><code class="docutils literal notranslate"><span class="pre">ActorType</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.actors.ActorType.ANNOTATOR"><code class="docutils literal notranslate"><span class="pre">ActorType.ANNOTATOR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.actors.ActorType.USER"><code class="docutils literal notranslate"><span class="pre">ActorType.USER</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#syndisco.actors.Persona"><code class="docutils literal notranslate"><span class="pre">Persona</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.actors.Persona.age"><code class="docutils literal notranslate"><span class="pre">Persona.age</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.actors.Persona.current_employment"><code class="docutils literal notranslate"><span class="pre">Persona.current_employment</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.actors.Persona.demographic_group"><code class="docutils literal notranslate"><span class="pre">Persona.demographic_group</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.actors.Persona.education_level"><code class="docutils literal notranslate"><span class="pre">Persona.education_level</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.actors.Persona.from_json_file"><code class="docutils literal notranslate"><span class="pre">Persona.from_json_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.actors.Persona.personality_characteristics"><code class="docutils literal notranslate"><span class="pre">Persona.personality_characteristics</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.actors.Persona.sex"><code class="docutils literal notranslate"><span class="pre">Persona.sex</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.actors.Persona.sexual_orientation"><code class="docutils literal notranslate"><span class="pre">Persona.sexual_orientation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.actors.Persona.special_instructions"><code class="docutils literal notranslate"><span class="pre">Persona.special_instructions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.actors.Persona.to_dict"><code class="docutils literal notranslate"><span class="pre">Persona.to_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.actors.Persona.to_json_file"><code class="docutils literal notranslate"><span class="pre">Persona.to_json_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.actors.Persona.username"><code class="docutils literal notranslate"><span class="pre">Persona.username</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-syndisco.experiments">syndisco.experiments module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#syndisco.experiments.AnnotationExperiment"><code class="docutils literal notranslate"><span class="pre">AnnotationExperiment</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.experiments.AnnotationExperiment.begin"><code class="docutils literal notranslate"><span class="pre">AnnotationExperiment.begin()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#syndisco.experiments.DiscussionExperiment"><code class="docutils literal notranslate"><span class="pre">DiscussionExperiment</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.experiments.DiscussionExperiment.begin"><code class="docutils literal notranslate"><span class="pre">DiscussionExperiment.begin()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-syndisco.jobs">syndisco.jobs module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#syndisco.jobs.Annotation"><code class="docutils literal notranslate"><span class="pre">Annotation</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.jobs.Annotation.begin"><code class="docutils literal notranslate"><span class="pre">Annotation.begin()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.jobs.Annotation.to_dict"><code class="docutils literal notranslate"><span class="pre">Annotation.to_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.jobs.Annotation.to_json_file"><code class="docutils literal notranslate"><span class="pre">Annotation.to_json_file()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#syndisco.jobs.Discussion"><code class="docutils literal notranslate"><span class="pre">Discussion</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.jobs.Discussion.begin"><code class="docutils literal notranslate"><span class="pre">Discussion.begin()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.jobs.Discussion.to_dict"><code class="docutils literal notranslate"><span class="pre">Discussion.to_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.jobs.Discussion.to_json_file"><code class="docutils literal notranslate"><span class="pre">Discussion.to_json_file()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-syndisco.logging_util">syndisco.logging_util module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#syndisco.logging_util.logging_setup"><code class="docutils literal notranslate"><span class="pre">logging_setup()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#syndisco.logging_util.timing"><code class="docutils literal notranslate"><span class="pre">timing()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-syndisco.model">syndisco.model module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#syndisco.model.BaseModel"><code class="docutils literal notranslate"><span class="pre">BaseModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.model.BaseModel.generate_response"><code class="docutils literal notranslate"><span class="pre">BaseModel.generate_response()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.model.BaseModel.get_name"><code class="docutils literal notranslate"><span class="pre">BaseModel.get_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.model.BaseModel.prompt"><code class="docutils literal notranslate"><span class="pre">BaseModel.prompt()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#syndisco.model.TransformersModel"><code class="docutils literal notranslate"><span class="pre">TransformersModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.model.TransformersModel.generate_response"><code class="docutils literal notranslate"><span class="pre">TransformersModel.generate_response()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-syndisco.postprocessing">syndisco.postprocessing module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#syndisco.postprocessing.import_annotations"><code class="docutils literal notranslate"><span class="pre">import_annotations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#syndisco.postprocessing.import_discussions"><code class="docutils literal notranslate"><span class="pre">import_discussions()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-syndisco.turn_manager">syndisco.turn_manager module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#syndisco.turn_manager.RandomWeighted"><code class="docutils literal notranslate"><span class="pre">RandomWeighted</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.turn_manager.RandomWeighted.DEFAULT_RESPOND_PROBABILITY"><code class="docutils literal notranslate"><span class="pre">RandomWeighted.DEFAULT_RESPOND_PROBABILITY</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#syndisco.turn_manager.RoundRobin"><code class="docutils literal notranslate"><span class="pre">RoundRobin</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#syndisco.turn_manager.TurnManager"><code class="docutils literal notranslate"><span class="pre">TurnManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.turn_manager.TurnManager.next"><code class="docutils literal notranslate"><span class="pre">TurnManager.next()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.turn_manager.TurnManager.set_names"><code class="docutils literal notranslate"><span class="pre">TurnManager.set_names()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-syndisco">Module contents</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -251,14 +348,14 @@ in the syndisco.jobs module.</p>
 <p>An experiment that uses LLM annotators to label synthetic discussion logs.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="syndisco.experiments.AnnotationExperiment.begin">
-<span class="sig-name descname"><span class="pre">begin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">discussions_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#syndisco.experiments.AnnotationExperiment.begin" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">begin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">discussions_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#syndisco.experiments.AnnotationExperiment.begin" title="Link to this definition"></a></dt>
 <dd><p>Start the annotation process over all discussion logs in a directory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>discussions_dir</strong> (<em>Path</em>) – Directory containing discussion logs.</p></li>
 <li><p><strong>output_dir</strong> (<em>Path</em>) – Directory to write annotation outputs.</p></li>
-<li><p><strong>verbose</strong> (<em>bool</em>) – Whether to display annotation progress.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>defaults to True</em>) – Whether to display annotation progress.</p></li>
 </ul>
 </dd>
 </dl>
@@ -643,7 +740,9 @@ constructor, or from the TurnManager.set() method</p>
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../guides_link.html" class="btn btn-neutral float-left" title="Guides" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
 
   <hr/>
 
