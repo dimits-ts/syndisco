@@ -11,6 +11,7 @@ myst-parser
 nbsphinx
 ipykernel
 sphinx-autobuild
+sphinx-rtd-theme
 
 build 
 twine
