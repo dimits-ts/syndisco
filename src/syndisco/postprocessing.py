@@ -47,42 +47,118 @@ def import_discussions(conv_dir: Path) -> pd.DataFrame:
     :return: A DataFrame containing processed conversation data.
     :rtype: pd.DataFrame
     """
-    df = _read_conversations(conv_dir)
-    df = df.reset_index(drop=True)
-    df = df.rename(columns={"id": "conv_id"})
+    """
+    Convert a list of JSON conversation files into a flat CSV format.
+    
+    Args:
+        json_files (list[str or Path]): List of file paths to JSON conversation files.
+        output_csv (str or Path): Output CSV path.
+    """
+    rows = []
 
-    # Filter out non-persona information
-    # assumes context and instructions are shared across participants
-    df.user_prompts = df.user_prompts.apply(
-        lambda user_prompts: [
-            user_prompt["persona"] for user_prompt in user_prompts
-        ]
-    )
+    for file in conv_dir.rglob("*.json"):
+        with open(file, "r", encoding="utf-8") as f:
+            data = json.load(f)
 
-    # Select only current user prompt
-    df["user_prompt"] = _select_user_prompt(df)
+        conv_id = data.get("id")
+        timestamp_conv = data.get("timestamp")
+        ctx_length_conv = data.get("ctx_length")
+        conv_variant = None
 
-    # Merge moderator and user prompts
-    df["is_moderator"] = _is_moderator(df.moderator, df.user)
-    df.user_prompt = df.moderator_prompt.where(df.is_moderator, df.user_prompt)
+        message_order = 1
 
-    df["message_id"] = _generate_message_hash(df.conv_id, df.message)
-    df["message_order"] = _add_message_order(df)
+        # Build persona + prompt lookup
+        persona_by_user = {}
+        for entry in data.get("user_prompts", []):
+            persona = entry.get("persona", {})
+            username = persona.get("username")
+            if username:
+                persona_by_user[username] = {
+                    "user_prompt_context": entry.get("context"),
+                    "user_prompt_instructions": entry.get("instructions"),
+                    "user_prompt_type": entry.get("type"),
+                    "age": persona.get("age"),
+                    "sex": persona.get("sex"),
+                    "sexual_orientation": persona.get("sexual_orientation"),
+                    "demographic_group": persona.get("demographic_group"),
+                    "current_employment": persona.get("current_employment"),
+                    "education_level": persona.get("education_level"),
+                    "special_instructions": persona.get(
+                        "special_instructions"
+                    ),
+                }
 
-    traits_df = pd.concat(
-        list(df.user_prompt.apply(_process_traits))
-    ).reset_index(drop=True)
-    del traits_df["username"]
+        # Add moderator
+        moderator_prompt = data.get("moderator_prompt", {})
+        moderator_persona = moderator_prompt.get("persona", {})
+        moderator_username = moderator_persona.get("username", "moderator")
 
-    # Remove unused columns
-    del df["user_prompts"]
-    del df["user_prompt"]
-    del df["users"]
-    del df["moderator"]
-    del df["moderator_prompt"]
+        persona_by_user[moderator_username] = {
+            "user_prompt_context": moderator_prompt.get("context"),
+            "user_prompt_instructions": moderator_prompt.get("instructions"),
+            "user_prompt_type": moderator_prompt.get("type"),
+            "age": moderator_persona.get("age"),
+            "sex": moderator_persona.get("sex"),
+            "sexual_orientation": moderator_persona.get("sexual_orientation"),
+            "demographic_group": moderator_persona.get("demographic_group"),
+            "current_employment": moderator_persona.get("current_employment"),
+            "education_level": moderator_persona.get("education_level"),
+            "special_instructions": moderator_persona.get(
+                "special_instructions"
+            ),
+        }
 
-    full_df = pd.concat([df, traits_df], axis=1)
-    return full_df
+        # Process logs
+        for log in data.get("logs", []):
+            user = log.get("name")
+            message = log.get("text")
+            model = log.get("model")
+
+            persona_info = persona_by_user.get(user, {})
+
+            rows.append(
+                {
+                    "conv_id": conv_id,
+                    "timestamp_conv": timestamp_conv,
+                    "ctx_length_conv": ctx_length_conv,
+                    "conv_variant": conv_variant,
+                    "user": user,
+                    "message": message,
+                    "model": model,
+                    "is_moderator": (user == moderator_username),
+                    "message_id": f"{conv_id}_{message_order}",
+                    "message_order": message_order,
+                    "user_prompt_context": persona_info.get(
+                        "user_prompt_context"
+                    ),
+                    "user_prompt_instructions": persona_info.get(
+                        "user_prompt_instructions"
+                    ),
+                    "user_prompt_type": persona_info.get("user_prompt_type"),
+                    "age_conv": persona_info.get("age"),
+                    "sex_conv": persona_info.get("sex"),
+                    "sexual_orientation_conv": persona_info.get(
+                        "sexual_orientation"
+                    ),
+                    "demographic_group_conv": persona_info.get(
+                        "demographic_group"
+                    ),
+                    "current_employment_conv": persona_info.get(
+                        "current_employment"
+                    ),
+                    "education_level_conv": persona_info.get(
+                        "education_level"
+                    ),
+                    "special_instructions": persona_info.get(
+                        "special_instructions"
+                    ),
+                }
+            )
+
+            message_order += 1
+
+    df = pd.DataFrame(rows)
+    return df
 
 
 def import_annotations(annot_dir: str | Path) -> pd.DataFrame:
@@ -156,120 +232,6 @@ def _rename_annot_df_columns(df):
     return df.rename(columns=rename_map)
 
 
-def _read_conversations(conv_dir: Path) -> pd.DataFrame:
-    """
-    Read conversation data from JSON files and convert it into a DataFrame.
-
-    This function recursively reads all JSON files in the specified directory,
-    extracts conversation data in raw form, and formats it into a DataFrame.
-
-    :param conv_dir: Directory containing JSON files with conversation data.
-    :type conv_dir: str | Path
-    :return: A DataFrame containing raw conversation data.
-    :rtype: pd.DataFrame
-    """
-    if not conv_dir.is_dir():
-        raise ValueError(
-            f"{conv_dir} is not a directory or does not exist"
-        ) from None
-
-    file_paths = _list_files_recursive(conv_dir)
-
-    if len(file_paths) == 0:
-        raise ValueError(
-            "No discussions found in directory ", conv_dir
-        ) from None
-    rows = []
-
-    for file_path in file_paths:
-        with open(file_path, "r", encoding="utf8") as fin:
-            conv = json.load(fin)
-
-        conv = pd.json_normalize(conv)
-        conv = conv.explode("logs")
-        conv["conv_variant"] = os.path.basename(os.path.dirname(file_path))
-        conv["user"] = conv.logs.apply(lambda x: x["name"])
-        conv["message"] = conv.logs.apply(lambda x: x["text"])
-        conv["model"] = conv.logs.apply(lambda x: x["model"])
-        del conv["logs"]
-        rows.append(conv)
-
-    full_df = pd.concat(rows)
-    return full_df
-
-
-def _is_moderator(moderator_name: pd.Series, username: pd.Series) -> pd.Series:
-    """
-    Determine if a user is the moderator.
-
-    :param moderator_name: Series of moderator names.
-    :type moderator_name: pd.Series
-    :param username: Series of usernames.
-    :type username: pd.Series
-    :return: A Series indicating whether each user is the moderator.
-    :rtype: pd.Series
-    """
-    return moderator_name == username
-
-
-def _list_files_recursive(start_path: str | Path) -> list[str]:
-    """
-    Recursively list all files in a directory and its subdirectories.
-
-    :param start_path: The starting directory path.
-    :type start_path: str | Path
-    :return: A list of file paths.
-    :rtype: list[str]
-    """
-    all_files = []
-    for root, _, files in os.walk(start_path):
-        for file in files:
-            all_files.append(os.path.join(root, file))
-    return all_files
-
-
-def _select_user_prompt(df: pd.DataFrame) -> list[str]:
-    """
-    Select the relevant user prompt for each conversation entry based
-    on matching username.
-
-    :param df: DataFrame containing 'user' and 'user_prompts' columns.
-    :return: A list of selected user prompts.
-    """
-    selected_user_prompts = []
-
-    for _, row in df.iterrows():
-        curr_username = row["user"]
-        user_prompts = row["user_prompts"]
-        matched_prompt = next(
-            (p for p in user_prompts if p["username"] == curr_username),
-            None,
-        )
-        if matched_prompt is None:
-            raise ValueError(
-                f"No matching prompt found for username: {curr_username}"
-            )
-
-        selected_user_prompts.append(matched_prompt)
-
-    return selected_user_prompts
-
-
-def _process_traits(user_prompt: dict) -> pd.DataFrame:
-    """
-    Process traits extracted from messages into a structured DataFrame.
-
-    :param series: Series containing traits in dictionary format.
-    :type series: pd.Series
-    :return: A DataFrame with extracted traits as columns.
-    :rtype: pd.DataFrame
-    """
-    prompt_file = StringIO(json.dumps(user_prompt))
-    df = pd.read_json(prompt_file)
-    aggregated_df = _group_all_but_one(df, "personality_characteristics")
-    return aggregated_df
-
-
 def _group_all_but_one(df: pd.DataFrame, to_list_col: str) -> pd.DataFrame:
     grouping_columns = [col for col in df.columns if col != to_list_col]
     aggregated_df = (
@@ -287,25 +249,3 @@ def _generate_message_hash(
     for conv_id, message in zip(conv_ids, messages):
         ls.append(hash_func(hash_func(conv_id) + hash_func(message)))
     return ls
-
-
-def _add_message_order(df: pd.DataFrame) -> pd.Series:
-    i = 1
-    last_conv_id = -1
-    last_message_id = -1
-    numbers = []
-
-    for _, row in df.iterrows():
-        new_conv_id = row["conv_id"]
-        new_message_id = row["message_id"]
-
-        if new_conv_id != last_conv_id:
-            last_conv_id = new_conv_id
-            last_message_id = new_message_id
-            i = 1
-        elif new_message_id != last_message_id:
-            i += 1
-            last_message_id = new_message_id
-
-        numbers.append(i)
-    return pd.Series(numbers)
