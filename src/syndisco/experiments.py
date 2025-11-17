@@ -3,25 +3,23 @@ Module automating and managing batches of discussion/annotation tasks defined
 in the syndisco.jobs module.
 """
 
-"""
-SynDisco: Automated experiment creation and execution using only LLM agents
-Copyright (C) 2025 Dimitris Tsirmpas
+# SynDisco: Automated experiment creation and execution using only LLM agents
+# Copyright (C) 2025 Dimitris Tsirmpas
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-You may contact the author at tsirbasdim@gmail.com
-"""
+# You may contact the author at dim.tsirmpas@aueb.gr
 
 import time
 import random
@@ -47,7 +45,7 @@ class DiscussionExperiment:
     def __init__(
         self,
         users: list[actors.Actor],
-        seed_opinions: list[str] = [],
+        seed_opinions: list[list[str]] | None = None,
         moderator: actors.Actor | None = None,
         next_turn_manager: turn_manager.TurnManager | None = None,
         history_ctx_len: int = 3,
@@ -60,9 +58,12 @@ class DiscussionExperiment:
 
         :param users: List of all possible participants (LLM agents).
         :type users: list[actors.Actor]
-        :param seed_opinions: Optional list of hardcoded seed comments to
-            initiate discussions. One will be selected randomly for each.
-        :type seed_opinions: list[str]
+        :param seed_opinions: Hardcoded seed discussion
+            segements to initiate synthetic discussions.
+            One segment will be selected randomly for each new synthetic
+            discussion and will be uttered by random synthetic participants.
+            None if no seed opinions are to be provided.
+        :type seed_opinions: list[list[str]], optional
         :param moderator: Optional moderator agent, or None to omit moderation.
         :type moderator: actors.Actor or None
         :param next_turn_manager: Strategy for selecting the next speaker.
@@ -77,7 +78,9 @@ class DiscussionExperiment:
         :param num_discussions: Total number of synthetic discussions to run.
         :type num_discussions: int
         """
-        self.seed_opinions = seed_opinions
+        self.seed_opinions = (
+            seed_opinions if seed_opinions is not None else [[]]
+        )
         self.users = users
         self.moderator = moderator
 
@@ -137,8 +140,7 @@ class DiscussionExperiment:
             moderator=self.moderator,
             history_context_len=self.history_ctx_len,
             conv_len=self.num_turns,
-            seed_opinion=rand_topic,
-            seed_opinion_username=random.choice(rand_users).get_name(),
+            seed_opinions=rand_topic,
             next_turn_manager=self.next_turn_manager,
         )
 

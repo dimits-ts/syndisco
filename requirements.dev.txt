@@ -11,6 +11,9 @@ myst-parser
 nbsphinx
 sphinx-autobuild
 sphinx-rtd-theme
+notebook
+ipywidgets
+pandoc
 
 build 
 twine

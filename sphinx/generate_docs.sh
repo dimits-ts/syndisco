@@ -4,8 +4,9 @@ SOURCE_FILES_DIR="$ROOT_DIR/src"
 HTML_OUT_DIR="$ROOT_DIR/docs"
 
 # avoid recursively reading output as input on later invocations
-rm -rf "$SPHINX_DIR/doctrees"
-rm -rf "$SPHINX_DIR/html"
+rm -r $HTML_OUT_DIR
+mkdir -p $HTML_OUT_DIR
+touch "${HTML_OUT_DIR}/.nojekyll"
 
 # create dirs if not exist
 mkdir -p "$SPHINX_DIR/_static"

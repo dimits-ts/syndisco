@@ -9,61 +9,61 @@ syndisco.actors module
 
 .. automodule:: syndisco.actors
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 syndisco.experiments module
 ---------------------------
 
 .. automodule:: syndisco.experiments
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 syndisco.jobs module
 --------------------
 
 .. automodule:: syndisco.jobs
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 syndisco.logging\_util module
 -----------------------------
 
 .. automodule:: syndisco.logging_util
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 syndisco.model module
 ---------------------
 
 .. automodule:: syndisco.model
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 syndisco.postprocessing module
 ------------------------------
 
 .. automodule:: syndisco.postprocessing
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 syndisco.turn\_manager module
 -----------------------------
 
 .. automodule:: syndisco.turn_manager
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 Module contents
 ---------------
 
 .. automodule:: syndisco
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:

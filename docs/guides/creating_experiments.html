@@ -191,19 +191,24 @@
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-2025-06-13 11:08:00 fedora py.warnings[44755] WARNING /home/dimits/anaconda3/envs/syndisco-dev/lib/python3.13/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+2025-11-17 15:54:30 CP-G482-Z52-00 py.warnings[1657124] WARNING /media/SSD_4TB_2/dtsirmpas/software/miniforge/envs/syndisco/lib/python3.13/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
   from .autonotebook import tqdm as notebook_tqdm
 
-2025-06-13 11:08:01 fedora urllib3.connectionpool[44755] DEBUG Starting new HTTPS connection (1): huggingface.co:443
-2025-06-13 11:08:02 fedora urllib3.connectionpool[44755] DEBUG https://huggingface.co:443 &#34;HEAD /unsloth/Llama-3.2-3B-Instruct-bnb-4bit/resolve/main/config.json HTTP/1.1&#34; 200 0
-2025-06-13 11:08:03 fedora bitsandbytes.cextension[44755] DEBUG Loading bitsandbytes native library from: /home/dimits/anaconda3/envs/syndisco-dev/lib/python3.13/site-packages/bitsandbytes/libbitsandbytes_cuda126.so
-2025-06-13 11:08:03 fedora accelerate.utils.modeling[44755] INFO We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
-2025-06-13 11:08:04 fedora urllib3.connectionpool[44755] DEBUG https://huggingface.co:443 &#34;HEAD /unsloth/Llama-3.2-3B-Instruct-bnb-4bit/resolve/main/generation_config.json HTTP/1.1&#34; 200 0
-2025-06-13 11:08:04 fedora urllib3.connectionpool[44755] DEBUG https://huggingface.co:443 &#34;HEAD /unsloth/Llama-3.2-3B-Instruct-bnb-4bit/resolve/main/custom_generate/generate.py HTTP/1.1&#34; 404 0
-2025-06-13 11:08:04 fedora model.py[44755] INFO Model memory footprint:  2095.83 MBs
-2025-06-13 11:08:05 fedora urllib3.connectionpool[44755] DEBUG https://huggingface.co:443 &#34;HEAD /unsloth/Llama-3.2-3B-Instruct-bnb-4bit/resolve/main/tokenizer_config.json HTTP/1.1&#34; 200 0
-2025-06-13 11:08:05 fedora urllib3.connectionpool[44755] DEBUG https://huggingface.co:443 &#34;GET /api/models/unsloth/Llama-3.2-3B-Instruct-bnb-4bit/tree/main/additional_chat_templates?recursive=False&amp;expand=False HTTP/1.1&#34; 404 64
-Device set to use cuda:0
+2025-11-17 15:54:32 CP-G482-Z52-00 urllib3.connectionpool[1657124] DEBUG Starting new HTTPS connection (1): huggingface.co:443
+2025-11-17 15:54:33 CP-G482-Z52-00 urllib3.connectionpool[1657124] DEBUG https://huggingface.co:443 &#34;HEAD /unsloth/Llama-3.2-3B-Instruct-bnb-4bit/resolve/main/config.json HTTP/1.1&#34; 307 0
+2025-11-17 15:54:33 CP-G482-Z52-00 urllib3.connectionpool[1657124] DEBUG https://huggingface.co:443 &#34;HEAD /api/resolve-cache/models/unsloth/Llama-3.2-3B-Instruct-bnb-4bit/bb1d317a108579fb40e646af8924a5e7ec5604b1/config.json HTTP/1.1&#34; 200 0
+2025-11-17 15:54:35 CP-G482-Z52-00 bitsandbytes.cextension[1657124] DEBUG Loading bitsandbytes native library from: /media/SSD_4TB_2/dtsirmpas/software/miniforge/envs/syndisco/lib/python3.13/site-packages/bitsandbytes/libbitsandbytes_cuda126.so
+2025-11-17 15:54:37 CP-G482-Z52-00 accelerate.utils.modeling[1657124] INFO Based on the current allocation process, no modules could be assigned to the following devices due to insufficient memory:
+  - 0: 247335936.0 bytes required
+These minimum requirements are specific to this allocation attempt and may vary. Consider increasing the available memory for these devices to at least the specified minimum, or adjusting the model config.
+2025-11-17 15:54:38 CP-G482-Z52-00 urllib3.connectionpool[1657124] DEBUG https://huggingface.co:443 &#34;HEAD /unsloth/Llama-3.2-3B-Instruct-bnb-4bit/resolve/main/generation_config.json HTTP/1.1&#34; 307 0
+2025-11-17 15:54:38 CP-G482-Z52-00 urllib3.connectionpool[1657124] DEBUG https://huggingface.co:443 &#34;HEAD /api/resolve-cache/models/unsloth/Llama-3.2-3B-Instruct-bnb-4bit/bb1d317a108579fb40e646af8924a5e7ec5604b1/generation_config.json HTTP/1.1&#34; 200 0
+2025-11-17 15:54:38 CP-G482-Z52-00 urllib3.connectionpool[1657124] DEBUG https://huggingface.co:443 &#34;HEAD /unsloth/Llama-3.2-3B-Instruct-bnb-4bit/resolve/main/custom_generate/generate.py HTTP/1.1&#34; 404 0
+2025-11-17 15:54:38 CP-G482-Z52-00 model.py[1657124] INFO Model memory footprint:  2095.83 MBs
+2025-11-17 15:54:38 CP-G482-Z52-00 urllib3.connectionpool[1657124] DEBUG https://huggingface.co:443 &#34;HEAD /unsloth/Llama-3.2-3B-Instruct-bnb-4bit/resolve/main/tokenizer_config.json HTTP/1.1&#34; 307 0
+2025-11-17 15:54:38 CP-G482-Z52-00 urllib3.connectionpool[1657124] DEBUG https://huggingface.co:443 &#34;HEAD /api/resolve-cache/models/unsloth/Llama-3.2-3B-Instruct-bnb-4bit/bb1d317a108579fb40e646af8924a5e7ec5604b1/tokenizer_config.json HTTP/1.1&#34; 200 0
+2025-11-17 15:54:38 CP-G482-Z52-00 urllib3.connectionpool[1657124] DEBUG https://huggingface.co:443 &#34;GET /api/models/unsloth/Llama-3.2-3B-Instruct-bnb-4bit/tree/main/additional_chat_templates?recursive=False&amp;expand=False HTTP/1.1&#34; 404 64
+Device set to use cuda:1
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -215,8 +220,8 @@ Device set to use cuda:0
 
 <span class="n">disc_exp</span> <span class="o">=</span> <span class="n">DiscussionExperiment</span><span class="p">(</span>
     <span class="n">seed_opinions</span><span class="o">=</span><span class="p">[</span>
-        <span class="s2">&quot;Should programmers be allowed to analyze data?&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Should data analysts be allowed to code?&quot;</span><span class="p">,</span>
+        <span class="p">[</span><span class="s2">&quot;Should programmers be allowed to analyze data?&quot;</span><span class="p">,</span> <span class="s2">&quot;Absolutely not&quot;</span><span class="p">],</span>
+        <span class="p">[</span><span class="s2">&quot;Should data analysts be allowed to code?&quot;</span><span class="p">,</span> <span class="s2">&quot;No they are nerds&quot;</span><span class="p">],</span>
     <span class="p">],</span>
     <span class="n">users</span><span class="o">=</span><span class="n">actors</span><span class="p">,</span>
     <span class="n">moderator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -233,12 +238,140 @@ Device set to use cuda:0
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-2025-06-13 11:08:05 fedora experiments.py[44755] WARNING No TurnManager selected: Defaulting to round robin strategy.
-  0%|          | 0/2 [00:00&lt;?, ?it/s]2025-06-13 11:08:05 fedora root[44755] INFO Running experiment 1/3...
-2025-06-13 11:08:05 fedora experiments.py[44755] INFO Beginning conversation...
-2025-06-13 11:08:05 fedora experiments.py[44755] DEBUG Experiment parameters: {
-    &#34;id&#34;: &#34;2ff8485b-a65e-4c73-8cf5-1178be43fb17&#34;,
-    &#34;timestamp&#34;: &#34;25-06-13-11-08&#34;,
+2025-11-17 15:54:39 CP-G482-Z52-00 experiments.py[1657124] WARNING No TurnManager selected: Defaulting to round robin strategy.
+  0%|          | 0/2 [00:00&lt;?, ?it/s]2025-11-17 15:54:39 CP-G482-Z52-00 root[1657124] INFO Running experiment 1/3...
+2025-11-17 15:54:39 CP-G482-Z52-00 experiments.py[1657124] INFO Beginning conversation...
+2025-11-17 15:54:39 CP-G482-Z52-00 experiments.py[1657124] DEBUG Experiment parameters: {
+    &#34;id&#34;: &#34;12ec04a7-bc7a-40ac-aaa4-64fd232e3fde&#34;,
+    &#34;timestamp&#34;: &#34;25-11-17-15-54&#34;,
+    &#34;users&#34;: [
+        &#34;Giannis&#34;,
+        &#34;Emma35&#34;
+    ],
+    &#34;moderator&#34;: null,
+    &#34;user_prompts&#34;: [
+        {
+            &#34;context&#34;: &#34;You are taking part in an online conversation&#34;,
+            &#34;instructions&#34;: &#34;Act like a human would&#34;,
+            &#34;type&#34;: &#34;1&#34;,
+            &#34;persona&#34;: {
+                &#34;username&#34;: &#34;Giannis&#34;,
+                &#34;age&#34;: 21,
+                &#34;sex&#34;: &#34;male&#34;,
+                &#34;sexual_orientation&#34;: &#34;Pansexual&#34;,
+                &#34;demographic_group&#34;: &#34;White&#34;,
+                &#34;current_employment&#34;: &#34;Game Developer&#34;,
+                &#34;education_level&#34;: &#34;College&#34;,
+                &#34;special_instructions&#34;: &#34;&#34;,
+                &#34;personality_characteristics&#34;: [
+                    &#34;strategic&#34;,
+                    &#34;meticulous&#34;,
+                    &#34;nerdy&#34;,
+                    &#34;hyper-focused&#34;
+                ]
+            }
+        },
+        {
+            &#34;context&#34;: &#34;You are taking part in an online conversation&#34;,
+            &#34;instructions&#34;: &#34;Act like a human would&#34;,
+            &#34;type&#34;: &#34;1&#34;,
+            &#34;persona&#34;: {
+                &#34;username&#34;: &#34;Emma35&#34;,
+                &#34;age&#34;: 38,
+                &#34;sex&#34;: &#34;female&#34;,
+                &#34;sexual_orientation&#34;: &#34;Heterosexual&#34;,
+                &#34;demographic_group&#34;: &#34;Latino&#34;,
+                &#34;current_employment&#34;: &#34;Registered Nurse&#34;,
+                &#34;education_level&#34;: &#34;Bachelor&#39;s&#34;,
+                &#34;special_instructions&#34;: &#34;&#34;,
+                &#34;personality_characteristics&#34;: [
+                    &#34;compassionate&#34;,
+                    &#34;patient&#34;,
+                    &#34;diligent&#34;,
+                    &#34;overwhelmed&#34;
+                ]
+            }
+        }
+    ],
+    &#34;moderator_prompt&#34;: null,
+    &#34;ctx_length&#34;: 3,
+    &#34;logs&#34;: []
+}
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Emma35 posted:
+Should data analysts be allowed to code?
+
+User Giannis posted:
+No they are nerds
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Giannis posted:
+I don&#39;t think that&#39;s fair. Just because someone is good with numbers
+and data, it doesn&#39;t mean they can&#39;t also be good with code. In fact,
+many data analysts already know how to code, and it&#39;s a valuable skill
+to have. It&#39;s not about being a &#34;nerd,&#34; it&#39;s about being versatile and
+having a range of skills.
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Emma35 posted:
+I completely agree with Giannis. As a registered nurse, I&#39;ve seen
+firsthand the importance of having a team of professionals who can
+communicate effectively and work together to solve problems. Data
+analysts play a crucial role in providing insights that can inform
+patient care, and their ability to code can be a huge asset in doing
+so. It&#39;s not about being a &#34;nerd&#34; or not, it&#39;s about being a well-
+rounded professional who can contribute to the team.
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+100%|██████████| 3/3 [00:17&lt;00:00,  5.97s/it]
+2025-11-17 15:54:57 CP-G482-Z52-00 root[1657124] DEBUG Finished discussion in 17.901949167251587 seconds.
+2025-11-17 15:54:57 CP-G482-Z52-00 experiments.py[1657124] INFO Conversation saved to /tmp/tmppls1u767/25-11-17-15-54.json
+2025-11-17 15:54:57 CP-G482-Z52-00 logging_util.py[1657124] INFO Procedure _run_single_discussion executed in 0.2984 minutes
+ 50%|█████     | 1/2 [00:17&lt;00:17, 17.91s/it]2025-11-17 15:54:57 CP-G482-Z52-00 root[1657124] INFO Running experiment 2/3...
+2025-11-17 15:54:57 CP-G482-Z52-00 experiments.py[1657124] INFO Beginning conversation...
+2025-11-17 15:54:57 CP-G482-Z52-00 experiments.py[1657124] DEBUG Experiment parameters: {
+    &#34;id&#34;: &#34;307e22a5-bd2b-4849-a292-9d65fad60494&#34;,
+    &#34;timestamp&#34;: &#34;25-11-17-15-54&#34;,
     &#34;users&#34;: [
         &#34;Giannis&#34;,
         &#34;Emma35&#34;
@@ -300,32 +433,19 @@ Device set to use cuda:0
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 User Giannis posted:
-Should data analysts be allowed to code?
+I love seeing people defending the honor of data analysts. I think
+it&#39;s great that we&#39;re having this conversation. As a game developer, I
+can attest to the importance of having a team with diverse skill sets.
+In the game development world, we often have artists, writers,
+designers, and of course, developers. Each of us brings our unique
+perspectives and skills to the table, and it&#39;s what makes a game truly
+great. I think data analysts are just as crucial to the success of a
 
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
+User Emma35 posted:
+Should programmers be allowed to analyze data?
 
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
 User Giannis posted:
-I think data analysts should definitely be allowed to code. In fact, I
-believe it&#39;s essential for their role. As a game developer myself, I
-can attest to the importance of having a good understanding of coding
-principles and practices. It&#39;s not just about crunching numbers, but
-also about being able to implement data-driven insights and make
-informed decisions.  In my experience, having a basic understanding of
-coding can make a huge difference in the quality of analysis and the
-impact of the insights that come out of
+Absolutely not
 
 </pre></div></div>
 </div>
@@ -343,103 +463,11 @@ impact of the insights that come out of
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 User Emma35 posted:
-I completely agree with Giannis on this one. As a registered nurse,
-I&#39;ve seen firsthand how data analysis can make a huge difference in
-patient care. Being able to code not only allows data analysts to
-implement their findings but also to create tools that can automate
-certain tasks, freeing up time for more strategic and high-level
-analysis. In my experience, it&#39;s not just about crunching numbers, but
-about using that data to drive meaningful insights and improvements.
-I&#39;ve even started learning some basic coding skills
-
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-100%|██████████| 3/3 [00:07&lt;00:00,  2.36s/it]
-2025-06-13 11:08:12 fedora root[44755] DEBUG Finished discussion in 7.078034162521362 seconds.
-2025-06-13 11:08:12 fedora experiments.py[44755] INFO Conversation saved to /tmp/tmpx43xqdwt/25-06-13-11-08.json
-2025-06-13 11:08:12 fedora logging_util.py[44755] INFO Procedure _run_single_discussion executed in 0.1180 minutes
- 50%|█████     | 1/2 [00:07&lt;00:07,  7.08s/it]2025-06-13 11:08:12 fedora root[44755] INFO Running experiment 2/3...
-2025-06-13 11:08:12 fedora experiments.py[44755] INFO Beginning conversation...
-2025-06-13 11:08:12 fedora experiments.py[44755] DEBUG Experiment parameters: {
-    &#34;id&#34;: &#34;5a488d0d-c469-4b51-b698-d4c3913019d0&#34;,
-    &#34;timestamp&#34;: &#34;25-06-13-11-08&#34;,
-    &#34;users&#34;: [
-        &#34;Emma35&#34;,
-        &#34;Giannis&#34;
-    ],
-    &#34;moderator&#34;: null,
-    &#34;user_prompts&#34;: [
-        {
-            &#34;context&#34;: &#34;You are taking part in an online conversation&#34;,
-            &#34;instructions&#34;: &#34;Act like a human would&#34;,
-            &#34;type&#34;: &#34;1&#34;,
-            &#34;persona&#34;: {
-                &#34;username&#34;: &#34;Emma35&#34;,
-                &#34;age&#34;: 38,
-                &#34;sex&#34;: &#34;female&#34;,
-                &#34;sexual_orientation&#34;: &#34;Heterosexual&#34;,
-                &#34;demographic_group&#34;: &#34;Latino&#34;,
-                &#34;current_employment&#34;: &#34;Registered Nurse&#34;,
-                &#34;education_level&#34;: &#34;Bachelor&#39;s&#34;,
-                &#34;special_instructions&#34;: &#34;&#34;,
-                &#34;personality_characteristics&#34;: [
-                    &#34;compassionate&#34;,
-                    &#34;patient&#34;,
-                    &#34;diligent&#34;,
-                    &#34;overwhelmed&#34;
-                ]
-            }
-        },
-        {
-            &#34;context&#34;: &#34;You are taking part in an online conversation&#34;,
-            &#34;instructions&#34;: &#34;Act like a human would&#34;,
-            &#34;type&#34;: &#34;1&#34;,
-            &#34;persona&#34;: {
-                &#34;username&#34;: &#34;Giannis&#34;,
-                &#34;age&#34;: 21,
-                &#34;sex&#34;: &#34;male&#34;,
-                &#34;sexual_orientation&#34;: &#34;Pansexual&#34;,
-                &#34;demographic_group&#34;: &#34;White&#34;,
-                &#34;current_employment&#34;: &#34;Game Developer&#34;,
-                &#34;education_level&#34;: &#34;College&#34;,
-                &#34;special_instructions&#34;: &#34;&#34;,
-                &#34;personality_characteristics&#34;: [
-                    &#34;strategic&#34;,
-                    &#34;meticulous&#34;,
-                    &#34;nerdy&#34;,
-                    &#34;hyper-focused&#34;
-                ]
-            }
-        }
-    ],
-    &#34;moderator_prompt&#34;: null,
-    &#34;ctx_length&#34;: 3,
-    &#34;logs&#34;: []
-}
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-User Giannis posted:
-User Giannis posted: I completely agree with Emma35 and I think it&#39;s
-amazing to see more people from different backgrounds and fields
-stepping into coding. As a game developer, I&#39;ve had the opportunity to
-work with data analysts who are not only great at crunching numbers
-but also have a solid understanding of coding principles. It&#39;s not
-just about being able to implement data-driven insights, but also
-about being able to communicate those insights effectively to non-
-technical stakeholders. In my experience, having a basic
-
-User Giannis posted:
-Should data analysts be allowed to code?
+User Emma35 posted: I disagree, I think programmers are essential in
+analyzing data. As a registered nurse, I&#39;ve seen firsthand how data
+analysis can help inform medical decisions and improve patient
+outcomes. Without programmers, we wouldn&#39;t have many of the medical
+breakthroughs we have today. What&#39;s your take on this, Giannis?
 
 </pre></div></div>
 </div>
@@ -457,14 +485,14 @@ Should data analysts be allowed to code?
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 User Giannis posted:
-As a game developer, I think data analysts can definitely code, but
-it&#39;s not always necessary. I mean, some data analysts might not need
-to write code, but rather focus on interpreting and visualizing the
-data. However, having some coding skills can be super beneficial for
-them. It can help them to automate certain tasks, create dashboards,
-and even communicate their findings more effectively.  That being
-said, I think it&#39;s more about the type of data analyst we&#39;re talking
-about. If they
+I&#39;m not saying programmers aren&#39;t essential, Emma, but I think it&#39;s a
+false dichotomy to say they&#39;re the only ones who can analyze data. I
+mean, have you ever tried to analyze a dataset with a team of doctors,
+nurses, and engineers working together? It&#39;s a beautiful thing. The
+insights we get from combining our expertise are far more valuable
+than anything a single programmer could come up with. Plus, I think
+there&#39;s a difference between analyzing data and interpreting it -
+anyone
 
 </pre></div></div>
 </div>
@@ -473,38 +501,13 @@ about. If they
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-User Emma35 posted:
-I completely agree with you, Giannis. As a registered nurse, I&#39;ve
-worked with data analysts before, and I can attest to the fact that
-having some coding skills can definitely enhance their abilities. In
-healthcare, for instance, data analysts often have to work with large
-datasets and need to be able to extract insights quickly. Coding can
-be a huge time-saver and help them focus on the more analytical
-aspects of their job.  Plus, with the increasing use of big data and
-AI in healthcare,
-
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-100%|██████████| 3/3 [00:06&lt;00:00,  2.23s/it]
-2025-06-13 11:08:19 fedora root[44755] DEBUG Finished discussion in 6.697901487350464 seconds.
-2025-06-13 11:08:19 fedora experiments.py[44755] INFO Conversation saved to /tmp/tmpx43xqdwt/25-06-13-11-08.json
-2025-06-13 11:08:19 fedora logging_util.py[44755] INFO Procedure _run_single_discussion executed in 0.1116 minutes
-100%|██████████| 2/2 [00:13&lt;00:00,  6.89s/it]
-2025-06-13 11:08:19 fedora experiments.py[44755] INFO Finished synthetic discussion generation.
-2025-06-13 11:08:19 fedora logging_util.py[44755] INFO Procedure _run_all_discussions executed in 0.2297 minutes
+100%|██████████| 3/3 [00:16&lt;00:00,  5.66s/it]
+2025-11-17 15:55:14 CP-G482-Z52-00 root[1657124] DEBUG Finished discussion in 16.972900867462158 seconds.
+2025-11-17 15:55:14 CP-G482-Z52-00 experiments.py[1657124] INFO Conversation saved to /tmp/tmppls1u767/25-11-17-15-55.json
+2025-11-17 15:55:14 CP-G482-Z52-00 logging_util.py[1657124] INFO Procedure _run_single_discussion executed in 0.2829 minutes
+100%|██████████| 2/2 [00:34&lt;00:00, 17.44s/it]
+2025-11-17 15:55:14 CP-G482-Z52-00 experiments.py[1657124] INFO Finished synthetic discussion generation.
+2025-11-17 15:55:14 CP-G482-Z52-00 logging_util.py[1657124] INFO Procedure _run_all_discussions executed in 0.5815 minutes
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -512,15 +515,15 @@ AI in healthcare,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-User Giannis posted:
-User Giannis posted: I completely agree with you both. In my
-experience, having some coding skills can definitely make a data
-analyst more efficient and effective in their work. And I think it&#39;s
-not just about healthcare, but also in other industries like finance,
-marketing, and more. Being able to automate tasks, create custom
-visualizations, and communicate complex data insights to non-technical
-stakeholders is a huge advantage. That being said, I do think there&#39;s
-a difference between a data analyst who is
+User Emma35 posted:
+I think we&#39;re getting somewhere with this conversation. As a nurse,
+I&#39;ve had the privilege of working alongside engineers and doctors to
+implement data-driven solutions in my hospital. I completely agree
+that a team effort is essential in analyzing and interpreting data.
+However, I still believe that programmers play a crucial role in
+collecting and processing the data in the first place. Without them,
+we wouldn&#39;t have the raw material to analyze in the first place. That
+being said, I do think it&#39;s essential to have
 
 </pre></div></div>
 </div>
@@ -572,11 +575,11 @@ a difference between a data analyst who is
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-  0%|          | 0/1 [00:00&lt;?, ?it/s]2025-06-13 11:08:19 fedora experiments.py[44755] INFO Running annotation 1/1...
-2025-06-13 11:08:19 fedora experiments.py[44755] INFO Beginning annotation...
-2025-06-13 11:08:19 fedora experiments.py[44755] DEBUG Experiment parameters: {
-    &#34;conv_id&#34;: &#34;5a488d0d-c469-4b51-b698-d4c3913019d0&#34;,
-    &#34;timestamp&#34;: &#34;25-06-13-11-08&#34;,
+  0%|          | 0/2 [00:00&lt;?, ?it/s]2025-11-17 15:55:14 CP-G482-Z52-00 experiments.py[1657124] INFO Running annotation 1/2...
+2025-11-17 15:55:14 CP-G482-Z52-00 experiments.py[1657124] INFO Beginning annotation...
+2025-11-17 15:55:14 CP-G482-Z52-00 experiments.py[1657124] DEBUG Experiment parameters: {
+    &#34;conv_id&#34;: &#34;307e22a5-bd2b-4849-a292-9d65fad60494&#34;,
+    &#34;timestamp&#34;: &#34;25-11-17-15-55&#34;,
     &#34;annotator_model&#34;: &#34;test_model&#34;,
     &#34;annotator_prompt&#34;: {
         &#34;context&#34;: &#34;You are annotating an online discussion&#34;,
@@ -606,7 +609,24 @@ a difference between a data analyst who is
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-User Giannis posted: Should data analysts be allowed to code?
+User Emma35 posted: Should programmers be allowed to analyze data?
+1
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Giannis posted: Absolutely not
 3
 </pre></div></div>
 </div>
@@ -623,14 +643,169 @@ User Giannis posted: Should data analysts be allowed to code?
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-User Giannis posted: As a game developer, I think data analysts can
-definitely code, but it&#39;s not always necessary. I mean, some data
-analysts might not need to write code, but rather focus on
-interpreting and visualizing the data. However, having some coding
-skills can be super beneficial for them. It can help them to automate
-certain tasks, create dashboards, and even communicate their findings
-more effectively.  That being said, I think it&#39;s more about the type
-of data analyst we&#39;re talking about. If they
+User Emma35 posted: User Emma35 posted: I disagree, I think
+programmers are essential in analyzing data. As a registered nurse,
+I&#39;ve seen firsthand how data analysis can help inform medical
+decisions and improve patient outcomes. Without programmers, we
+wouldn&#39;t have many of the medical breakthroughs we have today. What&#39;s
+your take on this, Giannis?
+3
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+You seem to be using the pipelines sequentially on GPU. In order to maximize efficiency please use a dataset
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Giannis posted: I&#39;m not saying programmers aren&#39;t essential,
+Emma, but I think it&#39;s a false dichotomy to say they&#39;re the only ones
+who can analyze data. I mean, have you ever tried to analyze a dataset
+with a team of doctors, nurses, and engineers working together? It&#39;s a
+beautiful thing. The insights we get from combining our expertise are
+far more valuable than anything a single programmer could come up
+with. Plus, I think there&#39;s a difference between analyzing data and
+interpreting it - anyone
+3
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+100%|██████████| 5/5 [00:02&lt;00:00,  2.49it/s]
+2025-11-17 15:55:16 CP-G482-Z52-00 experiments.py[1657124] INFO Annotation saved to /tmp/tmpd1mqghh3/25-11-17-15-55.json
+2025-11-17 15:55:16 CP-G482-Z52-00 logging_util.py[1657124] INFO Procedure _run_single_annotation executed in 0.0336 minutes
+ 50%|█████     | 1/2 [00:02&lt;00:02,  2.02s/it]2025-11-17 15:55:16 CP-G482-Z52-00 experiments.py[1657124] INFO Running annotation 2/2...
+2025-11-17 15:55:16 CP-G482-Z52-00 experiments.py[1657124] INFO Beginning annotation...
+2025-11-17 15:55:16 CP-G482-Z52-00 experiments.py[1657124] DEBUG Experiment parameters: {
+    &#34;conv_id&#34;: &#34;12ec04a7-bc7a-40ac-aaa4-64fd232e3fde&#34;,
+    &#34;timestamp&#34;: &#34;25-11-17-15-55&#34;,
+    &#34;annotator_model&#34;: &#34;test_model&#34;,
+    &#34;annotator_prompt&#34;: {
+        &#34;context&#34;: &#34;You are annotating an online discussion&#34;,
+        &#34;instructions&#34;: &#34;From a scale of 1 (not toxic) to 5 (very toxic) how toxic is the following comment? Reply only with a number.&#34;,
+        &#34;type&#34;: &#34;2&#34;,
+        &#34;persona&#34;: {
+            &#34;username&#34;: &#34;annotator&#34;,
+            &#34;age&#34;: 38,
+            &#34;sex&#34;: &#34;female&#34;,
+            &#34;sexual_orientation&#34;: &#34;Heterosexual&#34;,
+            &#34;demographic_group&#34;: &#34;White&#34;,
+            &#34;current_employment&#34;: &#34;Annotator&#34;,
+            &#34;education_level&#34;: &#34;Bachelor&#39;s&#34;,
+            &#34;special_instructions&#34;: &#34;&#34;,
+            &#34;personality_characteristics&#34;: [
+                &#34;competent&#34;
+            ]
+        }
+    },
+    &#34;ctx_length&#34;: 3,
+    &#34;logs&#34;: []
+}
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Emma35 posted: I think we&#39;re getting somewhere with this
+conversation. As a nurse, I&#39;ve had the privilege of working alongside
+engineers and doctors to implement data-driven solutions in my
+hospital. I completely agree that a team effort is essential in
+analyzing and interpreting data. However, I still believe that
+programmers play a crucial role in collecting and processing the data
+in the first place. Without them, we wouldn&#39;t have the raw material to
+analyze in the first place. That being said, I do think it&#39;s essential
+to have
+3
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Emma35 posted: Should data analysts be allowed to code?
+3
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Giannis posted: No they are nerds
+3
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Giannis posted: I don&#39;t think that&#39;s fair. Just because someone
+is good with numbers and data, it doesn&#39;t mean they can&#39;t also be good
+with code. In fact, many data analysts already know how to code, and
+it&#39;s a valuable skill to have. It&#39;s not about being a &#34;nerd,&#34; it&#39;s
+about being versatile and having a range of skills.
+1
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Emma35 posted: I completely agree with Giannis. As a registered
+nurse, I&#39;ve seen firsthand the importance of having a team of
+professionals who can communicate effectively and work together to
+solve problems. Data analysts play a crucial role in providing
+insights that can inform patient care, and their ability to code can
+be a huge asset in doing so. It&#39;s not about being a &#34;nerd&#34; or not,
+it&#39;s about being a well- rounded professional who can contribute to
+the team.
 2
 </pre></div></div>
 </div>
@@ -639,36 +814,12 @@ of data analyst we&#39;re talking about. If they
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-User Emma35 posted: I completely agree with you, Giannis. As a
-registered nurse, I&#39;ve worked with data analysts before, and I can
-attest to the fact that having some coding skills can definitely
-enhance their abilities. In healthcare, for instance, data analysts
-often have to work with large datasets and need to be able to extract
-insights quickly. Coding can be a huge time-saver and help them focus
-on the more analytical aspects of their job.  Plus, with the
-increasing use of big data and AI in healthcare,
-3
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-100%|██████████| 4/4 [00:00&lt;00:00,  7.35it/s]
-2025-06-13 11:08:19 fedora experiments.py[44755] INFO Annotation saved to /tmp/tmpiv_2fqz4/25-06-13-11-08.json
-2025-06-13 11:08:19 fedora logging_util.py[44755] INFO Procedure _run_single_annotation executed in 0.0091 minutes
-100%|██████████| 1/1 [00:00&lt;00:00,  1.83it/s]
-2025-06-13 11:08:19 fedora experiments.py[44755] INFO Finished annotation generation.
-2025-06-13 11:08:19 fedora logging_util.py[44755] INFO Procedure _run_all_annotations executed in 0.0091 minutes
+100%|██████████| 5/5 [00:01&lt;00:00,  2.57it/s]
+2025-11-17 15:55:18 CP-G482-Z52-00 experiments.py[1657124] INFO Annotation saved to /tmp/tmpd1mqghh3/25-11-17-15-55.json
+2025-11-17 15:55:18 CP-G482-Z52-00 logging_util.py[1657124] INFO Procedure _run_single_annotation executed in 0.0326 minutes
+100%|██████████| 2/2 [00:03&lt;00:00,  1.99s/it]
+2025-11-17 15:55:18 CP-G482-Z52-00 experiments.py[1657124] INFO Finished annotation generation.
+2025-11-17 15:55:18 CP-G482-Z52-00 logging_util.py[1657124] INFO Procedure _run_all_annotations executed in 0.0663 minutes
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -676,14 +827,14 @@ increasing use of big data and AI in healthcare,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-User Giannis posted: User Giannis posted: I completely agree with you
-both. In my experience, having some coding skills can definitely make
-a data analyst more efficient and effective in their work. And I think
-it&#39;s not just about healthcare, but also in other industries like
-finance, marketing, and more. Being able to automate tasks, create
-custom visualizations, and communicate complex data insights to non-
-technical stakeholders is a huge advantage. That being said, I do
-think there&#39;s a difference between a data analyst who is
+User Giannis posted: I love seeing people defending the honor of data
+analysts. I think it&#39;s great that we&#39;re having this conversation. As a
+game developer, I can attest to the importance of having a team with
+diverse skill sets. In the game development world, we often have
+artists, writers, designers, and of course, developers. Each of us
+brings our unique perspectives and skills to the table, and it&#39;s what
+makes a game truly great. I think data analysts are just as crucial to
+the success of a
 3
 </pre></div></div>
 </div>
@@ -750,36 +901,36 @@ think there&#39;s a difference between a data analyst who is
   <tbody>
     <tr>
       <th>0</th>
-      <td>5a488d0d-c469-4b51-b698-d4c3913019d0</td>
-      <td>25-06-13-11-08</td>
+      <td>307e22a5-bd2b-4849-a292-9d65fad60494</td>
+      <td>25-11-17-15-55</td>
       <td>3</td>
-      <td>tmpx43xqdwt</td>
-      <td>Giannis</td>
-      <td>Should data analysts be allowed to code?</td>
+      <td>tmppls1u767</td>
+      <td>Emma35</td>
+      <td>Should programmers be allowed to analyze data?</td>
       <td>hardcoded</td>
       <td>False</td>
-      <td>-84934534716399152</td>
+      <td>1029457235311448905</td>
       <td>1</td>
-      <td>21</td>
-      <td>male</td>
-      <td>Pansexual</td>
-      <td>White</td>
-      <td>Game Developer</td>
-      <td>College</td>
+      <td>38</td>
+      <td>female</td>
+      <td>Heterosexual</td>
+      <td>Latino</td>
+      <td>Registered Nurse</td>
+      <td>Bachelor's</td>
       <td></td>
-      <td>[strategic, meticulous, nerdy, hyper-focused]</td>
+      <td>[compassionate, patient, diligent, overwhelmed]</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>5a488d0d-c469-4b51-b698-d4c3913019d0</td>
-      <td>25-06-13-11-08</td>
+      <td>307e22a5-bd2b-4849-a292-9d65fad60494</td>
+      <td>25-11-17-15-55</td>
       <td>3</td>
-      <td>tmpx43xqdwt</td>
+      <td>tmppls1u767</td>
       <td>Giannis</td>
-      <td>As a game developer, I think data analysts can...</td>
-      <td>test_model</td>
+      <td>Absolutely not</td>
+      <td>hardcoded</td>
       <td>False</td>
-      <td>-700144548236281712</td>
+      <td>1275412311094042822</td>
       <td>2</td>
       <td>21</td>
       <td>male</td>
@@ -792,15 +943,15 @@ think there&#39;s a difference between a data analyst who is
     </tr>
     <tr>
       <th>2</th>
-      <td>5a488d0d-c469-4b51-b698-d4c3913019d0</td>
-      <td>25-06-13-11-08</td>
+      <td>307e22a5-bd2b-4849-a292-9d65fad60494</td>
+      <td>25-11-17-15-55</td>
       <td>3</td>
-      <td>tmpx43xqdwt</td>
+      <td>tmppls1u767</td>
       <td>Emma35</td>
-      <td>I completely agree with you, Giannis. As a reg...</td>
+      <td>User Emma35 posted:\nI disagree, I think progr...</td>
       <td>test_model</td>
       <td>False</td>
-      <td>-298280611323634084</td>
+      <td>-2292924728665999762</td>
       <td>3</td>
       <td>38</td>
       <td>female</td>
@@ -813,16 +964,142 @@ think there&#39;s a difference between a data analyst who is
     </tr>
     <tr>
       <th>3</th>
-      <td>5a488d0d-c469-4b51-b698-d4c3913019d0</td>
-      <td>25-06-13-11-08</td>
+      <td>307e22a5-bd2b-4849-a292-9d65fad60494</td>
+      <td>25-11-17-15-55</td>
       <td>3</td>
-      <td>tmpx43xqdwt</td>
+      <td>tmppls1u767</td>
       <td>Giannis</td>
-      <td>User Giannis posted:\nI completely agree with ...</td>
+      <td>I'm not saying programmers aren't essential, E...</td>
       <td>test_model</td>
       <td>False</td>
-      <td>-1155198955155069686</td>
+      <td>-527374938501688905</td>
       <td>4</td>
+      <td>21</td>
+      <td>male</td>
+      <td>Pansexual</td>
+      <td>White</td>
+      <td>Game Developer</td>
+      <td>College</td>
+      <td></td>
+      <td>[strategic, meticulous, nerdy, hyper-focused]</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>307e22a5-bd2b-4849-a292-9d65fad60494</td>
+      <td>25-11-17-15-55</td>
+      <td>3</td>
+      <td>tmppls1u767</td>
+      <td>Emma35</td>
+      <td>I think we're getting somewhere with this conv...</td>
+      <td>test_model</td>
+      <td>False</td>
+      <td>371714338555722897</td>
+      <td>5</td>
+      <td>38</td>
+      <td>female</td>
+      <td>Heterosexual</td>
+      <td>Latino</td>
+      <td>Registered Nurse</td>
+      <td>Bachelor's</td>
+      <td></td>
+      <td>[compassionate, patient, diligent, overwhelmed]</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>12ec04a7-bc7a-40ac-aaa4-64fd232e3fde</td>
+      <td>25-11-17-15-54</td>
+      <td>3</td>
+      <td>tmppls1u767</td>
+      <td>Emma35</td>
+      <td>Should data analysts be allowed to code?</td>
+      <td>hardcoded</td>
+      <td>False</td>
+      <td>-1031450388537896126</td>
+      <td>1</td>
+      <td>38</td>
+      <td>female</td>
+      <td>Heterosexual</td>
+      <td>Latino</td>
+      <td>Registered Nurse</td>
+      <td>Bachelor's</td>
+      <td></td>
+      <td>[compassionate, patient, diligent, overwhelmed]</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>12ec04a7-bc7a-40ac-aaa4-64fd232e3fde</td>
+      <td>25-11-17-15-54</td>
+      <td>3</td>
+      <td>tmppls1u767</td>
+      <td>Giannis</td>
+      <td>No they are nerds</td>
+      <td>hardcoded</td>
+      <td>False</td>
+      <td>-561152290859280713</td>
+      <td>2</td>
+      <td>21</td>
+      <td>male</td>
+      <td>Pansexual</td>
+      <td>White</td>
+      <td>Game Developer</td>
+      <td>College</td>
+      <td></td>
+      <td>[strategic, meticulous, nerdy, hyper-focused]</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>12ec04a7-bc7a-40ac-aaa4-64fd232e3fde</td>
+      <td>25-11-17-15-54</td>
+      <td>3</td>
+      <td>tmppls1u767</td>
+      <td>Giannis</td>
+      <td>I don't think that's fair. Just because someon...</td>
+      <td>test_model</td>
+      <td>False</td>
+      <td>-820257259971452438</td>
+      <td>3</td>
+      <td>21</td>
+      <td>male</td>
+      <td>Pansexual</td>
+      <td>White</td>
+      <td>Game Developer</td>
+      <td>College</td>
+      <td></td>
+      <td>[strategic, meticulous, nerdy, hyper-focused]</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>12ec04a7-bc7a-40ac-aaa4-64fd232e3fde</td>
+      <td>25-11-17-15-54</td>
+      <td>3</td>
+      <td>tmppls1u767</td>
+      <td>Emma35</td>
+      <td>I completely agree with Giannis. As a register...</td>
+      <td>test_model</td>
+      <td>False</td>
+      <td>-1837031216908053191</td>
+      <td>4</td>
+      <td>38</td>
+      <td>female</td>
+      <td>Heterosexual</td>
+      <td>Latino</td>
+      <td>Registered Nurse</td>
+      <td>Bachelor's</td>
+      <td></td>
+      <td>[compassionate, patient, diligent, overwhelmed]</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>12ec04a7-bc7a-40ac-aaa4-64fd232e3fde</td>
+      <td>25-11-17-15-54</td>
+      <td>3</td>
+      <td>tmppls1u767</td>
+      <td>Giannis</td>
+      <td>I love seeing people defending the honor of da...</td>
+      <td>test_model</td>
+      <td>False</td>
+      <td>-1624476104730163305</td>
+      <td>5</td>
       <td>21</td>
       <td>male</td>
       <td>Pansexual</td>
@@ -894,8 +1171,8 @@ think there&#39;s a difference between a data analyst who is
   <tbody>
     <tr>
       <th>0</th>
-      <td>5a488d0d-c469-4b51-b698-d4c3913019d0</td>
-      <td>25-06-13-11-08</td>
+      <td>12ec04a7-bc7a-40ac-aaa4-64fd232e3fde</td>
+      <td>25-11-17-15-55</td>
       <td>test_model</td>
       <td>3</td>
       <td>You are annotating an online discussion</td>
@@ -909,17 +1186,17 @@ think there&#39;s a difference between a data analyst who is
       <td>Annotator</td>
       <td>Bachelor's</td>
       <td></td>
-      <td>tmpiv_2fqz4</td>
-      <td>As a game developer, I think data analysts can...</td>
+      <td>tmpd1mqghh3</td>
+      <td>I completely agree with Giannis. As a register...</td>
       <td>2</td>
-      <td>-700144548236281712</td>
-      <td>2</td>
+      <td>-1837031216908053191</td>
+      <td>4</td>
       <td>[[competent]]</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>5a488d0d-c469-4b51-b698-d4c3913019d0</td>
-      <td>25-06-13-11-08</td>
+      <td>12ec04a7-bc7a-40ac-aaa4-64fd232e3fde</td>
+      <td>25-11-17-15-55</td>
       <td>test_model</td>
       <td>3</td>
       <td>You are annotating an online discussion</td>
@@ -933,17 +1210,17 @@ think there&#39;s a difference between a data analyst who is
       <td>Annotator</td>
       <td>Bachelor's</td>
       <td></td>
-      <td>tmpiv_2fqz4</td>
-      <td>I completely agree with you, Giannis. As a reg...</td>
-      <td>3</td>
-      <td>-298280611323634084</td>
+      <td>tmpd1mqghh3</td>
+      <td>I don't think that's fair. Just because someon...</td>
+      <td>1</td>
+      <td>-820257259971452438</td>
       <td>3</td>
       <td>[[competent]]</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>5a488d0d-c469-4b51-b698-d4c3913019d0</td>
-      <td>25-06-13-11-08</td>
+      <td>12ec04a7-bc7a-40ac-aaa4-64fd232e3fde</td>
+      <td>25-11-17-15-55</td>
       <td>test_model</td>
       <td>3</td>
       <td>You are annotating an online discussion</td>
@@ -957,17 +1234,17 @@ think there&#39;s a difference between a data analyst who is
       <td>Annotator</td>
       <td>Bachelor's</td>
       <td></td>
-      <td>tmpiv_2fqz4</td>
-      <td>Should data analysts be allowed to code?</td>
+      <td>tmpd1mqghh3</td>
+      <td>I love seeing people defending the honor of da...</td>
       <td>3</td>
-      <td>-84934534716399152</td>
-      <td>1</td>
+      <td>-1624476104730163305</td>
+      <td>5</td>
       <td>[[competent]]</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>5a488d0d-c469-4b51-b698-d4c3913019d0</td>
-      <td>25-06-13-11-08</td>
+      <td>12ec04a7-bc7a-40ac-aaa4-64fd232e3fde</td>
+      <td>25-11-17-15-55</td>
       <td>test_model</td>
       <td>3</td>
       <td>You are annotating an online discussion</td>
@@ -981,16 +1258,40 @@ think there&#39;s a difference between a data analyst who is
       <td>Annotator</td>
       <td>Bachelor's</td>
       <td></td>
-      <td>tmpiv_2fqz4</td>
-      <td>User Giannis posted:\nI completely agree with ...</td>
+      <td>tmpd1mqghh3</td>
+      <td>No they are nerds</td>
       <td>3</td>
-      <td>-1155198955155069686</td>
-      <td>4</td>
+      <td>-561152290859280713</td>
+      <td>2</td>
+      <td>[[competent]]</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>12ec04a7-bc7a-40ac-aaa4-64fd232e3fde</td>
+      <td>25-11-17-15-55</td>
+      <td>test_model</td>
+      <td>3</td>
+      <td>You are annotating an online discussion</td>
+      <td>From a scale of 1 (not toxic) to 5 (very toxic...</td>
+      <td>2</td>
+      <td>annotator</td>
+      <td>38</td>
+      <td>female</td>
+      <td>...</td>
+      <td>White</td>
+      <td>Annotator</td>
+      <td>Bachelor's</td>
+      <td></td>
+      <td>tmpd1mqghh3</td>
+      <td>Should data analysts be allowed to code?</td>
+      <td>3</td>
+      <td>-1031450388537896126</td>
+      <td>1</td>
       <td>[[competent]]</td>
     </tr>
   </tbody>
 </table>
-<p>4 rows × 21 columns</p>
+<p>5 rows × 21 columns</p>
 </div></div>
 </div>
 </section>

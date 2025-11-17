@@ -2,25 +2,23 @@
 Module handling the execution of LLM discussion and annotation tasks.
 """
 
-"""
-SynDisco: Automated experiment creation and execution using only LLM agents
-Copyright (C) 2025 Dimitris Tsirmpas
+# SynDisco: Automated experiment creation and execution using only LLM agents
+# Copyright (C) 2025 Dimitris Tsirmpas
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-You may contact the author at tsirbasdim@gmail.com
-"""
+# You may contact the author at dim.tsirmpas@aueb.gr
 
 import collections
 import datetime
@@ -29,6 +27,7 @@ import logging
 import uuid
 import copy
 import textwrap
+import random
 from pathlib import Path
 from typing import Any, Optional
 
@@ -58,8 +57,8 @@ class Discussion:
         moderator: Optional[actors.Actor] = None,
         history_context_len: int = 5,
         conv_len: int = 5,
-        seed_opinion: str = "",
-        seed_opinion_username: str = "",
+        seed_opinions: list[str] | None = None,
+        seed_opinion_usernames: list[str] | None = None,
     ) -> None:
         """
         Construct the framework for a conversation to take place.
@@ -80,12 +79,16 @@ class Discussion:
         (how many times each actor will be prompted),
          defaults to 5
         :type conv_len: int, optional
-        :param seed_opinion: The first hardcoded comments to
-        start the conversation with
-        :type seed_opinion: str, optional
-        :param seed_opinion_username: The username for the seed opinion
+        :param seed_opinions:
+            The first hardcoded comments to start the discussion with.
+            Will be inserted in the discussion, from top-to-bottom according
+            to the ordering provided by the list.
+        :type seed_opinion: list[str], optional
+        :param seed_opinion_usernames:
+            The usernames for each seed opinion.
+            None if the usernames are to be selected randomly.
         :type seed_opinion_username:
-            str, optional
+            list[str], optional
         :raises ValueError: if the number of seed opinions and seed
         opinion users are different, or
         if the number of seed opinions exceeds history_context_len
@@ -111,19 +114,10 @@ class Discussion:
         self.ctx_history = collections.deque(maxlen=history_context_len)
         self.conv_logs = []
 
-        self.seed_opinion_username = seed_opinion_username
-        self.seed_opinion = seed_opinion
+        self.seed_opinions = seed_opinions or []
+        self.seed_opinion_usernames = seed_opinion_usernames
 
     def begin(self, verbose: bool = True) -> None:
-        """
-        Begin the discussion between the actors.
-
-        :param verbose: whether to print the messages on the screen
-            as they are generated, defaults to True
-        :type verbose: bool, optional
-        :raises RuntimeError: if the object has already been used to generate
-            a conversation
-        """
         self.next_turn_manager.set_names(list(self.username_user_map.keys()))
 
         if len(self.conv_logs) != 0:
@@ -132,34 +126,17 @@ class Discussion:
                 "create a new Discussion object."
             )
 
-        if self.seed_opinion.strip() != "":
-            # create first "seed" opinion
-            seed_user = actors.Actor(
-                model=None,  # type: ignore
-                persona=actors.Persona(
-                    username=self.seed_opinion_username
-                ),
-                context="",
-                instructions="",
-                actor_type=actors.ActorType.USER,
-            )
-            self._archive_response(
-                seed_user, self.seed_opinion, verbose=verbose
-            )
-        else:
-            logger.info("No seed opinion provided.")
+        self._add_seed_opinions(verbose)
 
-        # begin generation
+        # begin main conversation
         for _ in tqdm(range(self.conv_len)):
             speaker_name = self.next_turn_manager.next()
             actor = self.username_user_map[speaker_name]
             res = actor.speak(list(self.ctx_history))
 
-            # if nothing was said, do not include it in history
             if len(res.strip()) != 0:
                 self._archive_response(actor, res, verbose)
 
-                # if something was said and there is a moderator, prompt him
                 if self.moderator is not None:
                     res = self.moderator.speak(list(self.ctx_history))
                     self._archive_response(self.moderator, res, verbose)
@@ -208,6 +185,34 @@ class Discussion:
         :type output_path: str
         """
         _file_util.dict_to_json(self.to_dict(), output_path)
+
+    def _add_seed_opinions(self, verbose: bool) -> None:
+        # Assign usernames if not provided
+        if len(self.seed_opinions) > 0:
+            usernames = self.seed_opinion_usernames
+            if usernames is None:
+                # sample without replacement
+                if len(self.seed_opinions) > len(self.username_user_map):
+                    raise ValueError(
+                        "Not enough users to assign unique usernames "
+                        "for seed opinions."
+                    )
+                usernames = random.sample(
+                    list(self.username_user_map.keys()),
+                    len(self.seed_opinions),
+                )
+
+            # insert seed opinions
+            for username, comment in zip(usernames, self.seed_opinions):
+                seed_user = actors.Actor(
+                    model=None,  # type: ignore
+                    persona=actors.Persona(username=username),
+                    context="",
+                    instructions="",
+                    actor_type=actors.ActorType.USER,
+                )
+                if comment.strip() != "":
+                    self._archive_response(seed_user, comment, verbose=verbose)
 
     def _archive_response(
         self, user: actors.Actor, comment: str, verbose: bool
