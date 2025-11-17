@@ -1,5 +1,16 @@
 # What's new
 
+## 2.0.2 (17/11/2025)
+
+### Features
+- Multiple seed opinions can be given for each synthetic discussion
+- Usernames do not have to be random when giving seed opinions via the Experiments interface
+
+### Fixes
+- The documentation page actually updates now
+- Fixed bug that prevented persona loading from json files
+- Fixed persistent issues with packaging discussion files into csvs
+
 ## 2.0.1 (13/06/2025)
 
 ### Features
