@@ -62,7 +62,7 @@ class Persona:
     )
 
     @classmethod
-    def from_json_file(file_path: Path) -> list:
+    def from_json_file(cls, file_path: Path) -> list:
         """
         Generate a list of personas from a properly formatted persona JSON
         file.
