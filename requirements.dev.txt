@@ -13,6 +13,7 @@ sphinx-autobuild
 sphinx-rtd-theme
 notebook
 ipywidgets
+pandoc
 
 build 
 twine
