@@ -45,7 +45,7 @@ class DiscussionExperiment:
     def __init__(
         self,
         users: list[actors.Actor],
-        seed_opinions: list[str] = [],
+        seed_opinions: list[list[str]] | None = None,
         moderator: actors.Actor | None = None,
         next_turn_manager: turn_manager.TurnManager | None = None,
         history_ctx_len: int = 3,
@@ -58,9 +58,12 @@ class DiscussionExperiment:
 
         :param users: List of all possible participants (LLM agents).
         :type users: list[actors.Actor]
-        :param seed_opinions: Optional list of hardcoded seed comments to
-            initiate discussions. One will be selected randomly for each.
-        :type seed_opinions: list[str]
+        :param seed_opinions: Hardcoded seed discussion
+            segements to initiate synthetic discussions.
+            One segment will be selected randomly for each new synthetic
+            discussion and will be uttered by random synthetic participants.
+            None if no seed opinions are to be provided.
+        :type seed_opinions: list[list[str]], optional
         :param moderator: Optional moderator agent, or None to omit moderation.
         :type moderator: actors.Actor or None
         :param next_turn_manager: Strategy for selecting the next speaker.
@@ -75,7 +78,9 @@ class DiscussionExperiment:
         :param num_discussions: Total number of synthetic discussions to run.
         :type num_discussions: int
         """
-        self.seed_opinions = seed_opinions
+        self.seed_opinions = (
+            seed_opinions if seed_opinions is not None else [[]]
+        )
         self.users = users
         self.moderator = moderator
 
@@ -135,8 +140,7 @@ class DiscussionExperiment:
             moderator=self.moderator,
             history_context_len=self.history_ctx_len,
             conv_len=self.num_turns,
-            seed_opinion=rand_topic,
-            seed_opinion_username=random.choice(rand_users).get_name(),
+            seed_opinions=rand_topic,
             next_turn_manager=self.next_turn_manager,
         )
 
