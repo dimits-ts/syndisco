@@ -52,8 +52,8 @@ class BaseModel(abc.ABC):
     ) -> str:
         """Generate the model's response based on a prompt.
 
-        :param json_prompt: 
-            A tuple containing the system and user prompt. 
+        :param json_prompt:
+            A tuple containing the system and user prompt.
             Could be strings, or a dictionary.
         :type json_prompt: tuple[typing.Any, typing.Any]
         :param stop_words: Strings where the model should stop generating
@@ -83,7 +83,7 @@ class BaseModel(abc.ABC):
             Strings where the model should stop generating
         :type stop_words:
             list[str]
-        :return: 
+        :return:
             The model's response
         :rtype: str
         """
@@ -115,11 +115,11 @@ class TransformersModel(BaseModel):
         """
         Initialize a new LLM wrapper.
 
-        :param model_path: 
+        :param model_path:
             The full path to the GGUF model file e.g.'openai-community/gpt2'
-        :param name: 
+        :param name:
             Your own name for the model e.g. 'GPT-2'
-        :param max_out_tokens: 
+        :param max_out_tokens:
             The maximum number of tokens in the response
         :param remove_string_list: A
             A list of strings to be removed from the response.
@@ -130,9 +130,8 @@ class TransformersModel(BaseModel):
             model_path, device_map="auto"
         )
 
-        logger.info(
-            f"Model memory footprint:  {self.model.get_memory_footprint()/2**20:.2f} MBs"
-        )
+        model_size = self.model.get_memory_footprint() / 2**20
+        logger.info(f"Model memory footprint:  {model_size:.2f} MBs")
 
         self.tokenizer = transformers.AutoTokenizer.from_pretrained(model_path)
 
@@ -146,16 +145,24 @@ class TransformersModel(BaseModel):
         """
         Generate a response using the model's chat template.
 
-        :param chat_prompt: A list of dictionaries representing the chat history.
-        :param stop_words: A list of stop words to prevent overflow in responses.
+        :param chat_prompt:
+            A list of dictionaries representing the chat history.
+        :param stop_words:
+            A list of stop words to prevent overflow in responses.
         """
+        system_prompt, user_prompt = json_prompt
+        messages = TransformersModel._build_messages(
+            system_prompt, user_prompt, self.tokenizer
+        )
+
         if hasattr(self.tokenizer, "apply_chat_template"):
             formatted_prompt = self.tokenizer.apply_chat_template(
-                json_prompt, tokenize=False, add_generation_prompt=True
+                messages, tokenize=False, add_generation_prompt=True
             )
         else:
             logger.warning(
-                "No chat template found in model's tokenizer: Falling back to default..."
+                "No chat template found in model's tokenizer: "
+                "Falling back to default..."
             )
             formatted_prompt = "\n".join(
                 f"{msg['role']}: {msg['content']}" for msg in json_prompt
@@ -170,3 +177,40 @@ class TransformersModel(BaseModel):
         ]  # type: ignore
 
         return response  # type: ignore
+
+    @staticmethod
+    def _build_messages(system_prompt: str, user_prompt: str, tokenizer):
+        """
+        Build a message structure compatible with the model's chat template.
+        Works for most HF instruct models. Falls back to text when unknown.
+        """
+        template = getattr(tokenizer, "chat_template", "") or ""
+
+        # ---- Case 1: Standard HF chat template ----
+        # Most models expect [{"role": "...", "content": "..."}]
+        if "role" in template and "content" in template:
+            return [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ]
+
+        # ---- Case 2: Templates referencing system explicitly ----
+        if "system" in template.lower():
+            return [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ]
+
+        # ---- Case 3: Models that use "User:" / "Assistant:" tokens ----
+        if "User:" in template or "USER:" in template:
+            return [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ]
+
+        # ---- Case 4: Unknown/unsupported template → safe fallback ----
+        combined = (
+            f"<system>\n{system_prompt}\n</system>\n"
+            f"<user>\n{user_prompt}\n</user>"
+        )
+        return [{"role": "user", "content": combined}]
