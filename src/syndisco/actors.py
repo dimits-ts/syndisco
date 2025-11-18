@@ -114,6 +114,7 @@ class Actor:
         context: str,
         instructions: str,
         actor_type: ActorType,
+        stop_words: list[str] = []
     ) -> None:
         """
         Create an Actor controlled by an LLM instance with a specific persona.
@@ -171,8 +172,7 @@ class Actor:
         system_prompt = self._system_prompt()
         message_prompt = self._message_prompt(history)
         response = self.model.prompt(
-            (system_prompt, message_prompt),
-            stop_words=["###", "\n\n", "User"],
+            (system_prompt, message_prompt)
         )
         return response
 

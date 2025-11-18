@@ -47,9 +47,7 @@ class BaseModel(abc.ABC):
         self.stop_list = stop_list if stop_list is not None else []
 
     @typing.final
-    def prompt(
-        self, json_prompt: tuple[typing.Any, typing.Any], stop_words: list[str]
-    ) -> str:
+    def prompt(self, json_prompt: tuple[typing.Any, typing.Any]) -> str:
         """Generate the model's response based on a prompt.
 
         :param json_prompt:
@@ -61,7 +59,7 @@ class BaseModel(abc.ABC):
         :return: the model's response
         :rtype: str
         """
-        response = self.generate_response(json_prompt, stop_words)
+        response = self.generate_response(json_prompt)
         # avoid model collapse attributed to certain strings
         for remove_word in self.stop_list:
             response = response.replace(remove_word, "")
@@ -70,7 +68,8 @@ class BaseModel(abc.ABC):
 
     @abc.abstractmethod
     def generate_response(
-        self, json_prompt: tuple[typing.Any, typing.Any], stop_words
+        self,
+        json_prompt: tuple[typing.Any, typing.Any],
     ) -> str:
         """Model-specific method which generates the LLM's response
 
@@ -79,10 +78,6 @@ class BaseModel(abc.ABC):
             Could be strings, or a dictionary.
         :type json_prompt:
             tuple[typing.Any, typing.Any]
-        :param stop_words:
-            Strings where the model should stop generating
-        :type stop_words:
-            list[str]
         :return:
             The model's response
         :rtype: str
@@ -102,7 +97,7 @@ class BaseModel(abc.ABC):
 
 class TransformersModel(BaseModel):
     """
-    A class encapsulating Transformers HuggingFace models.
+    HuggingFace Transformers model wrapper.
     """
 
     def __init__(
@@ -112,105 +107,54 @@ class TransformersModel(BaseModel):
         max_out_tokens: int,
         remove_string_list: list[str] | None = None,
     ):
-        """
-        Initialize a new LLM wrapper.
-
-        :param model_path:
-            The full path to the GGUF model file e.g.'openai-community/gpt2'
-        :param name:
-            Your own name for the model e.g. 'GPT-2'
-        :param max_out_tokens:
-            The maximum number of tokens in the response
-        :param remove_string_list: A
-            A list of strings to be removed from the response.
-        """
         super().__init__(name, max_out_tokens, remove_string_list)
 
         self.model = transformers.AutoModelForCausalLM.from_pretrained(
             model_path, device_map="auto"
         )
-
-        model_size = self.model.get_memory_footprint() / 2**20
-        logger.info(f"Model memory footprint:  {model_size:.2f} MBs")
-
         self.tokenizer = transformers.AutoTokenizer.from_pretrained(model_path)
 
-        self.generator = transformers.pipeline(
-            "text-generation", model=self.model, tokenizer=self.tokenizer
-        )
+        model_size = self.model.get_memory_footprint() / 2**20
+        logger.info(f"Model memory footprint: {model_size:.2f} MB")
 
-    def generate_response(
-        self, json_prompt: tuple[typing.Any, typing.Any], stop_words: list[str]
-    ) -> str:
-        """
-        Generate a response using the model's chat template.
+    def generate_response(self, json_prompt: tuple[str, str]) -> str:
 
-        :param chat_prompt:
-            A list of dictionaries representing the chat history.
-        :param stop_words:
-            A list of stop words to prevent overflow in responses.
-        """
         system_prompt, user_prompt = json_prompt
-        messages = TransformersModel._build_messages(
-            system_prompt, user_prompt, self.tokenizer
-        )
 
+        # Construct proper message list for chat template
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ]
+
+        # Prefer chat template if available
         if hasattr(self.tokenizer, "apply_chat_template"):
-            formatted_prompt = self.tokenizer.apply_chat_template(
-                messages, tokenize=False, add_generation_prompt=True
+            prompt_text = self.tokenizer.apply_chat_template(
+                messages,
+                tokenize=False,
+                add_generation_prompt=True,
             )
         else:
-            logger.warning(
-                "No chat template found in model's tokenizer: "
-                "Falling back to default..."
-            )
-            formatted_prompt = "\n".join(
-                f"{msg['role']}: {msg['content']}" for msg in json_prompt
+            logger.warning("Tokenizer has no chat template; falling back.")
+            prompt_text = (
+                f"System: {system_prompt}\nUser: {user_prompt}\nAssistant:"
             )
 
-        response = self.generator(
-            formatted_prompt,
-            max_new_tokens=self.max_out_tokens,
-            return_full_text=False,
-        )[0][
-            "generated_text"
-        ]  # type: ignore
-
-        return response  # type: ignore
-
-    @staticmethod
-    def _build_messages(system_prompt: str, user_prompt: str, tokenizer):
-        """
-        Build a message structure compatible with the model's chat template.
-        Works for most HF instruct models. Falls back to text when unknown.
-        """
-        template = getattr(tokenizer, "chat_template", "") or ""
-
-        # ---- Case 1: Standard HF chat template ----
-        # Most models expect [{"role": "...", "content": "..."}]
-        if "role" in template and "content" in template:
-            return [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ]
-
-        # ---- Case 2: Templates referencing system explicitly ----
-        if "system" in template.lower():
-            return [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ]
-
-        # ---- Case 3: Models that use "User:" / "Assistant:" tokens ----
-        if "User:" in template or "USER:" in template:
-            return [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ]
-
-        # ---- Case 4: Unknown/unsupported template → safe fallback ----
-        combined = (
-            f"<system>\n{system_prompt}\n</system>\n"
-            f"<user>\n{user_prompt}\n</user>"
+        inputs = self.tokenizer(prompt_text, return_tensors="pt").to(
+            self.model.device
         )
-        return [{"role": "user", "content": combined}]
+
+        output_ids = self.model.generate(
+            **inputs,
+            max_new_tokens=self.max_out_tokens,
+            do_sample=False,
+            pad_token_id=self.tokenizer.eos_token_id,
+        )
+
+        # Remove the prompt portion → keep only generated part
+        generated_ids = output_ids[0][inputs["input_ids"].shape[1]:]
+        response = self.tokenizer.decode(
+            generated_ids, skip_special_tokens=True
+        )
+
+        return response.strip()
