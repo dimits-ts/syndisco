@@ -114,7 +114,7 @@ class Actor:
         context: str,
         instructions: str,
         actor_type: ActorType,
-        stop_words: list[str] = []
+        stop_words: list[str] = [],
     ) -> None:
         """
         Create an Actor controlled by an LLM instance with a specific persona.
@@ -146,16 +146,16 @@ class Actor:
         self.instructions = instructions
         self.actor_type = actor_type
 
-    def _system_prompt(self) -> dict:
+    def _system_prompt(self) -> str:
         prompt = {
             "context": self.context,
             "instructions": self.instructions,
             "type": self.actor_type,
             "persona": self.persona.to_dict(),
         }
-        return {"role": "system", "content": prompt}
+        return json.dumps(prompt)
 
-    def _message_prompt(self, history: list[str]) -> dict:
+    def _message_prompt(self, history: list[str]) -> str:
         return _apply_template(self.actor_type, self.get_name(), history)
 
     @typing.final
@@ -171,19 +171,17 @@ class Actor:
         """
         system_prompt = self._system_prompt()
         message_prompt = self._message_prompt(history)
-        response = self.model.prompt(
-            (system_prompt, message_prompt)
-        )
+        response = self.model.prompt(system_prompt, message_prompt)
         return response
 
-    def describe(self) -> dict:
+    def describe(self) -> str:
         """
         Get a description of the actor's internals.
 
         :return: A brief description of the actor
         :rtype: dict
         """
-        return self._system_prompt()["content"]
+        return self._system_prompt()
 
     @typing.final
     def get_name(self) -> str:
@@ -198,19 +196,19 @@ class Actor:
 
 def _apply_template(
     actor_type: ActorType, username: str, history: list[str]
-) -> dict[str, str]:
+) -> str:
+
     if actor_type == ActorType.USER:
-        return {
+        json_input = {
             "role": "user",
-            "content": "\n".join(history) + f"\nUser {username} posted:",
+            "content": f"{"\n".join(history)}\nUser {username} posted:",
         }
     elif actor_type == ActorType.ANNOTATOR:
         # LLMActor asks the model to respond as its username
         # by modifying this protected method, we instead prompt
         # it to write the annotation
-        return {
+        json_input = {
             "role": "user",
-            "content": "Conversation so far:\n\n"
-            + "\n".join(history)
-            + "\nOutput:",
+            "content": f"Conversation so far:\n{"\n".join(history)}\nOutput:",
         }
+    return json.dumps(json_input)

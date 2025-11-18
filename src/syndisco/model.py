@@ -47,42 +47,28 @@ class BaseModel(abc.ABC):
         self.stop_list = stop_list if stop_list is not None else []
 
     @typing.final
-    def prompt(self, json_prompt: tuple[typing.Any, typing.Any]) -> str:
+    def prompt(
+        self,
+        system_prompt: str,
+        user_prompt: str,
+    ) -> str:
         """Generate the model's response based on a prompt.
 
-        :param json_prompt:
-            A tuple containing the system and user prompt.
-            Could be strings, or a dictionary.
-        :type json_prompt: tuple[typing.Any, typing.Any]
-        :param stop_words: Strings where the model should stop generating
+        :param system_prompt: The system prompt.
+        :type system_prompt: str
+        :param user_prompt: The user prompt.
+        :type user_prompt: str
+        :param stop_words: Strings to be removed after generation.
         :type stop_words: list[str]
         :return: the model's response
         :rtype: str
         """
-        response = self.generate_response(json_prompt)
+        response = self._generate_response(system_prompt, user_prompt)
         # avoid model collapse attributed to certain strings
         for remove_word in self.stop_list:
             response = response.replace(remove_word, "")
 
         return response
-
-    @abc.abstractmethod
-    def generate_response(
-        self,
-        json_prompt: tuple[typing.Any, typing.Any],
-    ) -> str:
-        """Model-specific method which generates the LLM's response
-
-        :param json_prompt:
-            A tuple containing the system and user prompt.
-            Could be strings, or a dictionary.
-        :type json_prompt:
-            tuple[typing.Any, typing.Any]
-        :return:
-            The model's response
-        :rtype: str
-        """
-        raise NotImplementedError("Abstract class call")
 
     @typing.final
     def get_name(self) -> str:
@@ -93,6 +79,23 @@ class BaseModel(abc.ABC):
         :rtype: str
         """
         return self.name
+
+    @abc.abstractmethod
+    def _generate_response(
+        self,
+        system_prompt: str,
+        user_prompt: str,
+    ) -> str:
+        """Model-specific method which generates the LLM's response
+
+        :param system_prompt: The system prompt.
+        :type system_prompt: str
+        :param user_prompt: The user prompt.
+        :type user_prompt: str
+        :return: The model's response
+        :rtype: str
+        """
+        raise NotImplementedError("Abstract class call")
 
 
 class TransformersModel(BaseModel):
@@ -117,10 +120,9 @@ class TransformersModel(BaseModel):
         model_size = self.model.get_memory_footprint() / 2**20
         logger.info(f"Model memory footprint: {model_size:.2f} MB")
 
-    def generate_response(self, json_prompt: tuple[str, str]) -> str:
-
-        system_prompt, user_prompt = json_prompt
-
+    def _generate_response(self, system_prompt: str, user_prompt: str) -> str:
+        assert type(system_prompt) is str
+        assert type(type(user_prompt) is str)
         # Construct proper message list for chat template
         messages = [
             {"role": "system", "content": system_prompt},
