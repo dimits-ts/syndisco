@@ -60,8 +60,8 @@ class Persona:
         default_factory=list
     )
 
-    @classmethod
-    def from_json_file(cls, file_path: Path) -> list:
+    @staticmethod
+    def from_json_file(file_path: Path) -> list:
         """
         Generate a list of personas from a properly formatted persona JSON
         file.
