@@ -111,15 +111,11 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-syndisco.model">syndisco.model module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#syndisco.model.BaseModel"><code class="docutils literal notranslate"><span class="pre">BaseModel</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#syndisco.model.BaseModel.generate_response"><code class="docutils literal notranslate"><span class="pre">BaseModel.generate_response()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#syndisco.model.BaseModel.get_name"><code class="docutils literal notranslate"><span class="pre">BaseModel.get_name()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#syndisco.model.BaseModel.prompt"><code class="docutils literal notranslate"><span class="pre">BaseModel.prompt()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#syndisco.model.TransformersModel"><code class="docutils literal notranslate"><span class="pre">TransformersModel</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#syndisco.model.TransformersModel.generate_response"><code class="docutils literal notranslate"><span class="pre">TransformersModel.generate_response()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="#syndisco.model.TransformersModel"><code class="docutils literal notranslate"><span class="pre">TransformersModel</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-syndisco.postprocessing">syndisco.postprocessing module</a><ul>
@@ -179,13 +175,13 @@
 <p>Module defining LLM users in discussions and their characteristics.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="syndisco.actors.Actor">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">syndisco.actors.</span></span><span class="sig-name descname"><span class="pre">Actor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#syndisco.model.BaseModel" title="syndisco.model.BaseModel"><span class="pre">BaseModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">persona</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#syndisco.actors.Persona" title="syndisco.actors.Persona"><span class="pre">Persona</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instructions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actor_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#syndisco.actors.ActorType" title="syndisco.actors.ActorType"><span class="pre">ActorType</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#syndisco.actors.Actor" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">syndisco.actors.</span></span><span class="sig-name descname"><span class="pre">Actor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#syndisco.model.BaseModel" title="syndisco.model.BaseModel"><span class="pre">BaseModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">persona</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#syndisco.actors.Persona" title="syndisco.actors.Persona"><span class="pre">Persona</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instructions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actor_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#syndisco.actors.ActorType" title="syndisco.actors.ActorType"><span class="pre">ActorType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_words</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#syndisco.actors.Actor" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>An abstract class representing an actor which responds according to an
 underlying LLM instance.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="syndisco.actors.Actor.describe">
-<span class="sig-name descname"><span class="pre">describe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#syndisco.actors.Actor.describe" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">describe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#syndisco.actors.Actor.describe" title="Link to this definition"></a></dt>
 <dd><p>Get a description of the actor’s internals.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -277,7 +273,7 @@ and special instructions.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="syndisco.actors.Persona.from_json_file">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_json_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#syndisco.actors.Persona.from_json_file" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_json_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#syndisco.actors.Persona.from_json_file" title="Link to this definition"></a></dt>
 <dd><p>Generate a list of personas from a properly formatted persona JSON
 file.</p>
 <dl class="field-list simple">
@@ -533,27 +529,6 @@ defaults to None</p></li>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
 <p>Interface for all local LLM wrappers</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="syndisco.model.BaseModel.generate_response">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">generate_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_words</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#syndisco.model.BaseModel.generate_response" title="Link to this definition"></a></dt>
-<dd><p>Model-specific method which generates the LLM’s response</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>json_prompt</strong> (<em>tuple</em><em>[</em><em>Any</em><em>, </em><em>Any</em><em>]</em>) – A tuple containing the system and user prompt.
-Could be strings, or a dictionary.</p></li>
-<li><p><strong>stop_words</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – Strings where the model should stop generating</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The model’s response</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="syndisco.model.BaseModel.get_name">
 <em class="property"><span class="pre">final</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#syndisco.model.BaseModel.get_name" title="Link to this definition"></a></dt>
 <dd><p>Get the model’s assigned pseudoname.</p>
@@ -569,14 +544,14 @@ Could be strings, or a dictionary.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="syndisco.model.BaseModel.prompt">
-<em class="property"><span class="pre">final</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">prompt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_words</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#syndisco.model.BaseModel.prompt" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">final</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">prompt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#syndisco.model.BaseModel.prompt" title="Link to this definition"></a></dt>
 <dd><p>Generate the model’s response based on a prompt.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>json_prompt</strong> (<em>tuple</em><em>[</em><em>Any</em><em>, </em><em>Any</em><em>]</em>) – A tuple containing the system and user prompt. 
-Could be strings, or a dictionary.</p></li>
-<li><p><strong>stop_words</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – Strings where the model should stop generating</p></li>
+<li><p><strong>system_prompt</strong> (<em>str</em>) – The system prompt.</p></li>
+<li><p><strong>user_prompt</strong> (<em>str</em>) – The user prompt.</p></li>
+<li><p><strong>stop_words</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – Strings to be removed after generation.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -594,21 +569,7 @@ Could be strings, or a dictionary.</p></li>
 <dt class="sig sig-object py" id="syndisco.model.TransformersModel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">syndisco.model.</span></span><span class="sig-name descname"><span class="pre">TransformersModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_out_tokens</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_string_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#syndisco.model.TransformersModel" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#syndisco.model.BaseModel" title="syndisco.model.BaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
-<p>A class encapsulating Transformers HuggingFace models.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="syndisco.model.TransformersModel.generate_response">
-<span class="sig-name descname"><span class="pre">generate_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_words</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#syndisco.model.TransformersModel.generate_response" title="Link to this definition"></a></dt>
-<dd><p>Generate a response using the model’s chat template.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>chat_prompt</strong> – A list of dictionaries representing the chat history.</p></li>
-<li><p><strong>stop_words</strong> – A list of stop words to prevent overflow in responses.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
+<p>HuggingFace Transformers model wrapper.</p>
 </dd></dl>
 
 </section>
