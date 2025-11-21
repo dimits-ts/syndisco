@@ -1,5 +1,19 @@
 # What's new
 
+## 2.0.3 (21/11/2025)
+
+### Features
+- The logger now asks gently before spamming stdout
+    - Removed redundant logging messages in experiments
+    - Downgraded timing information to DEBUG stream
+- Remove word stop-list
+    - It's almost 2026, and LLMs are now much more stable in their output
+
+### Fixes
+- The `WeightedRandom` turn-taking algorithm now accepts {0,1} values (corresponding to "never/always select the previous speaker").
+- Fix issues between internal Actor/Model modules when using models other than LLaMa
+
+
 ## 2.0.2 (17/11/2025)
 
 ### Features
