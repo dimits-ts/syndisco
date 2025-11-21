@@ -48,46 +48,27 @@ class BaseModel(abc.ABC):
 
     @typing.final
     def prompt(
-        self, json_prompt: tuple[typing.Any, typing.Any], stop_words: list[str]
+        self,
+        system_prompt: str,
+        user_prompt: str,
     ) -> str:
         """Generate the model's response based on a prompt.
 
-        :param json_prompt: 
-            A tuple containing the system and user prompt. 
-            Could be strings, or a dictionary.
-        :type json_prompt: tuple[typing.Any, typing.Any]
-        :param stop_words: Strings where the model should stop generating
+        :param system_prompt: The system prompt.
+        :type system_prompt: str
+        :param user_prompt: The user prompt.
+        :type user_prompt: str
+        :param stop_words: Strings to be removed after generation.
         :type stop_words: list[str]
         :return: the model's response
         :rtype: str
         """
-        response = self.generate_response(json_prompt, stop_words)
+        response = self._generate_response(system_prompt, user_prompt)
         # avoid model collapse attributed to certain strings
         for remove_word in self.stop_list:
             response = response.replace(remove_word, "")
 
         return response
-
-    @abc.abstractmethod
-    def generate_response(
-        self, json_prompt: tuple[typing.Any, typing.Any], stop_words
-    ) -> str:
-        """Model-specific method which generates the LLM's response
-
-        :param json_prompt:
-            A tuple containing the system and user prompt.
-            Could be strings, or a dictionary.
-        :type json_prompt:
-            tuple[typing.Any, typing.Any]
-        :param stop_words:
-            Strings where the model should stop generating
-        :type stop_words:
-            list[str]
-        :return: 
-            The model's response
-        :rtype: str
-        """
-        raise NotImplementedError("Abstract class call")
 
     @typing.final
     def get_name(self) -> str:
@@ -99,10 +80,27 @@ class BaseModel(abc.ABC):
         """
         return self.name
 
+    @abc.abstractmethod
+    def _generate_response(
+        self,
+        system_prompt: str,
+        user_prompt: str,
+    ) -> str:
+        """Model-specific method which generates the LLM's response
+
+        :param system_prompt: The system prompt.
+        :type system_prompt: str
+        :param user_prompt: The user prompt.
+        :type user_prompt: str
+        :return: The model's response
+        :rtype: str
+        """
+        raise NotImplementedError("Abstract class call")
+
 
 class TransformersModel(BaseModel):
     """
-    A class encapsulating Transformers HuggingFace models.
+    HuggingFace Transformers model wrapper.
     """
 
     def __init__(
@@ -112,61 +110,53 @@ class TransformersModel(BaseModel):
         max_out_tokens: int,
         remove_string_list: list[str] | None = None,
     ):
-        """
-        Initialize a new LLM wrapper.
-
-        :param model_path: 
-            The full path to the GGUF model file e.g.'openai-community/gpt2'
-        :param name: 
-            Your own name for the model e.g. 'GPT-2'
-        :param max_out_tokens: 
-            The maximum number of tokens in the response
-        :param remove_string_list: A
-            A list of strings to be removed from the response.
-        """
         super().__init__(name, max_out_tokens, remove_string_list)
 
         self.model = transformers.AutoModelForCausalLM.from_pretrained(
             model_path, device_map="auto"
         )
-
-        logger.info(
-            f"Model memory footprint:  {self.model.get_memory_footprint()/2**20:.2f} MBs"
-        )
-
         self.tokenizer = transformers.AutoTokenizer.from_pretrained(model_path)
 
-        self.generator = transformers.pipeline(
-            "text-generation", model=self.model, tokenizer=self.tokenizer
-        )
+        model_size = self.model.get_memory_footprint() / 2**20
+        logger.info(f"Model memory footprint: {model_size:.2f} MB")
 
-    def generate_response(
-        self, json_prompt: tuple[typing.Any, typing.Any], stop_words: list[str]
-    ) -> str:
-        """
-        Generate a response using the model's chat template.
+    def _generate_response(self, system_prompt: str, user_prompt: str) -> str:
+        assert type(system_prompt) is str
+        assert type(type(user_prompt) is str)
+        # Construct proper message list for chat template
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ]
 
-        :param chat_prompt: A list of dictionaries representing the chat history.
-        :param stop_words: A list of stop words to prevent overflow in responses.
-        """
+        # Prefer chat template if available
         if hasattr(self.tokenizer, "apply_chat_template"):
-            formatted_prompt = self.tokenizer.apply_chat_template(
-                json_prompt, tokenize=False, add_generation_prompt=True
+            prompt_text = self.tokenizer.apply_chat_template(
+                messages,
+                tokenize=False,
+                add_generation_prompt=True,
             )
         else:
-            logger.warning(
-                "No chat template found in model's tokenizer: Falling back to default..."
-            )
-            formatted_prompt = "\n".join(
-                f"{msg['role']}: {msg['content']}" for msg in json_prompt
+            logger.warning("Tokenizer has no chat template; falling back.")
+            prompt_text = (
+                f"System: {system_prompt}\nUser: {user_prompt}\nAssistant:"
             )
 
-        response = self.generator(
-            formatted_prompt,
+        inputs = self.tokenizer(prompt_text, return_tensors="pt").to(
+            self.model.device
+        )
+
+        output_ids = self.model.generate(
+            **inputs,
             max_new_tokens=self.max_out_tokens,
-            return_full_text=False,
-        )[0][
-            "generated_text"
-        ]  # type: ignore
+            do_sample=False,
+            pad_token_id=self.tokenizer.eos_token_id,
+        )
 
-        return response  # type: ignore
+        # Remove the prompt portion → keep only generated part
+        generated_ids = output_ids[0][inputs["input_ids"].shape[1]:]
+        response = self.tokenizer.decode(
+            generated_ids, skip_special_tokens=True
+        )
+
+        return response.strip()

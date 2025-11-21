@@ -188,7 +188,6 @@ class DiscussionExperiment:
         :type verbose: bool
         """
         try:
-            logger.info("Beginning conversation...")
             logger.debug(f"Experiment parameters: {str(discussion)}")
 
             start_time = time.time()
@@ -201,7 +200,6 @@ class DiscussionExperiment:
             )
 
             discussion.to_json_file(output_path)
-            logger.info(f"Conversation saved to {output_path}")
         except Exception:
             logger.exception("Experiment aborted due to error.")
 
@@ -313,10 +311,7 @@ class AnnotationExperiment:
         :param verbose: Whether to log intermediate steps.
         :type verbose: bool, defaults to true
         """
-        for i, annotation_task in tqdm(list(enumerate(annotation_tasks))):
-            logger.info(
-                f"Running annotation {i + 1}/{len(annotation_tasks)}..."
-            )
+        for annotation_task in tqdm(list(annotation_tasks)):
             self._run_single_annotation(annotation_task, output_dir, verbose)
 
         logger.info("Finished annotation generation.")
@@ -336,13 +331,11 @@ class AnnotationExperiment:
         :type verbose: bool
         """
         try:
-            logger.info("Beginning annotation...")
             logger.debug(f"Experiment parameters: {str(annotation_task)}")
             annotation_task.begin(verbose=verbose)
             output_path = _file_util.generate_datetime_filename(
                 output_dir=output_dir, file_ending=".json"
             )
             annotation_task.to_json_file(output_path)
-            logger.info(f"Annotation saved to {output_path}")
         except Exception:
             logger.exception("Annotation experiment aborted due to error.")

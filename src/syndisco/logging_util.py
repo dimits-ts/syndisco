@@ -109,7 +109,7 @@ def timing(f: typing.Callable) -> typing.Any:
         result = f(*args, **kw)
         te = time.time()
         exec_time_mins = (te - ts) / 60
-        logger.info(
+        logger.debug(
             f"Procedure {f.__name__} executed in {exec_time_mins:2.4f} minutes"
         )
         return result

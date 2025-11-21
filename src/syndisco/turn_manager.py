@@ -41,7 +41,7 @@ class TurnManager(Iterable):
             after this object's creation.
         :type config: dict[str, float], optional
         """
-        self.names = None if names is None else list(names)
+        self.names = [] if names is None else list(names)
 
     @typing.final
     def set_names(self, names: Iterable[str]) -> None:
@@ -63,7 +63,7 @@ class TurnManager(Iterable):
         :return: the next speaker's username
         :rtype: str
         """
-        if self.names is None:
+        if self.names == []:
             raise ValueError(
                 "No usernames have been provided for the turn manager. "
                 "Use self.initialize_names()"
@@ -118,7 +118,7 @@ class RandomWeighted(TurnManager):
         else:
             self.chance_to_respond = p_respond
             assert (
-                0 < self.chance_to_respond < 1
+                0 <= self.chance_to_respond <= 1
             ), f"p_respond must be between 0 and 1, but is {p_respond}"
 
         self.second_to_last_speaker = None
