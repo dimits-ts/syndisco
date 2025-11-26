@@ -23,9 +23,9 @@ format.
 
 import os
 import json
+import hashlib
 from pathlib import Path
 from typing import Iterable
-from io import StringIO
 
 import pandas as pd
 
@@ -226,23 +226,23 @@ def _list_files_recursive(start_path: str | Path) -> list[str]:
     return all_files
 
 
-def _select_user_prompt(df: pd.DataFrame) -> list[str]:
-    """
-    Select the relevant user prompt for each conversation entry based
-    on matching username.
-
-    :param df: DataFrame containing 'user' and 'user_prompts' columns.
-    :return: A list of selected user prompts.
-    """
+def _select_user_prompt(df):
     selected_user_prompts = []
 
     for _, row in df.iterrows():
         curr_username = row["user"]
+        if curr_username == row["moderator"]:
+            # Use moderator prompt
+            selected_user_prompts.append(
+                json.loads(row["moderator_prompt"])["persona"]
+            )
+            continue
+
         user_prompts = row["user_prompts"]
         matched_prompt = next(
             (p for p in user_prompts if p["username"] == curr_username),
             None,
-        )   
+        )
         if matched_prompt is None:
             raise ValueError(
                 f"No matching prompt found for username: {curr_username}"
@@ -262,10 +262,7 @@ def _process_traits(user_prompt: dict) -> pd.DataFrame:
     :return: A DataFrame with extracted traits as columns.
     :rtype: pd.DataFrame
     """
-    prompt_file = StringIO(json.dumps(user_prompt))
-    df = pd.read_json(prompt_file)
-    aggregated_df = _group_all_but_one(df, "personality_characteristics")
-    return aggregated_df
+    return pd.DataFrame([user_prompt])
 
 
 def _group_all_but_one(df: pd.DataFrame, to_list_col: str) -> pd.DataFrame:
@@ -279,11 +276,14 @@ def _group_all_but_one(df: pd.DataFrame, to_list_col: str) -> pd.DataFrame:
 
 
 def _generate_message_hash(
-    conv_ids: Iterable[str], messages: Iterable[str], hash_func=hash
+    conv_ids: Iterable[str], messages: Iterable[str]
 ) -> list[str]:
     ls = []
     for conv_id, message in zip(conv_ids, messages):
-        ls.append(hash_func(hash_func(conv_id) + hash_func(message)))
+        hashed_message = hashlib.md5(
+            f"{conv_id}_{message}".encode()
+        ).hexdigest()
+        ls.append(hashed_message)
     return ls
 
 
