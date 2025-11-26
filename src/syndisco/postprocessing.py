@@ -53,7 +53,7 @@ def import_discussions(conv_dir: Path) -> pd.DataFrame:
     # assumes context and instructions are shared across participants
     df.user_prompts = df.user_prompts.apply(
         lambda user_prompts: [
-            user_prompt["persona"] for user_prompt in user_prompts
+            json.loads(user_prompt)["persona"] for user_prompt in user_prompts
         ]
     )
 
@@ -242,7 +242,7 @@ def _select_user_prompt(df: pd.DataFrame) -> list[str]:
         matched_prompt = next(
             (p for p in user_prompts if p["username"] == curr_username),
             None,
-        )
+        )   
         if matched_prompt is None:
             raise ValueError(
                 f"No matching prompt found for username: {curr_username}"
