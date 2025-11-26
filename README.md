@@ -59,3 +59,11 @@ git clone https://github.com/dimits-ts/syndisco.git
 pip install -r requirements.dev.txt
 pip install -e .
 ```
+
+or 
+
+```bash
+git clone https://github.com/dimits-ts/syndisco.git
+pip install -r requirements.dev.txt
+pip install -e .[dev]
+```
