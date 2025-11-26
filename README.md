@@ -1,5 +1,7 @@
 # SynDisco: Automated experiment creation and execution using only LLM agents
 
+![Syndisco Logo](./sphinx/syndisco_logo.svg)
+
 A lightweight, simple and specialized framework used for creating, storing, annotating and analyzing synthetic discussions between Large Language Model (LLM) user-agents in the context of online discussions.
 
 This framework is designed for academic use, mainly for simulating Social Science experiments with multiple participants. It is finetuned for heavy server-side use and multi-day computations with limited resources. It has been tested on both simulated debates and online fora.
