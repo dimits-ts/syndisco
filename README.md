@@ -1,13 +1,10 @@
 # SynDisco: Automated experiment creation and execution using only LLM agents
 
+![Syndisco Logo](./sphinx/syndisco_logo.svg)
+
 A lightweight, simple and specialized framework used for creating, storing, annotating and analyzing synthetic discussions between Large Language Model (LLM) user-agents in the context of online discussions.
 
 This framework is designed for academic use, mainly for simulating Social Science experiments with multiple participants. It is finetuned for heavy server-side use and multi-day computations with limited resources. It has been tested on both simulated debates and online fora.
-
-> ⚠ **Warning: Active Development**  
-> This project is currently in active development. The API is subject to change at any time without prior notice.  
-> We recommend keeping an eye on updates and version releases if you're using this project in your applications.
-> Any bug reports or feature requests are welcome!.
 
 
 ## Usage
@@ -58,4 +55,12 @@ If you want to contribute to the project, or modify the library's code you may u
 git clone https://github.com/dimits-ts/syndisco.git
 pip install -r requirements.dev.txt
 pip install -e .
+```
+
+or 
+
+```bash
+git clone https://github.com/dimits-ts/syndisco.git
+pip install -r requirements.dev.txt
+pip install -e .[dev]
 ```

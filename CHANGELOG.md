@@ -1,5 +1,16 @@
 # What's new
 
+
+## 2.0.4 (26/11/2025)
+
+### Features 
+- Added logo :)
+
+### Fixes
+
+- Fixed postprocessing bug not properly parsing JSON files
+- Fixed outdated documentation in some parts
+
 ## 2.0.3 (21/11/2025)
 
 ### Features

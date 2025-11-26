@@ -1,41 +1,64 @@
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
 [project]
 name = "syndisco"
-version = "2.0.3"
-authors = [
-  { name="Dimitris Tsirmpas", email="tsirbasdim@gmail.com" },
-]
+version = "2.0.4"
 description = "Automated experiment creation and execution using LLM agents"
 readme = "README.md"
 requires-python = ">=3.12"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "Operating System :: OS Independent",
-    "Development Status :: 3 - Alpha",
-    "Environment :: GPU :: NVIDIA CUDA :: 11.8",
-    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
-    "Topic :: Scientific/Engineering :: Artificial Intelligence",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-    "Topic :: Software Development :: Version Control :: Git",
-    "Typing :: Typed",
-    "Intended Audience :: Science/Research"
-]
 license = "GPL-3.0"
 license-files = ["LICEN[CS]E*"]
-dependencies = [
-  "pandas",
-  "coloredlogs",
-  "transformers",
-  "bitsandbytes",
-  "accelerate>=0.26.0",
-  "torch",
-  "tqdm"
+authors = [
+  { name = "Dimitris Tsirmpas", email = "dim.tsirmaps@aueb.gr" },
 ]
-keywords = ["llms", "llm", "large language models", "llm agents", "synthetic", "discussion", "self-hosting", "local"]
+keywords = [
+  "discussion",
+  "large language models",
+  "llm",
+  "llm agents",
+  "llms",
+  "local",
+  "self-hosting",
+  "synthetic"
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: GPU :: NVIDIA CUDA :: 11.8",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Topic :: Software Development :: Version Control :: Git",
+  "Typing :: Typed"
+]
+dependencies = [
+  "accelerate>=0.26.0",
+  "bitsandbytes",
+  "coloredlogs",
+  "pandas",
+  "torch",
+  "tqdm",
+  "transformers"
+]
 
 [project.urls]
 Homepage = "https://github.com/dimits-ts/synthetic_discussion_framework"
 Issues = "https://github.com/dimits-ts/synthetic_discussion_framework/issues"
+
+[project.optional-dependencies]
+dev = [
+  "sphinx",
+  "myst-parser",
+  "nbsphinx",
+  "sphinx-autobuild",
+  "sphinx-rtd-theme",
+  "notebook",
+  "ipywidgets",
+  "pandoc",
+  "build",
+  "twine"
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
