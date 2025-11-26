@@ -4,11 +4,6 @@ A lightweight, simple and specialized framework used for creating, storing, anno
 
 This framework is designed for academic use, mainly for simulating Social Science experiments with multiple participants. It is finetuned for heavy server-side use and multi-day computations with limited resources. It has been tested on both simulated debates and online fora.
 
-> ⚠ **Warning: Active Development**  
-> This project is currently in active development. The API is subject to change at any time without prior notice.  
-> We recommend keeping an eye on updates and version releases if you're using this project in your applications.
-> Any bug reports or feature requests are welcome!.
-
 
 ## Usage
 
