@@ -185,7 +185,6 @@ def _read_conversations(conv_dir: Path) -> pd.DataFrame:
 
         conv = pd.json_normalize(conv)
         conv = conv.explode("logs")
-        conv["conv_variant"] = os.path.basename(os.path.dirname(file_path))
         conv["user"] = conv.logs.apply(lambda x: x["name"])
         conv["message"] = conv.logs.apply(lambda x: x["text"])
         conv["model"] = conv.logs.apply(lambda x: x["model"])
