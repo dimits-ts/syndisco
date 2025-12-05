@@ -9,8 +9,13 @@ Welcome to SynDisco's documentation!
 
 .. image:: syndisco_logo.svg
 
-Welcome to the official documentation of SynDisco! This project provides a lightweight framework for creating, managing, annotating, and analyzing synthetic discussions between Large Language Model (LLM) user-agents in online forums.
+Welcome to the official documentation of SynDisco! 
+This project provides a lightweight framework for creating, managing, 
+annotating, and analyzing synthetic discussions between Large Language Model 
+(LLM) user-agents in online forums.
  
+While simple, SynDisco offers multiple ways to randomize / customize 
+discussions.
  
 
 Introduction
@@ -18,8 +23,8 @@ Introduction
 .. toctree::
    :maxdepth: 2
 
-   overview_link.md
-   guides_link.md
+   overview
+   guides
    source/syndisco
 
 
