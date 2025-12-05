@@ -53,12 +53,12 @@ Features
 Introduction
 ====================================
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
    overview
    installation
    guides
-   source/syndisco
+   syndisco
 
 
 Indices and tables
