@@ -1,6 +1,17 @@
 # What's new
 
 
+## 2.0.5 (26/11/2025)
+
+### Features 
+- Improved documentation
+
+### Fixes
+- Removed conv_variant column from preprocessing, since it was too use-case specific
+- Sphinx uses conventional configuration
+- Docs are now built using gh-actions instead of pushing all HTML pages to Github
+
+
 ## 2.0.4+ (26/11/2025)
 
 ### Features 
