@@ -21,7 +21,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Guides" href="guides.html" />
+    <link rel="next" title="Installation" href="installation.html" />
     <link rel="prev" title="Welcome to SynDisco’s documentation!" href="index.html" /> 
 </head>
 
@@ -46,8 +46,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#features">Features</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="guides.html">Guides</a></li>
 <li class="toctree-l1"><a class="reference internal" href="source/syndisco.html">syndisco package</a></li>
 </ul>
@@ -107,61 +106,13 @@ toxicity between the discussions to resolve our hypothesis.</p>
 <p>See how you can easily use these concepts programmatically in the
 <a class="reference internal" href="guides.html"><span class="doc">Guides section</span></a>.</p>
 </section>
-<section id="features">
-<h1>Features<a class="headerlink" href="#features" title="Link to this heading"></a></h1>
-<ul class="simple">
-<li><p><strong>Automated Experiment Generation</strong>
-SynDisco generates a randomized set of discussion templates. With only a
-handful of configurations, the researcher can run hundreds or thousands of
-unique experiments.</p></li>
-<li><p><strong>Synthetic Group Discussion Generation</strong>
-SynDisco accepts an arbitrarily large number of LLM user-agent profiles and
-possible Original Posts (OPs). Each experiment involves a random selection
-of these user-agents replying to a randomly selected OP. The researcher can
-determine how these participants behave, whether there is a moderator
-present, and even how the turn-taking is determined.</p></li>
-<li><p><strong>Synthetic Annotation Generation with multiple annotators</strong>
-The researcher can create multiple LLM annotator-agent profiles. Each of
-these annotators will process each generated discussion at the
-comment-level and annotate according to the provided instruction prompt,
-enabling an arbitrary selection of metrics to be used.</p></li>
-<li><p><strong>Native Transformers support</strong>
-The framework supports most Hugging Face Transformer models out of the box.
-Support for models managed by other libraries can be easily achieved by
-extending a single class.</p></li>
-<li><p><strong>Native logging and fault tolerance</strong>
-Since SynDisco may run for days on remote servers, it keeps detailed logs
-both on-screen and on-disk. Should any experiment fail, the next one will
-be loaded with no delay. Results are intermittently saved to disk, ensuring
-no data loss or corruption even in catastrophic errors.</p></li>
-</ul>
-</section>
-<section id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h1>
-<p>You can download the package from PIP:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">syndisco</span>
-</pre></div>
-</div>
-<p>Or build from source:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">dimits</span><span class="o">-</span><span class="n">ts</span><span class="o">/</span><span class="n">syndisco</span><span class="o">.</span><span class="n">git</span>
-<span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
-<span class="n">pip</span> <span class="n">install</span> <span class="o">.</span>
-</pre></div>
-</div>
-<p>If you want to contribute to the project or modify the library’s code, use:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">dimits</span><span class="o">-</span><span class="n">ts</span><span class="o">/</span><span class="n">syndisco</span><span class="o">.</span><span class="n">git</span>
-<span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">dev</span><span class="o">.</span><span class="n">txt</span>
-<span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="o">.</span>
-</pre></div>
-</div>
-</section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="index.html" class="btn btn-neutral float-left" title="Welcome to SynDisco’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="guides.html" class="btn btn-neutral float-right" title="Guides" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

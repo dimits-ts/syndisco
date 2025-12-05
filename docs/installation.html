@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Guides &mdash; SynDisco 2.0.4 documentation</title>
+  <title>Installation &mdash; SynDisco 2.0.4 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
@@ -21,8 +21,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="syndisco package" href="source/syndisco.html" />
-    <link rel="prev" title="Installation" href="installation.html" /> 
+    <link rel="next" title="Guides" href="guides.html" />
+    <link rel="prev" title="Overview" href="overview.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -46,13 +46,8 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Guides</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#id1">How to Create a Synthetic Discussion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id2">How to Annotate your Synthetic Discussions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id3">How to Use the Experiment API to Manage Large-Scale Studies</a></li>
-</ul>
-</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guides.html">Guides</a></li>
 <li class="toctree-l1"><a class="reference internal" href="source/syndisco.html">syndisco package</a></li>
 </ul>
 
@@ -70,9 +65,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Guides</li>
+      <li class="breadcrumb-item active">Installation</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/guides.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/installation.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -80,34 +75,30 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="guides">
-<h1>Guides<a class="headerlink" href="#guides" title="Link to this heading"></a></h1>
-<p>We provide three short tutorials on how to use SynDisco. At the end of these
-tutorials, you will understand how to set up and execute a synthetic
-discussion, annotate it, as well as how to generate and manage up to hundreds
-of discussions.</p>
-<p>The code for each of these guides can also be found in the
-<a class="reference external" href="https://github.com/dimits-ts/syndisco/tree/master/docs/guides">project’s repository</a>.</p>
-<section id="id1">
-<h2><a class="reference internal" href="guides/creating_discussions.html"><span class="doc">How to Create a Synthetic Discussion</span></a><a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
-<p>Basic setup including setting up models, actors, and turn-taking strategies.</p>
-</section>
-<section id="id2">
-<h2><a class="reference internal" href="guides/creating_annotations.html"><span class="doc">How to Annotate your Synthetic Discussions</span></a><a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
-</section>
-<section id="id3">
-<h2><a class="reference internal" href="guides/creating_experiments.html"><span class="doc">How to Use the Experiment API to Manage Large-Scale Studies</span></a><a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
-<p>Also includes features such as logging and exporting synthetic datasets to CSV
-format.</p>
-</section>
+  <section id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h1>
+<p>You can download the package from PIP:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">syndisco</span>
+</pre></div>
+</div>
+<p>Or build from source:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">dimits</span><span class="o">-</span><span class="n">ts</span><span class="o">/</span><span class="n">syndisco</span><span class="o">.</span><span class="n">git</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="o">.</span>
+</pre></div>
+</div>
+<p>If you want to contribute to the project or modify the library’s code, use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">dimits</span><span class="o">-</span><span class="n">ts</span><span class="o">/</span><span class="n">syndisco</span><span class="o">.</span><span class="n">git</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="o">.</span><span class="p">[</span><span class="n">dev</span><span class="p">]</span>
+</pre></div>
+</div>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="source/syndisco.html" class="btn btn-neutral float-right" title="syndisco package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="overview.html" class="btn btn-neutral float-left" title="Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="guides.html" class="btn btn-neutral float-right" title="Guides" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

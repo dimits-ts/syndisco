@@ -32,53 +32,5 @@ In general, each discussion goes through three phases:
 See how you can easily use these concepts programmatically in the
 `Guides section <guides.md>`_.
 
-Features
-========
 
-- **Automated Experiment Generation**  
-  SynDisco generates a randomized set of discussion templates. With only a
-  handful of configurations, the researcher can run hundreds or thousands of
-  unique experiments.
 
-- **Synthetic Group Discussion Generation**  
-  SynDisco accepts an arbitrarily large number of LLM user-agent profiles and
-  possible Original Posts (OPs). Each experiment involves a random selection
-  of these user-agents replying to a randomly selected OP. The researcher can
-  determine how these participants behave, whether there is a moderator
-  present, and even how the turn-taking is determined.
-
-- **Synthetic Annotation Generation with multiple annotators**  
-  The researcher can create multiple LLM annotator-agent profiles. Each of
-  these annotators will process each generated discussion at the
-  comment-level and annotate according to the provided instruction prompt,
-  enabling an arbitrary selection of metrics to be used.
-
-- **Native Transformers support**  
-  The framework supports most Hugging Face Transformer models out of the box.
-  Support for models managed by other libraries can be easily achieved by
-  extending a single class.
-
-- **Native logging and fault tolerance**  
-  Since SynDisco may run for days on remote servers, it keeps detailed logs
-  both on-screen and on-disk. Should any experiment fail, the next one will
-  be loaded with no delay. Results are intermittently saved to disk, ensuring
-  no data loss or corruption even in catastrophic errors.
-
-Installation
-============
-
-You can download the package from PIP::
-
-    pip install syndisco
-
-Or build from source::
-
-    git clone https://github.com/dimits-ts/syndisco.git
-    pip install -r requirements.txt
-    pip install .
-
-If you want to contribute to the project or modify the library's code, use::
-
-    git clone https://github.com/dimits-ts/syndisco.git
-    pip install -r requirements.dev.txt
-    pip install -e .

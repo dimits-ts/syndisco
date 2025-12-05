@@ -45,8 +45,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="overview.html#features">Features</a></li>
-<li class="toctree-l1"><a class="reference internal" href="overview.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="guides.html">Guides</a></li>
 <li class="toctree-l1"><a class="reference internal" href="source/syndisco.html">syndisco package</a></li>
 </ul>
@@ -85,13 +84,41 @@ annotating, and analyzing synthetic discussions between Large Language Model
 <p>While simple, SynDisco offers multiple ways to randomize / customize
 discussions.</p>
 </section>
+<section id="features">
+<h1>Features<a class="headerlink" href="#features" title="Link to this heading"></a></h1>
+<ul class="simple">
+<li><p><strong>Automated Experiment Generation</strong>
+SynDisco generates a randomized set of discussion templates. With only a
+handful of configurations, the researcher can run hundreds or thousands of
+unique experiments.</p></li>
+<li><p><strong>Synthetic Group Discussion Generation</strong>
+SynDisco accepts an arbitrarily large number of LLM user-agent profiles and
+possible Original Posts (OPs). Each experiment involves a random selection
+of these user-agents replying to a randomly selected OP. The researcher can
+determine how these participants behave, whether there is a moderator
+present, and even how the turn-taking is determined.</p></li>
+<li><p><strong>Synthetic Annotation Generation with multiple annotators</strong>
+The researcher can create multiple LLM annotator-agent profiles. Each of
+these annotators will process each generated discussion at the
+comment-level and annotate according to the provided instruction prompt,
+enabling an arbitrary selection of metrics to be used.</p></li>
+<li><p><strong>Native Transformers support</strong>
+The framework supports most Hugging Face Transformer models out of the box.
+Support for models managed by other libraries can be easily achieved by
+extending a single class.</p></li>
+<li><p><strong>Native logging and fault tolerance</strong>
+Since SynDisco may run for days on remote servers, it keeps detailed logs
+both on-screen and on-disk. Should any experiment fail, the next one will
+be loaded with no delay. Results are intermittently saved to disk, ensuring
+no data loss or corruption even in catastrophic errors.</p></li>
+</ul>
+</section>
 <section id="introduction">
 <h1>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="overview.html#features">Features</a></li>
-<li class="toctree-l1"><a class="reference internal" href="overview.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="guides.html">Guides</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="guides.html#id1">How to Create a Synthetic Discussion</a></li>
 <li class="toctree-l2"><a class="reference internal" href="guides.html#id2">How to Annotate your Synthetic Discussions</a></li>
