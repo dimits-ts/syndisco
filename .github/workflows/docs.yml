@@ -1,9 +1,9 @@
-name: Build Sphinx documentation
+name: Build and Deploy Sphinx Docs
 
 on:
   push:
-    branches: [ master ]   
-  workflow_dispatch:     
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -13,8 +13,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install Pandoc
+        uses: pandoc/actions/setup@v1
+        with:
+          pandoc-version: "3.1"
 
       - name: Install dependencies
         run: |
