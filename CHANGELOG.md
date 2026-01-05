@@ -1,5 +1,7 @@
 # What's new
 
+## 2.0.6 (6/12/2025)
+- Added OpenAI support
 
 ## 2.0.5 (26/11/2025)
 
