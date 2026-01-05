@@ -1,0 +1,910 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Creating a Discussion\n",
+    "\n",
+    "The simplest task you can accomplish with this library is to create a small discussion between LLMs. \n",
+    "\n",
+    "This guide will teach you the basic setup of the library. You will understand how to setup models, user-agents and how to coordinate them in a discussion. By the end of htis guide, you will be able to run a small discussion with a moderator and save it to the disk for persistence."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Basics"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### The Model\n",
+    "\n",
+    "SynDisco can theoretically support any LLM, as long as it is wrapped in a `BaseModel` wrapper. The `BaseModel` class is a very simple interface with one method. This method gives the underlying LLM input, and returns its output to the library.\n",
+    "\n",
+    "There already exists a `TransformersModel` class which handles models from the `transformers` python library. In 90% of your applications, this will be enough. We can load a TransformersModel using the following code:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-04-04T13:14:26.434159Z",
+     "iopub.status.busy": "2025-04-04T13:14:26.433413Z",
+     "iopub.status.idle": "2025-04-04T13:17:17.032081Z",
+     "shell.execute_reply": "2025-04-04T13:17:17.031468Z"
+    }
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "/media/SSD_4TB_2/dtsirmpas/software/miniforge/envs/syndisco/lib/python3.13/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html\n",
+      "  from .autonotebook import tqdm as notebook_tqdm\n",
+      "Device set to use cuda:1\n"
+     ]
+    }
+   ],
+   "source": [
+    "from syndisco.model import TransformersModel\n",
+    "\n",
+    "llm = TransformersModel(\n",
+    "    model_path=\"unsloth/Llama-3.2-3B-Instruct-bnb-4bit\",\n",
+    "    name=\"test_model\",\n",
+    "    max_out_tokens=100,\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "This will download a small LLM from huggingface. You can substitute the model_path for any similar model in [HuggingFace](https://huggingface.co/) supporting the Transformers library."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Creating personas\n",
+    "\n",
+    "All `actors` can be defined by a `persona`, aka a set of attributes that define them. These attributes can be age, ethnicity, and even include special instructions on how they should behave.\n",
+    "\n",
+    "Creating a persona programmatically is simple:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-04-04T13:17:17.035421Z",
+     "iopub.status.busy": "2025-04-04T13:17:17.035009Z",
+     "iopub.status.idle": "2025-04-04T13:17:17.043083Z",
+     "shell.execute_reply": "2025-04-04T13:17:17.042635Z"
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "{\"username\": \"Emma35\", \"age\": 38, \"sex\": \"female\", \"sexual_orientation\": \"Heterosexual\", \"demographic_group\": \"Latino\", \"current_employment\": \"Registered Nurse\", \"education_level\": \"Bachelor's\", \"special_instructions\": \"\", \"personality_characteristics\": [\"compassionate\", \"patient\", \"diligent\", \"overwhelmed\"]}\n",
+      "{\"username\": \"Giannis\", \"age\": 21, \"sex\": \"male\", \"sexual_orientation\": \"Pansexual\", \"demographic_group\": \"White\", \"current_employment\": \"Game Developer\", \"education_level\": \"College\", \"special_instructions\": \"\", \"personality_characteristics\": [\"strategic\", \"meticulous\", \"nerdy\", \"hyper-focused\"]}\n"
+     ]
+    }
+   ],
+   "source": [
+    "from syndisco.actors import Persona\n",
+    "\n",
+    "persona_data = [\n",
+    "    {\n",
+    "        \"username\": \"Emma35\",\n",
+    "        \"age\": 38,\n",
+    "        \"sex\": \"female\",\n",
+    "        \"education_level\": \"Bachelor's\",\n",
+    "        \"sexual_orientation\": \"Heterosexual\",\n",
+    "        \"demographic_group\": \"Latino\",\n",
+    "        \"current_employment\": \"Registered Nurse\",\n",
+    "        \"special_instructions\": \"\",\n",
+    "        \"personality_characteristics\": [\n",
+    "            \"compassionate\",\n",
+    "            \"patient\",\n",
+    "            \"diligent\",\n",
+    "            \"overwhelmed\",\n",
+    "        ],\n",
+    "    },\n",
+    "    {\n",
+    "        \"username\": \"Giannis\",\n",
+    "        \"age\": 21,\n",
+    "        \"sex\": \"male\",\n",
+    "        \"education_level\": \"College\",\n",
+    "        \"sexual_orientation\": \"Pansexual\",\n",
+    "        \"demographic_group\": \"White\",\n",
+    "        \"current_employment\": \"Game Developer\",\n",
+    "        \"special_instructions\": \"\",\n",
+    "        \"personality_characteristics\": [\n",
+    "            \"strategic\",\n",
+    "            \"meticulous\",\n",
+    "            \"nerdy\",\n",
+    "            \"hyper-focused\",\n",
+    "        ],\n",
+    "    },\n",
+    "]\n",
+    "\n",
+    "personas = [Persona(**data) for data in persona_data]\n",
+    "\n",
+    "for persona in personas:\n",
+    "    print(persona)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Since creating a lot of distinct users is essential in running large-scale experiments, users are usually defined in JSON format. That way, you can change anything without touching your code!\n",
+    "\n",
+    "[Here](https://github.com/dimits-ts/synthetic_moderation_experiments/blob/master/data/discussions_input/personas/personas.json) is an applied example of how to mass-define user personas through JSON files."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Creating the user-agents\n",
+    "\n",
+    "Having a `persona` and a `model` we can finally create an `actor`. The actor will personify the selected persona using the model to talk.\n",
+    "\n",
+    "Besides a persona and a model, the actors will also need instructions and a context. By convention, all actors share the same context, and all user-agents share the same instructions. Personalized instructions are defined in the actor's persona."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-04-04T13:17:17.045370Z",
+     "iopub.status.busy": "2025-04-04T13:17:17.045239Z",
+     "iopub.status.idle": "2025-04-04T13:17:17.048755Z",
+     "shell.execute_reply": "2025-04-04T13:17:17.048324Z"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "from syndisco.actors import Actor, ActorType\n",
+    "\n",
+    "\n",
+    "CONTEXT = \"You are taking part in an online conversation\"\n",
+    "INSTRUCTIONS = \"Act like a human would\"\n",
+    "\n",
+    "actors = [\n",
+    "    Actor(\n",
+    "        model=llm,\n",
+    "        persona=p,\n",
+    "        actor_type=ActorType.USER,\n",
+    "        context=CONTEXT,\n",
+    "        instructions=INSTRUCTIONS\n",
+    "    )\n",
+    "    for p in personas\n",
+    "]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Managing turn-taking\n",
+    "\n",
+    "In real-life discussions, who gets to speak at each point in time is determined by complex social dynamics, which are difficult to realistically model.\n",
+    "However, there are ways with which we can simulate these dynamics. \n",
+    "\n",
+    "SynDisco uses the `TurnManager` class to model turn taking. Two implementations are available by default: Round Robin, and Random Weighted"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "- `Round Robin` is the simplest, most intuitive way to model turn-taking; everyone gets to talk once per round. Once everyone talks once, they get to talk again in the same sequence"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-04-04T13:17:17.051022Z",
+     "iopub.status.busy": "2025-04-04T13:17:17.050894Z",
+     "iopub.status.idle": "2025-04-04T13:17:17.054840Z",
+     "shell.execute_reply": "2025-04-04T13:17:17.054315Z"
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "John\n",
+      "Mary\n",
+      "Howard\n",
+      "Todd\n",
+      "John\n",
+      "Mary\n",
+      "Howard\n",
+      "Todd\n",
+      "John\n",
+      "Mary\n"
+     ]
+    }
+   ],
+   "source": [
+    "from syndisco.turn_manager import RoundRobin\n",
+    "\n",
+    "\n",
+    "rrobin_turn_manager = RoundRobin([\"John\", \"Mary\", \"Howard\", \"Todd\"])\n",
+    "\n",
+    "for i in range(10):\n",
+    "    print(next(rrobin_turn_manager))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "- `RandomWeighted` on the other hand throws a weighted coin on each round. If the coin flip succedes, the previous user gets to respond. If not, another user is selected at random"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-04-04T13:17:17.057039Z",
+     "iopub.status.busy": "2025-04-04T13:17:17.056846Z",
+     "iopub.status.idle": "2025-04-04T13:17:17.060907Z",
+     "shell.execute_reply": "2025-04-04T13:17:17.060380Z"
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Todd\n",
+      "Mary\n",
+      "Howard\n",
+      "John\n",
+      "Howard\n",
+      "Todd\n",
+      "Howard\n",
+      "Mary\n",
+      "Todd\n",
+      "John\n"
+     ]
+    }
+   ],
+   "source": [
+    "from syndisco.turn_manager import RandomWeighted\n",
+    "\n",
+    "\n",
+    "rweighted_turn_manager = RandomWeighted(\n",
+    "    names=[\"John\", \"Mary\", \"Howard\", \"Todd\"], p_respond=0.5\n",
+    ")\n",
+    "\n",
+    "for i in range(10):\n",
+    "    print(next(rweighted_turn_manager))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Generating a discussion\n",
+    "\n",
+    "Let's start with the most basic task; a single discussion between two user-agents."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Since we only have two users, a RoundRobin approach where each user takes a turn sequentially is sufficient."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now we can run a simple discussion"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-04-04T13:17:17.063253Z",
+     "iopub.status.busy": "2025-04-04T13:17:17.063053Z",
+     "iopub.status.idle": "2025-04-04T13:17:44.769808Z",
+     "shell.execute_reply": "2025-04-04T13:17:44.768924Z"
+    }
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      " 20%|██        | 1/5 [00:02<00:08,  2.05s/it]"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "User Emma35 posted:\n",
+      "I'm happy to chat with you. How's your day going so far? \n",
+      "\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      " 40%|████      | 2/5 [00:05<00:08,  2.90s/it]"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "User Giannis posted:\n",
+      "It's going alright, I guess. Been stuck on this game bug for a while\n",
+      "now and I'm trying to figure out why it's not compiling as expected.\n",
+      "But, other than that, I'm good. How about you, how's your day going? \n",
+      "\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      " 60%|██████    | 3/5 [00:10<00:07,  3.80s/it]"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "User Emma35 posted:\n",
+      "It's been a busy day for me. I've been juggling multiple patients and\n",
+      "trying to keep up with their needs. I love my job as a registered\n",
+      "nurse, but some days are definitely more chaotic than others. I've\n",
+      "been feeling a bit overwhelmed, to be honest. How about you, have you\n",
+      "found any solutions to that game bug you've been stuck on? \n",
+      "\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      " 80%|████████  | 4/5 [00:16<00:04,  4.84s/it]"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "User Giannis posted:\n",
+      "I totally understand the feeling of being overwhelmed. As a game\n",
+      "developer, I'm used to juggling multiple tasks and deadlines, but it's\n",
+      "not always easy. I've been working on this bug for a while now, and I\n",
+      "think I might have found the issue. It seems like a subtle one, but\n",
+      "it's been causing some inconsistencies in the game's physics engine.\n",
+      "I'm just hoping I can squash it before the next patch.  But, I'm\n",
+      "curious, what kind of patients are you \n",
+      "\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "100%|██████████| 5/5 [00:23<00:00,  4.68s/it]"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "User Emma35 posted:\n",
+      "I work in a busy hospital, so I'm constantly surrounded by patients\n",
+      "with all sorts of medical needs. There's the elderly gentleman who's\n",
+      "recovering from a hip replacement surgery, the young mom who's having\n",
+      "trouble with her newborn's reflux, and the patient who's dealing with\n",
+      "a chronic illness that requires constant monitoring. It's a lot to\n",
+      "handle, but I love the feeling of making a difference in their lives.\n",
+      "Speaking of which, I did have a patient who was really grateful for my\n",
+      "care today \n",
+      "\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "\n"
+     ]
+    }
+   ],
+   "source": [
+    "from syndisco.jobs import Discussion\n",
+    "\n",
+    "\n",
+    "turn_manager = RoundRobin([actor.get_name() for actor in actors])\n",
+    "conv = Discussion(next_turn_manager=turn_manager, users=actors)\n",
+    "conv.begin()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Let's add a moderator to oversee the discussion."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-04-04T13:17:44.772648Z",
+     "iopub.status.busy": "2025-04-04T13:17:44.772462Z",
+     "iopub.status.idle": "2025-04-04T13:18:34.768890Z",
+     "shell.execute_reply": "2025-04-04T13:18:34.768037Z"
+    }
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "  0%|          | 0/5 [00:00<?, ?it/s]"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "User Emma35 posted:\n",
+      "I'm happy to chat with you. How's your day going so far? \n",
+      "\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      " 20%|██        | 1/5 [00:04<00:17,  4.40s/it]"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "User Moderator posted:\n",
+      "User Emma35, thanks for the friendly greeting. As a moderator, I don't\n",
+      "really have personal experiences or emotions, but I'm functioning\n",
+      "properly and ready to assist with any topics you'd like to discuss.\n",
+      "What's on your mind? \n",
+      "\n",
+      "User Giannis posted:\n",
+      "Thanks for the warm welcome, Emma! I'm glad to be here. As for me,\n",
+      "it's been a pretty typical day of working on some new game mechanics\n",
+      "and debugging code. I'm really excited about the project I'm currently\n",
+      "working on, but it's been a bit of a challenge to get everything just\n",
+      "right. I've been spending most of my free time playing some strategy\n",
+      "games to get my mind warmed up, actually. I'm a bit of a nerd, so I\n",
+      "love that kind \n",
+      "\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      " 40%|████      | 2/5 [00:14<00:23,  7.88s/it]"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "User Moderator posted:\n",
+      "User Giannis, it's great to hear that you're working on a new project\n",
+      "and debugging code can be a challenging but rewarding experience. What\n",
+      "specific areas of the game mechanics are you finding tricky to get\n",
+      "right, and are there any particular strategies or techniques you're\n",
+      "using to overcome those challenges? \n",
+      "\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "You seem to be using the pipelines sequentially on GPU. In order to maximize efficiency please use a dataset\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "User Moderator posted:\n",
+      "User Giannis, debugging code can indeed be a complex process. Can you\n",
+      "tell us more about the specific areas of the game mechanics that\n",
+      "you're struggling with? Are there any particular issues or bugs that\n",
+      "you're having trouble resolving? \n",
+      "\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      " 60%|██████    | 3/5 [00:21<00:14,  7.36s/it]"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "User Moderator posted:\n",
+      "User Giannis, you mentioned that you're working on some new game\n",
+      "mechanics and debugging code. Can you provide more details on the\n",
+      "specific areas that are giving you trouble? Are you experiencing any\n",
+      "issues with balance, gameplay, or perhaps something else? \n",
+      "\n",
+      "User Emma35 posted:\n",
+      "I'd love to hear more about your project, Giannis. As a nurse, I'm\n",
+      "always fascinated by the creative and technical aspects of game\n",
+      "development. I'm sure it's not easy to balance gameplay and mechanics,\n",
+      "especially when trying to make everything just right.  I've always\n",
+      "been impressed by the complexity of game development, and I'm sure\n",
+      "it's not unlike the intricacies of patient care - sometimes you have\n",
+      "to think outside the box to come up with a solution that works for\n",
+      "everyone. What \n",
+      "\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      " 80%|████████  | 4/5 [00:34<00:09,  9.63s/it]"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "User Moderator posted:\n",
+      "User Giannis, thank you for sharing more about your project. It sounds\n",
+      "like you're facing some interesting challenges in terms of balancing\n",
+      "gameplay and mechanics. Can you tell us a bit more about what specific\n",
+      "areas you're struggling with? For example, are you having trouble with\n",
+      "character movement, puzzle-solving, or perhaps something else?  Also,\n",
+      "I'd like to invite Emma35 to continue the conversation. As a nurse,\n",
+      "her perspective on the complexities of balancing multiple systems and\n",
+      "finding solutions that work for everyone is \n",
+      "\n",
+      "User Giannis posted:\n",
+      "Thanks for having me, Moderator. I'm happy to share more about my\n",
+      "project. To be honest, I'm having a bit of trouble with the balance\n",
+      "between exploration and combat mechanics. I want the player to feel\n",
+      "like they can explore the world without feeling overwhelmed by the\n",
+      "combat system, but at the same time, I want the combat to be\n",
+      "challenging and rewarding.  Specifically, I'm struggling with finding\n",
+      "the right ratio of exploration time to combat time. If the player\n",
+      "spends too much time fighting, \n",
+      "\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "100%|██████████| 5/5 [00:47<00:00,  9.56s/it]"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "User Moderator posted:\n",
+      "User Moderator posted: User Giannis, that's a great starting point.\n",
+      "Balancing exploration and combat can be a delicate dance. Can you tell\n",
+      "us more about what you've tried so far to achieve this balance? For\n",
+      "example, have you experimented with different combat mechanics, such\n",
+      "as difficulty scaling, enemy AI, or player abilities? Have you also\n",
+      "considered implementing a \"rest\" or \"regeneration\" system to give\n",
+      "players a break from combat? We'd also like to hear from Emma35, who \n",
+      "\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "\n"
+     ]
+    }
+   ],
+   "source": [
+    "MODERATOR_INSTRUCTIONS = \"You are a moderator. Oversee the discussion\"\n",
+    "\n",
+    "moderator_persona = Persona(\n",
+    "    **{\n",
+    "        \"username\": \"Moderator\",\n",
+    "        \"age\": 41,\n",
+    "        \"sex\": \"male\",\n",
+    "        \"education_level\": \"PhD\",\n",
+    "        \"sexual_orientation\": \"Pansexual\",\n",
+    "        \"demographic_group\": \"White\",\n",
+    "        \"current_employment\": \"Moderator\",\n",
+    "        \"special_instructions\": \"\",\n",
+    "        \"personality_characteristics\": [\n",
+    "            \"strict\",\n",
+    "            \"neutral\",\n",
+    "            \"just\",\n",
+    "        ],\n",
+    "    }\n",
+    ")\n",
+    "\n",
+    "moderator = Actor(\n",
+    "    model=llm,\n",
+    "    persona=moderator_persona,\n",
+    "    actor_type=ActorType.USER,\n",
+    "    context=CONTEXT,\n",
+    "    instructions=MODERATOR_INSTRUCTIONS\n",
+    ")\n",
+    "\n",
+    "# remember to update this!\n",
+    "turn_manager = RoundRobin(\n",
+    "    [actor.get_name() for actor in actors] + [moderator.get_name()]\n",
+    ")\n",
+    "conv = Discussion(\n",
+    "    next_turn_manager=turn_manager,\n",
+    "    users=actors + [moderator],\n",
+    "    moderator=moderator,\n",
+    ")\n",
+    "conv.begin()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Saving a discussion to the disk\n",
+    "\n",
+    "It's best practice to save the results of each discussion after it has concluded. This way, no matter what happens to the program executing the discussions, progress will be checkpointed.\n",
+    "\n",
+    "The `Discussion` class provides a method for saving its logs and related metadata to a JSON file:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-04-04T13:18:34.771690Z",
+     "iopub.status.busy": "2025-04-04T13:18:34.771521Z",
+     "iopub.status.idle": "2025-04-04T13:18:34.776980Z",
+     "shell.execute_reply": "2025-04-04T13:18:34.776394Z"
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "{\n",
+      "  \"id\": \"88dc8d0b-8976-45a8-bda1-c15ed7d75450\",\n",
+      "  \"timestamp\": \"25-11-17-15-13\",\n",
+      "  \"users\": [\n",
+      "    \"Emma35\",\n",
+      "    \"Giannis\",\n",
+      "    \"Moderator\"\n",
+      "  ],\n",
+      "  \"moderator\": \"Moderator\",\n",
+      "  \"user_prompts\": [\n",
+      "    {\n",
+      "      \"context\": \"You are taking part in an online conversation\",\n",
+      "      \"instructions\": \"Act like a human would\",\n",
+      "      \"type\": \"1\",\n",
+      "      \"persona\": {\n",
+      "        \"username\": \"Emma35\",\n",
+      "        \"age\": 38,\n",
+      "        \"sex\": \"female\",\n",
+      "        \"sexual_orientation\": \"Heterosexual\",\n",
+      "        \"demographic_group\": \"Latino\",\n",
+      "        \"current_employment\": \"Registered Nurse\",\n",
+      "        \"education_level\": \"Bachelor's\",\n",
+      "        \"special_instructions\": \"\",\n",
+      "        \"personality_characteristics\": [\n",
+      "          \"compassionate\",\n",
+      "          \"patient\",\n",
+      "          \"diligent\",\n",
+      "          \"overwhelmed\"\n",
+      "        ]\n",
+      "      }\n",
+      "    },\n",
+      "    {\n",
+      "      \"context\": \"You are taking part in an online conversation\",\n",
+      "      \"instructions\": \"Act like a human would\",\n",
+      "      \"type\": \"1\",\n",
+      "      \"persona\": {\n",
+      "        \"username\": \"Giannis\",\n",
+      "        \"age\": 21,\n",
+      "        \"sex\": \"male\",\n",
+      "        \"sexual_orientation\": \"Pansexual\",\n",
+      "        \"demographic_group\": \"White\",\n",
+      "        \"current_employment\": \"Game Developer\",\n",
+      "        \"education_level\": \"College\",\n",
+      "        \"special_instructions\": \"\",\n",
+      "        \"personality_characteristics\": [\n",
+      "          \"strategic\",\n",
+      "          \"meticulous\",\n",
+      "          \"nerdy\",\n",
+      "          \"hyper-focused\"\n",
+      "        ]\n",
+      "      }\n",
+      "    },\n",
+      "    {\n",
+      "      \"context\": \"You are taking part in an online conversation\",\n",
+      "      \"instructions\": \"You are a moderator. Oversee the discussion\",\n",
+      "      \"type\": \"1\",\n",
+      "      \"persona\": {\n",
+      "        \"username\": \"Moderator\",\n",
+      "        \"age\": 41,\n",
+      "        \"sex\": \"male\",\n",
+      "        \"sexual_orientation\": \"Pansexual\",\n",
+      "        \"demographic_group\": \"White\",\n",
+      "        \"current_employment\": \"Moderator\",\n",
+      "        \"education_level\": \"PhD\",\n",
+      "        \"special_instructions\": \"\",\n",
+      "        \"personality_characteristics\": [\n",
+      "          \"strict\",\n",
+      "          \"neutral\",\n",
+      "          \"just\"\n",
+      "        ]\n",
+      "      }\n",
+      "    }\n",
+      "  ],\n",
+      "  \"moderator_prompt\": {\n",
+      "    \"context\": \"You are taking part in an online conversation\",\n",
+      "    \"instructions\": \"You are a moderator. Oversee the discussion\",\n",
+      "    \"type\": \"1\",\n",
+      "    \"persona\": {\n",
+      "      \"username\": \"Moderator\",\n",
+      "      \"age\": 41,\n",
+      "      \"sex\": \"male\",\n",
+      "      \"sexual_orientation\": \"Pansexual\",\n",
+      "      \"demographic_group\": \"White\",\n",
+      "      \"current_employment\": \"Moderator\",\n",
+      "      \"education_level\": \"PhD\",\n",
+      "      \"special_instructions\": \"\",\n",
+      "      \"personality_characteristics\": [\n",
+      "        \"strict\",\n",
+      "        \"neutral\",\n",
+      "        \"just\"\n",
+      "      ]\n",
+      "    }\n",
+      "  },\n",
+      "  \"ctx_length\": 5,\n",
+      "  \"logs\": [\n",
+      "    {\n",
+      "      \"name\": \"Emma35\",\n",
+      "      \"text\": \"I'm happy to chat with you. How's your day going so far?\",\n",
+      "      \"model\": \"test_model\"\n",
+      "    },\n",
+      "    {\n",
+      "      \"name\": \"Moderator\",\n",
+      "      \"text\": \"User Emma35, thanks for the friendly greeting. As a moderator, I don't really have personal experiences or emotions, but I'm functioning properly and ready to assist with any topics you'd like to discuss. What's on your mind?\",\n",
+      "      \"model\": \"test_model\"\n",
+      "    },\n",
+      "    {\n",
+      "      \"name\": \"Giannis\",\n",
+      "      \"text\": \"Thanks for the warm welcome, Emma! I'm glad to be here. As for me, it's been a pretty typical day of working on some new game mechanics and debugging code. I'm really excited about the project I'm currently working on, but it's been a bit of a challenge to get everything just right. I've been spending most of my free time playing some strategy games to get my mind warmed up, actually. I'm a bit of a nerd, so I love that kind\",\n",
+      "      \"model\": \"test_model\"\n",
+      "    },\n",
+      "    {\n",
+      "      \"name\": \"Moderator\",\n",
+      "      \"text\": \"User Giannis, it's great to hear that you're working on a new project and debugging code can be a challenging but rewarding experience. What specific areas of the game mechanics are you finding tricky to get right, and are there any particular strategies or techniques you're using to overcome those challenges?\",\n",
+      "      \"model\": \"test_model\"\n",
+      "    },\n",
+      "    {\n",
+      "      \"name\": \"Moderator\",\n",
+      "      \"text\": \"User Giannis, debugging code can indeed be a complex process. Can you tell us more about the specific areas of the game mechanics that you're struggling with? Are there any particular issues or bugs that you're having trouble resolving?\",\n",
+      "      \"model\": \"test_model\"\n",
+      "    },\n",
+      "    {\n",
+      "      \"name\": \"Moderator\",\n",
+      "      \"text\": \"User Giannis, you mentioned that you're working on some new game mechanics and debugging code. Can you provide more details on the specific areas that are giving you trouble? Are you experiencing any issues with balance, gameplay, or perhaps something else?\",\n",
+      "      \"model\": \"test_model\"\n",
+      "    },\n",
+      "    {\n",
+      "      \"name\": \"Emma35\",\n",
+      "      \"text\": \"I'd love to hear more about your project, Giannis. As a nurse, I'm always fascinated by the creative and technical aspects of game development. I'm sure it's not easy to balance gameplay and mechanics, especially when trying to make everything just right.\\n\\nI've always been impressed by the complexity of game development, and I'm sure it's not unlike the intricacies of patient care - sometimes you have to think outside the box to come up with a solution that works for everyone. What\",\n",
+      "      \"model\": \"test_model\"\n",
+      "    },\n",
+      "    {\n",
+      "      \"name\": \"Moderator\",\n",
+      "      \"text\": \"User Giannis, thank you for sharing more about your project. It sounds like you're facing some interesting challenges in terms of balancing gameplay and mechanics. Can you tell us a bit more about what specific areas you're struggling with? For example, are you having trouble with character movement, puzzle-solving, or perhaps something else?\\n\\nAlso, I'd like to invite Emma35 to continue the conversation. As a nurse, her perspective on the complexities of balancing multiple systems and finding solutions that work for everyone is\",\n",
+      "      \"model\": \"test_model\"\n",
+      "    },\n",
+      "    {\n",
+      "      \"name\": \"Giannis\",\n",
+      "      \"text\": \"Thanks for having me, Moderator. I'm happy to share more about my project. To be honest, I'm having a bit of trouble with the balance between exploration and combat mechanics. I want the player to feel like they can explore the world without feeling overwhelmed by the combat system, but at the same time, I want the combat to be challenging and rewarding.\\n\\nSpecifically, I'm struggling with finding the right ratio of exploration time to combat time. If the player spends too much time fighting,\",\n",
+      "      \"model\": \"test_model\"\n",
+      "    },\n",
+      "    {\n",
+      "      \"name\": \"Moderator\",\n",
+      "      \"text\": \"User Moderator posted:\\nUser Giannis, that's a great starting point. Balancing exploration and combat can be a delicate dance. Can you tell us more about what you've tried so far to achieve this balance? For example, have you experimented with different combat mechanics, such as difficulty scaling, enemy AI, or player abilities? Have you also considered implementing a \\\"rest\\\" or \\\"regeneration\\\" system to give players a break from combat? We'd also like to hear from Emma35, who\",\n",
+      "      \"model\": \"test_model\"\n",
+      "    }\n",
+      "  ]\n",
+      "}\n"
+     ]
+    }
+   ],
+   "source": [
+    "import tempfile\n",
+    "import json\n",
+    "\n",
+    "tp = tempfile.NamedTemporaryFile(delete=True)\n",
+    "\n",
+    "conv.to_json_file(tp.name)\n",
+    "\n",
+    "# if you are running this on Windows, uncomment this line\n",
+    "# tp.close()\n",
+    "with open(tp.name, mode=\"rb\") as f:\n",
+    "    print(json.dumps(json.load(f), indent=2))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Congratulations, you can now run fully synthetic discussions! You may want to experiment with adding more than 2 users or testing more realistic turn taking procedures (for example, check out the `RandomWeighted` turn manager)."
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "syndisco",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.13.5"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}

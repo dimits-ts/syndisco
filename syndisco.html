@@ -1,0 +1,311 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>syndisco package &mdash; SynDisco 2.0.5 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="shortcut icon" href="_static/syndisco_logo.svg"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=09beee0d"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Guides" href="guides.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SynDisco
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html#how-to-customize-your-discussion">How to Customize Your Discussion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guides.html">Guides</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">syndisco package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#syndisco-actors-module">syndisco.actors module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#syndisco-experiments-module">syndisco.experiments module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#syndisco-jobs-module">syndisco.jobs module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-syndisco.logging_util">syndisco.logging_util module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#syndisco.logging_util.logging_setup"><code class="docutils literal notranslate"><span class="pre">logging_setup()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#syndisco.logging_util.timing"><code class="docutils literal notranslate"><span class="pre">timing()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#syndisco-model-module">syndisco.model module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-syndisco.postprocessing">syndisco.postprocessing module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#syndisco.postprocessing.import_annotations"><code class="docutils literal notranslate"><span class="pre">import_annotations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#syndisco.postprocessing.import_discussions"><code class="docutils literal notranslate"><span class="pre">import_discussions()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-syndisco.turn_manager">syndisco.turn_manager module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#syndisco.turn_manager.RandomWeighted"><code class="docutils literal notranslate"><span class="pre">RandomWeighted</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.turn_manager.RandomWeighted.DEFAULT_RESPOND_PROBABILITY"><code class="docutils literal notranslate"><span class="pre">RandomWeighted.DEFAULT_RESPOND_PROBABILITY</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#syndisco.turn_manager.RoundRobin"><code class="docutils literal notranslate"><span class="pre">RoundRobin</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#syndisco.turn_manager.TurnManager"><code class="docutils literal notranslate"><span class="pre">TurnManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.turn_manager.TurnManager.next"><code class="docutils literal notranslate"><span class="pre">TurnManager.next()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.turn_manager.TurnManager.set_names"><code class="docutils literal notranslate"><span class="pre">TurnManager.set_names()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-syndisco">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SynDisco</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">syndisco package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/syndisco.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="syndisco-package">
+<h1>syndisco package<a class="headerlink" href="#syndisco-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="syndisco-actors-module">
+<h2>syndisco.actors module<a class="headerlink" href="#syndisco-actors-module" title="Link to this heading"></a></h2>
+</section>
+<section id="syndisco-experiments-module">
+<h2>syndisco.experiments module<a class="headerlink" href="#syndisco-experiments-module" title="Link to this heading"></a></h2>
+</section>
+<section id="syndisco-jobs-module">
+<h2>syndisco.jobs module<a class="headerlink" href="#syndisco-jobs-module" title="Link to this heading"></a></h2>
+</section>
+<section id="module-syndisco.logging_util">
+<span id="syndisco-logging-util-module"></span><h2>syndisco.logging_util module<a class="headerlink" href="#module-syndisco.logging_util" title="Link to this heading"></a></h2>
+<p>Module handling logging for LLM discussion and annotation tasks.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="syndisco.logging_util.logging_setup">
+<span class="sig-prename descclassname"><span class="pre">syndisco.logging_util.</span></span><span class="sig-name descname"><span class="pre">logging_setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">print_to_terminal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_to_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logs_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'debug'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_colors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_warnings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#syndisco.logging_util.logging_setup" title="Link to this definition"></a></dt>
+<dd><p>Create the logger configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>print_to_terminal</strong> (<em>bool</em>) – whether to print logs to the screen</p></li>
+<li><p><strong>write_to_file</strong> (<em>bool</em>) – whether to write logs to a file.
+Needs logs_dir to be specified.</p></li>
+<li><p><strong>logs_dir</strong> (<em>Optional</em><em>[</em><em>str</em><em>  |  </em><em>Path</em><em>]</em><em>, </em><em>optional</em>) – the directory where the logs will be placed,
+defaults to None</p></li>
+<li><p><strong>level</strong> – the logging level, defaults to logging.DEBUG</p></li>
+<li><p><strong>use_colors</strong> (<em>bool</em><em>, </em><em>defaults to True</em>) – whether to color the output.</p></li>
+<li><p><strong>log_warnings</strong> (<em>bool</em><em>, </em><em>defaults to True</em>) – whether to log library warnings</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="syndisco.logging_util.timing">
+<span class="sig-prename descclassname"><span class="pre">syndisco.logging_util.</span></span><span class="sig-name descname"><span class="pre">timing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#syndisco.logging_util.timing" title="Link to this definition"></a></dt>
+<dd><p>Decorator which logs the execution time of a function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>f</strong> (<em>Function</em>) – the function to be timed</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the result of the function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>_type_</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="syndisco-model-module">
+<h2>syndisco.model module<a class="headerlink" href="#syndisco-model-module" title="Link to this heading"></a></h2>
+</section>
+<section id="module-syndisco.postprocessing">
+<span id="syndisco-postprocessing-module"></span><h2>syndisco.postprocessing module<a class="headerlink" href="#module-syndisco.postprocessing" title="Link to this heading"></a></h2>
+<p>Module responsible for exporting discussions and their annotations in CSV
+format.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="syndisco.postprocessing.import_annotations">
+<span class="sig-prename descclassname"><span class="pre">syndisco.postprocessing.</span></span><span class="sig-name descname"><span class="pre">import_annotations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annot_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#syndisco.postprocessing.import_annotations" title="Link to this definition"></a></dt>
+<dd><p>Import annotation data from JSON files in a directory and process it
+into a DataFrame.</p>
+<p>This function reads JSON files containing annotation data, processes the
+data to standardize columns, and includes structured user traits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>annot_dir</strong> (<em>str</em><em> | </em><em>Path</em>) – Directory containing JSON files with annotation data.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A DataFrame containing processed annotation data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="syndisco.postprocessing.import_discussions">
+<span class="sig-prename descclassname"><span class="pre">syndisco.postprocessing.</span></span><span class="sig-name descname"><span class="pre">import_discussions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conv_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#syndisco.postprocessing.import_discussions" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Import discussion output (logs) from JSON files in a directory and process</dt><dd><p>it into a DataFrame.</p>
+</dd>
+<dt>This function reads JSON files containing conversation data, processes the</dt><dd><p>data to</p>
+</dd>
+<dt>standardize columns, and adds derived attributes such as user traits and</dt><dd><p>prompts.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>conv_dir</strong> (<em>str</em><em> | </em><em>Path</em>) – Directory containing JSON files with conversation data.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A DataFrame containing processed conversation data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-syndisco.turn_manager">
+<span id="syndisco-turn-manager-module"></span><h2>syndisco.turn_manager module<a class="headerlink" href="#module-syndisco.turn_manager" title="Link to this heading"></a></h2>
+<p>Module handling the turn order of LLM participants in discussions.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="syndisco.turn_manager.RandomWeighted">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">syndisco.turn_manager.</span></span><span class="sig-name descname"><span class="pre">RandomWeighted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p_respond</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#syndisco.turn_manager.RandomWeighted" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#syndisco.turn_manager.TurnManager" title="syndisco.turn_manager.TurnManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">TurnManager</span></code></a></p>
+<p>Enable a participant to reply with a set probability, else randomly select
+another participant.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="syndisco.turn_manager.RandomWeighted.DEFAULT_RESPOND_PROBABILITY">
+<span class="sig-name descname"><span class="pre">DEFAULT_RESPOND_PROBABILITY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.5</span></em><a class="headerlink" href="#syndisco.turn_manager.RandomWeighted.DEFAULT_RESPOND_PROBABILITY" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="syndisco.turn_manager.RoundRobin">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">syndisco.turn_manager.</span></span><span class="sig-name descname"><span class="pre">RoundRobin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#syndisco.turn_manager.RoundRobin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#syndisco.turn_manager.TurnManager" title="syndisco.turn_manager.TurnManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">TurnManager</span></code></a></p>
+<p>A simple turn manager which gives priority to the next user in the queue.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="syndisco.turn_manager.TurnManager">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">syndisco.turn_manager.</span></span><span class="sig-name descname"><span class="pre">TurnManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#syndisco.turn_manager.TurnManager" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></p>
+<p>A class that handles which handles turns between users.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="syndisco.turn_manager.TurnManager.next">
+<em class="property"><span class="k"><span class="pre">final</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">next</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#syndisco.turn_manager.TurnManager.next" title="Link to this definition"></a></dt>
+<dd><p>Get the username of the next speaker.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – if no names have been provided from the
+constructor, or from the TurnManager.set() method</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the next speaker’s username</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="syndisco.turn_manager.TurnManager.set_names">
+<em class="property"><span class="k"><span class="pre">final</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#syndisco.turn_manager.TurnManager.set_names" title="Link to this definition"></a></dt>
+<dd><p>Initialize the manager by providing the names of the users.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>names</strong> (<em>Iterable</em><em>[</em><em>str</em><em>]</em>) – the usernames of the participants</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-syndisco">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-syndisco" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="guides.html" class="btn btn-neutral float-left" title="Guides" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Dimitris Tsirmpas.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
