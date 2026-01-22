@@ -21,7 +21,6 @@ format.
 
 # You may contact the author at dim.tsirmpas@aueb.gr
 
-import os
 import json
 import hashlib
 from pathlib import Path
@@ -99,12 +98,11 @@ def import_annotations(annot_dir: str | Path) -> pd.DataFrame:
     annot_dir = Path(annot_dir)
     df = _read_annotations(annot_dir)
     df = df.reset_index(drop=True)
-    df = _rename_annot_df_columns(df)
 
     # Generate unique message ID and message order
     df["message_id"] = _generate_message_hash(df.conv_id, df.message)
     df["message_order"] = _add_message_order(df)
-    print(df)
+    #print([x for x in df.annotator_prompt])
     df = _group_all_but_one(df)
     return df
 
@@ -121,10 +119,8 @@ def _read_annotations(annot_dir: Path) -> pd.DataFrame:
     :return: A DataFrame containing raw annotation data.
     :rtype: pd.DataFrame
     """
-    file_paths = _list_files_recursive(annot_dir)
     rows = []
-
-    for file_path in file_paths:
+    for file_path in annot_dir.rglob("*"):
         with open(file_path, "r", encoding="utf8") as fin:
             conv = json.load(fin)
 
@@ -138,18 +134,6 @@ def _read_annotations(annot_dir: Path) -> pd.DataFrame:
 
     full_df = pd.concat(rows)
     return full_df
-
-
-def _rename_annot_df_columns(df):
-    # Identify persona columns
-    persona_prefix = "annotator_prompt.persona."
-    rename_map = {
-        col: "annot_" + col.replace(persona_prefix, "")
-        for col in df.columns
-        if col.startswith(persona_prefix)
-    }
-    # Apply renaming
-    return df.rename(columns=rename_map)
 
 
 def _read_conversations(conv_dir: Path) -> pd.DataFrame:
@@ -169,7 +153,7 @@ def _read_conversations(conv_dir: Path) -> pd.DataFrame:
             f"{conv_dir} is not a directory or does not exist"
         ) from None
 
-    file_paths = _list_files_recursive(conv_dir)
+    file_paths = list(conv_dir.rglob("*"))
 
     if len(file_paths) == 0:
         raise ValueError(
@@ -205,22 +189,6 @@ def _is_moderator(moderator_name: pd.Series, username: pd.Series) -> pd.Series:
     :rtype: pd.Series
     """
     return moderator_name == username
-
-
-def _list_files_recursive(start_path: str | Path) -> list[str]:
-    """
-    Recursively list all files in a directory and its subdirectories.
-
-    :param start_path: The starting directory path.
-    :type start_path: str | Path
-    :return: A list of file paths.
-    :rtype: list[str]
-    """
-    all_files = []
-    for root, _, files in os.walk(start_path):
-        for file in files:
-            all_files.append(os.path.join(root, file))
-    return all_files
 
 
 def _select_user_prompt(df):
