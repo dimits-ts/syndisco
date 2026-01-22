@@ -113,7 +113,7 @@ def ensure_parent_directories_exist(output_path: str | Path) -> None:
 
 def generate_datetime_filename(
     output_dir: Optional[str | Path] = None,
-    timestamp_format: str = "%y-%m-%d-%H-%M",
+    timestamp_format: str = "%y-%m-%d-%H-%M-%S",
     file_ending: str = "",
 ) -> Path:
     """

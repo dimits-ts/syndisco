@@ -102,7 +102,6 @@ def import_annotations(annot_dir: str | Path) -> pd.DataFrame:
     # Generate unique message ID and message order
     df["message_id"] = _generate_message_hash(df.conv_id, df.message)
     df["message_order"] = _add_message_order(df)
-    #print([x for x in df.annotator_prompt])
     df = _group_all_but_one(df)
     return df
 
