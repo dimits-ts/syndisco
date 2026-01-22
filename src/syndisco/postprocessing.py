@@ -130,9 +130,6 @@ def _read_annotations(annot_dir: Path) -> pd.DataFrame:
 
         conv = pd.json_normalize(conv)
         conv = conv.explode("logs")
-        conv["annotation_variant"] = os.path.basename(
-            os.path.dirname(file_path)
-        )
         conv["message"] = conv.logs.apply(lambda x: x[0])
         conv["annotation"] = conv.logs.apply(lambda x: x[1])
 
