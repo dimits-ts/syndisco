@@ -104,7 +104,8 @@ def import_annotations(annot_dir: str | Path) -> pd.DataFrame:
     # Generate unique message ID and message order
     df["message_id"] = _generate_message_hash(df.conv_id, df.message)
     df["message_order"] = _add_message_order(df)
-    df = _group_all_but_one(df, "annot_personality_characteristics")
+    print(df)
+    df = _group_all_but_one(df)
     return df
 
 
@@ -264,14 +265,18 @@ def _process_traits(user_prompt: dict) -> pd.DataFrame:
     return pd.DataFrame([user_prompt])
 
 
-def _group_all_but_one(df: pd.DataFrame, to_list_col: str) -> pd.DataFrame:
-    grouping_columns = [col for col in df.columns if col != to_list_col]
-    aggregated_df = (
-        df.groupby(grouping_columns, as_index=False)
-        .agg({to_list_col: list})
-        .reset_index(drop=True)
+def _group_all_but_one(
+    df: pd.DataFrame,
+    to_list_col: str = "annotation",
+) -> pd.DataFrame:
+    if to_list_col not in df.columns:
+        raise ValueError(f"Column '{to_list_col}' not found in DataFrame")
+
+    grouping_columns = [c for c in df.columns if c != to_list_col]
+
+    return df.groupby(grouping_columns, as_index=False).agg(
+        {to_list_col: list}
     )
-    return aggregated_df
 
 
 def _generate_message_hash(
