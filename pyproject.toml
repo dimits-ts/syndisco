@@ -40,7 +40,8 @@ dependencies = [
   "pandas",
   "torch",
   "tqdm",
-  "transformers"
+  "transformers",
+  "openai"
 ]
 
 [project.urls]
