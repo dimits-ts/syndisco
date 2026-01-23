@@ -1,0 +1,717 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Creating a Discussion\n",
+    "\n",
+    "The simplest task you can accomplish with this library is to create a small discussion between LLMs. \n",
+    "\n",
+    "This guide will teach you the basic setup of the library. You will understand how to setup models, user-agents and how to coordinate them in a discussion. By the end of htis guide, you will be able to run a small discussion with a moderator and save it to the disk for persistence."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Basics"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### The Model\n",
+    "\n",
+    "SynDisco can theoretically support any LLM, as long as it is wrapped in a `BaseModel` wrapper. The `BaseModel` class is a very simple interface with one method. This method gives the underlying LLM input, and returns its output to the library.\n",
+    "\n",
+    "There already exists a `TransformersModel` class which handles models from the `transformers` python library. In 90% of your applications, this will be enough. We can load a TransformersModel using the following code:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-04-04T13:14:26.434159Z",
+     "iopub.status.busy": "2025-04-04T13:14:26.433413Z",
+     "iopub.status.idle": "2025-04-04T13:17:17.032081Z",
+     "shell.execute_reply": "2025-04-04T13:17:17.031468Z"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "from syndisco.model import TransformersModel\n",
+    "\n",
+    "llm = TransformersModel(\n",
+    "    model_path=\"unsloth/Llama-3.2-3B-Instruct-bnb-4bit\",\n",
+    "    name=\"test_model\",\n",
+    "    max_out_tokens=100,\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "This will download a small LLM from huggingface. You can substitute the model_path for any similar model in [HuggingFace](https://huggingface.co/) supporting the Transformers library."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Creating personas\n",
+    "\n",
+    "All `actors` can be defined by a `persona`, aka a set of attributes that define them. These attributes can be age, ethnicity, and even include special instructions on how they should behave.\n",
+    "\n",
+    "Creating a persona programmatically is simple:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-04-04T13:17:17.035421Z",
+     "iopub.status.busy": "2025-04-04T13:17:17.035009Z",
+     "iopub.status.idle": "2025-04-04T13:17:17.043083Z",
+     "shell.execute_reply": "2025-04-04T13:17:17.042635Z"
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "{\"username\": \"Emma35\", \"age\": 38, \"sex\": \"female\", \"sexual_orientation\": \"Heterosexual\", \"demographic_group\": \"Latino\", \"current_employment\": \"Registered Nurse\", \"education_level\": \"Bachelor's\", \"special_instructions\": \"\", \"personality_characteristics\": [\"compassionate\", \"patient\", \"diligent\", \"overwhelmed\"]}\n",
+      "{\"username\": \"Giannis\", \"age\": 21, \"sex\": \"male\", \"sexual_orientation\": \"Pansexual\", \"demographic_group\": \"White\", \"current_employment\": \"Game Developer\", \"education_level\": \"College\", \"special_instructions\": \"\", \"personality_characteristics\": [\"strategic\", \"meticulous\", \"nerdy\", \"hyper-focused\"]}\n"
+     ]
+    }
+   ],
+   "source": [
+    "from syndisco.actors import Persona\n",
+    "\n",
+    "persona_data = [\n",
+    "    {\n",
+    "        \"username\": \"Emma35\",\n",
+    "        \"age\": 38,\n",
+    "        \"sex\": \"female\",\n",
+    "        \"education_level\": \"Bachelor's\",\n",
+    "        \"sexual_orientation\": \"Heterosexual\",\n",
+    "        \"demographic_group\": \"Latino\",\n",
+    "        \"current_employment\": \"Registered Nurse\",\n",
+    "        \"special_instructions\": \"\",\n",
+    "        \"personality_characteristics\": [\n",
+    "            \"compassionate\",\n",
+    "            \"patient\",\n",
+    "            \"diligent\",\n",
+    "            \"overwhelmed\",\n",
+    "        ],\n",
+    "    },\n",
+    "    {\n",
+    "        \"username\": \"Giannis\",\n",
+    "        \"age\": 21,\n",
+    "        \"sex\": \"male\",\n",
+    "        \"education_level\": \"College\",\n",
+    "        \"sexual_orientation\": \"Pansexual\",\n",
+    "        \"demographic_group\": \"White\",\n",
+    "        \"current_employment\": \"Game Developer\",\n",
+    "        \"special_instructions\": \"\",\n",
+    "        \"personality_characteristics\": [\n",
+    "            \"strategic\",\n",
+    "            \"meticulous\",\n",
+    "            \"nerdy\",\n",
+    "            \"hyper-focused\",\n",
+    "        ],\n",
+    "    },\n",
+    "]\n",
+    "\n",
+    "personas = [Persona(**data) for data in persona_data]\n",
+    "\n",
+    "for persona in personas:\n",
+    "    print(persona)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Since creating a lot of distinct users is essential in running large-scale experiments, users are usually defined in JSON format. That way, you can change anything without touching your code!\n",
+    "\n",
+    "[Here](https://github.com/dimits-ts/synthetic_moderation_experiments/blob/master/data/discussions_input/personas/personas.json) is an applied example of how to mass-define user personas through JSON files."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Creating the user-agents\n",
+    "\n",
+    "Having a `persona` and a `model` we can finally create an `actor`. The actor will personify the selected persona using the model to talk.\n",
+    "\n",
+    "Besides a persona and a model, the actors will also need instructions and a context. By convention, all actors share the same context, and all user-agents share the same instructions. Personalized instructions are defined in the actor's persona."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-04-04T13:17:17.045370Z",
+     "iopub.status.busy": "2025-04-04T13:17:17.045239Z",
+     "iopub.status.idle": "2025-04-04T13:17:17.048755Z",
+     "shell.execute_reply": "2025-04-04T13:17:17.048324Z"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "from syndisco.actors import Actor, ActorType\n",
+    "\n",
+    "\n",
+    "CONTEXT = \"You are taking part in an online conversation\"\n",
+    "INSTRUCTIONS = \"Act like a human would\"\n",
+    "\n",
+    "actors = [\n",
+    "    Actor(\n",
+    "        model=llm,\n",
+    "        persona=p,\n",
+    "        actor_type=ActorType.USER,\n",
+    "        context=CONTEXT,\n",
+    "        instructions=INSTRUCTIONS\n",
+    "    )\n",
+    "    for p in personas\n",
+    "]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Managing turn-taking\n",
+    "\n",
+    "In real-life discussions, who gets to speak at each point in time is determined by complex social dynamics, which are difficult to realistically model.\n",
+    "However, there are ways with which we can simulate these dynamics. \n",
+    "\n",
+    "SynDisco uses the `TurnManager` class to model turn taking. Two implementations are available by default: Round Robin, and Random Weighted"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "- `Round Robin` is the simplest, most intuitive way to model turn-taking; everyone gets to talk once per round. Once everyone talks once, they get to talk again in the same sequence"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-04-04T13:17:17.051022Z",
+     "iopub.status.busy": "2025-04-04T13:17:17.050894Z",
+     "iopub.status.idle": "2025-04-04T13:17:17.054840Z",
+     "shell.execute_reply": "2025-04-04T13:17:17.054315Z"
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "John\n",
+      "Mary\n",
+      "Howard\n",
+      "Todd\n",
+      "John\n",
+      "Mary\n",
+      "Howard\n",
+      "Todd\n",
+      "John\n",
+      "Mary\n"
+     ]
+    }
+   ],
+   "source": [
+    "from syndisco.turn_manager import RoundRobin\n",
+    "\n",
+    "\n",
+    "rrobin_turn_manager = RoundRobin([\"John\", \"Mary\", \"Howard\", \"Todd\"])\n",
+    "\n",
+    "for i in range(10):\n",
+    "    print(next(rrobin_turn_manager))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "- `RandomWeighted` on the other hand throws a weighted coin on each round. If the coin flip succedes, the previous user gets to respond. If not, another user is selected at random"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-04-04T13:17:17.057039Z",
+     "iopub.status.busy": "2025-04-04T13:17:17.056846Z",
+     "iopub.status.idle": "2025-04-04T13:17:17.060907Z",
+     "shell.execute_reply": "2025-04-04T13:17:17.060380Z"
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Mary\n",
+      "John\n",
+      "Howard\n",
+      "Mary\n",
+      "Todd\n",
+      "Mary\n",
+      "Todd\n",
+      "Howard\n",
+      "Todd\n",
+      "Mary\n"
+     ]
+    }
+   ],
+   "source": [
+    "from syndisco.turn_manager import RandomWeighted\n",
+    "\n",
+    "\n",
+    "rweighted_turn_manager = RandomWeighted(\n",
+    "    names=[\"John\", \"Mary\", \"Howard\", \"Todd\"], p_respond=0.5\n",
+    ")\n",
+    "\n",
+    "for i in range(10):\n",
+    "    print(next(rweighted_turn_manager))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Generating a discussion\n",
+    "\n",
+    "Let's start with the most basic task; a single discussion between two user-agents."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Since we only have two users, a RoundRobin approach where each user takes a turn sequentially is sufficient."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now we can run a simple discussion"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-04-04T13:17:17.063253Z",
+     "iopub.status.busy": "2025-04-04T13:17:17.063053Z",
+     "iopub.status.idle": "2025-04-04T13:17:44.769808Z",
+     "shell.execute_reply": "2025-04-04T13:17:44.768924Z"
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "application/vnd.jupyter.widget-view+json": {
+       "model_id": "471e0ee6bd37436ca34eef9a07b645b5",
+       "version_major": 2,
+       "version_minor": 0
+      },
+      "text/plain": [
+       "  0%|          | 0/5 [00:00<?, ?it/s]"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "The following generation flags are not valid and may be ignored: ['temperature', 'top_p']. Set `TRANSFORMERS_VERBOSITY=info` for more details.\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "User Emma35 posted:\n",
+      "\"Hey everyone, I just got back from a long shift at the hospital and\n",
+      "I'm exhausted. Anyone else have days like that? I swear, some days I\n",
+      "feel like I'm running on coffee fumes and adrenaline alone\" \n",
+      "\n",
+      "User Giannis posted:\n",
+      "{\"role\": \"Giannis\", \"content\": \"Hey Emma, sorry to hear that. I feel\n",
+      "you. I've had those days too, especially when I'm working on a tight\n",
+      "deadline for a game. The adrenaline rush from the initial project\n",
+      "start can be replaced by a crushing sense of responsibility once the\n",
+      "clock starts ticking. What do you do to recharge after a long shift?\"} \n",
+      "\n",
+      "User Emma35 posted:\n",
+      "{\"role\": \"Emma35\", \"content\": \"Giannis, I totally get what you mean!\n",
+      "As a nurse, I'm always on call and have to be ready to jump into\n",
+      "action at a moment's notice. But when I'm not working, I love to\n",
+      "unwind with a good book and a cup of tea. Sometimes I'll take a long\n",
+      "bath, light some candles, and just relax. I also try to prioritize\n",
+      "self-care, whether that's getting a massage, taking a yoga \n",
+      "\n",
+      "User Giannis posted:\n",
+      "\"Hey Emma, I'm glad you're prioritizing self-care. As a game\n",
+      "developer, I have to admit that my go-to recharge method is a bit\n",
+      "different. When I'm feeling burnt out, I try to take a break and do\n",
+      "something creative, like drawing or writing a short story. It helps me\n",
+      "clear my mind and get my creative juices flowing again. I also love\n",
+      "playing video games, it's a great way to unwind and take my mind off\n",
+      "things. But I have to say \n",
+      "\n",
+      "User Emma35 posted:\n",
+      "\"Giannis, I'm so glad you brought up self-care. As a nurse, I have to\n",
+      "admit that it's not always easy to prioritize my own needs, especially\n",
+      "when there are so many patients to care for. But I've learned that\n",
+      "taking care of myself is crucial to being able to provide the best\n",
+      "care for my patients. I've actually been thinking of starting a\n",
+      "journaling practice, where I write down my thoughts and feelings after\n",
+      "a long shift. It helps me process everything that happened \n",
+      "\n"
+     ]
+    }
+   ],
+   "source": [
+    "from syndisco.jobs import Discussion\n",
+    "\n",
+    "\n",
+    "turn_manager = RoundRobin([actor.get_name() for actor in actors])\n",
+    "conv = Discussion(next_turn_manager=turn_manager, users=actors)\n",
+    "conv.begin()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Let's add a moderator to oversee the discussion."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-04-04T13:17:44.772648Z",
+     "iopub.status.busy": "2025-04-04T13:17:44.772462Z",
+     "iopub.status.idle": "2025-04-04T13:18:34.768890Z",
+     "shell.execute_reply": "2025-04-04T13:18:34.768037Z"
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "application/vnd.jupyter.widget-view+json": {
+       "model_id": "d0e52ade55434a848bbb704ef69556c3",
+       "version_major": 2,
+       "version_minor": 0
+      },
+      "text/plain": [
+       "  0%|          | 0/5 [00:00<?, ?it/s]"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "User Emma35 posted:\n",
+      "\"Hey everyone, I just got back from a long shift at the hospital and\n",
+      "I'm exhausted. Anyone else have days like that? I swear, some days I\n",
+      "feel like I'm running on coffee fumes and adrenaline alone\" \n",
+      "\n",
+      "User Moderator posted:\n",
+      "{\"role\": \"Moderator\", \"content\": \"Hey Emma35, sorry to hear that\n",
+      "you're feeling exhausted. It's completely understandable, especially\n",
+      "after a long shift at the hospital. Many healthcare workers put in\n",
+      "long hours and sacrifice a lot to care for their patients. How do you\n",
+      "manage to cope with the physical and emotional demands of your job? Do\n",
+      "you have any self-care routines or strategies that help you\n",
+      "recharge?\"} \n",
+      "\n",
+      "User Giannis posted:\n",
+      "\"Hey Emma35, I totally feel you. As a game developer, I'm used to long\n",
+      "hours of focus and concentration, but I can imagine how draining it\n",
+      "must be to deal with the emotional toll of working in a hospital. I've\n",
+      "found that for me, taking short breaks to stretch and move around\n",
+      "really helps. I also try to prioritize my sleep and make time for\n",
+      "activities that bring me joy, like playing video games or reading. But\n",
+      "I'm curious, Emma, what kind of self \n",
+      "\n",
+      "User Moderator posted:\n",
+      "{\"role\": \"Moderator\", \"content\": \"That's a great point, Giannis.\n",
+      "Taking short breaks to stretch and move around can definitely help\n",
+      "reduce stress and increase productivity. Emma, can you tell us more\n",
+      "about your self-care routines? What activities do you enjoy doing to\n",
+      "unwind and recharge after a long shift?\"} \n",
+      "\n",
+      "User Moderator posted:\n",
+      "It seems like we have a conversation started. The user Emma35 shared\n",
+      "their experience of having a long shift at the hospital and feeling\n",
+      "exhausted. The Moderator responded with a sympathetic message, asking\n",
+      "about Emma's self-care routines and strategies for managing the\n",
+      "physical and emotional demands of her job. Giannis, a game developer,\n",
+      "chimed in with a similar experience and shared his own self-care\n",
+      "strategies, including taking short breaks to stretch and prioritize\n",
+      "sleep and activities that bring joy. The Moderator then asked Emma to\n",
+      "elaborate \n",
+      "\n",
+      "User Moderator posted:\n",
+      "{\"role\": \"Moderator\", \"content\": \"That's a great point, Giannis.\n",
+      "Taking short breaks to stretch and move around can definitely help\n",
+      "reduce stress and increase productivity. Emma, can you tell us more\n",
+      "about your self-care routines? What activities do you enjoy doing to\n",
+      "unwind and recharge after a long shift? For example, do you have a\n",
+      "favorite hobby or activity that helps you relax and de-stress? We'd\n",
+      "love to hear about it and see if we can learn from each \n",
+      "\n",
+      "User Emma35 posted:\n",
+      "\"Thank you so much for your kind words and understanding, Moderator. I\n",
+      "really appreciate it. As for my self-care routines, I have to say that\n",
+      "they're quite simple, but they're essential to me. After a long shift\n",
+      "at the hospital, I love to come home and spend time with my family. My\n",
+      "husband and I will often cook dinner together, and we'll watch a movie\n",
+      "or play a game as a way to unwind. I also enjoy practicing yoga and\n",
+      "meditation to help me relax \n",
+      "\n",
+      "User Moderator posted:\n",
+      "It seems like we have a conversation started. The user Emma35 shared\n",
+      "her experience of having a long shift at the hospital and feeling\n",
+      "exhausted. The Moderator responded with a sympathetic message, asking\n",
+      "about Emma's self-care routines and strategies for managing the\n",
+      "physical and emotional demands of her job. Giannis, a game developer,\n",
+      "chimed in with a similar experience and shared his own self-care\n",
+      "strategies, including taking short breaks to stretch and prioritize\n",
+      "sleep and activities that bring joy. The Moderator then asked Emma to\n",
+      "elaborate \n",
+      "\n",
+      "User Giannis posted:\n",
+      "\"Hey, I totally get what Emma is saying. As a game developer, I'm\n",
+      "always staring at screens and working on complex problems, so I need\n",
+      "to make sure I'm taking care of myself too. For me, unwinding after a\n",
+      "long day is all about getting my mind off the code. I love playing\n",
+      "video games, reading, or watching sci-fi movies. It's amazing how\n",
+      "something as simple as a good story or a fun game can take my mind off\n",
+      "the stress of the day \n",
+      "\n",
+      "User Moderator posted:\n",
+      "It seems like we have a conversation started. The user Emma35 shared\n",
+      "her experience of having a long shift at the hospital and feeling\n",
+      "exhausted. The Moderator responded with a sympathetic message, asking\n",
+      "about Emma's self-care routines and strategies for managing the\n",
+      "physical and emotional demands of her job. Giannis, a game developer,\n",
+      "chimed in with a similar experience and shared his own self-care\n",
+      "strategies, including taking short breaks to stretch and prioritize\n",
+      "sleep and activities that bring joy. The Moderator then asked Emma to\n",
+      "elaborate \n",
+      "\n"
+     ]
+    }
+   ],
+   "source": [
+    "MODERATOR_INSTRUCTIONS = \"You are a moderator. Oversee the discussion\"\n",
+    "\n",
+    "moderator_persona = Persona(\n",
+    "    **{\n",
+    "        \"username\": \"Moderator\",\n",
+    "        \"age\": 41,\n",
+    "        \"sex\": \"male\",\n",
+    "        \"education_level\": \"PhD\",\n",
+    "        \"sexual_orientation\": \"Pansexual\",\n",
+    "        \"demographic_group\": \"White\",\n",
+    "        \"current_employment\": \"Moderator\",\n",
+    "        \"special_instructions\": \"\",\n",
+    "        \"personality_characteristics\": [\n",
+    "            \"strict\",\n",
+    "            \"neutral\",\n",
+    "            \"just\",\n",
+    "        ],\n",
+    "    }\n",
+    ")\n",
+    "\n",
+    "moderator = Actor(\n",
+    "    model=llm,\n",
+    "    persona=moderator_persona,\n",
+    "    actor_type=ActorType.USER,\n",
+    "    context=CONTEXT,\n",
+    "    instructions=MODERATOR_INSTRUCTIONS\n",
+    ")\n",
+    "\n",
+    "# remember to update this!\n",
+    "turn_manager = RoundRobin(\n",
+    "    [actor.get_name() for actor in actors] + [moderator.get_name()]\n",
+    ")\n",
+    "conv = Discussion(\n",
+    "    next_turn_manager=turn_manager,\n",
+    "    users=actors + [moderator],\n",
+    "    moderator=moderator,\n",
+    ")\n",
+    "conv.begin()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Saving a discussion to the disk\n",
+    "\n",
+    "It's best practice to save the results of each discussion after it has concluded. This way, no matter what happens to the program executing the discussions, progress will be checkpointed.\n",
+    "\n",
+    "The `Discussion` class provides a method for saving its logs and related metadata to a JSON file:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-04-04T13:18:34.771690Z",
+     "iopub.status.busy": "2025-04-04T13:18:34.771521Z",
+     "iopub.status.idle": "2025-04-04T13:18:34.776980Z",
+     "shell.execute_reply": "2025-04-04T13:18:34.776394Z"
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "{\n",
+      "  \"id\": \"4c2cc6c2-b73c-4da2-ae36-71ed0b0e6565\",\n",
+      "  \"timestamp\": \"26-01-23-10-08\",\n",
+      "  \"users\": [\n",
+      "    \"Emma35\",\n",
+      "    \"Giannis\",\n",
+      "    \"Moderator\"\n",
+      "  ],\n",
+      "  \"moderator\": \"Moderator\",\n",
+      "  \"user_prompts\": [\n",
+      "    \"{\\\"context\\\": \\\"You are taking part in an online conversation\\\", \\\"instructions\\\": \\\"Act like a human would\\\", \\\"type\\\": \\\"1\\\", \\\"persona\\\": {\\\"username\\\": \\\"Emma35\\\", \\\"age\\\": 38, \\\"sex\\\": \\\"female\\\", \\\"sexual_orientation\\\": \\\"Heterosexual\\\", \\\"demographic_group\\\": \\\"Latino\\\", \\\"current_employment\\\": \\\"Registered Nurse\\\", \\\"education_level\\\": \\\"Bachelor's\\\", \\\"special_instructions\\\": \\\"\\\", \\\"personality_characteristics\\\": [\\\"compassionate\\\", \\\"patient\\\", \\\"diligent\\\", \\\"overwhelmed\\\"]}}\",\n",
+      "    \"{\\\"context\\\": \\\"You are taking part in an online conversation\\\", \\\"instructions\\\": \\\"Act like a human would\\\", \\\"type\\\": \\\"1\\\", \\\"persona\\\": {\\\"username\\\": \\\"Giannis\\\", \\\"age\\\": 21, \\\"sex\\\": \\\"male\\\", \\\"sexual_orientation\\\": \\\"Pansexual\\\", \\\"demographic_group\\\": \\\"White\\\", \\\"current_employment\\\": \\\"Game Developer\\\", \\\"education_level\\\": \\\"College\\\", \\\"special_instructions\\\": \\\"\\\", \\\"personality_characteristics\\\": [\\\"strategic\\\", \\\"meticulous\\\", \\\"nerdy\\\", \\\"hyper-focused\\\"]}}\",\n",
+      "    \"{\\\"context\\\": \\\"You are taking part in an online conversation\\\", \\\"instructions\\\": \\\"You are a moderator. Oversee the discussion\\\", \\\"type\\\": \\\"1\\\", \\\"persona\\\": {\\\"username\\\": \\\"Moderator\\\", \\\"age\\\": 41, \\\"sex\\\": \\\"male\\\", \\\"sexual_orientation\\\": \\\"Pansexual\\\", \\\"demographic_group\\\": \\\"White\\\", \\\"current_employment\\\": \\\"Moderator\\\", \\\"education_level\\\": \\\"PhD\\\", \\\"special_instructions\\\": \\\"\\\", \\\"personality_characteristics\\\": [\\\"strict\\\", \\\"neutral\\\", \\\"just\\\"]}}\"\n",
+      "  ],\n",
+      "  \"moderator_prompt\": \"{\\\"context\\\": \\\"You are taking part in an online conversation\\\", \\\"instructions\\\": \\\"You are a moderator. Oversee the discussion\\\", \\\"type\\\": \\\"1\\\", \\\"persona\\\": {\\\"username\\\": \\\"Moderator\\\", \\\"age\\\": 41, \\\"sex\\\": \\\"male\\\", \\\"sexual_orientation\\\": \\\"Pansexual\\\", \\\"demographic_group\\\": \\\"White\\\", \\\"current_employment\\\": \\\"Moderator\\\", \\\"education_level\\\": \\\"PhD\\\", \\\"special_instructions\\\": \\\"\\\", \\\"personality_characteristics\\\": [\\\"strict\\\", \\\"neutral\\\", \\\"just\\\"]}}\",\n",
+      "  \"ctx_length\": 5,\n",
+      "  \"logs\": [\n",
+      "    {\n",
+      "      \"name\": \"Emma35\",\n",
+      "      \"text\": \"\\\"Hey everyone, I just got back from a long shift at the hospital and I'm exhausted. Anyone else have days like that? I swear, some days I feel like I'm running on coffee fumes and adrenaline alone\\\"\",\n",
+      "      \"model\": \"test_model\"\n",
+      "    },\n",
+      "    {\n",
+      "      \"name\": \"Moderator\",\n",
+      "      \"text\": \"{\\\"role\\\": \\\"Moderator\\\", \\\"content\\\": \\\"Hey Emma35, sorry to hear that you're feeling exhausted. It's completely understandable, especially after a long shift at the hospital. Many healthcare workers put in long hours and sacrifice a lot to care for their patients. How do you manage to cope with the physical and emotional demands of your job? Do you have any self-care routines or strategies that help you recharge?\\\"}\",\n",
+      "      \"model\": \"test_model\"\n",
+      "    },\n",
+      "    {\n",
+      "      \"name\": \"Giannis\",\n",
+      "      \"text\": \"\\\"Hey Emma35, I totally feel you. As a game developer, I'm used to long hours of focus and concentration, but I can imagine how draining it must be to deal with the emotional toll of working in a hospital. I've found that for me, taking short breaks to stretch and move around really helps. I also try to prioritize my sleep and make time for activities that bring me joy, like playing video games or reading. But I'm curious, Emma, what kind of self\",\n",
+      "      \"model\": \"test_model\"\n",
+      "    },\n",
+      "    {\n",
+      "      \"name\": \"Moderator\",\n",
+      "      \"text\": \"{\\\"role\\\": \\\"Moderator\\\", \\\"content\\\": \\\"That's a great point, Giannis. Taking short breaks to stretch and move around can definitely help reduce stress and increase productivity. Emma, can you tell us more about your self-care routines? What activities do you enjoy doing to unwind and recharge after a long shift?\\\"}\",\n",
+      "      \"model\": \"test_model\"\n",
+      "    },\n",
+      "    {\n",
+      "      \"name\": \"Moderator\",\n",
+      "      \"text\": \"It seems like we have a conversation started. The user Emma35 shared their experience of having a long shift at the hospital and feeling exhausted. The Moderator responded with a sympathetic message, asking about Emma's self-care routines and strategies for managing the physical and emotional demands of her job. Giannis, a game developer, chimed in with a similar experience and shared his own self-care strategies, including taking short breaks to stretch and prioritize sleep and activities that bring joy. The Moderator then asked Emma to elaborate\",\n",
+      "      \"model\": \"test_model\"\n",
+      "    },\n",
+      "    {\n",
+      "      \"name\": \"Moderator\",\n",
+      "      \"text\": \"{\\\"role\\\": \\\"Moderator\\\", \\\"content\\\": \\\"That's a great point, Giannis. Taking short breaks to stretch and move around can definitely help reduce stress and increase productivity. Emma, can you tell us more about your self-care routines? What activities do you enjoy doing to unwind and recharge after a long shift? For example, do you have a favorite hobby or activity that helps you relax and de-stress? We'd love to hear about it and see if we can learn from each\",\n",
+      "      \"model\": \"test_model\"\n",
+      "    },\n",
+      "    {\n",
+      "      \"name\": \"Emma35\",\n",
+      "      \"text\": \"\\\"Thank you so much for your kind words and understanding, Moderator. I really appreciate it. As for my self-care routines, I have to say that they're quite simple, but they're essential to me. After a long shift at the hospital, I love to come home and spend time with my family. My husband and I will often cook dinner together, and we'll watch a movie or play a game as a way to unwind. I also enjoy practicing yoga and meditation to help me relax\",\n",
+      "      \"model\": \"test_model\"\n",
+      "    },\n",
+      "    {\n",
+      "      \"name\": \"Moderator\",\n",
+      "      \"text\": \"It seems like we have a conversation started. The user Emma35 shared her experience of having a long shift at the hospital and feeling exhausted. The Moderator responded with a sympathetic message, asking about Emma's self-care routines and strategies for managing the physical and emotional demands of her job. Giannis, a game developer, chimed in with a similar experience and shared his own self-care strategies, including taking short breaks to stretch and prioritize sleep and activities that bring joy. The Moderator then asked Emma to elaborate\",\n",
+      "      \"model\": \"test_model\"\n",
+      "    },\n",
+      "    {\n",
+      "      \"name\": \"Giannis\",\n",
+      "      \"text\": \"\\\"Hey, I totally get what Emma is saying. As a game developer, I'm always staring at screens and working on complex problems, so I need to make sure I'm taking care of myself too. For me, unwinding after a long day is all about getting my mind off the code. I love playing video games, reading, or watching sci-fi movies. It's amazing how something as simple as a good story or a fun game can take my mind off the stress of the day\",\n",
+      "      \"model\": \"test_model\"\n",
+      "    },\n",
+      "    {\n",
+      "      \"name\": \"Moderator\",\n",
+      "      \"text\": \"It seems like we have a conversation started. The user Emma35 shared her experience of having a long shift at the hospital and feeling exhausted. The Moderator responded with a sympathetic message, asking about Emma's self-care routines and strategies for managing the physical and emotional demands of her job. Giannis, a game developer, chimed in with a similar experience and shared his own self-care strategies, including taking short breaks to stretch and prioritize sleep and activities that bring joy. The Moderator then asked Emma to elaborate\",\n",
+      "      \"model\": \"test_model\"\n",
+      "    }\n",
+      "  ]\n",
+      "}\n"
+     ]
+    }
+   ],
+   "source": [
+    "import tempfile\n",
+    "import json\n",
+    "\n",
+    "tp = tempfile.NamedTemporaryFile(delete=True)\n",
+    "\n",
+    "conv.to_json_file(tp.name)\n",
+    "\n",
+    "# if you are running this on Windows, uncomment this line\n",
+    "# tp.close()\n",
+    "with open(tp.name, mode=\"rb\") as f:\n",
+    "    print(json.dumps(json.load(f), indent=2))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Congratulations, you can now run fully synthetic discussions! You may want to experiment with adding more than 2 users or testing more realistic turn taking procedures (for example, check out the `RandomWeighted` turn manager)."
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "syndisco-dev",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.14.2"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}

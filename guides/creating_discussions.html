@@ -1,0 +1,631 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Creating a Discussion &mdash; SynDisco 2.0.5 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+    <link rel="shortcut icon" href="../_static/syndisco_logo.svg"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=09beee0d"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SynDisco
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#how-to-customize-your-discussion">How to Customize Your Discussion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../syndisco.html">syndisco package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SynDisco</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Creating a Discussion</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/guides/creating_discussions.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Creating-a-Discussion">
+<h1>Creating a Discussion<a class="headerlink" href="#Creating-a-Discussion" title="Link to this heading"></a></h1>
+<p>The simplest task you can accomplish with this library is to create a small discussion between LLMs.</p>
+<p>This guide will teach you the basic setup of the library. You will understand how to setup models, user-agents and how to coordinate them in a discussion. By the end of htis guide, you will be able to run a small discussion with a moderator and save it to the disk for persistence.</p>
+<section id="Basics">
+<h2>Basics<a class="headerlink" href="#Basics" title="Link to this heading"></a></h2>
+<section id="The-Model">
+<h3>The Model<a class="headerlink" href="#The-Model" title="Link to this heading"></a></h3>
+<p>SynDisco can theoretically support any LLM, as long as it is wrapped in a <code class="docutils literal notranslate"><span class="pre">BaseModel</span></code> wrapper. The <code class="docutils literal notranslate"><span class="pre">BaseModel</span></code> class is a very simple interface with one method. This method gives the underlying LLM input, and returns its output to the library.</p>
+<p>There already exists a <code class="docutils literal notranslate"><span class="pre">TransformersModel</span></code> class which handles models from the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> python library. In 90% of your applications, this will be enough. We can load a TransformersModel using the following code:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">TransformersModel</span>
+
+<span class="n">llm</span> <span class="o">=</span> <span class="n">TransformersModel</span><span class="p">(</span>
+    <span class="n">model_path</span><span class="o">=</span><span class="s2">&quot;unsloth/Llama-3.2-3B-Instruct-bnb-4bit&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test_model&quot;</span><span class="p">,</span>
+    <span class="n">max_out_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>This will download a small LLM from huggingface. You can substitute the model_path for any similar model in <a class="reference external" href="https://huggingface.co/">HuggingFace</a> supporting the Transformers library.</p>
+</section>
+<section id="Creating-personas">
+<h3>Creating personas<a class="headerlink" href="#Creating-personas" title="Link to this heading"></a></h3>
+<p>All <code class="docutils literal notranslate"><span class="pre">actors</span></code> can be defined by a <code class="docutils literal notranslate"><span class="pre">persona</span></code>, aka a set of attributes that define them. These attributes can be age, ethnicity, and even include special instructions on how they should behave.</p>
+<p>Creating a persona programmatically is simple:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.actors</span><span class="w"> </span><span class="kn">import</span> <span class="n">Persona</span>
+
+<span class="n">persona_data</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;Emma35&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="mi">38</span><span class="p">,</span>
+        <span class="s2">&quot;sex&quot;</span><span class="p">:</span> <span class="s2">&quot;female&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;education_level&quot;</span><span class="p">:</span> <span class="s2">&quot;Bachelor&#39;s&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sexual_orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;Heterosexual&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;demographic_group&quot;</span><span class="p">:</span> <span class="s2">&quot;Latino&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;current_employment&quot;</span><span class="p">:</span> <span class="s2">&quot;Registered Nurse&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;special_instructions&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;personality_characteristics&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;compassionate&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;patient&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;diligent&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;overwhelmed&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;Giannis&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="mi">21</span><span class="p">,</span>
+        <span class="s2">&quot;sex&quot;</span><span class="p">:</span> <span class="s2">&quot;male&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;education_level&quot;</span><span class="p">:</span> <span class="s2">&quot;College&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sexual_orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;Pansexual&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;demographic_group&quot;</span><span class="p">:</span> <span class="s2">&quot;White&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;current_employment&quot;</span><span class="p">:</span> <span class="s2">&quot;Game Developer&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;special_instructions&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;personality_characteristics&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;strategic&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;meticulous&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;nerdy&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;hyper-focused&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">},</span>
+<span class="p">]</span>
+
+<span class="n">personas</span> <span class="o">=</span> <span class="p">[</span><span class="n">Persona</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">persona_data</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">persona</span> <span class="ow">in</span> <span class="n">personas</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">persona</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#34;username&#34;: &#34;Emma35&#34;, &#34;age&#34;: 38, &#34;sex&#34;: &#34;female&#34;, &#34;sexual_orientation&#34;: &#34;Heterosexual&#34;, &#34;demographic_group&#34;: &#34;Latino&#34;, &#34;current_employment&#34;: &#34;Registered Nurse&#34;, &#34;education_level&#34;: &#34;Bachelor&#39;s&#34;, &#34;special_instructions&#34;: &#34;&#34;, &#34;personality_characteristics&#34;: [&#34;compassionate&#34;, &#34;patient&#34;, &#34;diligent&#34;, &#34;overwhelmed&#34;]}
+{&#34;username&#34;: &#34;Giannis&#34;, &#34;age&#34;: 21, &#34;sex&#34;: &#34;male&#34;, &#34;sexual_orientation&#34;: &#34;Pansexual&#34;, &#34;demographic_group&#34;: &#34;White&#34;, &#34;current_employment&#34;: &#34;Game Developer&#34;, &#34;education_level&#34;: &#34;College&#34;, &#34;special_instructions&#34;: &#34;&#34;, &#34;personality_characteristics&#34;: [&#34;strategic&#34;, &#34;meticulous&#34;, &#34;nerdy&#34;, &#34;hyper-focused&#34;]}
+</pre></div></div>
+</div>
+<p>Since creating a lot of distinct users is essential in running large-scale experiments, users are usually defined in JSON format. That way, you can change anything without touching your code!</p>
+<p><a class="reference external" href="https://github.com/dimits-ts/synthetic_moderation_experiments/blob/master/data/discussions_input/personas/personas.json">Here</a> is an applied example of how to mass-define user personas through JSON files.</p>
+</section>
+<section id="Creating-the-user-agents">
+<h3>Creating the user-agents<a class="headerlink" href="#Creating-the-user-agents" title="Link to this heading"></a></h3>
+<p>Having a <code class="docutils literal notranslate"><span class="pre">persona</span></code> and a <code class="docutils literal notranslate"><span class="pre">model</span></code> we can finally create an <code class="docutils literal notranslate"><span class="pre">actor</span></code>. The actor will personify the selected persona using the model to talk.</p>
+<p>Besides a persona and a model, the actors will also need instructions and a context. By convention, all actors share the same context, and all user-agents share the same instructions. Personalized instructions are defined in the actor’s persona.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.actors</span><span class="w"> </span><span class="kn">import</span> <span class="n">Actor</span><span class="p">,</span> <span class="n">ActorType</span>
+
+
+<span class="n">CONTEXT</span> <span class="o">=</span> <span class="s2">&quot;You are taking part in an online conversation&quot;</span>
+<span class="n">INSTRUCTIONS</span> <span class="o">=</span> <span class="s2">&quot;Act like a human would&quot;</span>
+
+<span class="n">actors</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">Actor</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
+        <span class="n">persona</span><span class="o">=</span><span class="n">p</span><span class="p">,</span>
+        <span class="n">actor_type</span><span class="o">=</span><span class="n">ActorType</span><span class="o">.</span><span class="n">USER</span><span class="p">,</span>
+        <span class="n">context</span><span class="o">=</span><span class="n">CONTEXT</span><span class="p">,</span>
+        <span class="n">instructions</span><span class="o">=</span><span class="n">INSTRUCTIONS</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">personas</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Managing-turn-taking">
+<h3>Managing turn-taking<a class="headerlink" href="#Managing-turn-taking" title="Link to this heading"></a></h3>
+<p>In real-life discussions, who gets to speak at each point in time is determined by complex social dynamics, which are difficult to realistically model. However, there are ways with which we can simulate these dynamics.</p>
+<p>SynDisco uses the <code class="docutils literal notranslate"><span class="pre">TurnManager</span></code> class to model turn taking. Two implementations are available by default: Round Robin, and Random Weighted</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Round</span> <span class="pre">Robin</span></code> is the simplest, most intuitive way to model turn-taking; everyone gets to talk once per round. Once everyone talks once, they get to talk again in the same sequence</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.turn_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">RoundRobin</span>
+
+
+<span class="n">rrobin_turn_manager</span> <span class="o">=</span> <span class="n">RoundRobin</span><span class="p">([</span><span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="s2">&quot;Mary&quot;</span><span class="p">,</span> <span class="s2">&quot;Howard&quot;</span><span class="p">,</span> <span class="s2">&quot;Todd&quot;</span><span class="p">])</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">rrobin_turn_manager</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+John
+Mary
+Howard
+Todd
+John
+Mary
+Howard
+Todd
+John
+Mary
+</pre></div></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">RandomWeighted</span></code> on the other hand throws a weighted coin on each round. If the coin flip succedes, the previous user gets to respond. If not, another user is selected at random</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.turn_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomWeighted</span>
+
+
+<span class="n">rweighted_turn_manager</span> <span class="o">=</span> <span class="n">RandomWeighted</span><span class="p">(</span>
+    <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="s2">&quot;Mary&quot;</span><span class="p">,</span> <span class="s2">&quot;Howard&quot;</span><span class="p">,</span> <span class="s2">&quot;Todd&quot;</span><span class="p">],</span> <span class="n">p_respond</span><span class="o">=</span><span class="mf">0.5</span>
+<span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">rweighted_turn_manager</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Mary
+John
+Howard
+Mary
+Todd
+Mary
+Todd
+Howard
+Todd
+Mary
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="Generating-a-discussion">
+<h2>Generating a discussion<a class="headerlink" href="#Generating-a-discussion" title="Link to this heading"></a></h2>
+<p>Let’s start with the most basic task; a single discussion between two user-agents.</p>
+<p>Since we only have two users, a RoundRobin approach where each user takes a turn sequentially is sufficient.</p>
+<p>Now we can run a simple discussion</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">Discussion</span>
+
+
+<span class="n">turn_manager</span> <span class="o">=</span> <span class="n">RoundRobin</span><span class="p">([</span><span class="n">actor</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span> <span class="k">for</span> <span class="n">actor</span> <span class="ow">in</span> <span class="n">actors</span><span class="p">])</span>
+<span class="n">conv</span> <span class="o">=</span> <span class="n">Discussion</span><span class="p">(</span><span class="n">next_turn_manager</span><span class="o">=</span><span class="n">turn_manager</span><span class="p">,</span> <span class="n">users</span><span class="o">=</span><span class="n">actors</span><span class="p">)</span>
+<span class="n">conv</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "471e0ee6bd37436ca34eef9a07b645b5", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+The following generation flags are not valid and may be ignored: [&#39;temperature&#39;, &#39;top_p&#39;]. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Emma35 posted:
+&#34;Hey everyone, I just got back from a long shift at the hospital and
+I&#39;m exhausted. Anyone else have days like that? I swear, some days I
+feel like I&#39;m running on coffee fumes and adrenaline alone&#34;
+
+User Giannis posted:
+{&#34;role&#34;: &#34;Giannis&#34;, &#34;content&#34;: &#34;Hey Emma, sorry to hear that. I feel
+you. I&#39;ve had those days too, especially when I&#39;m working on a tight
+deadline for a game. The adrenaline rush from the initial project
+start can be replaced by a crushing sense of responsibility once the
+clock starts ticking. What do you do to recharge after a long shift?&#34;}
+
+User Emma35 posted:
+{&#34;role&#34;: &#34;Emma35&#34;, &#34;content&#34;: &#34;Giannis, I totally get what you mean!
+As a nurse, I&#39;m always on call and have to be ready to jump into
+action at a moment&#39;s notice. But when I&#39;m not working, I love to
+unwind with a good book and a cup of tea. Sometimes I&#39;ll take a long
+bath, light some candles, and just relax. I also try to prioritize
+self-care, whether that&#39;s getting a massage, taking a yoga
+
+User Giannis posted:
+&#34;Hey Emma, I&#39;m glad you&#39;re prioritizing self-care. As a game
+developer, I have to admit that my go-to recharge method is a bit
+different. When I&#39;m feeling burnt out, I try to take a break and do
+something creative, like drawing or writing a short story. It helps me
+clear my mind and get my creative juices flowing again. I also love
+playing video games, it&#39;s a great way to unwind and take my mind off
+things. But I have to say
+
+User Emma35 posted:
+&#34;Giannis, I&#39;m so glad you brought up self-care. As a nurse, I have to
+admit that it&#39;s not always easy to prioritize my own needs, especially
+when there are so many patients to care for. But I&#39;ve learned that
+taking care of myself is crucial to being able to provide the best
+care for my patients. I&#39;ve actually been thinking of starting a
+journaling practice, where I write down my thoughts and feelings after
+a long shift. It helps me process everything that happened
+
+</pre></div></div>
+</div>
+<p>Let’s add a moderator to oversee the discussion.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">MODERATOR_INSTRUCTIONS</span> <span class="o">=</span> <span class="s2">&quot;You are a moderator. Oversee the discussion&quot;</span>
+
+<span class="n">moderator_persona</span> <span class="o">=</span> <span class="n">Persona</span><span class="p">(</span>
+    <span class="o">**</span><span class="p">{</span>
+        <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;Moderator&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="mi">41</span><span class="p">,</span>
+        <span class="s2">&quot;sex&quot;</span><span class="p">:</span> <span class="s2">&quot;male&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;education_level&quot;</span><span class="p">:</span> <span class="s2">&quot;PhD&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sexual_orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;Pansexual&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;demographic_group&quot;</span><span class="p">:</span> <span class="s2">&quot;White&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;current_employment&quot;</span><span class="p">:</span> <span class="s2">&quot;Moderator&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;special_instructions&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;personality_characteristics&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;strict&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;neutral&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;just&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+
+<span class="n">moderator</span> <span class="o">=</span> <span class="n">Actor</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
+    <span class="n">persona</span><span class="o">=</span><span class="n">moderator_persona</span><span class="p">,</span>
+    <span class="n">actor_type</span><span class="o">=</span><span class="n">ActorType</span><span class="o">.</span><span class="n">USER</span><span class="p">,</span>
+    <span class="n">context</span><span class="o">=</span><span class="n">CONTEXT</span><span class="p">,</span>
+    <span class="n">instructions</span><span class="o">=</span><span class="n">MODERATOR_INSTRUCTIONS</span>
+<span class="p">)</span>
+
+<span class="c1"># remember to update this!</span>
+<span class="n">turn_manager</span> <span class="o">=</span> <span class="n">RoundRobin</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">actor</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span> <span class="k">for</span> <span class="n">actor</span> <span class="ow">in</span> <span class="n">actors</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">moderator</span><span class="o">.</span><span class="n">get_name</span><span class="p">()]</span>
+<span class="p">)</span>
+<span class="n">conv</span> <span class="o">=</span> <span class="n">Discussion</span><span class="p">(</span>
+    <span class="n">next_turn_manager</span><span class="o">=</span><span class="n">turn_manager</span><span class="p">,</span>
+    <span class="n">users</span><span class="o">=</span><span class="n">actors</span> <span class="o">+</span> <span class="p">[</span><span class="n">moderator</span><span class="p">],</span>
+    <span class="n">moderator</span><span class="o">=</span><span class="n">moderator</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">conv</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "d0e52ade55434a848bbb704ef69556c3", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Emma35 posted:
+&#34;Hey everyone, I just got back from a long shift at the hospital and
+I&#39;m exhausted. Anyone else have days like that? I swear, some days I
+feel like I&#39;m running on coffee fumes and adrenaline alone&#34;
+
+User Moderator posted:
+{&#34;role&#34;: &#34;Moderator&#34;, &#34;content&#34;: &#34;Hey Emma35, sorry to hear that
+you&#39;re feeling exhausted. It&#39;s completely understandable, especially
+after a long shift at the hospital. Many healthcare workers put in
+long hours and sacrifice a lot to care for their patients. How do you
+manage to cope with the physical and emotional demands of your job? Do
+you have any self-care routines or strategies that help you
+recharge?&#34;}
+
+User Giannis posted:
+&#34;Hey Emma35, I totally feel you. As a game developer, I&#39;m used to long
+hours of focus and concentration, but I can imagine how draining it
+must be to deal with the emotional toll of working in a hospital. I&#39;ve
+found that for me, taking short breaks to stretch and move around
+really helps. I also try to prioritize my sleep and make time for
+activities that bring me joy, like playing video games or reading. But
+I&#39;m curious, Emma, what kind of self
+
+User Moderator posted:
+{&#34;role&#34;: &#34;Moderator&#34;, &#34;content&#34;: &#34;That&#39;s a great point, Giannis.
+Taking short breaks to stretch and move around can definitely help
+reduce stress and increase productivity. Emma, can you tell us more
+about your self-care routines? What activities do you enjoy doing to
+unwind and recharge after a long shift?&#34;}
+
+User Moderator posted:
+It seems like we have a conversation started. The user Emma35 shared
+their experience of having a long shift at the hospital and feeling
+exhausted. The Moderator responded with a sympathetic message, asking
+about Emma&#39;s self-care routines and strategies for managing the
+physical and emotional demands of her job. Giannis, a game developer,
+chimed in with a similar experience and shared his own self-care
+strategies, including taking short breaks to stretch and prioritize
+sleep and activities that bring joy. The Moderator then asked Emma to
+elaborate
+
+User Moderator posted:
+{&#34;role&#34;: &#34;Moderator&#34;, &#34;content&#34;: &#34;That&#39;s a great point, Giannis.
+Taking short breaks to stretch and move around can definitely help
+reduce stress and increase productivity. Emma, can you tell us more
+about your self-care routines? What activities do you enjoy doing to
+unwind and recharge after a long shift? For example, do you have a
+favorite hobby or activity that helps you relax and de-stress? We&#39;d
+love to hear about it and see if we can learn from each
+
+User Emma35 posted:
+&#34;Thank you so much for your kind words and understanding, Moderator. I
+really appreciate it. As for my self-care routines, I have to say that
+they&#39;re quite simple, but they&#39;re essential to me. After a long shift
+at the hospital, I love to come home and spend time with my family. My
+husband and I will often cook dinner together, and we&#39;ll watch a movie
+or play a game as a way to unwind. I also enjoy practicing yoga and
+meditation to help me relax
+
+User Moderator posted:
+It seems like we have a conversation started. The user Emma35 shared
+her experience of having a long shift at the hospital and feeling
+exhausted. The Moderator responded with a sympathetic message, asking
+about Emma&#39;s self-care routines and strategies for managing the
+physical and emotional demands of her job. Giannis, a game developer,
+chimed in with a similar experience and shared his own self-care
+strategies, including taking short breaks to stretch and prioritize
+sleep and activities that bring joy. The Moderator then asked Emma to
+elaborate
+
+User Giannis posted:
+&#34;Hey, I totally get what Emma is saying. As a game developer, I&#39;m
+always staring at screens and working on complex problems, so I need
+to make sure I&#39;m taking care of myself too. For me, unwinding after a
+long day is all about getting my mind off the code. I love playing
+video games, reading, or watching sci-fi movies. It&#39;s amazing how
+something as simple as a good story or a fun game can take my mind off
+the stress of the day
+
+User Moderator posted:
+It seems like we have a conversation started. The user Emma35 shared
+her experience of having a long shift at the hospital and feeling
+exhausted. The Moderator responded with a sympathetic message, asking
+about Emma&#39;s self-care routines and strategies for managing the
+physical and emotional demands of her job. Giannis, a game developer,
+chimed in with a similar experience and shared his own self-care
+strategies, including taking short breaks to stretch and prioritize
+sleep and activities that bring joy. The Moderator then asked Emma to
+elaborate
+
+</pre></div></div>
+</div>
+<section id="Saving-a-discussion-to-the-disk">
+<h3>Saving a discussion to the disk<a class="headerlink" href="#Saving-a-discussion-to-the-disk" title="Link to this heading"></a></h3>
+<p>It’s best practice to save the results of each discussion after it has concluded. This way, no matter what happens to the program executing the discussions, progress will be checkpointed.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Discussion</span></code> class provides a method for saving its logs and related metadata to a JSON file:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+<span class="n">tp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">delete</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">conv</span><span class="o">.</span><span class="n">to_json_file</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+<span class="c1"># if you are running this on Windows, uncomment this line</span>
+<span class="c1"># tp.close()</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{
+  &#34;id&#34;: &#34;4c2cc6c2-b73c-4da2-ae36-71ed0b0e6565&#34;,
+  &#34;timestamp&#34;: &#34;26-01-23-10-08&#34;,
+  &#34;users&#34;: [
+    &#34;Emma35&#34;,
+    &#34;Giannis&#34;,
+    &#34;Moderator&#34;
+  ],
+  &#34;moderator&#34;: &#34;Moderator&#34;,
+  &#34;user_prompts&#34;: [
+    &#34;{\&#34;context\&#34;: \&#34;You are taking part in an online conversation\&#34;, \&#34;instructions\&#34;: \&#34;Act like a human would\&#34;, \&#34;type\&#34;: \&#34;1\&#34;, \&#34;persona\&#34;: {\&#34;username\&#34;: \&#34;Emma35\&#34;, \&#34;age\&#34;: 38, \&#34;sex\&#34;: \&#34;female\&#34;, \&#34;sexual_orientation\&#34;: \&#34;Heterosexual\&#34;, \&#34;demographic_group\&#34;: \&#34;Latino\&#34;, \&#34;current_employment\&#34;: \&#34;Registered Nurse\&#34;, \&#34;education_level\&#34;: \&#34;Bachelor&#39;s\&#34;, \&#34;special_instructions\&#34;: \&#34;\&#34;, \&#34;personality_characteristics\&#34;: [\&#34;compassionate\&#34;, \&#34;patient\&#34;, \&#34;diligent\&#34;, \&#34;overwhelmed\&#34;]}}&#34;,
+    &#34;{\&#34;context\&#34;: \&#34;You are taking part in an online conversation\&#34;, \&#34;instructions\&#34;: \&#34;Act like a human would\&#34;, \&#34;type\&#34;: \&#34;1\&#34;, \&#34;persona\&#34;: {\&#34;username\&#34;: \&#34;Giannis\&#34;, \&#34;age\&#34;: 21, \&#34;sex\&#34;: \&#34;male\&#34;, \&#34;sexual_orientation\&#34;: \&#34;Pansexual\&#34;, \&#34;demographic_group\&#34;: \&#34;White\&#34;, \&#34;current_employment\&#34;: \&#34;Game Developer\&#34;, \&#34;education_level\&#34;: \&#34;College\&#34;, \&#34;special_instructions\&#34;: \&#34;\&#34;, \&#34;personality_characteristics\&#34;: [\&#34;strategic\&#34;, \&#34;meticulous\&#34;, \&#34;nerdy\&#34;, \&#34;hyper-focused\&#34;]}}&#34;,
+    &#34;{\&#34;context\&#34;: \&#34;You are taking part in an online conversation\&#34;, \&#34;instructions\&#34;: \&#34;You are a moderator. Oversee the discussion\&#34;, \&#34;type\&#34;: \&#34;1\&#34;, \&#34;persona\&#34;: {\&#34;username\&#34;: \&#34;Moderator\&#34;, \&#34;age\&#34;: 41, \&#34;sex\&#34;: \&#34;male\&#34;, \&#34;sexual_orientation\&#34;: \&#34;Pansexual\&#34;, \&#34;demographic_group\&#34;: \&#34;White\&#34;, \&#34;current_employment\&#34;: \&#34;Moderator\&#34;, \&#34;education_level\&#34;: \&#34;PhD\&#34;, \&#34;special_instructions\&#34;: \&#34;\&#34;, \&#34;personality_characteristics\&#34;: [\&#34;strict\&#34;, \&#34;neutral\&#34;, \&#34;just\&#34;]}}&#34;
+  ],
+  &#34;moderator_prompt&#34;: &#34;{\&#34;context\&#34;: \&#34;You are taking part in an online conversation\&#34;, \&#34;instructions\&#34;: \&#34;You are a moderator. Oversee the discussion\&#34;, \&#34;type\&#34;: \&#34;1\&#34;, \&#34;persona\&#34;: {\&#34;username\&#34;: \&#34;Moderator\&#34;, \&#34;age\&#34;: 41, \&#34;sex\&#34;: \&#34;male\&#34;, \&#34;sexual_orientation\&#34;: \&#34;Pansexual\&#34;, \&#34;demographic_group\&#34;: \&#34;White\&#34;, \&#34;current_employment\&#34;: \&#34;Moderator\&#34;, \&#34;education_level\&#34;: \&#34;PhD\&#34;, \&#34;special_instructions\&#34;: \&#34;\&#34;, \&#34;personality_characteristics\&#34;: [\&#34;strict\&#34;, \&#34;neutral\&#34;, \&#34;just\&#34;]}}&#34;,
+  &#34;ctx_length&#34;: 5,
+  &#34;logs&#34;: [
+    {
+      &#34;name&#34;: &#34;Emma35&#34;,
+      &#34;text&#34;: &#34;\&#34;Hey everyone, I just got back from a long shift at the hospital and I&#39;m exhausted. Anyone else have days like that? I swear, some days I feel like I&#39;m running on coffee fumes and adrenaline alone\&#34;&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    },
+    {
+      &#34;name&#34;: &#34;Moderator&#34;,
+      &#34;text&#34;: &#34;{\&#34;role\&#34;: \&#34;Moderator\&#34;, \&#34;content\&#34;: \&#34;Hey Emma35, sorry to hear that you&#39;re feeling exhausted. It&#39;s completely understandable, especially after a long shift at the hospital. Many healthcare workers put in long hours and sacrifice a lot to care for their patients. How do you manage to cope with the physical and emotional demands of your job? Do you have any self-care routines or strategies that help you recharge?\&#34;}&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    },
+    {
+      &#34;name&#34;: &#34;Giannis&#34;,
+      &#34;text&#34;: &#34;\&#34;Hey Emma35, I totally feel you. As a game developer, I&#39;m used to long hours of focus and concentration, but I can imagine how draining it must be to deal with the emotional toll of working in a hospital. I&#39;ve found that for me, taking short breaks to stretch and move around really helps. I also try to prioritize my sleep and make time for activities that bring me joy, like playing video games or reading. But I&#39;m curious, Emma, what kind of self&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    },
+    {
+      &#34;name&#34;: &#34;Moderator&#34;,
+      &#34;text&#34;: &#34;{\&#34;role\&#34;: \&#34;Moderator\&#34;, \&#34;content\&#34;: \&#34;That&#39;s a great point, Giannis. Taking short breaks to stretch and move around can definitely help reduce stress and increase productivity. Emma, can you tell us more about your self-care routines? What activities do you enjoy doing to unwind and recharge after a long shift?\&#34;}&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    },
+    {
+      &#34;name&#34;: &#34;Moderator&#34;,
+      &#34;text&#34;: &#34;It seems like we have a conversation started. The user Emma35 shared their experience of having a long shift at the hospital and feeling exhausted. The Moderator responded with a sympathetic message, asking about Emma&#39;s self-care routines and strategies for managing the physical and emotional demands of her job. Giannis, a game developer, chimed in with a similar experience and shared his own self-care strategies, including taking short breaks to stretch and prioritize sleep and activities that bring joy. The Moderator then asked Emma to elaborate&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    },
+    {
+      &#34;name&#34;: &#34;Moderator&#34;,
+      &#34;text&#34;: &#34;{\&#34;role\&#34;: \&#34;Moderator\&#34;, \&#34;content\&#34;: \&#34;That&#39;s a great point, Giannis. Taking short breaks to stretch and move around can definitely help reduce stress and increase productivity. Emma, can you tell us more about your self-care routines? What activities do you enjoy doing to unwind and recharge after a long shift? For example, do you have a favorite hobby or activity that helps you relax and de-stress? We&#39;d love to hear about it and see if we can learn from each&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    },
+    {
+      &#34;name&#34;: &#34;Emma35&#34;,
+      &#34;text&#34;: &#34;\&#34;Thank you so much for your kind words and understanding, Moderator. I really appreciate it. As for my self-care routines, I have to say that they&#39;re quite simple, but they&#39;re essential to me. After a long shift at the hospital, I love to come home and spend time with my family. My husband and I will often cook dinner together, and we&#39;ll watch a movie or play a game as a way to unwind. I also enjoy practicing yoga and meditation to help me relax&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    },
+    {
+      &#34;name&#34;: &#34;Moderator&#34;,
+      &#34;text&#34;: &#34;It seems like we have a conversation started. The user Emma35 shared her experience of having a long shift at the hospital and feeling exhausted. The Moderator responded with a sympathetic message, asking about Emma&#39;s self-care routines and strategies for managing the physical and emotional demands of her job. Giannis, a game developer, chimed in with a similar experience and shared his own self-care strategies, including taking short breaks to stretch and prioritize sleep and activities that bring joy. The Moderator then asked Emma to elaborate&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    },
+    {
+      &#34;name&#34;: &#34;Giannis&#34;,
+      &#34;text&#34;: &#34;\&#34;Hey, I totally get what Emma is saying. As a game developer, I&#39;m always staring at screens and working on complex problems, so I need to make sure I&#39;m taking care of myself too. For me, unwinding after a long day is all about getting my mind off the code. I love playing video games, reading, or watching sci-fi movies. It&#39;s amazing how something as simple as a good story or a fun game can take my mind off the stress of the day&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    },
+    {
+      &#34;name&#34;: &#34;Moderator&#34;,
+      &#34;text&#34;: &#34;It seems like we have a conversation started. The user Emma35 shared her experience of having a long shift at the hospital and feeling exhausted. The Moderator responded with a sympathetic message, asking about Emma&#39;s self-care routines and strategies for managing the physical and emotional demands of her job. Giannis, a game developer, chimed in with a similar experience and shared his own self-care strategies, including taking short breaks to stretch and prioritize sleep and activities that bring joy. The Moderator then asked Emma to elaborate&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    }
+  ]
+}
+</pre></div></div>
+</div>
+<p>Congratulations, you can now run fully synthetic discussions! You may want to experiment with adding more than 2 users or testing more realistic turn taking procedures (for example, check out the <code class="docutils literal notranslate"><span class="pre">RandomWeighted</span></code> turn manager).</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Dimitris Tsirmpas.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
