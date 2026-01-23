@@ -21,6 +21,7 @@ in the syndisco.jobs module.
 
 # You may contact the author at dim.tsirmpas@aueb.gr
 
+import copy
 import time
 import random
 import logging
@@ -269,7 +270,7 @@ class AnnotationExperiment:
         for annotator in self.annotators:
             for discussion_path in discussions_dir.iterdir():
                 annotation_task = self._create_annotation_task(
-                    annotator, discussion_path
+                    copy.deepcopy(annotator), discussion_path
                 )
                 annotation_tasks.append(annotation_task)
         return annotation_tasks
