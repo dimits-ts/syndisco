@@ -1,5 +1,10 @@
 # What's new
 
+## 2.0.7 (23/1/2025)
+- Fixed long-standing bugs with annotation export
+- Updated guides
+- Fixed dependency issues from 2.0.6
+
 ## 2.0.6 (6/12/2025)
 - Added OpenAI support
 
