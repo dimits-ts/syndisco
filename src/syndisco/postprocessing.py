@@ -101,7 +101,6 @@ def import_annotations(annot_dir: str | Path) -> pd.DataFrame:
 
     # Generate unique message ID and message order
     df["message_id"] = _generate_message_hash(df.conv_id, df.message)
-    df["message_order"] = _add_message_order(df)
     df = _group_all_but_one(df)
     return df
 
@@ -231,15 +230,14 @@ def _process_traits(user_prompt: dict) -> pd.DataFrame:
 
 def _group_all_but_one(
     df: pd.DataFrame,
-    to_list_col: str = "annotation",
 ) -> pd.DataFrame:
-    if to_list_col not in df.columns:
-        raise ValueError(f"Column '{to_list_col}' not found in DataFrame")
-
-    grouping_columns = [c for c in df.columns if c != to_list_col]
+    # all other columns should be identical for the same message
+    grouping_columns = [
+        c for c in df.columns if c not in ["annotation", "annotator_prompt"]
+    ]
 
     return df.groupby(grouping_columns, as_index=False).agg(
-        {to_list_col: list}
+        {"annotation": list}, {"annotator_prompt": list}
     )
 
 

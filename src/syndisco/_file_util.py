@@ -114,14 +114,14 @@ def ensure_parent_directories_exist(output_path: str | Path) -> None:
 def generate_datetime_filename(
     output_dir: Optional[str | Path] = None,
     timestamp_format: str = "%y-%m-%d-%H-%M-%S",
-    file_ending: str = "",
+    file_ending: str = ".json",
 ) -> Path:
     """
     Generate a filename based on the current date and time.
 
     :param output_dir: The path to the generated file, defaults to None
     :type output_dir: str | Path, optional
-    :param timestamp_format: strftime format, defaults to "%y-%m-%d-%H-%M"
+    :param timestamp_format: strftime format, defaults to "%y-%m-%d-%H-%M-%S"
     :type timestamp_format: str, optional
     :param file_ending: The ending of the file (e.g '.json')
     :type file_ending: str
