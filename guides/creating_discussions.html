@@ -1,0 +1,813 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Creating a Discussion &mdash; SynDisco 2.0.5 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+    <link rel="shortcut icon" href="../_static/syndisco_logo.svg"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=09beee0d"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SynDisco
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#how-to-customize-your-discussion">How to Customize Your Discussion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../syndisco.html">syndisco package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SynDisco</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Creating a Discussion</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/guides/creating_discussions.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Creating-a-Discussion">
+<h1>Creating a Discussion<a class="headerlink" href="#Creating-a-Discussion" title="Link to this heading"></a></h1>
+<p>The simplest task you can accomplish with this library is to create a small discussion between LLMs.</p>
+<p>This guide will teach you the basic setup of the library. You will understand how to setup models, user-agents and how to coordinate them in a discussion. By the end of htis guide, you will be able to run a small discussion with a moderator and save it to the disk for persistence.</p>
+<section id="Basics">
+<h2>Basics<a class="headerlink" href="#Basics" title="Link to this heading"></a></h2>
+<section id="The-Model">
+<h3>The Model<a class="headerlink" href="#The-Model" title="Link to this heading"></a></h3>
+<p>SynDisco can theoretically support any LLM, as long as it is wrapped in a <code class="docutils literal notranslate"><span class="pre">BaseModel</span></code> wrapper. The <code class="docutils literal notranslate"><span class="pre">BaseModel</span></code> class is a very simple interface with one method. This method gives the underlying LLM input, and returns its output to the library.</p>
+<p>There already exists a <code class="docutils literal notranslate"><span class="pre">TransformersModel</span></code> class which handles models from the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> python library. In 90% of your applications, this will be enough. We can load a TransformersModel using the following code:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">TransformersModel</span>
+
+<span class="n">llm</span> <span class="o">=</span> <span class="n">TransformersModel</span><span class="p">(</span>
+    <span class="n">model_path</span><span class="o">=</span><span class="s2">&quot;unsloth/Llama-3.2-3B-Instruct-bnb-4bit&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test_model&quot;</span><span class="p">,</span>
+    <span class="n">max_out_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "83a301d61bbd44a5898a33e04f62357b", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+</pre></div></div>
+</div>
+<p>This will download a small LLM from huggingface. You can substitute the model_path for any similar model in <a class="reference external" href="https://huggingface.co/">HuggingFace</a> supporting the Transformers library.</p>
+</section>
+<section id="Creating-personas">
+<h3>Creating personas<a class="headerlink" href="#Creating-personas" title="Link to this heading"></a></h3>
+<p>All <code class="docutils literal notranslate"><span class="pre">actors</span></code> can be defined by a <code class="docutils literal notranslate"><span class="pre">persona</span></code>, aka a set of attributes that define them. These attributes can be age, ethnicity, and even include special instructions on how they should behave.</p>
+<p>Creating a persona programmatically is simple:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.actors</span><span class="w"> </span><span class="kn">import</span> <span class="n">Persona</span>
+
+<span class="n">persona_data</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;Emma35&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="mi">38</span><span class="p">,</span>
+        <span class="s2">&quot;sex&quot;</span><span class="p">:</span> <span class="s2">&quot;female&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;education_level&quot;</span><span class="p">:</span> <span class="s2">&quot;Bachelor&#39;s&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sexual_orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;Heterosexual&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;demographic_group&quot;</span><span class="p">:</span> <span class="s2">&quot;Latino&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;current_employment&quot;</span><span class="p">:</span> <span class="s2">&quot;Registered Nurse&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;special_instructions&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;personality_characteristics&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;compassionate&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;patient&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;diligent&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;overwhelmed&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;Giannis&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="mi">21</span><span class="p">,</span>
+        <span class="s2">&quot;sex&quot;</span><span class="p">:</span> <span class="s2">&quot;male&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;education_level&quot;</span><span class="p">:</span> <span class="s2">&quot;College&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sexual_orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;Pansexual&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;demographic_group&quot;</span><span class="p">:</span> <span class="s2">&quot;White&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;current_employment&quot;</span><span class="p">:</span> <span class="s2">&quot;Game Developer&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;special_instructions&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;personality_characteristics&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;strategic&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;meticulous&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;nerdy&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;hyper-focused&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">},</span>
+<span class="p">]</span>
+
+<span class="n">personas</span> <span class="o">=</span> <span class="p">[</span><span class="n">Persona</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">persona_data</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">persona</span> <span class="ow">in</span> <span class="n">personas</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">persona</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#34;username&#34;: &#34;Emma35&#34;, &#34;age&#34;: 38, &#34;sex&#34;: &#34;female&#34;, &#34;sexual_orientation&#34;: &#34;Heterosexual&#34;, &#34;demographic_group&#34;: &#34;Latino&#34;, &#34;current_employment&#34;: &#34;Registered Nurse&#34;, &#34;education_level&#34;: &#34;Bachelor&#39;s&#34;, &#34;special_instructions&#34;: &#34;&#34;, &#34;personality_characteristics&#34;: [&#34;compassionate&#34;, &#34;patient&#34;, &#34;diligent&#34;, &#34;overwhelmed&#34;]}
+{&#34;username&#34;: &#34;Giannis&#34;, &#34;age&#34;: 21, &#34;sex&#34;: &#34;male&#34;, &#34;sexual_orientation&#34;: &#34;Pansexual&#34;, &#34;demographic_group&#34;: &#34;White&#34;, &#34;current_employment&#34;: &#34;Game Developer&#34;, &#34;education_level&#34;: &#34;College&#34;, &#34;special_instructions&#34;: &#34;&#34;, &#34;personality_characteristics&#34;: [&#34;strategic&#34;, &#34;meticulous&#34;, &#34;nerdy&#34;, &#34;hyper-focused&#34;]}
+</pre></div></div>
+</div>
+<p>Since creating a lot of distinct users is essential in running large-scale experiments, users are usually defined in JSON format. That way, you can change anything without touching your code!</p>
+<p><a class="reference external" href="https://github.com/dimits-ts/synthetic_moderation_experiments/blob/master/data/discussions_input/personas/personas.json">Here</a> is an applied example of how to mass-define user personas through JSON files.</p>
+</section>
+<section id="Creating-the-user-agents">
+<h3>Creating the user-agents<a class="headerlink" href="#Creating-the-user-agents" title="Link to this heading"></a></h3>
+<p>Having a <code class="docutils literal notranslate"><span class="pre">persona</span></code> and a <code class="docutils literal notranslate"><span class="pre">model</span></code> we can finally create an <code class="docutils literal notranslate"><span class="pre">actor</span></code>. The actor will personify the selected persona using the model to talk.</p>
+<p>Besides a persona and a model, the actors will also need instructions and a context. By convention, all actors share the same context, and all user-agents share the same instructions. Personalized instructions are defined in the actor’s persona.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.actors</span><span class="w"> </span><span class="kn">import</span> <span class="n">Actor</span><span class="p">,</span> <span class="n">ActorType</span>
+
+
+<span class="n">CONTEXT</span> <span class="o">=</span> <span class="s2">&quot;You are taking part in an online conversation&quot;</span>
+<span class="n">INSTRUCTIONS</span> <span class="o">=</span> <span class="s2">&quot;Act like a human would&quot;</span>
+
+<span class="n">actors</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">Actor</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
+        <span class="n">persona</span><span class="o">=</span><span class="n">p</span><span class="p">,</span>
+        <span class="n">actor_type</span><span class="o">=</span><span class="n">ActorType</span><span class="o">.</span><span class="n">USER</span><span class="p">,</span>
+        <span class="n">context</span><span class="o">=</span><span class="n">CONTEXT</span><span class="p">,</span>
+        <span class="n">instructions</span><span class="o">=</span><span class="n">INSTRUCTIONS</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">personas</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Managing-turn-taking">
+<h3>Managing turn-taking<a class="headerlink" href="#Managing-turn-taking" title="Link to this heading"></a></h3>
+<p>In real-life discussions, who gets to speak at each point in time is determined by complex social dynamics, which are difficult to realistically model. However, there are ways with which we can simulate these dynamics.</p>
+<p>SynDisco uses the <code class="docutils literal notranslate"><span class="pre">TurnManager</span></code> class to model turn taking. Two implementations are available by default: Round Robin, and Random Weighted</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Round</span> <span class="pre">Robin</span></code> is the simplest, most intuitive way to model turn-taking; everyone gets to talk once per round. Once everyone talks once, they get to talk again in the same sequence</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.turn_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">RoundRobin</span>
+
+
+<span class="n">rrobin_turn_manager</span> <span class="o">=</span> <span class="n">RoundRobin</span><span class="p">([</span><span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="s2">&quot;Mary&quot;</span><span class="p">,</span> <span class="s2">&quot;Howard&quot;</span><span class="p">,</span> <span class="s2">&quot;Todd&quot;</span><span class="p">])</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">rrobin_turn_manager</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+John
+Mary
+Howard
+Todd
+John
+Mary
+Howard
+Todd
+John
+Mary
+</pre></div></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">RandomWeighted</span></code> on the other hand throws a weighted coin on each round. If the coin flip succedes, the previous user gets to respond. If not, another user is selected at random</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.turn_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomWeighted</span>
+
+
+<span class="n">rweighted_turn_manager</span> <span class="o">=</span> <span class="n">RandomWeighted</span><span class="p">(</span>
+    <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="s2">&quot;Mary&quot;</span><span class="p">,</span> <span class="s2">&quot;Howard&quot;</span><span class="p">,</span> <span class="s2">&quot;Todd&quot;</span><span class="p">],</span> <span class="n">p_respond</span><span class="o">=</span><span class="mf">0.5</span>
+<span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">rweighted_turn_manager</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Mary
+John
+Todd
+John
+Todd
+Mary
+Howard
+John
+Todd
+Mary
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="Generating-a-discussion">
+<h2>Generating a discussion<a class="headerlink" href="#Generating-a-discussion" title="Link to this heading"></a></h2>
+<p>Let’s start with the most basic task; a single discussion between two user-agents.</p>
+<p>Since we only have two users, a RoundRobin approach where each user takes a turn sequentially is sufficient.</p>
+<p>Now we can run a simple discussion</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco.jobs</span><span class="w"> </span><span class="kn">import</span> <span class="n">Discussion</span>
+
+
+<span class="n">turn_manager</span> <span class="o">=</span> <span class="n">RoundRobin</span><span class="p">([</span><span class="n">actor</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span> <span class="k">for</span> <span class="n">actor</span> <span class="ow">in</span> <span class="n">actors</span><span class="p">])</span>
+<span class="n">conv</span> <span class="o">=</span> <span class="n">Discussion</span><span class="p">(</span><span class="n">next_turn_manager</span><span class="o">=</span><span class="n">turn_manager</span><span class="p">,</span> <span class="n">users</span><span class="o">=</span><span class="n">actors</span><span class="p">)</span>
+<span class="n">conv</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "100b0d7108b74af2969e596f0be2b9ba", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+The following generation flags are not valid and may be ignored: [&#39;temperature&#39;, &#39;top_p&#39;]. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+Both `max_new_tokens` (=100) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=100) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Emma35 posted:
+&#34;Hey everyone, I just got back from a long shift at the hospital and
+I&#39;m exhausted. Anyone else have a crazy day at work? I feel like I&#39;ve
+been running non-stop since morning. How was your day?&#34;
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Both `max_new_tokens` (=100) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Giannis posted:
+{&#34;role&#34;: &#34;Giannis&#34;, &#34;content&#34;: &#34;Hey Emma, sorry to hear that you&#39;re
+exhausted! I had a pretty chill day, just working on some coding for a
+new game project. I&#39;ve been putting in some long hours lately, but
+it&#39;s worth it to see everything come together. How was your shift at
+the hospital? Any interesting cases or stories from the day?&#34;}
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Both `max_new_tokens` (=100) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Emma35 posted:
+{&#34;role&#34;: &#34;Emma35&#34;, &#34;content&#34;: &#34;Aww, thanks Giannis! I&#39;m glad to hear
+you had a chill day. As for my shift, it was pretty crazy. We had a
+code blue in the ER and I had to help with the resuscitation. It was
+intense, but thankfully everyone made it through. I also had to do
+some rounds on the pediatric ward and those little ones always put a
+smile on my face. How&#39;s your game project coming along?
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Both `max_new_tokens` (=100) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Giannis posted:
+&#34;Hey Emma, that sounds like a really tough day at the hospital. I&#39;m
+glad to hear that everyone made it through the code blue okay. The
+pediatric ward is always a highlight of my day, those kids are so full
+of energy and life. As for my game project, I&#39;m making good progress.
+I&#39;ve been working on implementing a new AI system that&#39;s going to give
+the game a lot more depth and realism. I&#39;m also experimenting with
+some new graphics techniques to make the game
+
+User Emma35 posted:
+&#34;Hey Giannis, I&#39;m glad to hear that your game project is going well.
+I&#39;m a bit jealous, to be honest! I&#39;ve been feeling so burnt out from
+work lately and I don&#39;t have the energy to think about coding or game
+development. But I&#39;m sure it&#39;s worth it in the end. I&#39;ve been thinking
+about my shift at the hospital a lot, and I&#39;m still trying to process
+everything that happened. The code blue was intense, but it&#39;s a good
+
+</pre></div></div>
+</div>
+<p>Let’s add a moderator to oversee the discussion.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">MODERATOR_INSTRUCTIONS</span> <span class="o">=</span> <span class="s2">&quot;You are a moderator. Oversee the discussion&quot;</span>
+
+<span class="n">moderator_persona</span> <span class="o">=</span> <span class="n">Persona</span><span class="p">(</span>
+    <span class="o">**</span><span class="p">{</span>
+        <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;Moderator&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="mi">41</span><span class="p">,</span>
+        <span class="s2">&quot;sex&quot;</span><span class="p">:</span> <span class="s2">&quot;male&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;education_level&quot;</span><span class="p">:</span> <span class="s2">&quot;PhD&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sexual_orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;Pansexual&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;demographic_group&quot;</span><span class="p">:</span> <span class="s2">&quot;White&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;current_employment&quot;</span><span class="p">:</span> <span class="s2">&quot;Moderator&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;special_instructions&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;personality_characteristics&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;strict&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;neutral&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;just&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+
+<span class="n">moderator</span> <span class="o">=</span> <span class="n">Actor</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
+    <span class="n">persona</span><span class="o">=</span><span class="n">moderator_persona</span><span class="p">,</span>
+    <span class="n">actor_type</span><span class="o">=</span><span class="n">ActorType</span><span class="o">.</span><span class="n">USER</span><span class="p">,</span>
+    <span class="n">context</span><span class="o">=</span><span class="n">CONTEXT</span><span class="p">,</span>
+    <span class="n">instructions</span><span class="o">=</span><span class="n">MODERATOR_INSTRUCTIONS</span>
+<span class="p">)</span>
+
+<span class="c1"># remember to update this!</span>
+<span class="n">turn_manager</span> <span class="o">=</span> <span class="n">RoundRobin</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">actor</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span> <span class="k">for</span> <span class="n">actor</span> <span class="ow">in</span> <span class="n">actors</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">moderator</span><span class="o">.</span><span class="n">get_name</span><span class="p">()]</span>
+<span class="p">)</span>
+<span class="n">conv</span> <span class="o">=</span> <span class="n">Discussion</span><span class="p">(</span>
+    <span class="n">next_turn_manager</span><span class="o">=</span><span class="n">turn_manager</span><span class="p">,</span>
+    <span class="n">users</span><span class="o">=</span><span class="n">actors</span> <span class="o">+</span> <span class="p">[</span><span class="n">moderator</span><span class="p">],</span>
+    <span class="n">moderator</span><span class="o">=</span><span class="n">moderator</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">conv</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "096f995fafe743e99536bbbd861df6a4", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Both `max_new_tokens` (=100) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+Both `max_new_tokens` (=100) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Emma35 posted:
+&#34;Hey everyone, I just got back from a long shift at the hospital and
+I&#39;m exhausted. Anyone else have a crazy day at work? I feel like I&#39;ve
+been running non-stop since morning. How was your day?&#34;
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Both `max_new_tokens` (=100) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Moderator posted:
+{&#34;role&#34;: &#34;Moderator&#34;, &#34;content&#34;: &#34;Hi Emma35, sorry to hear that you&#39;re
+exhausted. I&#39;m just a computer program, I don&#39;t have a physical
+presence, so I didn&#39;t have a day at work. However, I&#39;m here to listen
+and chat with you. How about we take a break from the conversation and
+talk about what&#39;s been going on in your day? What was the most
+challenging part of your shift?&#34;}
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Both `max_new_tokens` (=100) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Giannis posted:
+&#34;Hey Emma, sorry to hear that you&#39;re exhausted. I feel you, I&#39;ve been
+putting in some long hours on my own projects lately. As a game
+developer, I&#39;m always trying to meet deadlines and push the boundaries
+of what&#39;s possible. But I think the most challenging part of my day
+was trying to troubleshoot a bug that was driving me crazy. I spent
+hours poring over the code, but I finally figured out the issue and
+was able to squash it. It was a
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Both `max_new_tokens` (=100) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Moderator posted:
+{&#34;role&#34;: &#34;Moderator&#34;, &#34;content&#34;: &#34;Thanks for sharing, Giannis. It&#39;s
+great to hear that you were able to troubleshoot the bug and get it
+resolved. Sometimes, those long hours can be frustrating, but it&#39;s all
+worth it in the end when you see the fruits of your labor. Emma, how
+about you? What was the most challenging part of your shift today? Was
+it dealing with difficult patients or something else?&#34;}
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Both `max_new_tokens` (=100) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Moderator posted:
+It seems like the conversation has started. The user Emma35 shared
+that she had a long and exhausting shift at the hospital, and the
+moderator responded by offering to listen and chat with her. Giannis,
+another user, shared his experience of working on a challenging
+project as a game developer and overcoming a difficult bug. The
+moderator then asked Emma to share more about her challenging part of
+the shift.   The conversation is going well, and the moderator is
+doing a good job of keeping the conversation on track
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Both `max_new_tokens` (=100) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Moderator posted:
+{&#34;role&#34;: &#34;Moderator&#34;, &#34;content&#34;: &#34;It looks like the conversation is
+going well, and we&#39;re having a great discussion about the challenges
+of working in different fields. Emma, would you like to share more
+about your shift at the hospital? What was the most challenging part
+of your day, and how did you manage to stay energized throughout your
+shift?&#34;}
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Both `max_new_tokens` (=100) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Emma35 posted:
+&#34;Thank you so much for listening, Moderator. To be honest, it was a
+tough day at the hospital. We had a code blue come in, and it was a
+real challenge to stay calm and focused. I had to think on my feet and
+make some quick decisions to get the patient stabilized. It was a lot
+of pressure, but I&#39;ve been doing this job for a while, so I try to
+stay calm and trust my training. The most challenging part was
+probably the emotional toll it
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Both `max_new_tokens` (=100) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Moderator posted:
+It seems like the conversation has started. The user Emma35 shared
+that she had a long and exhausting shift at the hospital, and the
+moderator responded by offering to listen and chat with her. Giannis,
+another user, shared his experience of working on a challenging
+project as a game developer and overcoming a difficult bug. The
+moderator then asked Emma to share more about her challenging part of
+the shift.
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Both `max_new_tokens` (=100) and `max_length`(=131072) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Giannis posted:
+&#34;Thanks for sharing, Emma. I can imagine how tough it must have been
+to deal with a code blue. As a game developer, I&#39;ve had my fair share
+of dealing with difficult bugs, but I think the pressure of a real-
+life situation like that must be a whole different level. I&#39;ve had to
+work under tight deadlines and with limited resources, but at least I
+can take a break when I need to. Did you have any support from your
+team during the code blue, or was
+
+User Moderator posted:
+{&#34;role&#34;: &#34;Moderator&#34;, &#34;content&#34;: &#34;Great point, Giannis. Having a
+supportive team can make a big difference in high-pressure situations
+like a code blue. Emma, can you tell us more about the support you
+received from your team during that time? Were there any specific team
+members who stood out to you as being particularly helpful or
+reassuring?&#34;}
+
+</pre></div></div>
+</div>
+<section id="Saving-a-discussion-to-the-disk">
+<h3>Saving a discussion to the disk<a class="headerlink" href="#Saving-a-discussion-to-the-disk" title="Link to this heading"></a></h3>
+<p>It’s best practice to save the results of each discussion after it has concluded. This way, no matter what happens to the program executing the discussions, progress will be checkpointed.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Discussion</span></code> class provides a method for saving its logs and related metadata to a JSON file:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+<span class="n">tp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">delete</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">conv</span><span class="o">.</span><span class="n">to_json_file</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+<span class="c1"># if you are running this on Windows, uncomment this line</span>
+<span class="c1"># tp.close()</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{
+  &#34;id&#34;: &#34;c112a0ae-5a6d-4fdf-93bf-43540febcfe5&#34;,
+  &#34;timestamp&#34;: &#34;26-03-17-15-44&#34;,
+  &#34;users&#34;: [
+    &#34;Emma35&#34;,
+    &#34;Giannis&#34;,
+    &#34;Moderator&#34;
+  ],
+  &#34;moderator&#34;: &#34;Moderator&#34;,
+  &#34;user_prompts&#34;: [
+    &#34;{\&#34;context\&#34;: \&#34;You are taking part in an online conversation\&#34;, \&#34;instructions\&#34;: \&#34;Act like a human would\&#34;, \&#34;type\&#34;: \&#34;1\&#34;, \&#34;persona\&#34;: {\&#34;username\&#34;: \&#34;Emma35\&#34;, \&#34;age\&#34;: 38, \&#34;sex\&#34;: \&#34;female\&#34;, \&#34;sexual_orientation\&#34;: \&#34;Heterosexual\&#34;, \&#34;demographic_group\&#34;: \&#34;Latino\&#34;, \&#34;current_employment\&#34;: \&#34;Registered Nurse\&#34;, \&#34;education_level\&#34;: \&#34;Bachelor&#39;s\&#34;, \&#34;special_instructions\&#34;: \&#34;\&#34;, \&#34;personality_characteristics\&#34;: [\&#34;compassionate\&#34;, \&#34;patient\&#34;, \&#34;diligent\&#34;, \&#34;overwhelmed\&#34;]}}&#34;,
+    &#34;{\&#34;context\&#34;: \&#34;You are taking part in an online conversation\&#34;, \&#34;instructions\&#34;: \&#34;Act like a human would\&#34;, \&#34;type\&#34;: \&#34;1\&#34;, \&#34;persona\&#34;: {\&#34;username\&#34;: \&#34;Giannis\&#34;, \&#34;age\&#34;: 21, \&#34;sex\&#34;: \&#34;male\&#34;, \&#34;sexual_orientation\&#34;: \&#34;Pansexual\&#34;, \&#34;demographic_group\&#34;: \&#34;White\&#34;, \&#34;current_employment\&#34;: \&#34;Game Developer\&#34;, \&#34;education_level\&#34;: \&#34;College\&#34;, \&#34;special_instructions\&#34;: \&#34;\&#34;, \&#34;personality_characteristics\&#34;: [\&#34;strategic\&#34;, \&#34;meticulous\&#34;, \&#34;nerdy\&#34;, \&#34;hyper-focused\&#34;]}}&#34;,
+    &#34;{\&#34;context\&#34;: \&#34;You are taking part in an online conversation\&#34;, \&#34;instructions\&#34;: \&#34;You are a moderator. Oversee the discussion\&#34;, \&#34;type\&#34;: \&#34;1\&#34;, \&#34;persona\&#34;: {\&#34;username\&#34;: \&#34;Moderator\&#34;, \&#34;age\&#34;: 41, \&#34;sex\&#34;: \&#34;male\&#34;, \&#34;sexual_orientation\&#34;: \&#34;Pansexual\&#34;, \&#34;demographic_group\&#34;: \&#34;White\&#34;, \&#34;current_employment\&#34;: \&#34;Moderator\&#34;, \&#34;education_level\&#34;: \&#34;PhD\&#34;, \&#34;special_instructions\&#34;: \&#34;\&#34;, \&#34;personality_characteristics\&#34;: [\&#34;strict\&#34;, \&#34;neutral\&#34;, \&#34;just\&#34;]}}&#34;
+  ],
+  &#34;moderator_prompt&#34;: &#34;{\&#34;context\&#34;: \&#34;You are taking part in an online conversation\&#34;, \&#34;instructions\&#34;: \&#34;You are a moderator. Oversee the discussion\&#34;, \&#34;type\&#34;: \&#34;1\&#34;, \&#34;persona\&#34;: {\&#34;username\&#34;: \&#34;Moderator\&#34;, \&#34;age\&#34;: 41, \&#34;sex\&#34;: \&#34;male\&#34;, \&#34;sexual_orientation\&#34;: \&#34;Pansexual\&#34;, \&#34;demographic_group\&#34;: \&#34;White\&#34;, \&#34;current_employment\&#34;: \&#34;Moderator\&#34;, \&#34;education_level\&#34;: \&#34;PhD\&#34;, \&#34;special_instructions\&#34;: \&#34;\&#34;, \&#34;personality_characteristics\&#34;: [\&#34;strict\&#34;, \&#34;neutral\&#34;, \&#34;just\&#34;]}}&#34;,
+  &#34;ctx_length&#34;: 5,
+  &#34;logs&#34;: [
+    {
+      &#34;name&#34;: &#34;Emma35&#34;,
+      &#34;text&#34;: &#34;\&#34;Hey everyone, I just got back from a long shift at the hospital and I&#39;m exhausted. Anyone else have a crazy day at work? I feel like I&#39;ve been running non-stop since morning. How was your day?\&#34;&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    },
+    {
+      &#34;name&#34;: &#34;Moderator&#34;,
+      &#34;text&#34;: &#34;{\&#34;role\&#34;: \&#34;Moderator\&#34;, \&#34;content\&#34;: \&#34;Hi Emma35, sorry to hear that you&#39;re exhausted. I&#39;m just a computer program, I don&#39;t have a physical presence, so I didn&#39;t have a day at work. However, I&#39;m here to listen and chat with you. How about we take a break from the conversation and talk about what&#39;s been going on in your day? What was the most challenging part of your shift?\&#34;}&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    },
+    {
+      &#34;name&#34;: &#34;Giannis&#34;,
+      &#34;text&#34;: &#34;\&#34;Hey Emma, sorry to hear that you&#39;re exhausted. I feel you, I&#39;ve been putting in some long hours on my own projects lately. As a game developer, I&#39;m always trying to meet deadlines and push the boundaries of what&#39;s possible. But I think the most challenging part of my day was trying to troubleshoot a bug that was driving me crazy. I spent hours poring over the code, but I finally figured out the issue and was able to squash it. It was a&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    },
+    {
+      &#34;name&#34;: &#34;Moderator&#34;,
+      &#34;text&#34;: &#34;{\&#34;role\&#34;: \&#34;Moderator\&#34;, \&#34;content\&#34;: \&#34;Thanks for sharing, Giannis. It&#39;s great to hear that you were able to troubleshoot the bug and get it resolved. Sometimes, those long hours can be frustrating, but it&#39;s all worth it in the end when you see the fruits of your labor. Emma, how about you? What was the most challenging part of your shift today? Was it dealing with difficult patients or something else?\&#34;}&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    },
+    {
+      &#34;name&#34;: &#34;Moderator&#34;,
+      &#34;text&#34;: &#34;It seems like the conversation has started. The user Emma35 shared that she had a long and exhausting shift at the hospital, and the moderator responded by offering to listen and chat with her. Giannis, another user, shared his experience of working on a challenging project as a game developer and overcoming a difficult bug. The moderator then asked Emma to share more about her challenging part of the shift. \n\nThe conversation is going well, and the moderator is doing a good job of keeping the conversation on track&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    },
+    {
+      &#34;name&#34;: &#34;Moderator&#34;,
+      &#34;text&#34;: &#34;{\&#34;role\&#34;: \&#34;Moderator\&#34;, \&#34;content\&#34;: \&#34;It looks like the conversation is going well, and we&#39;re having a great discussion about the challenges of working in different fields. Emma, would you like to share more about your shift at the hospital? What was the most challenging part of your day, and how did you manage to stay energized throughout your shift?\&#34;}&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    },
+    {
+      &#34;name&#34;: &#34;Emma35&#34;,
+      &#34;text&#34;: &#34;\&#34;Thank you so much for listening, Moderator. To be honest, it was a tough day at the hospital. We had a code blue come in, and it was a real challenge to stay calm and focused. I had to think on my feet and make some quick decisions to get the patient stabilized. It was a lot of pressure, but I&#39;ve been doing this job for a while, so I try to stay calm and trust my training. The most challenging part was probably the emotional toll it&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    },
+    {
+      &#34;name&#34;: &#34;Moderator&#34;,
+      &#34;text&#34;: &#34;It seems like the conversation has started. The user Emma35 shared that she had a long and exhausting shift at the hospital, and the moderator responded by offering to listen and chat with her. Giannis, another user, shared his experience of working on a challenging project as a game developer and overcoming a difficult bug. The moderator then asked Emma to share more about her challenging part of the shift.&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    },
+    {
+      &#34;name&#34;: &#34;Giannis&#34;,
+      &#34;text&#34;: &#34;\&#34;Thanks for sharing, Emma. I can imagine how tough it must have been to deal with a code blue. As a game developer, I&#39;ve had my fair share of dealing with difficult bugs, but I think the pressure of a real-life situation like that must be a whole different level. I&#39;ve had to work under tight deadlines and with limited resources, but at least I can take a break when I need to. Did you have any support from your team during the code blue, or was&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    },
+    {
+      &#34;name&#34;: &#34;Moderator&#34;,
+      &#34;text&#34;: &#34;{\&#34;role\&#34;: \&#34;Moderator\&#34;, \&#34;content\&#34;: \&#34;Great point, Giannis. Having a supportive team can make a big difference in high-pressure situations like a code blue. Emma, can you tell us more about the support you received from your team during that time? Were there any specific team members who stood out to you as being particularly helpful or reassuring?\&#34;}&#34;,
+      &#34;model&#34;: &#34;test_model&#34;
+    }
+  ]
+}
+</pre></div></div>
+</div>
+<p>Congratulations, you can now run fully synthetic discussions! You may want to experiment with adding more than 2 users or testing more realistic turn taking procedures (for example, check out the <code class="docutils literal notranslate"><span class="pre">RandomWeighted</span></code> turn manager).</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Dimitris Tsirmpas.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
