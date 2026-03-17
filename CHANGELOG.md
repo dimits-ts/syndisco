@@ -1,5 +1,12 @@
 # What's new
 
+## 2.0.8 (17/3/2026)
+- Reworked discussion and annotation exports to be more robust, intuitive and maintainable.
+- Transformer models are now loaded in eval mode and run on inference mode.
+    - This should lead to some improvements w.r.t. memory and computational requirements, but don't expect anything drastic.
+    - I am still amazed that these were not the defaults for the huggingface models. The documentation about this is sorely lacking.
+    - Thanks to my colleague T.P. for pointing this inefficiency out!
+
 ## 2.0.7 (23/1/2025)
 - Fixed long-standing bugs with annotation export
 - Updated guides

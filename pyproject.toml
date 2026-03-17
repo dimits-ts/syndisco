@@ -1,6 +1,6 @@
 [project]
 name = "syndisco"
-version = "2.0.7"
+version = "2.0.8"
 description = "Automated experiment creation and execution using LLM agents"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -55,7 +55,7 @@ dev = [
   "nbsphinx",
   "sphinx-autobuild",
   "sphinx-rtd-theme",
-  "notebook",
+  "ipykernel",
   "ipywidgets",
   "pandoc",
   "build",
