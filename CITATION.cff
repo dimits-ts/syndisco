@@ -7,7 +7,7 @@ type: software
 authors:
   - given-names: Dimitris
     family-names: Tsirmpas
-    email: tsirbasdim@gmail.com
+    email: dim.tsirmpas@aueb.gr
     affiliation: Athens University of Economics and Business
     orcid: 'https://orcid.org/0000-0002-5675-3939'
 repository-code: 'https://github.com/dimits-ts/syndisco/'
