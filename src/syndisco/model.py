@@ -123,8 +123,6 @@ class TransformersModel(BaseModel):
         logger.info(f"Model memory footprint: {model_size:.2f} MB")
 
     def _generate_response(self, system_prompt: str, user_prompt: str) -> str:
-        assert type(system_prompt) is str
-        assert type(type(user_prompt) is str)
         # Construct proper message list for chat template
         messages = [
             {"role": "system", "content": system_prompt},
