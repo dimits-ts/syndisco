@@ -25,6 +25,7 @@ import logging
 from pathlib import Path
 
 import transformers
+import torch
 from openai import OpenAI
 
 
@@ -115,7 +116,7 @@ class TransformersModel(BaseModel):
 
         self.model = transformers.AutoModelForCausalLM.from_pretrained(
             model_path, device_map="auto"
-        )
+        ).eval()
         self.tokenizer = transformers.AutoTokenizer.from_pretrained(model_path)
 
         model_size = self.model.get_memory_footprint() / 2**20
@@ -143,16 +144,17 @@ class TransformersModel(BaseModel):
                 f"System: {system_prompt}\nUser: {user_prompt}\nAssistant:"
             )
 
-        inputs = self.tokenizer(prompt_text, return_tensors="pt").to(
-            self.model.device
-        )
+        with torch.inference_mode():
+            inputs = self.tokenizer(prompt_text, return_tensors="pt").to(
+                self.model.device
+            )
 
-        output_ids = self.model.generate(
-            **inputs,
-            max_new_tokens=self.max_out_tokens,
-            do_sample=False,
-            pad_token_id=self.tokenizer.eos_token_id,
-        )
+            output_ids = self.model.generate(
+                **inputs,
+                max_new_tokens=self.max_out_tokens,
+                do_sample=False,
+                pad_token_id=self.tokenizer.eos_token_id,
+            )
 
         # Remove the prompt portion → keep only generated part
         generated_ids = output_ids[0][inputs["input_ids"].shape[1]:]
@@ -182,7 +184,8 @@ class OpenAIModel(BaseModel):
     ):
         """Initialize the OpenAI model wrapper.
 
-        :param model_name: The model identifier to use (e.g., "gpt-4", "gpt-3.5-turbo")
+        :param model_name: 
+            The model identifier to use (e.g., "gpt-4", "gpt-3.5-turbo")
         :type model_name: str
         :param api_key: The API key for authentication
         :type api_key: str
