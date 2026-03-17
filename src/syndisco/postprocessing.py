@@ -48,38 +48,32 @@ def import_discussions(conv_dir: Path) -> pd.DataFrame:
     df = df.reset_index(drop=True)
     df = df.rename(columns={"id": "conv_id"})
 
-    # Filter out non-persona information
-    # assumes context and instructions are shared across participants
-    df.user_prompts = df.user_prompts.apply(
-        lambda user_prompts: [
-            json.loads(user_prompt)["persona"] for user_prompt in user_prompts
+    df["user_prompts"] = df["user_prompts"].apply(
+        lambda prompts: [
+            {
+                "persona": json.loads(p)["persona"],
+                "instructions": json.loads(p)["instructions"],
+            }
+            for p in prompts
         ]
     )
 
-    # Select only current user prompt
-    df["user_prompt"] = _select_user_prompt(df)
+    # Select persona per message (user or moderator)
+    df["persona"], df["prompt"] = _select_persona_and_prompt(df)
 
-    # Merge moderator and user prompts
-    df["is_moderator"] = _is_moderator(df.moderator, df.user)
-    df.user_prompt = df.moderator_prompt.where(df.is_moderator, df.user_prompt)
+    # Moderator flag
+    df["is_moderator"] = _is_moderator(df["moderator"], df["user"])
 
+    # Message-level identifiers
     df["message_id"] = _generate_message_hash(df.conv_id, df.message)
     df["message_order"] = _add_message_order(df)
 
-    traits_df = pd.concat(
-        list(df.user_prompt.apply(_process_traits))
-    ).reset_index(drop=True)
-    del traits_df["username"]
+    # Drop unused columns
+    df = df.drop(
+        columns=["user_prompts", "users", "moderator_prompt", "moderator"]
+    )
 
-    # Remove unused columns
-    del df["user_prompts"]
-    del df["user_prompt"]
-    del df["users"]
-    del df["moderator"]
-    del df["moderator_prompt"]
-
-    full_df = pd.concat([df, traits_df], axis=1)
-    return full_df
+    return df
 
 
 def import_annotations(annot_dir: str | Path) -> pd.DataFrame:
@@ -118,20 +112,21 @@ def _read_annotations(annot_dir: Path) -> pd.DataFrame:
     :rtype: pd.DataFrame
     """
     rows = []
-    for file_path in annot_dir.rglob("*"):
+
+    for file_path in annot_dir.rglob("*.json"):
         with open(file_path, "r", encoding="utf8") as fin:
             conv = json.load(fin)
 
         conv = pd.json_normalize(conv)
         conv = conv.explode("logs")
+
         conv["message"] = conv.logs.apply(lambda x: x[0])
         conv["annotation"] = conv.logs.apply(lambda x: x[1])
 
-        del conv["logs"]
+        conv = conv.drop(columns=["logs"])
         rows.append(conv)
 
-    full_df = pd.concat(rows)
-    return full_df
+    return pd.concat(rows, ignore_index=True)
 
 
 def _read_conversations(conv_dir: Path) -> pd.DataFrame:
@@ -147,32 +142,24 @@ def _read_conversations(conv_dir: Path) -> pd.DataFrame:
     :rtype: pd.DataFrame
     """
     if not conv_dir.is_dir():
-        raise ValueError(
-            f"{conv_dir} is not a directory or does not exist"
-        ) from None
+        raise ValueError(f"{conv_dir} is not a directory or does not exist")
 
-    file_paths = list(conv_dir.rglob("*"))
-
-    if len(file_paths) == 0:
-        raise ValueError(
-            "No discussions found in directory ", conv_dir
-        ) from None
     rows = []
-
-    for file_path in file_paths:
+    for file_path in conv_dir.rglob("*.json"):
         with open(file_path, "r", encoding="utf8") as fin:
             conv = json.load(fin)
 
-        conv = pd.json_normalize(conv)
-        conv = conv.explode("logs")
-        conv["user"] = conv.logs.apply(lambda x: x["name"])
-        conv["message"] = conv.logs.apply(lambda x: x["text"])
-        conv["model"] = conv.logs.apply(lambda x: x["model"])
-        del conv["logs"]
-        rows.append(conv)
+        base = pd.json_normalize(conv)
+        logs = base.explode("logs")
 
-    full_df = pd.concat(rows)
-    return full_df
+        logs["user"] = logs["logs"].apply(lambda x: x["name"])
+        logs["message"] = logs["logs"].apply(lambda x: x["text"])
+        logs["model"] = logs["logs"].apply(lambda x: x["model"])
+
+        logs = logs.drop(columns=["logs"])
+        rows.append(logs)
+
+    return pd.concat(rows, ignore_index=True)
 
 
 def _is_moderator(moderator_name: pd.Series, username: pd.Series) -> pd.Series:
@@ -189,55 +176,50 @@ def _is_moderator(moderator_name: pd.Series, username: pd.Series) -> pd.Series:
     return moderator_name == username
 
 
-def _select_user_prompt(df):
-    selected_user_prompts = []
+def _select_persona_and_prompt(
+    df: pd.DataFrame,
+) -> tuple[list[dict], list[str]]:
+    personas = []
+    prompts = []
 
     for _, row in df.iterrows():
-        curr_username = row["user"]
-        if curr_username == row["moderator"]:
-            # Use moderator prompt
-            selected_user_prompts.append(
-                json.loads(row["moderator_prompt"])["persona"]
-            )
+        username = row["user"]
+
+        # Moderator message
+        if username == row["moderator"]:
+            moderator_prompt = json.loads(row["moderator_prompt"])
+            personas.append(moderator_prompt["persona"])
+            prompts.append(moderator_prompt["instructions"])
             continue
 
-        user_prompts = row["user_prompts"]
-        matched_prompt = next(
-            (p for p in user_prompts if p["username"] == curr_username),
+        # Regular user
+        match = next(
+            (
+                p
+                for p in row["user_prompts"]
+                if p["persona"]["username"] == username
+            ),
             None,
         )
-        if matched_prompt is None:
+
+        if match is None:
             raise ValueError(
-                f"No matching prompt found for username: {curr_username}"
+                f"No matching persona found for username: {username}"
             )
 
-        selected_user_prompts.append(matched_prompt)
+        personas.append(match["persona"])
+        prompts.append(match["instructions"])
 
-    return selected_user_prompts
-
-
-def _process_traits(user_prompt: dict) -> pd.DataFrame:
-    """
-    Process traits extracted from messages into a structured DataFrame.
-
-    :param series: Series containing traits in dictionary format.
-    :type series: pd.Series
-    :return: A DataFrame with extracted traits as columns.
-    :rtype: pd.DataFrame
-    """
-    return pd.DataFrame([user_prompt])
+    return personas, prompts
 
 
-def _group_all_but_one(
-    df: pd.DataFrame,
-) -> pd.DataFrame:
-    # all other columns should be identical for the same message
+def _group_all_but_one(df: pd.DataFrame) -> pd.DataFrame:
     grouping_columns = [
         c for c in df.columns if c not in ["annotation", "annotator_prompt"]
     ]
 
     return df.groupby(grouping_columns, as_index=False).agg(
-        {"annotation": list}, {"annotator_prompt": list}
+        {"annotation": list, "annotator_prompt": list}
     )
 
 
