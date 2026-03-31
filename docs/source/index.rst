@@ -7,7 +7,7 @@ Welcome to SynDisco's documentation!
 ====================================
 
 
-.. image:: syndisco_logo.svg
+.. image:: logo.svg
 
 Welcome to the official documentation of SynDisco! 
 This project provides a lightweight framework for creating, managing, 
