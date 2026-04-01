@@ -1,9 +1,6 @@
 Overview
 ========
 
-.. figure::  research_goal.png
-  :alt: diagram showing synthetic discussion
-
 An example use-case of SynDisco on online discussions. The framework can be adapted to many use cases.
 
 
