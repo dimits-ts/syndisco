@@ -29,7 +29,7 @@ import copy
 import textwrap
 import random
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from tqdm.auto import tqdm
 
@@ -54,7 +54,6 @@ class Discussion:
         self,
         next_turn_manager: turn_manager.TurnManager,
         users: list[actors.Actor],
-        moderator: Optional[actors.Actor] = None,
         history_context_len: int = 5,
         conv_len: int = 5,
         seed_opinions: list[str] | None = None,
@@ -68,10 +67,6 @@ class Discussion:
         :type turn_manager: turn_manager.TurnManager
         :param users: A list of discussion participants
         :type users: list[actors.Actor]
-        :param moderator: An actor tasked with moderation if not None,
-        can speak at any point in the conversation,
-         defaults to None
-        :type moderator: actors.Actor | None, optional
         :param history_context_len: How many prior messages are included
         to the LLMs prompt as context, defaults to 5
         :type history_context_len: int, optional
@@ -102,8 +97,6 @@ class Discussion:
         self.user_types = [
             type(user).__name__ for user in self.username_user_map
         ]
-
-        self.moderator = moderator
         self.conv_len = conv_len
 
         # unique id for each conversation
@@ -137,10 +130,6 @@ class Discussion:
             if len(res.strip()) != 0:
                 self._archive_response(actor, res, verbose)
 
-                if self.moderator is not None:
-                    res = self.moderator.speak(list(self.ctx_history))
-                    self._archive_response(self.moderator, res, verbose)
-
     def to_dict(
         self, timestamp_format: str = "%y-%m-%d-%H-%M"
     ) -> dict[str, Any]:
@@ -160,19 +149,9 @@ class Discussion:
             "users": [
                 user.get_name() for user in self.username_user_map.values()
             ],
-            "moderator": (
-                self.moderator.get_name()
-                if self.moderator is not None
-                else None
-            ),
             "user_prompts": [
                 user.describe() for user in self.username_user_map.values()
             ],
-            "moderator_prompt": (
-                self.moderator.describe()
-                if self.moderator is not None
-                else None
-            ),
             "ctx_length": self.ctx_len,
             "logs": self.conv_logs,
         }
@@ -284,7 +263,6 @@ class Annotation:
         self,
         annotator: actors.Actor,
         conv_logs_path: str | Path,
-        include_moderator_comments: bool,
         history_ctx_len: int = 2,
     ):
         """
@@ -297,17 +275,12 @@ class Annotation:
         :param conv_logs_path: The path to the file containing the
         discussion logs in JSON format
         :type conv_logs_path: str | Path
-        :param include_moderator_comments: Whether to annotate moderator
-        comments, and include them
-        in conversational context when annotating user responses.
-        :type include_moderator_comments: bool
         :param history_ctx_len: How many previous comments the annotator will
         remember, defaults to 4
         :type history_ctx_len: int, optional
         """
         self.annotator = annotator
         self.history_ctx_len = history_ctx_len
-        self.include_moderator_comments = include_moderator_comments
         self.annotation_logs = []
 
         with open(conv_logs_path, "r", encoding="utf8") as fin:
@@ -326,11 +299,6 @@ class Annotation:
         for message_data in tqdm(self.conv_data_dict["logs"]):
             username = message_data["name"]
             message = message_data["text"]
-
-            # do not include moderator comments in annotation ctx if told so
-            if "moderator" in username:
-                if not self.include_moderator_comments:
-                    continue
 
             formatted_message = _format_chat_message(username, message)
             ctx_history.append(formatted_message)

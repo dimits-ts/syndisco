@@ -58,11 +58,8 @@ def import_discussions(conv_dir: Path) -> pd.DataFrame:
         ]
     )
 
-    # Select persona per message (user or moderator)
+    # Select persona per message
     df["persona"], df["prompt"] = _select_persona_and_prompt(df)
-
-    # Moderator flag
-    df["is_moderator"] = _is_moderator(df["moderator"], df["user"])
 
     # Message-level identifiers
     df["message_id"] = _generate_message_hash(df.conv_id, df.message)
@@ -70,7 +67,7 @@ def import_discussions(conv_dir: Path) -> pd.DataFrame:
 
     # Drop unused columns
     df = df.drop(
-        columns=["user_prompts", "users", "moderator_prompt", "moderator"]
+        columns=["user_prompts", "users"]
     )
 
     return df
@@ -162,20 +159,6 @@ def _read_conversations(conv_dir: Path) -> pd.DataFrame:
     return pd.concat(rows, ignore_index=True)
 
 
-def _is_moderator(moderator_name: pd.Series, username: pd.Series) -> pd.Series:
-    """
-    Determine if a user is the moderator.
-
-    :param moderator_name: Series of moderator names.
-    :type moderator_name: pd.Series
-    :param username: Series of usernames.
-    :type username: pd.Series
-    :return: A Series indicating whether each user is the moderator.
-    :rtype: pd.Series
-    """
-    return moderator_name == username
-
-
 def _select_persona_and_prompt(
     df: pd.DataFrame,
 ) -> tuple[list[dict], list[str]]:
@@ -184,15 +167,6 @@ def _select_persona_and_prompt(
 
     for _, row in df.iterrows():
         username = row["user"]
-
-        # Moderator message
-        if username == row["moderator"]:
-            moderator_prompt = json.loads(row["moderator_prompt"])
-            personas.append(moderator_prompt["persona"])
-            prompts.append(moderator_prompt["instructions"])
-            continue
-
-        # Regular user
         match = next(
             (
                 p

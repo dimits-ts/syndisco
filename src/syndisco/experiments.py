@@ -47,7 +47,6 @@ class DiscussionExperiment:
         self,
         users: list[actors.Actor],
         seed_opinions: list[list[str]] | None = None,
-        moderator: actors.Actor | None = None,
         next_turn_manager: turn_manager.TurnManager | None = None,
         history_ctx_len: int = 3,
         num_turns: int = 10,
@@ -65,14 +64,12 @@ class DiscussionExperiment:
             discussion and will be uttered by random synthetic participants.
             None if no seed opinions are to be provided.
         :type seed_opinions: list[list[str]], optional
-        :param moderator: Optional moderator agent, or None to omit moderation.
-        :type moderator: actors.Actor or None
         :param next_turn_manager: Strategy for selecting the next speaker.
             Defaults to round-robin if None.
         :type next_turn_manager: turn_manager.TurnManager or None
         :param history_ctx_len: Number of past comments visible as context.
         :type history_ctx_len: int
-        :param num_turns: Number of user (non-moderator) turns per discussion.
+        :param num_turns: Number of turns per discussion.
         :type num_turns: int
         :param num_active_users: Number of active participants per discussion.
         :type num_active_users: int
@@ -83,7 +80,6 @@ class DiscussionExperiment:
             seed_opinions if seed_opinions is not None else [[]]
         )
         self.users = users
-        self.moderator = moderator
 
         if next_turn_manager is None:
             logger.warning(
@@ -138,7 +134,6 @@ class DiscussionExperiment:
 
         return jobs.Discussion(
             users=rand_users,
-            moderator=self.moderator,
             history_context_len=self.history_ctx_len,
             conv_len=self.num_turns,
             seed_opinions=rand_topic,
@@ -214,7 +209,6 @@ class AnnotationExperiment:
         self,
         annotators: list[actors.Actor],
         history_ctx_len: int = 3,
-        include_mod_comments: bool = True,
     ):
         """
         Initialize an annotation experiment using LLM-based annotators.
@@ -224,13 +218,9 @@ class AnnotationExperiment:
         :param history_ctx_len: Number of previous comments visible to the
             annotator.
         :type history_ctx_len: int
-        :param include_mod_comments: Whether to include moderator comments
-            during annotation.
-        :type include_mod_comments: bool
         """
         self.annotators = annotators
         self.history_ctx_len = history_ctx_len
-        self.include_mod_comments = include_mod_comments
 
     def begin(
         self, discussions_dir: Path, output_dir: Path, verbose: bool = True
@@ -291,8 +281,7 @@ class AnnotationExperiment:
         return jobs.Annotation(
             annotator=annotator,
             conv_logs_path=conv_logs_path,
-            history_ctx_len=self.history_ctx_len,
-            include_moderator_comments=self.include_mod_comments,
+            history_ctx_len=self.history_ctx_len
         )
 
     @logging_util.timing
