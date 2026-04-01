@@ -1,4 +1,5 @@
 import collections
+import collections.abc
 import datetime
 import json
 import logging
@@ -6,8 +7,8 @@ import uuid
 import copy
 import textwrap
 import random
+import typing
 from pathlib import Path
-from typing import Any
 
 from tqdm.auto import tqdm
 
@@ -30,6 +31,10 @@ class DiscussionLogs:
 
     def __init__(self) -> None:
         self._entries: list[dict[str, str]] = []
+
+    # ------------------------------------------------------------------
+    # Alternative constructors
+    # ------------------------------------------------------------------
 
     @classmethod
     def from_lists(
@@ -102,9 +107,9 @@ class DiscussionLogs:
     def to_dict(
         self,
         *,
-        extra: dict[str, Any] | None = None,
+        extra: dict[str, typing.Any] | None = None,
         timestamp_format: str = "%y-%m-%d-%H-%M",
-    ) -> dict[str, Any]:
+    ) -> dict[str, typing.Any]:
         """
         Serialize the logs to a dict, optionally merging caller-supplied
         metadata via *extra*.
@@ -119,7 +124,7 @@ class DiscussionLogs:
         :return: A serializable dict representation of the logs.
         :rtype: dict[str, Any]
         """
-        base: dict[str, Any] = {
+        base: dict[str, typing.Any] = {
             "timestamp": datetime.datetime.now().strftime(timestamp_format),
             "logs": self.to_list(),
         }
@@ -131,7 +136,7 @@ class DiscussionLogs:
         self,
         output_path: str | Path,
         *,
-        extra: dict[str, Any] | None = None,
+        extra: dict[str, typing.Any] | None = None,
         timestamp_format: str = "%y-%m-%d-%H-%M",
     ) -> None:
         """
@@ -154,12 +159,31 @@ class DiscussionLogs:
         return json.dumps(self.to_dict(), indent=4)
 
 
-# No superclass because the shared method names between the
-# Discussion and Annotation classes is coincidental.
-class Discussion:
+class Discussion(collections.abc.Iterator[dict[str, str]]):
     """
     A job conducting a discussion between different actors
     (:class:`actors.Actor`).
+
+    ``Discussion`` implements the iterator protocol: each call to
+    :func:`next` prompts the next speaker and returns the resulting log
+    entry.  This means it can be driven step-by-step::
+
+        discussion = Discussion(...)
+        for entry in discussion:          # full run
+            print(entry["name"], entry["text"])
+
+    or consumed one turn at a time::
+
+        it = iter(discussion)
+        first = next(it)
+        second = next(it)
+
+    :meth:`begin` is a convenience wrapper that exhausts the iterator
+    while printing output, matching the original one-shot API.
+
+    Because ``Discussion`` is its own iterator (``__iter__`` returns
+    ``self``), it is single-pass: once ``StopIteration`` is raised the
+    instance is exhausted and should not be reused.
     """
 
     def __init__(
@@ -174,31 +198,32 @@ class Discussion:
         """
         Construct the framework for a conversation to take place.
 
-        :param turn_manager: an object handling the speaker priority of the
-            participants
-        :type turn_manager: turn_manager.TurnManager
-        :param users: A list of discussion participants
+        :param next_turn_manager: An object handling the speaker order of
+            the participants.
+        :type next_turn_manager: turn_manager.TurnManager
+        :param users: A list of discussion participants.
         :type users: list[actors.Actor]
         :param history_context_len: How many prior messages are included
-            in the LLM's prompt as context, defaults to 5
+            in the LLM's prompt as context, defaults to 5.
         :type history_context_len: int, optional
-        :param conv_len: The total length of the conversation
-            (how many times each actor will be prompted), defaults to 5
+        :param conv_len: The total number of prompted turns (seed opinions
+            do not count toward this), defaults to 5.
         :type conv_len: int, optional
-        :param seed_opinions: The first hardcoded comments to start the
-            discussion with.  Inserted top-to-bottom in list order.
+        :param seed_opinions: Hardcoded opening comments inserted before
+            the first prompted turn, top-to-bottom in list order.
         :type seed_opinions: list[str], optional
         :param seed_opinion_usernames: The username for each seed opinion.
             Sampled randomly (without replacement) when *None*.
         :type seed_opinion_usernames: list[str], optional
         :raises ValueError: if the number of seed opinions and seed
-            opinion users differ, or if seed opinions exceed
-            *history_context_len*.
+            opinion usernames differ, or if there are more seed opinions
+            than participants.
         """
         users = copy.copy(users)
         self.username_user_map = {user.get_name(): user for user in users}
 
         self.next_turn_manager = next_turn_manager
+        self.next_turn_manager.set_names([user.get_name() for user in users])
 
         # used only during export, tags underlying models
         self.user_types = [
@@ -221,29 +246,59 @@ class Discussion:
         self.seed_opinions = seed_opinions or []
         self.seed_opinion_usernames = seed_opinion_usernames
 
+        # iterator state
+        self._steps_taken: int = 0
+
+    def __next__(self) -> dict[str, str]:
+        """
+        Prompt the next speaker and return the new log entry.
+
+        Skips turns where the actor returns only whitespace (the step
+        still counts toward ``conv_len``).  Raises :exc:`StopIteration`
+        once ``conv_len`` steps have been taken.
+
+        :return: The newly appended log entry (keys: ``name``, ``text``,
+            ``model``).
+        :rtype: dict[str, str]
+        :raises StopIteration: when all ``conv_len`` turns are exhausted.
+        """
+        if self._steps_taken >= self.conv_len:
+            raise StopIteration
+
+        speaker_name = self.next_turn_manager.next()
+        actor = self.username_user_map[speaker_name]
+        res = actor.speak(list(self.ctx_history))
+        self._steps_taken += 1
+
+        if res.strip():
+            self._archive_response(actor, res)
+            return self.logs[-1]
+
+        # Whitespace response: return a placeholder entry so the caller
+        # always receives one value per next() call.
+        return {"name": actor.get_name(), "text": "", "model": ""}
+
+    # Convenience one-shot API
     def begin(self, verbose: bool = True) -> None:
-        self.next_turn_manager.set_names(list(self.username_user_map.keys()))
+        """
+        Run the entire discussion to completion, printing each entry when
+        *verbose* is ``True``.
 
-        if len(self.logs) != 0:
-            raise RuntimeError(
-                "This conversation has already been concluded, "
-                "create a new Discussion object."
-            )
+        This is a thin wrapper that exhausts the iterator via
+        :func:`tqdm`, applying *verbose* printing along the way.
 
-        self._add_seed_opinions(verbose)
-
-        # begin main conversation
-        for _ in tqdm(range(self.conv_len)):
-            speaker_name = self.next_turn_manager.next()
-            actor = self.username_user_map[speaker_name]
-            res = actor.speak(list(self.ctx_history))
-
-            if len(res.strip()) != 0:
-                self._archive_response(actor, res, verbose)
+        :param verbose: Whether to print each comment to stdout,
+            defaults to ``True``.
+        :type verbose: bool, optional
+        """
+        for entry in tqdm(self, total=self.conv_len):
+            if verbose and entry["text"]:
+                formatted = _format_chat_message(entry["name"], entry["text"])
+                print(formatted, "\n")
 
     def to_dict(
         self, timestamp_format: str = "%y-%m-%d-%H-%M"
-    ) -> dict[str, Any]:
+    ) -> dict[str, typing.Any]:
         """
         Get a dictionary view of the data and metadata contained in the
         discussion.
@@ -287,7 +342,7 @@ class Discussion:
         }
         self.logs.to_json_file(output_path, extra=extra)
 
-    def _add_seed_opinions(self, verbose: bool) -> None:
+    def _add_seed_opinions(self) -> None:
         if len(self.seed_opinions) > 0:
             usernames = self.seed_opinion_usernames
             if usernames is None:
@@ -310,11 +365,9 @@ class Discussion:
                     actor_type=actors.ActorType.USER,
                 )
                 if comment.strip() != "":
-                    self._archive_response(seed_user, comment, verbose=verbose)
+                    self._archive_response(seed_user, comment)
 
-    def _archive_response(
-        self, user: actors.Actor, comment: str, verbose: bool
-    ) -> None:
+    def _archive_response(self, user: actors.Actor, comment: str) -> None:
         """
         Persist *comment* to the log and the rolling context window.
 
@@ -322,33 +375,13 @@ class Discussion:
         :type user: actors.Actor
         :param comment: The new comment.
         :type comment: str
-        :param verbose: Whether to print the comment to stdout.
-        :type verbose: bool
         """
         model_name = (
             user.model.get_name() if user.model is not None else "hardcoded"
         )
         self.logs.append(name=user.get_name(), text=comment, model=model_name)
-        self._add_comment_to_history(user, comment, verbose)
-
-    def _add_comment_to_history(
-        self, user: actors.Actor, comment: str, verbose: bool
-    ) -> None:
-        """
-        Add *comment* to the rolling context window shown to future
-        participants, and optionally print it.
-
-        :param user: The user who created the new comment.
-        :type user: actors.Actor
-        :param comment: The new comment.
-        :type comment: str
-        :param verbose: Whether to print the comment to stdout.
-        :type verbose: bool
-        """
-        formatted_res = _format_chat_message(user.get_name(), comment)
-        self.ctx_history.append(formatted_res)
-        if verbose:
-            print(formatted_res, "\n")
+        formatted = _format_chat_message(user.get_name(), comment)
+        self.ctx_history.append(formatted)
 
     def __str__(self) -> str:
         return json.dumps(self.to_dict(), indent=4)
@@ -416,7 +449,7 @@ class Annotation:
 
     def to_dict(
         self, timestamp_format: str = "%y-%m-%d-%H-%M"
-    ) -> dict[str, Any]:
+    ) -> dict[str, typing.Any]:
         """
         Get a dictionary view of the annotation data and metadata.
 
