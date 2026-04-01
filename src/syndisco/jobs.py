@@ -1,25 +1,3 @@
-"""
-Module handling the execution of LLM discussion and annotation tasks.
-"""
-
-# SynDisco: Automated experiment creation and execution using only LLM agents
-# Copyright (C) 2025 Dimitris Tsirmpas
-
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-# You may contact the author at dim.tsirmpas@aueb.gr
-
 import collections
 import datetime
 import json
@@ -40,10 +18,144 @@ from . import _file_util
 logger = logging.getLogger(Path(__file__).name)
 
 
-# No superclass because the shared method names between the classes
-# is coincidental
+class DiscussionLogs:
+    """
+    Stores and serializes the log entries of a discussion.
+
+    Each entry is a dict with keys ``name``, ``text``, and ``model``.
+    The class can be constructed incrementally via :meth:`append`, or
+    built all at once from plain lists via the :meth:`from_lists`
+    class method.
+    """
+
+    def __init__(self) -> None:
+        self._entries: list[dict[str, str]] = []
+
+    @classmethod
+    def from_lists(
+        cls,
+        names: list[str],
+        texts: list[str],
+        models: list[str] | None = None,
+    ) -> "DiscussionLogs":
+        """
+        Build a :class:`DiscussionLogs` from parallel lists of names and
+        texts, optionally with model labels.
+
+        :param names: The username for each entry.
+        :type names: list[str]
+        :param texts: The message text for each entry.
+        :type texts: list[str]
+        :param models: The model label for each entry.  Defaults to
+            ``"hardcoded"`` for every entry when *None*.
+        :type models: list[str] | None, optional
+        :raises ValueError: if *names* and *texts* (and, when provided,
+            *models*) differ in length.
+        :return: A populated :class:`DiscussionLogs` instance.
+        :rtype: DiscussionLogs
+        """
+        if len(names) != len(texts):
+            raise ValueError(
+                f"names and texts must have the same length "
+                f"(got {len(names)} and {len(texts)})."
+            )
+        if models is not None and len(models) != len(names):
+            raise ValueError(
+                f"models must have the same length as names and texts "
+                f"(got {len(models)} vs {len(names)})."
+            )
+
+        instance = cls()
+        resolved_models = (
+            models if models is not None else ["hardcoded"] * len(names)
+        )
+        for name, text, model in zip(names, texts, resolved_models):
+            instance.append(name=name, text=text, model=model)
+        return instance
+
+    def append(self, *, name: str, text: str, model: str) -> None:
+        """
+        Add a single log entry.
+
+        :param name: The username of the speaker.
+        :type name: str
+        :param text: The message text.
+        :type text: str
+        :param model: The model (or ``"hardcoded"`` for seed entries).
+        :type model: str
+        """
+        self._entries.append({"name": name, "text": text, "model": model})
+
+    def __iter__(self):
+        return iter(self._entries)
+
+    def __len__(self) -> int:
+        return len(self._entries)
+
+    def __getitem__(self, index: int) -> dict[str, str]:
+        return self._entries[index]
+
+    def to_list(self) -> list[dict[str, str]]:
+        """Return a shallow copy of the raw entry list."""
+        return list(self._entries)
+
+    def to_dict(
+        self,
+        *,
+        extra: dict[str, Any] | None = None,
+        timestamp_format: str = "%y-%m-%d-%H-%M",
+    ) -> dict[str, Any]:
+        """
+        Serialize the logs to a dict, optionally merging caller-supplied
+        metadata via *extra*.
+
+        :param extra: Additional key/value pairs to include in the output
+            dict.  Values in *extra* take precedence over the default keys
+            (``timestamp``, ``logs``).
+        :type extra: dict[str, Any] | None, optional
+        :param timestamp_format: strftime format for the ``timestamp``
+            field, defaults to ``"%y-%m-%d-%H-%M"``.
+        :type timestamp_format: str, optional
+        :return: A serializable dict representation of the logs.
+        :rtype: dict[str, Any]
+        """
+        base: dict[str, Any] = {
+            "timestamp": datetime.datetime.now().strftime(timestamp_format),
+            "logs": self.to_list(),
+        }
+        if extra:
+            base.update(extra)
+        return base
+
+    def to_json_file(
+        self,
+        output_path: str | Path,
+        *,
+        extra: dict[str, Any] | None = None,
+        timestamp_format: str = "%y-%m-%d-%H-%M",
+    ) -> None:
+        """
+        Write the logs (and any *extra* metadata) to a JSON file.
+
+        :param output_path: Destination path for the JSON file.
+        :type output_path: str | Path
+        :param extra: Additional metadata to embed alongside the log
+            entries (forwarded to :meth:`to_dict`).
+        :type extra: dict[str, Any] | None, optional
+        :param timestamp_format: strftime format for the timestamp field.
+        :type timestamp_format: str, optional
+        """
+        _file_util.dict_to_json(
+            self.to_dict(extra=extra, timestamp_format=timestamp_format),
+            output_path,
+        )
+
+    def __str__(self) -> str:
+        return json.dumps(self.to_dict(), indent=4)
 
 
+# No superclass because the shared method names between the
+# Discussion and Annotation classes is coincidental.
 class Discussion:
     """
     A job conducting a discussion between different actors
@@ -63,30 +175,25 @@ class Discussion:
         Construct the framework for a conversation to take place.
 
         :param turn_manager: an object handling the speaker priority of the
-        participants
+            participants
         :type turn_manager: turn_manager.TurnManager
         :param users: A list of discussion participants
         :type users: list[actors.Actor]
         :param history_context_len: How many prior messages are included
-        to the LLMs prompt as context, defaults to 5
+            in the LLM's prompt as context, defaults to 5
         :type history_context_len: int, optional
         :param conv_len: The total length of the conversation
-        (how many times each actor will be prompted),
-         defaults to 5
+            (how many times each actor will be prompted), defaults to 5
         :type conv_len: int, optional
-        :param seed_opinions:
-            The first hardcoded comments to start the discussion with.
-            Will be inserted in the discussion, from top-to-bottom according
-            to the ordering provided by the list.
-        :type seed_opinion: list[str], optional
-        :param seed_opinion_usernames:
-            The usernames for each seed opinion.
-            None if the usernames are to be selected randomly.
-        :type seed_opinion_username:
-            list[str], optional
+        :param seed_opinions: The first hardcoded comments to start the
+            discussion with.  Inserted top-to-bottom in list order.
+        :type seed_opinions: list[str], optional
+        :param seed_opinion_usernames: The username for each seed opinion.
+            Sampled randomly (without replacement) when *None*.
+        :type seed_opinion_usernames: list[str], optional
         :raises ValueError: if the number of seed opinions and seed
-        opinion users are different, or
-        if the number of seed opinions exceeds history_context_len
+            opinion users differ, or if seed opinions exceed
+            *history_context_len*.
         """
         users = copy.copy(users)
         self.username_user_map = {user.get_name(): user for user in users}
@@ -104,8 +211,12 @@ class Discussion:
 
         # keep a limited context of the conversation to feed to the models
         self.ctx_len = history_context_len
-        self.ctx_history = collections.deque(maxlen=history_context_len)
-        self.conv_logs = []
+        self.ctx_history: collections.deque[str] = collections.deque(
+            maxlen=history_context_len
+        )
+
+        # all persistent log state is owned by DiscussionLogs
+        self.logs = DiscussionLogs()
 
         self.seed_opinions = seed_opinions or []
         self.seed_opinion_usernames = seed_opinion_usernames
@@ -113,7 +224,7 @@ class Discussion:
     def begin(self, verbose: bool = True) -> None:
         self.next_turn_manager.set_names(list(self.username_user_map.keys()))
 
-        if len(self.conv_logs) != 0:
+        if len(self.logs) != 0:
             raise RuntimeError(
                 "This conversation has already been concluded, "
                 "create a new Discussion object."
@@ -143,9 +254,8 @@ class Discussion:
         :return: a dict representing the conversation
         :rtype: dict[str, Any]
         """
-        return {
+        extra = {
             "id": str(self.id),
-            "timestamp": datetime.datetime.now().strftime(timestamp_format),
             "users": [
                 user.get_name() for user in self.username_user_map.values()
             ],
@@ -153,24 +263,34 @@ class Discussion:
                 user.describe() for user in self.username_user_map.values()
             ],
             "ctx_length": self.ctx_len,
-            "logs": self.conv_logs,
         }
+        return self.logs.to_dict(
+            extra=extra, timestamp_format=timestamp_format
+        )
 
     def to_json_file(self, output_path: str | Path) -> None:
         """
-        Export the data and metadata of the conversation as a json file.
+        Export the data and metadata of the conversation as a JSON file.
 
         :param output_path: the path for the exported file
-        :type output_path: str
+        :type output_path: str | Path
         """
-        _file_util.dict_to_json(self.to_dict(), output_path)
+        extra = {
+            "id": str(self.id),
+            "users": [
+                user.get_name() for user in self.username_user_map.values()
+            ],
+            "user_prompts": [
+                user.describe() for user in self.username_user_map.values()
+            ],
+            "ctx_length": self.ctx_len,
+        }
+        self.logs.to_json_file(output_path, extra=extra)
 
     def _add_seed_opinions(self, verbose: bool) -> None:
-        # Assign usernames if not provided
         if len(self.seed_opinions) > 0:
             usernames = self.seed_opinion_usernames
             if usernames is None:
-                # sample without replacement
                 if len(self.seed_opinions) > len(self.username_user_map):
                     raise ValueError(
                         "Not enough users to assign unique usernames "
@@ -181,7 +301,6 @@ class Discussion:
                     len(self.seed_opinions),
                 )
 
-            # insert seed opinions
             for username, comment in zip(usernames, self.seed_opinions):
                 seed_user = actors.Actor(
                     model=None,  # type: ignore
@@ -197,55 +316,37 @@ class Discussion:
         self, user: actors.Actor, comment: str, verbose: bool
     ) -> None:
         """
-        Save the new comment to discussion output,
-        to discussion history for other users to see, maybe print it on screen.
+        Persist *comment* to the log and the rolling context window.
 
         :param user: The user who created the new comment.
-        :type user: actors.LLMActor
+        :type user: actors.Actor
         :param comment: The new comment.
         :type comment: str
-        :param verbose: Whether to print the comment to stdout
+        :param verbose: Whether to print the comment to stdout.
         :type verbose: bool
-        """
-        self._log_comment(user, comment)
-        self._add_comment_to_history(user, comment, verbose)
-
-    def _log_comment(self, user: actors.Actor, comment: str) -> None:
-        """
-        Save new comment to the output history.
-
-        :param user: The user who created the new comment
-        :type user: actors.LLMActor
-        :param comment: The new comment
-        :type comment: str
         """
         model_name = (
             user.model.get_name() if user.model is not None else "hardcoded"
         )
-        artifact = {
-            "name": user.get_name(),
-            "text": comment,
-            "model": model_name,
-        }
-        self.conv_logs.append(artifact)
+        self.logs.append(name=user.get_name(), text=comment, model=model_name)
+        self._add_comment_to_history(user, comment, verbose)
 
     def _add_comment_to_history(
         self, user: actors.Actor, comment: str, verbose: bool
     ) -> None:
         """
-        Add new comment to the discussion history,
-            so it can be shown to the other participants in the future.
+        Add *comment* to the rolling context window shown to future
+        participants, and optionally print it.
 
-        :param user: The user who created the new comment
-        :type user: actors.LLMActor
-        :param comment: The new comment
+        :param user: The user who created the new comment.
+        :type user: actors.Actor
+        :param comment: The new comment.
         :type comment: str
-        :param verbose: Whether to print the comment to stdout
+        :param verbose: Whether to print the comment to stdout.
         :type verbose: bool
         """
         formatted_res = _format_chat_message(user.get_name(), comment)
         self.ctx_history.append(formatted_res)
-
         if verbose:
             print(formatted_res, "\n")
 
@@ -255,8 +356,8 @@ class Discussion:
 
 class Annotation:
     """
-    An annotation job modelled as a discussion between the system writing the
-    logs of a finished discussion, and the LLM Annotator.
+    An annotation job modelled as a discussion between the system writing
+    the logs of a finished discussion, and the LLM Annotator.
     """
 
     def __init__(
@@ -267,34 +368,34 @@ class Annotation:
     ):
         """
         Create an annotation job.
-        The annotation is modelled as a conversation between the system and
-        the annotator.
 
-        :param annotator: The annotator
-        :type annotator: actors.IActor
-        :param conv_logs_path: The path to the file containing the
-        discussion logs in JSON format
+        :param annotator: The annotator.
+        :type annotator: actors.Actor
+        :param conv_logs_path: Path to the JSON file containing the
+            discussion logs.
         :type conv_logs_path: str | Path
-        :param history_ctx_len: How many previous comments the annotator will
-        remember, defaults to 4
+        :param history_ctx_len: How many previous comments the annotator
+            will remember, defaults to 2.
         :type history_ctx_len: int, optional
         """
         self.annotator = annotator
         self.history_ctx_len = history_ctx_len
-        self.annotation_logs = []
+        self.logs = DiscussionLogs()
 
         with open(conv_logs_path, "r", encoding="utf8") as fin:
             self.conv_data_dict = json.load(fin)
 
-    def begin(self, verbose=True) -> None:
+    def begin(self, verbose: bool = True) -> None:
         """
         Begin the conversation-modelled annotation job.
 
-        :param verbose: whether to print the results of the annotation to the
-            console, defaults to True
+        :param verbose: Whether to print annotation results to the console,
+            defaults to True.
         :type verbose: bool, optional
         """
-        ctx_history = collections.deque(maxlen=self.history_ctx_len)
+        ctx_history: collections.deque[str] = collections.deque(
+            maxlen=self.history_ctx_len
+        )
 
         for message_data in tqdm(self.conv_data_dict["logs"]):
             username = message_data["name"]
@@ -303,7 +404,11 @@ class Annotation:
             formatted_message = _format_chat_message(username, message)
             ctx_history.append(formatted_message)
             annotation = self.annotator.speak(list(ctx_history))
-            self.annotation_logs.append((message, annotation))
+            self.logs.append(
+                name=username,
+                text=annotation,
+                model=self.annotator.model.get_name(),
+            )
 
             if verbose:
                 print(textwrap.fill(formatted_message))
@@ -313,32 +418,38 @@ class Annotation:
         self, timestamp_format: str = "%y-%m-%d-%H-%M"
     ) -> dict[str, Any]:
         """
-        Get a dictionary view of the data and metadata contained in
-        the annotation.
+        Get a dictionary view of the annotation data and metadata.
 
-        :param timestamp_format: the format for the conversation's creation
-            time, defaults to "%y-%m-%d-%H-%M"
+        :param timestamp_format: strftime format for the timestamp field,
+            defaults to ``"%y-%m-%d-%H-%M"``.
         :type timestamp_format: str, optional
-        :return: a dict representing the conversation
+        :return: a dict representing the annotation run.
         :rtype: dict[str, Any]
         """
-        return {
+        extra = {
             "conv_id": str(self.conv_data_dict["id"]),
-            "timestamp": datetime.datetime.now().strftime(timestamp_format),
             "annotator_model": self.annotator.model.get_name(),
             "annotator_prompt": self.annotator.describe(),
             "ctx_length": self.history_ctx_len,
-            "logs": self.annotation_logs,
         }
+        return self.logs.to_dict(
+            extra=extra, timestamp_format=timestamp_format
+        )
 
     def to_json_file(self, output_path: str | Path) -> None:
         """
-        Export the data and metadata of the conversation as a json file.
+        Export the annotation data and metadata as a JSON file.
 
-        :param output_path: the path for the exported file
-        :type output_path: str
+        :param output_path: the path for the exported file.
+        :type output_path: str | Path
         """
-        _file_util.dict_to_json(self.to_dict(), output_path)
+        extra = {
+            "conv_id": str(self.conv_data_dict["id"]),
+            "annotator_model": self.annotator.model.get_name(),
+            "annotator_prompt": self.annotator.describe(),
+            "ctx_length": self.history_ctx_len,
+        }
+        self.logs.to_json_file(output_path, extra=extra)
 
     def __str__(self) -> str:
         return json.dumps(self.to_dict(), indent=4)
@@ -349,17 +460,16 @@ def _format_chat_message(username: str, message: str) -> str:
     Create a prompt-friendly/console-friendly string representing a message
     made by a user.
 
-    :param username: the name of the user who made the post
+    :param username: the name of the user who made the post.
     :type username: str
-    :param message: the message that was posted
+    :param message: the message that was posted.
     :type message: str
-    :return: a formatted string containing both username and his message
+    :return: a formatted string containing both username and message.
     :rtype: str
     """
     if len(message.strip()) != 0:
-        # append name of actor to his response
-        # "user x posted" important for the model to not confuse it
-        # with the instruction prompt
+        # Prefix with "User X posted:" so the model doesn't confuse it
+        # with the instruction prompt.
         wrapped_res = textwrap.fill(message, 70)
         formatted_res = f"User {username} posted:\n{wrapped_res}"
     else:
