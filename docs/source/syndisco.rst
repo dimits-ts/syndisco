@@ -31,7 +31,7 @@ syndisco.jobs module
 syndisco.logging\_util module
 -----------------------------
 
-.. automodule:: syndisco.logging_util
+.. automodule:: syndisco.logging
    :members:
    :undoc-members:
    :show-inheritance:

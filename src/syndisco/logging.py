@@ -21,7 +21,7 @@ Module handling logging for LLM discussion and annotation tasks.
 # You may contact the author at dim.tsirmpas@aueb.gr
 
 import time
-import logging
+import logging as pylog
 import typing
 import warnings
 import functools
@@ -31,7 +31,7 @@ from logging.handlers import TimedRotatingFileHandler
 import coloredlogs
 
 
-logger = logging.getLogger(Path(__file__).name)
+logger = pylog.getLogger(Path(__file__).name)
 
 
 def logging_setup(
@@ -68,7 +68,7 @@ def logging_setup(
     level = _str_to_log_level(level)  # type: ignore
     handlers = []
     if print_to_terminal:
-        handlers.append(logging.StreamHandler())
+        handlers.append(pylog.StreamHandler())
 
     if write_to_file:
         if logs_dir is None:
@@ -79,7 +79,7 @@ def logging_setup(
         else:
             handlers.append(_get_file_handler(Path(logs_dir)))
 
-    logging.basicConfig(
+    pylog.basicConfig(
         handlers=handlers,
         level=level,
         format="%(asctime)s %(levelname)-8s %(message)s",
@@ -89,7 +89,7 @@ def logging_setup(
     if use_colors:
         coloredlogs.install(level=level)
 
-    logging.captureWarnings(log_warnings)
+    pylog.captureWarnings(log_warnings)
 
 
 # https://stackoverflow.com/questions/1622943/timeit-versus-timing-decorator
@@ -120,24 +120,24 @@ def timing(f: typing.Callable) -> typing.Any:
 def _str_to_log_level(level_str: str):
     match level_str.lower().strip():
         case "debug":
-            return logging.DEBUG
+            return pylog.DEBUG
         case "info":
-            return logging.INFO
+            return pylog.INFO
         case "not_set":
-            return logging.NOTSET
+            return pylog.NOTSET
         case "warning":
-            return logging.WARNING
+            return pylog.WARNING
         case "warn":
-            return logging.WARNING
+            return pylog.WARNING
         case "error":
-            return logging.ERROR
+            return pylog.ERROR
         case "critical":
-            return logging.CRITICAL
+            return pylog.CRITICAL
         case _:
             logger.warning(
                 f"Unrecognized log level {level_str}. Defaulting to NOT_SET"
             )
-            return logging.NOTSET
+            return pylog.NOTSET
 
 
 def _get_file_handler(logs_dir: Path):

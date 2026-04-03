@@ -10,44 +10,31 @@ Welcome to SynDisco's documentation!
 .. image:: logo.svg
 
 Welcome to the official documentation of SynDisco! 
-This project provides a lightweight framework for creating, managing, 
-annotating, and analyzing synthetic discussions between Large Language Model 
-(LLM) user-agents in online forums.
+This project provides a lightweight framework for creating, managing, annotating, and analyzing synthetic discussions between Large Language Model (LLM) user-agents.
  
-While simple, SynDisco offers multiple ways to randomize / customize 
-discussions.
+While simple, SynDisco offers multiple ways to randomize / customize discussions.
  
 Features
 ========
 
 - **Automated Experiment Generation**  
   SynDisco generates a randomized set of discussion templates. With only a
-  handful of configurations, the researcher can run hundreds or thousands of
-  unique experiments.
+  handful of configurations, the library can execute hundreds or thousands of unique experiments.
 
 - **Synthetic Group Discussion Generation**  
-  SynDisco accepts an arbitrarily large number of LLM user-agent profiles and
-  possible Original Posts (OPs). Each experiment involves a random selection
-  of these user-agents replying to a randomly selected OP. The researcher can
-  determine how these participants behave, whether there is a moderator
-  present, and even how the turn-taking is determined.
+  SynDisco accepts an arbitrarily large number of LLM user-agent profiles and possible seed comments (parts of real-life discussions). Each experiment involves a random selection of these user-agents replying to a randomly selected series of comments.
 
 - **Synthetic Annotation Generation with multiple annotators**  
-  The researcher can create multiple LLM annotator-agent profiles. Each of
+  The library can create multiple LLM annotator-agent profiles. Each of
   these annotators will process each generated discussion at the
   comment-level and annotate according to the provided instruction prompt,
   enabling an arbitrary selection of metrics to be used.
 
-- **Native Transformers support**  
-  The framework supports most Hugging Face Transformer models out of the box.
-  Support for models managed by other libraries can be easily achieved by
-  extending a single class.
+- **Support for most models**  
+  Our library supports most Hugging Face Transformer models out of the box for local execution, as well as all OpenAI models, and (soon!) Gemini.Support for models managed by other libraries can be easily achieved by extending a single class.
 
 - **Native logging and fault tolerance**  
-  Since SynDisco may run for days on remote servers, it keeps detailed logs
-  both on-screen and on-disk. Should any experiment fail, the next one will
-  be loaded with no delay. Results are intermittently saved to disk, ensuring
-  no data loss or corruption even in catastrophic errors.
+  Since SynDisco may run for days on remote servers, it keeps detailed logs both on-screen and on-disk. Should any experiment fail, the next one will be loaded with no delay. Results are intermittently saved to disk, ensuring no data loss or corruption even in catastrophic errors.
 
 
 Introduction
