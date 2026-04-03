@@ -1,0 +1,4 @@
+﻿syndisco.timing
+===============
+
+.. autofunction:: syndisco.timing

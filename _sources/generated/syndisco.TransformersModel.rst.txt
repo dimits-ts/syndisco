@@ -1,0 +1,7 @@
+﻿syndisco.TransformersModel
+==========================
+
+.. autoclass:: syndisco.TransformersModel
+   :members:
+   :undoc-members:
+   :show-inheritance:

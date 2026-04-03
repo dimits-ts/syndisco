@@ -1,0 +1,7 @@
+﻿syndisco.Persona
+================
+
+.. autoclass:: syndisco.Persona
+   :members:
+   :undoc-members:
+   :show-inheritance:

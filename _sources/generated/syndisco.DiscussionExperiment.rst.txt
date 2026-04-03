@@ -1,0 +1,7 @@
+﻿syndisco.DiscussionExperiment
+=============================
+
+.. autoclass:: syndisco.DiscussionExperiment
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,657 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Creating a Discussion &mdash; SynDisco 2.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=33f7ffd5" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+    <link rel="shortcut icon" href="../_static/logo.svg"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=20623aea"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SynDisco
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#how-to-customize-your-discussion">How to Customize Your Discussion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SynDisco</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Creating a Discussion</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/guides/creating_discussions.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Creating-a-Discussion">
+<h1>Creating a Discussion<a class="headerlink" href="#Creating-a-Discussion" title="Link to this heading"></a></h1>
+<p>The simplest task you can accomplish with this library is to create a small discussion between LLMs.</p>
+<p>This guide will teach you the basic setup of the library. You will understand how to setup models, user-agents and how to coordinate them in a discussion. By the end of htis guide, you will be able to run a small discussion with a moderator and save it to the disk for persistence.</p>
+<section id="Basics">
+<h2>Basics<a class="headerlink" href="#Basics" title="Link to this heading"></a></h2>
+<section id="The-Model">
+<h3>The Model<a class="headerlink" href="#The-Model" title="Link to this heading"></a></h3>
+<p>SynDisco can theoretically support any LLM, as long as it is wrapped in a <code class="docutils literal notranslate"><span class="pre">BaseModel</span></code> wrapper. The <code class="docutils literal notranslate"><span class="pre">BaseModel</span></code> class is a very simple interface with one method. This method gives the underlying LLM input, and returns its output to the library.</p>
+<p>There already exists a <code class="docutils literal notranslate"><span class="pre">TransformersModel</span></code> class which handles models from the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> python library. In 90% of your applications, this will be enough. We can load a TransformersModel using the following code:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">syndisco</span>
+
+<span class="n">llm</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">TransformersModel</span><span class="p">(</span>
+    <span class="n">model_path</span><span class="o">=</span><span class="s2">&quot;unsloth/Llama-3.2-3B-Instruct-bnb-4bit&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test_model&quot;</span><span class="p">,</span>
+    <span class="n">max_out_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>This will download a small LLM from huggingface. You can substitute the model_path for any similar model in <a class="reference external" href="https://huggingface.co/">HuggingFace</a> supporting the Transformers library.</p>
+</section>
+<section id="Creating-personas">
+<h3>Creating personas<a class="headerlink" href="#Creating-personas" title="Link to this heading"></a></h3>
+<p>All <code class="docutils literal notranslate"><span class="pre">actors</span></code> can be defined by a <code class="docutils literal notranslate"><span class="pre">persona</span></code>, aka a set of attributes that define them. These attributes can be age, ethnicity, and even include special instructions on how they should behave.</p>
+<p>Creating a persona programmatically is simple:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">persona_data</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;Emma35&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="mi">38</span><span class="p">,</span>
+        <span class="s2">&quot;sex&quot;</span><span class="p">:</span> <span class="s2">&quot;female&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;education_level&quot;</span><span class="p">:</span> <span class="s2">&quot;Bachelor&#39;s&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sexual_orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;Heterosexual&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;demographic_group&quot;</span><span class="p">:</span> <span class="s2">&quot;Latino&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;current_employment&quot;</span><span class="p">:</span> <span class="s2">&quot;Registered Nurse&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;special_instructions&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;personality_characteristics&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;compassionate&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;patient&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;diligent&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;overwhelmed&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;Giannis&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="mi">21</span><span class="p">,</span>
+        <span class="s2">&quot;sex&quot;</span><span class="p">:</span> <span class="s2">&quot;male&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;education_level&quot;</span><span class="p">:</span> <span class="s2">&quot;College&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sexual_orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;Pansexual&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;demographic_group&quot;</span><span class="p">:</span> <span class="s2">&quot;White&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;current_employment&quot;</span><span class="p">:</span> <span class="s2">&quot;Game Developer&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;special_instructions&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;personality_characteristics&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;strategic&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;meticulous&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;nerdy&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;hyper-focused&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">},</span>
+<span class="p">]</span>
+
+<span class="n">personas</span> <span class="o">=</span> <span class="p">[</span><span class="n">syndisco</span><span class="o">.</span><span class="n">Persona</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">persona_data</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">persona</span> <span class="ow">in</span> <span class="n">personas</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">persona</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#34;username&#34;: &#34;Emma35&#34;, &#34;age&#34;: 38, &#34;sex&#34;: &#34;female&#34;, &#34;sexual_orientation&#34;: &#34;Heterosexual&#34;, &#34;demographic_group&#34;: &#34;Latino&#34;, &#34;current_employment&#34;: &#34;Registered Nurse&#34;, &#34;education_level&#34;: &#34;Bachelor&#39;s&#34;, &#34;special_instructions&#34;: &#34;&#34;, &#34;personality_characteristics&#34;: [&#34;compassionate&#34;, &#34;patient&#34;, &#34;diligent&#34;, &#34;overwhelmed&#34;]}
+{&#34;username&#34;: &#34;Giannis&#34;, &#34;age&#34;: 21, &#34;sex&#34;: &#34;male&#34;, &#34;sexual_orientation&#34;: &#34;Pansexual&#34;, &#34;demographic_group&#34;: &#34;White&#34;, &#34;current_employment&#34;: &#34;Game Developer&#34;, &#34;education_level&#34;: &#34;College&#34;, &#34;special_instructions&#34;: &#34;&#34;, &#34;personality_characteristics&#34;: [&#34;strategic&#34;, &#34;meticulous&#34;, &#34;nerdy&#34;, &#34;hyper-focused&#34;]}
+</pre></div></div>
+</div>
+<p>Since creating a lot of distinct users is essential in running large-scale experiments, users are usually defined in JSON format. That way, you can change anything without touching your code!</p>
+<p><a class="reference external" href="https://github.com/dimits-ts/synthetic_moderation_experiments/blob/master/data/discussions_input/personas/personas.json">Here</a> is an applied example of how to mass-define user personas through JSON files.</p>
+</section>
+<section id="Creating-the-user-agents">
+<h3>Creating the user-agents<a class="headerlink" href="#Creating-the-user-agents" title="Link to this heading"></a></h3>
+<p>Having a <code class="docutils literal notranslate"><span class="pre">persona</span></code> and a <code class="docutils literal notranslate"><span class="pre">model</span></code> we can finally create an <code class="docutils literal notranslate"><span class="pre">actor</span></code>. The actor will personify the selected persona using the model to talk.</p>
+<p>Besides a persona and a model, the actors will also need instructions and a context. By convention, all actors share the same context, and all user-agents share the same instructions. Personalized instructions are defined in the actor’s persona.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">CONTEXT</span> <span class="o">=</span> <span class="s2">&quot;You are taking part in an online conversation&quot;</span>
+<span class="n">INSTRUCTIONS</span> <span class="o">=</span> <span class="s2">&quot;Act like a human would&quot;</span>
+
+<span class="n">actors</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">syndisco</span><span class="o">.</span><span class="n">Actor</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
+        <span class="n">persona</span><span class="o">=</span><span class="n">p</span><span class="p">,</span>
+        <span class="n">actor_type</span><span class="o">=</span><span class="n">syndisco</span><span class="o">.</span><span class="n">ActorType</span><span class="o">.</span><span class="n">USER</span><span class="p">,</span>
+        <span class="n">context</span><span class="o">=</span><span class="n">CONTEXT</span><span class="p">,</span>
+        <span class="n">instructions</span><span class="o">=</span><span class="n">INSTRUCTIONS</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">personas</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Managing-turn-taking">
+<h3>Managing turn-taking<a class="headerlink" href="#Managing-turn-taking" title="Link to this heading"></a></h3>
+<p>In real-life discussions, who gets to speak at each point in time is determined by complex social dynamics, which are difficult to realistically model. However, there are ways with which we can simulate these dynamics.</p>
+<p>SynDisco uses the <code class="docutils literal notranslate"><span class="pre">TurnManager</span></code> class to model turn taking. Two implementations are available by default: Round Robin, and Random Weighted</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Round</span> <span class="pre">Robin</span></code> is the simplest, most intuitive way to model turn-taking; everyone gets to talk once per round. Once everyone talks once, they get to talk again in the same sequence</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rrobin_turn_manager</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">RoundRobin</span><span class="p">([</span><span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="s2">&quot;Mary&quot;</span><span class="p">,</span> <span class="s2">&quot;Howard&quot;</span><span class="p">,</span> <span class="s2">&quot;Todd&quot;</span><span class="p">])</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">rrobin_turn_manager</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+John
+Mary
+Howard
+Todd
+John
+Mary
+Howard
+Todd
+John
+Mary
+</pre></div></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">RandomWeighted</span></code> on the other hand throws a weighted coin on each round. If the coin flip succedes, the previous user gets to respond. If not, another user is selected at random</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rweighted_turn_manager</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">RandomWeighted</span><span class="p">(</span>
+    <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="s2">&quot;Mary&quot;</span><span class="p">,</span> <span class="s2">&quot;Howard&quot;</span><span class="p">,</span> <span class="s2">&quot;Todd&quot;</span><span class="p">],</span> <span class="n">p_respond</span><span class="o">=</span><span class="mf">0.5</span>
+<span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">rweighted_turn_manager</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+John
+Howard
+John
+Howard
+Todd
+Howard
+John
+Todd
+John
+Todd
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="Generating-a-discussion">
+<h2>Generating a discussion<a class="headerlink" href="#Generating-a-discussion" title="Link to this heading"></a></h2>
+<p>Let’s start with the most basic task; a single discussion between two user-agents.</p>
+<p>Since we only have two users, a RoundRobin approach where each user takes a turn sequentially is sufficient.</p>
+<p>Now we can run a simple discussion</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">turn_manager</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">RoundRobin</span><span class="p">([</span><span class="n">actor</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span> <span class="k">for</span> <span class="n">actor</span> <span class="ow">in</span> <span class="n">actors</span><span class="p">])</span>
+<span class="n">conv</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">Discussion</span><span class="p">(</span><span class="n">next_turn_manager</span><span class="o">=</span><span class="n">turn_manager</span><span class="p">,</span> <span class="n">users</span><span class="o">=</span><span class="n">actors</span><span class="p">)</span>
+<span class="n">conv</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "6ad389c5f54f43be828c8bebcaab2bfe", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+The following generation flags are not valid and may be ignored: [&#39;temperature&#39;, &#39;top_p&#39;]. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Emma35 posted:
+&#34;Hey everyone, I just got back from a long shift at the hospital and
+I&#39;m exhausted. Anyone else have a crazy day at work? I feel like I&#39;ve
+been running non-stop since morning. How was your day?&#34;
+
+User Giannis posted:
+{&#34;role&#34;: &#34;Giannis&#34;, &#34;content&#34;: &#34;Hey Emma, sorry to hear that you&#39;re
+exhausted. I had a pretty standard day at the office, just working on
+some bug fixes for our new game. Nothing too crazy, but I did have to
+troubleshoot a weird issue with the physics engine. Nothing a good
+night&#39;s sleep couldn&#39;t fix, though. How about you, did anything
+interesting happen at the hospital?&#34;
+
+User Emma35 posted:
+&#34;Hey Giannis, thanks for the concern! I actually had a pretty crazy
+day at the hospital. We had a code blue come in and I had to help with
+the resuscitation. It was a tough situation, but we managed to get the
+patient stabilized. I&#39;m just glad everyone made it through okay. I&#39;m
+looking forward to a quiet night at home now. How was the game
+development going? Did you guys make any progress on the new level?&#34;
+
+User Giannis posted:
+&#34;Hey Emma, I&#39;m glad to hear that the patient is okay. That must have
+been a really intense situation. As for the game development, we
+actually made some good progress on the new level. We&#39;re still
+tweaking the difficulty curve, but it&#39;s starting to feel like it&#39;s
+coming together. I&#39;m thinking of adding some more environmental
+hazards to make it more challenging. What do you think? Should we add
+more obstacles or keep it relatively straightforward?&#34;
+
+User Emma35 posted:
+&#34;Hey Giannis, I&#39;m glad to hear that the patient is okay. That must
+have been a really intense situation. As for the game development, I
+think adding more environmental hazards would definitely make the
+level more challenging and exciting. I&#39;ve always been a fan of games
+with obstacles to navigate around, it adds an extra layer of strategy
+and makes the gameplay more engaging. Plus, it&#39;s always fun to see
+players figure out creative ways to overcome the challenges. What kind
+of environmental hazards were you
+
+</pre></div></div>
+</div>
+</section>
+<section id="Driving-a-discussion-step-by-step">
+<h2>Driving a discussion step by step<a class="headerlink" href="#Driving-a-discussion-step-by-step" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">Discussion</span></code> implements Python’s iterator protocol, so you are not limited to running the whole conversation at once with <code class="docutils literal notranslate"><span class="pre">begin()</span></code>. You can drive it one turn at a time, which is useful when you want to inspect or react to each entry before the next speaker is prompted — for example to apply early stopping, live logging, or conditional branching.</p>
+<p>Because <code class="docutils literal notranslate"><span class="pre">Discussion</span></code> is its own iterator (<code class="docutils literal notranslate"><span class="pre">__iter__</span></code> returns <code class="docutils literal notranslate"><span class="pre">self</span></code>), it is <strong>single-pass</strong>: once <code class="docutils literal notranslate"><span class="pre">StopIteration</span></code> is raised the instance is exhausted and should not be reused.</p>
+<section id="Calling-next()-manually">
+<h3>Calling <code class="docutils literal notranslate"><span class="pre">next()</span></code> manually<a class="headerlink" href="#Calling-next()-manually" title="Link to this heading"></a></h3>
+<p>Calling <code class="docutils literal notranslate"><span class="pre">iter()</span></code> on a <code class="docutils literal notranslate"><span class="pre">Discussion</span></code> performs the one-time setup (registering participant names and inserting any seed opinions). Each subsequent <code class="docutils literal notranslate"><span class="pre">next()</span></code> prompts one speaker and returns the new log entry as a plain dict.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">turn_manager</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">RoundRobin</span><span class="p">([</span><span class="n">actor</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span> <span class="k">for</span> <span class="n">actor</span> <span class="ow">in</span> <span class="n">actors</span><span class="p">])</span>
+<span class="n">conv</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">Discussion</span><span class="p">(</span>
+    <span class="n">next_turn_manager</span><span class="o">=</span><span class="n">turn_manager</span><span class="p">,</span> <span class="n">users</span><span class="o">=</span><span class="n">actors</span><span class="p">,</span> <span class="n">conv_len</span><span class="o">=</span><span class="mi">4</span>
+<span class="p">)</span>
+
+<span class="n">it</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">conv</span><span class="p">)</span>  <span class="c1"># one-time setup happens here</span>
+
+<span class="n">first_entry</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;First speaker: &quot;</span><span class="p">,</span> <span class="n">first_entry</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Their message: &quot;</span><span class="p">,</span> <span class="n">first_entry</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">],</span> <span class="s2">&quot;...&quot;</span><span class="p">)</span>
+
+<span class="n">second_entry</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Second speaker:&quot;</span><span class="p">,</span> <span class="n">second_entry</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Their message: &quot;</span><span class="p">,</span> <span class="n">second_entry</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">],</span> <span class="s2">&quot;...&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+First speaker:  Emma35
+Their message:  &#34;Hey everyone, I just got back from a long shift at the hospital and I&#39;m exhausted. Anyone else have a crazy day at work? I feel like I&#39;ve been running non-stop since morning. How was your day?&#34; ...
+
+Second speaker: Giannis
+Their message:  {&#34;role&#34;: &#34;Giannis&#34;, &#34;content&#34;: &#34;Hey Emma, sorry to hear that you&#39;re exhausted. I had a pretty standard day at the office, just working on some bug fixes for our new game. Nothing too crazy, but I did have to troubleshoot a weird issue with the physics engine. Nothing a good night&#39;s sleep couldn&#39;t fix, though. How about you, did anything interesting happen at the hospital?&#34; ...
+</pre></div></div>
+</div>
+</section>
+<section id="Using-a-for-loop">
+<h3>Using a <code class="docutils literal notranslate"><span class="pre">for</span></code> loop<a class="headerlink" href="#Using-a-for-loop" title="Link to this heading"></a></h3>
+<p>The same iterator works directly in a <code class="docutils literal notranslate"><span class="pre">for</span></code> loop. Here we stop early if a particular word appears in an entry — something that is impossible with <code class="docutils literal notranslate"><span class="pre">begin()</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">turn_manager</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">RoundRobin</span><span class="p">([</span><span class="n">actor</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span> <span class="k">for</span> <span class="n">actor</span> <span class="ow">in</span> <span class="n">actors</span><span class="p">])</span>
+<span class="n">conv</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">Discussion</span><span class="p">(</span>
+    <span class="n">next_turn_manager</span><span class="o">=</span><span class="n">turn_manager</span><span class="p">,</span> <span class="n">users</span><span class="o">=</span><span class="n">actors</span><span class="p">,</span> <span class="n">conv_len</span><span class="o">=</span><span class="mi">10</span>
+<span class="p">)</span>
+
+<span class="n">STOP_WORD</span> <span class="o">=</span> <span class="s2">&quot;hospital&quot;</span>
+
+<span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">conv</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">STOP_WORD</span> <span class="ow">in</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Stop word &#39;</span><span class="si">{</span><span class="n">STOP_WORD</span><span class="si">}</span><span class="s2">&#39; detected — halting early.&quot;</span><span class="p">)</span>
+        <span class="k">break</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Turns completed so far: </span><span class="si">{</span><span class="n">conv</span><span class="o">.</span><span class="n">_steps_taken</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Emma35: &#34;Hey everyone, I just got back from a long shift at the hospital and I&#39;m exhausted. Anyone else have a crazy day at work? I feel like I&#39;ve been running non-stop since morning. How was your day?&#34;...
+
+Stop word &#39;hospital&#39; detected — halting early.
+
+Turns completed so far: 1
+</pre></div></div>
+</div>
+<p>Congratulations, you can now run fully synthetic discussions! You may want to experiment with adding more than 2 users or testing more realistic turn taking procedures (for example, check out the <code class="docutils literal notranslate"><span class="pre">RandomWeighted</span></code> turn manager).</p>
+</section>
+</section>
+<section id="Working-with-Logs">
+<h2>Working with <code class="docutils literal notranslate"><span class="pre">Logs</span></code><a class="headerlink" href="#Working-with-Logs" title="Link to this heading"></a></h2>
+<p>All log state is held in <code class="docutils literal notranslate"><span class="pre">Discussion.logs</span></code>, an instance of <code class="docutils literal notranslate"><span class="pre">Logs</span></code>. This object supports the standard sequence interface, so you can index, slice, and iterate over it directly - no need to call <code class="docutils literal notranslate"><span class="pre">to_dict()</span></code> just to inspect entries.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run a fresh discussion so the logs are fully populated</span>
+<span class="n">turn_manager</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">RoundRobin</span><span class="p">([</span><span class="n">actor</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span> <span class="k">for</span> <span class="n">actor</span> <span class="ow">in</span> <span class="n">actors</span><span class="p">])</span>
+<span class="n">conv</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">Discussion</span><span class="p">(</span><span class="n">next_turn_manager</span><span class="o">=</span><span class="n">turn_manager</span><span class="p">,</span> <span class="n">users</span><span class="o">=</span><span class="n">actors</span><span class="p">,</span> <span class="n">conv_len</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">conv</span><span class="o">.</span><span class="n">begin</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">logs</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">logs</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total entries : </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">logs</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;First entry   : </span><span class="si">{</span><span class="n">logs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Last entry    : </span><span class="si">{</span><span class="n">logs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="c1"># Iterate directly — each item is a dict with &#39;name&#39;, &#39;text&#39;, &#39;model&#39;</span>
+<span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">logs</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">][:</span><span class="mi">60</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "ec094ff9db1b4db9b27b7e251a717fd9", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Total entries : 4
+First entry   : {&#39;name&#39;: &#39;Emma35&#39;, &#39;text&#39;: &#39;&#34;Hey everyone, I just got back from a long shift at the hospital and I\&#39;m exhausted. Anyone else have a crazy day at work? I feel like I\&#39;ve been running non-stop since morning. How was your day?&#34;&#39;, &#39;model&#39;: &#39;test_model&#39;, &#39;prompt&#39;: &#39;{&#34;context&#34;: &#34;You are taking part in an online conversation&#34;, &#34;instructions&#34;: &#34;Act like a human would&#34;, &#34;type&#34;: &#34;1&#34;, &#34;persona&#34;: {&#34;username&#34;: &#34;Emma35&#34;, &#34;age&#34;: 38, &#34;sex&#34;: &#34;female&#34;, &#34;sexual_orientation&#34;: &#34;Heterosexual&#34;, &#34;demographic_group&#34;: &#34;Latino&#34;, &#34;current_employment&#34;: &#34;Registered Nurse&#34;, &#34;education_level&#34;: &#34;Bachelor\&#39;s&#34;, &#34;special_instructions&#34;: &#34;&#34;, &#34;personality_characteristics&#34;: [&#34;compassionate&#34;, &#34;patient&#34;, &#34;diligent&#34;, &#34;overwhelmed&#34;]}}&#39;}
+Last entry    : {&#39;name&#39;: &#39;Giannis&#39;, &#39;text&#39;: &#39;&#34;Hey Emma, I\&#39;m glad to hear that the patient is okay. That must have been a really intense situation. As for the game development, we actually made some good progress on the new level. We\&#39;re still tweaking the difficulty curve, but it\&#39;s starting to feel like it\&#39;s coming together. I\&#39;m thinking of adding some more environmental hazards to make it more challenging. What do you think? Should we add more obstacles or keep it relatively straightforward?&#34;&#39;, &#39;model&#39;: &#39;test_model&#39;, &#39;prompt&#39;: &#39;{&#34;context&#34;: &#34;You are taking part in an online conversation&#34;, &#34;instructions&#34;: &#34;Act like a human would&#34;, &#34;type&#34;: &#34;1&#34;, &#34;persona&#34;: {&#34;username&#34;: &#34;Giannis&#34;, &#34;age&#34;: 21, &#34;sex&#34;: &#34;male&#34;, &#34;sexual_orientation&#34;: &#34;Pansexual&#34;, &#34;demographic_group&#34;: &#34;White&#34;, &#34;current_employment&#34;: &#34;Game Developer&#34;, &#34;education_level&#34;: &#34;College&#34;, &#34;special_instructions&#34;: &#34;&#34;, &#34;personality_characteristics&#34;: [&#34;strategic&#34;, &#34;meticulous&#34;, &#34;nerdy&#34;, &#34;hyper-focused&#34;]}}&#39;}
+
+[Emma35] &#34;Hey everyone, I just got back from a long shift at the hosp...
+[Giannis] {&#34;role&#34;: &#34;Giannis&#34;, &#34;content&#34;: &#34;Hey Emma, sorry to hear that...
+[Emma35] &#34;Hey Giannis, thanks for the concern! I actually had a prett...
+[Giannis] &#34;Hey Emma, I&#39;m glad to hear that the patient is okay. That m...
+</pre></div></div>
+</div>
+</section>
+<section id="Exporting-and-importing-discussions-with-Logs">
+<h2>Exporting and importing discussions with <code class="docutils literal notranslate"><span class="pre">Logs</span></code><a class="headerlink" href="#Exporting-and-importing-discussions-with-Logs" title="Link to this heading"></a></h2>
+<p>All persistent state in a <code class="docutils literal notranslate"><span class="pre">Discussion</span></code> is managed by a <code class="docutils literal notranslate"><span class="pre">Logs</span></code> object. This class you inspect, serialize, or pass saved conversations to an <code class="docutils literal notranslate"><span class="pre">Annotation</span></code> job without re-running the discussion.</p>
+<p>using <code class="docutils literal notranslate"><span class="pre">Logs.from_lists()</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">from_lists</span></code> accepts three parallel lists — names, texts, and (optionally) model labels — and is the canonical way to construct a <code class="docutils literal notranslate"><span class="pre">Logs</span></code> from an external source.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+
+
+<span class="n">tp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;.json&quot;</span><span class="p">,</span> <span class="n">delete</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">logs</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_logs</span><span class="p">()</span>
+<span class="n">logs</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{
+    &#34;timestamp&#34;: &#34;26-04-03-12-51&#34;,
+    &#34;logs&#34;: [
+        {
+            &#34;name&#34;: &#34;Emma35&#34;,
+            &#34;text&#34;: &#34;\&#34;Hey everyone, I just got back from a long shift at the hospital and I&#39;m exhausted. Anyone else have a crazy day at work? I feel like I&#39;ve been running non-stop since morning. How was your day?\&#34;&#34;,
+            &#34;model&#34;: &#34;test_model&#34;,
+            &#34;prompt&#34;: &#34;{\&#34;context\&#34;: \&#34;You are taking part in an online conversation\&#34;, \&#34;instructions\&#34;: \&#34;Act like a human would\&#34;, \&#34;type\&#34;: \&#34;1\&#34;, \&#34;persona\&#34;: {\&#34;username\&#34;: \&#34;Emma35\&#34;, \&#34;age\&#34;: 38, \&#34;sex\&#34;: \&#34;female\&#34;, \&#34;sexual_orientation\&#34;: \&#34;Heterosexual\&#34;, \&#34;demographic_group\&#34;: \&#34;Latino\&#34;, \&#34;current_employment\&#34;: \&#34;Registered Nurse\&#34;, \&#34;education_level\&#34;: \&#34;Bachelor&#39;s\&#34;, \&#34;special_instructions\&#34;: \&#34;\&#34;, \&#34;personality_characteristics\&#34;: [\&#34;compassionate\&#34;, \&#34;patient\&#34;, \&#34;diligent\&#34;, \&#34;overwhelmed\&#34;]}}&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Giannis&#34;,
+            &#34;text&#34;: &#34;{\&#34;role\&#34;: \&#34;Giannis\&#34;, \&#34;content\&#34;: \&#34;Hey Emma, sorry to hear that you&#39;re exhausted. I had a pretty standard day at the office, just working on some bug fixes for our new game. Nothing too crazy, but I did have to troubleshoot a weird issue with the physics engine. Nothing a good night&#39;s sleep couldn&#39;t fix, though. How about you, did anything interesting happen at the hospital?\&#34;&#34;,
+            &#34;model&#34;: &#34;test_model&#34;,
+            &#34;prompt&#34;: &#34;{\&#34;context\&#34;: \&#34;You are taking part in an online conversation\&#34;, \&#34;instructions\&#34;: \&#34;Act like a human would\&#34;, \&#34;type\&#34;: \&#34;1\&#34;, \&#34;persona\&#34;: {\&#34;username\&#34;: \&#34;Giannis\&#34;, \&#34;age\&#34;: 21, \&#34;sex\&#34;: \&#34;male\&#34;, \&#34;sexual_orientation\&#34;: \&#34;Pansexual\&#34;, \&#34;demographic_group\&#34;: \&#34;White\&#34;, \&#34;current_employment\&#34;: \&#34;Game Developer\&#34;, \&#34;education_level\&#34;: \&#34;College\&#34;, \&#34;special_instructions\&#34;: \&#34;\&#34;, \&#34;personality_characteristics\&#34;: [\&#34;strategic\&#34;, \&#34;meticulous\&#34;, \&#34;nerdy\&#34;, \&#34;hyper-focused\&#34;]}}&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Emma35&#34;,
+            &#34;text&#34;: &#34;\&#34;Hey Giannis, thanks for the concern! I actually had a pretty crazy day at the hospital. We had a code blue come in and I had to help with the resuscitation. It was a tough situation, but we managed to get the patient stabilized. I&#39;m just glad everyone made it through okay. I&#39;m looking forward to a quiet night at home now. How was the game development going? Did you guys make any progress on the new level?\&#34;&#34;,
+            &#34;model&#34;: &#34;test_model&#34;,
+            &#34;prompt&#34;: &#34;{\&#34;context\&#34;: \&#34;You are taking part in an online conversation\&#34;, \&#34;instructions\&#34;: \&#34;Act like a human would\&#34;, \&#34;type\&#34;: \&#34;1\&#34;, \&#34;persona\&#34;: {\&#34;username\&#34;: \&#34;Emma35\&#34;, \&#34;age\&#34;: 38, \&#34;sex\&#34;: \&#34;female\&#34;, \&#34;sexual_orientation\&#34;: \&#34;Heterosexual\&#34;, \&#34;demographic_group\&#34;: \&#34;Latino\&#34;, \&#34;current_employment\&#34;: \&#34;Registered Nurse\&#34;, \&#34;education_level\&#34;: \&#34;Bachelor&#39;s\&#34;, \&#34;special_instructions\&#34;: \&#34;\&#34;, \&#34;personality_characteristics\&#34;: [\&#34;compassionate\&#34;, \&#34;patient\&#34;, \&#34;diligent\&#34;, \&#34;overwhelmed\&#34;]}}&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Giannis&#34;,
+            &#34;text&#34;: &#34;\&#34;Hey Emma, I&#39;m glad to hear that the patient is okay. That must have been a really intense situation. As for the game development, we actually made some good progress on the new level. We&#39;re still tweaking the difficulty curve, but it&#39;s starting to feel like it&#39;s coming together. I&#39;m thinking of adding some more environmental hazards to make it more challenging. What do you think? Should we add more obstacles or keep it relatively straightforward?\&#34;&#34;,
+            &#34;model&#34;: &#34;test_model&#34;,
+            &#34;prompt&#34;: &#34;{\&#34;context\&#34;: \&#34;You are taking part in an online conversation\&#34;, \&#34;instructions\&#34;: \&#34;Act like a human would\&#34;, \&#34;type\&#34;: \&#34;1\&#34;, \&#34;persona\&#34;: {\&#34;username\&#34;: \&#34;Giannis\&#34;, \&#34;age\&#34;: 21, \&#34;sex\&#34;: \&#34;male\&#34;, \&#34;sexual_orientation\&#34;: \&#34;Pansexual\&#34;, \&#34;demographic_group\&#34;: \&#34;White\&#34;, \&#34;current_employment\&#34;: \&#34;Game Developer\&#34;, \&#34;education_level\&#34;: \&#34;College\&#34;, \&#34;special_instructions\&#34;: \&#34;\&#34;, \&#34;personality_characteristics\&#34;: [\&#34;strategic\&#34;, \&#34;meticulous\&#34;, \&#34;nerdy\&#34;, \&#34;hyper-focused\&#34;]}}&#34;
+        }
+    ],
+    &#34;id&#34;: &#34;b6d2e9c0424b0217b6433ec93450ac811eb456b5f02ede8783b13625e82d6649&#34;
+}
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">logs2</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">Logs</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">logs2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{
+    &#34;timestamp&#34;: &#34;26-04-03-12-51&#34;,
+    &#34;logs&#34;: [
+        {
+            &#34;name&#34;: &#34;Emma35&#34;,
+            &#34;text&#34;: &#34;\&#34;Hey everyone, I just got back from a long shift at the hospital and I&#39;m exhausted. Anyone else have a crazy day at work? I feel like I&#39;ve been running non-stop since morning. How was your day?\&#34;&#34;,
+            &#34;model&#34;: &#34;test_model&#34;,
+            &#34;prompt&#34;: &#34;&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Giannis&#34;,
+            &#34;text&#34;: &#34;{\&#34;role\&#34;: \&#34;Giannis\&#34;, \&#34;content\&#34;: \&#34;Hey Emma, sorry to hear that you&#39;re exhausted. I had a pretty standard day at the office, just working on some bug fixes for our new game. Nothing too crazy, but I did have to troubleshoot a weird issue with the physics engine. Nothing a good night&#39;s sleep couldn&#39;t fix, though. How about you, did anything interesting happen at the hospital?\&#34;&#34;,
+            &#34;model&#34;: &#34;test_model&#34;,
+            &#34;prompt&#34;: &#34;&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Emma35&#34;,
+            &#34;text&#34;: &#34;\&#34;Hey Giannis, thanks for the concern! I actually had a pretty crazy day at the hospital. We had a code blue come in and I had to help with the resuscitation. It was a tough situation, but we managed to get the patient stabilized. I&#39;m just glad everyone made it through okay. I&#39;m looking forward to a quiet night at home now. How was the game development going? Did you guys make any progress on the new level?\&#34;&#34;,
+            &#34;model&#34;: &#34;test_model&#34;,
+            &#34;prompt&#34;: &#34;&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Giannis&#34;,
+            &#34;text&#34;: &#34;\&#34;Hey Emma, I&#39;m glad to hear that the patient is okay. That must have been a really intense situation. As for the game development, we actually made some good progress on the new level. We&#39;re still tweaking the difficulty curve, but it&#39;s starting to feel like it&#39;s coming together. I&#39;m thinking of adding some more environmental hazards to make it more challenging. What do you think? Should we add more obstacles or keep it relatively straightforward?\&#34;&#34;,
+            &#34;model&#34;: &#34;test_model&#34;,
+            &#34;prompt&#34;: &#34;&#34;
+        }
+    ],
+    &#34;id&#34;: &#34;163bc0db2cb8cef56593c289519ef634230dda045a73160854bd97f694904cbb&#34;
+}
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Alice&quot;</span><span class="p">]</span>
+<span class="n">texts</span><span class="o">=</span><span class="p">[</span>
+    <span class="s2">&quot;What do you think about the new policy?&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Honestly, I think it goes too far.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;I can see that perspective, though I&#39;m not sure I agree.&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">handcrafted</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">Logs</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">text</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">texts</span><span class="p">):</span>
+    <span class="n">handcrafted</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">handcrafted</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{
+    &#34;timestamp&#34;: &#34;26-04-03-12-51&#34;,
+    &#34;logs&#34;: [
+        {
+            &#34;name&#34;: &#34;Alice&#34;,
+            &#34;text&#34;: &#34;What do you think about the new policy?&#34;,
+            &#34;model&#34;: &#34;hardcoded&#34;,
+            &#34;prompt&#34;: &#34;&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Bob&#34;,
+            &#34;text&#34;: &#34;Honestly, I think it goes too far.&#34;,
+            &#34;model&#34;: &#34;hardcoded&#34;,
+            &#34;prompt&#34;: &#34;&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Alice&#34;,
+            &#34;text&#34;: &#34;I can see that perspective, though I&#39;m not sure I agree.&#34;,
+            &#34;model&#34;: &#34;hardcoded&#34;,
+            &#34;prompt&#34;: &#34;&#34;
+        }
+    ],
+    &#34;id&#34;: &#34;c148dc4f3a8d305962c48bd967dcb5aaa85ee136fafb7acf2b1479be5b596d74&#34;
+}
+</pre></div></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Dimitris Tsirmpas.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

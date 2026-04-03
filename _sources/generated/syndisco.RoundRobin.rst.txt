@@ -1,0 +1,7 @@
+﻿syndisco.RoundRobin
+===================
+
+.. autoclass:: syndisco.RoundRobin
+   :members:
+   :undoc-members:
+   :show-inheritance:

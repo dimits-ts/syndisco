@@ -1,0 +1,234 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Reference &mdash; SynDisco 2.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=33f7ffd5" />
+
+  
+    <link rel="shortcut icon" href="_static/logo.svg"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=20623aea"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="syndisco.Discussion" href="generated/syndisco.Discussion.html" />
+    <link rel="prev" title="Guides" href="guides.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SynDisco
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html#how-to-customize-your-discussion">How to Customize Your Discussion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guides.html">Guides</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#single-job-management">Single Job Management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/syndisco.Discussion.html">syndisco.Discussion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/syndisco.Annotation.html">syndisco.Annotation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/syndisco.Logs.html">syndisco.Logs</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#multi-job-management">Multi-Job Management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/syndisco.DiscussionExperiment.html">syndisco.DiscussionExperiment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/syndisco.AnnotationExperiment.html">syndisco.AnnotationExperiment</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#actors">Actors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/syndisco.Actor.html">syndisco.Actor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/syndisco.Persona.html">syndisco.Persona</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/syndisco.ActorType.html">syndisco.ActorType</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#models">Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/syndisco.TransformersModel.html">syndisco.TransformersModel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/syndisco.OpenAIModel.html">syndisco.OpenAIModel</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#turn-management">Turn Management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/syndisco.RandomWeighted.html">syndisco.RandomWeighted</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/syndisco.RoundRobin.html">syndisco.RoundRobin</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#utilities">Utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/syndisco.logging.html">syndisco.logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/syndisco.timing.html">syndisco.timing</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SynDisco</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">API Reference</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/api.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="api-reference">
+<h1>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading"></a></h1>
+<section id="single-job-management">
+<h2>Single Job Management<a class="headerlink" href="#single-job-management" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/syndisco.Discussion.html#syndisco.Discussion" title="syndisco.Discussion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">syndisco.Discussion</span></code></a></p></td>
+<td><p>A job conducting a discussion between different actors (<code class="xref py py-class docutils literal notranslate"><span class="pre">actors.Actor</span></code>).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/syndisco.Annotation.html#syndisco.Annotation" title="syndisco.Annotation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">syndisco.Annotation</span></code></a></p></td>
+<td><p>An annotation job applied on a single discussion.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/syndisco.Logs.html#syndisco.Logs" title="syndisco.Logs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">syndisco.Logs</span></code></a></p></td>
+<td><p>Stores and serializes the log entries of a discussion.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="multi-job-management">
+<h2>Multi-Job Management<a class="headerlink" href="#multi-job-management" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/syndisco.DiscussionExperiment.html#syndisco.DiscussionExperiment" title="syndisco.DiscussionExperiment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">syndisco.DiscussionExperiment</span></code></a></p></td>
+<td><p>An experiment that creates, manages, and executes multiple synthetic discussions using LLM-based agents.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/syndisco.AnnotationExperiment.html#syndisco.AnnotationExperiment" title="syndisco.AnnotationExperiment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">syndisco.AnnotationExperiment</span></code></a></p></td>
+<td><p>An experiment that uses LLM annotators to label synthetic discussion logs.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="actors">
+<h2>Actors<a class="headerlink" href="#actors" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/syndisco.Actor.html#syndisco.Actor" title="syndisco.Actor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">syndisco.Actor</span></code></a></p></td>
+<td><p>An abstract class representing an actor which responds according to an underlying LLM instance.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/syndisco.Persona.html#syndisco.Persona" title="syndisco.Persona"><code class="xref py py-obj docutils literal notranslate"><span class="pre">syndisco.Persona</span></code></a></p></td>
+<td><p>A dataclass holding information about the synthetic persona of a LLM actor.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/syndisco.ActorType.html#syndisco.ActorType" title="syndisco.ActorType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">syndisco.ActorType</span></code></a></p></td>
+<td><p>The purpose of the LLMActor, used to determine proper prompt structure</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="models">
+<h2>Models<a class="headerlink" href="#models" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/syndisco.TransformersModel.html#syndisco.TransformersModel" title="syndisco.TransformersModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">syndisco.TransformersModel</span></code></a></p></td>
+<td><p>HuggingFace Transformers model wrapper.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/syndisco.OpenAIModel.html#syndisco.OpenAIModel" title="syndisco.OpenAIModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">syndisco.OpenAIModel</span></code></a></p></td>
+<td><p>OpenAI API-compatible model wrapper.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="turn-management">
+<h2>Turn Management<a class="headerlink" href="#turn-management" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/syndisco.RandomWeighted.html#syndisco.RandomWeighted" title="syndisco.RandomWeighted"><code class="xref py py-obj docutils literal notranslate"><span class="pre">syndisco.RandomWeighted</span></code></a></p></td>
+<td><p>Enable a participant to reply with a set probability, else randomly select another participant.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/syndisco.RoundRobin.html#syndisco.RoundRobin" title="syndisco.RoundRobin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">syndisco.RoundRobin</span></code></a></p></td>
+<td><p>A simple turn manager which gives priority to the next user in the queue.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="utilities">
+<h2>Utilities<a class="headerlink" href="#utilities" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/syndisco.logging.html#module-syndisco.logging" title="syndisco.logging"><code class="xref py py-obj docutils literal notranslate"><span class="pre">syndisco.logging</span></code></a></p></td>
+<td><p>Module handling logging for LLM discussion and annotation tasks.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/syndisco.timing.html#syndisco.timing" title="syndisco.timing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">syndisco.timing</span></code></a></p></td>
+<td><p>Decorator which logs the execution time of a function.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="guides.html" class="btn btn-neutral float-left" title="Guides" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="generated/syndisco.Discussion.html" class="btn btn-neutral float-right" title="syndisco.Discussion" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Dimitris Tsirmpas.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

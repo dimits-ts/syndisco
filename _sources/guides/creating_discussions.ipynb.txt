@@ -1,0 +1,762 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Creating a Discussion\n",
+    "\n",
+    "The simplest task you can accomplish with this library is to create a small discussion between LLMs. \n",
+    "\n",
+    "This guide will teach you the basic setup of the library. You will understand how to setup models, user-agents and how to coordinate them in a discussion. By the end of htis guide, you will be able to run a small discussion with a moderator and save it to the disk for persistence."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Basics"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### The Model\n",
+    "\n",
+    "SynDisco can theoretically support any LLM, as long as it is wrapped in a `BaseModel` wrapper. The `BaseModel` class is a very simple interface with one method. This method gives the underlying LLM input, and returns its output to the library.\n",
+    "\n",
+    "There already exists a `TransformersModel` class which handles models from the `transformers` python library. In 90% of your applications, this will be enough. We can load a TransformersModel using the following code:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-04-04T13:14:26.434159Z",
+     "iopub.status.busy": "2025-04-04T13:14:26.433413Z",
+     "iopub.status.idle": "2025-04-04T13:17:17.032081Z",
+     "shell.execute_reply": "2025-04-04T13:17:17.031468Z"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "import syndisco\n",
+    "\n",
+    "llm = syndisco.TransformersModel(\n",
+    "    model_path=\"unsloth/Llama-3.2-3B-Instruct-bnb-4bit\",\n",
+    "    name=\"test_model\",\n",
+    "    max_out_tokens=100,\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "This will download a small LLM from huggingface. You can substitute the model_path for any similar model in [HuggingFace](https://huggingface.co/) supporting the Transformers library."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Creating personas\n",
+    "\n",
+    "All `actors` can be defined by a `persona`, aka a set of attributes that define them. These attributes can be age, ethnicity, and even include special instructions on how they should behave.\n",
+    "\n",
+    "Creating a persona programmatically is simple:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-04-04T13:17:17.035421Z",
+     "iopub.status.busy": "2025-04-04T13:17:17.035009Z",
+     "iopub.status.idle": "2025-04-04T13:17:17.043083Z",
+     "shell.execute_reply": "2025-04-04T13:17:17.042635Z"
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "{\"username\": \"Emma35\", \"age\": 38, \"sex\": \"female\", \"sexual_orientation\": \"Heterosexual\", \"demographic_group\": \"Latino\", \"current_employment\": \"Registered Nurse\", \"education_level\": \"Bachelor's\", \"special_instructions\": \"\", \"personality_characteristics\": [\"compassionate\", \"patient\", \"diligent\", \"overwhelmed\"]}\n",
+      "{\"username\": \"Giannis\", \"age\": 21, \"sex\": \"male\", \"sexual_orientation\": \"Pansexual\", \"demographic_group\": \"White\", \"current_employment\": \"Game Developer\", \"education_level\": \"College\", \"special_instructions\": \"\", \"personality_characteristics\": [\"strategic\", \"meticulous\", \"nerdy\", \"hyper-focused\"]}\n"
+     ]
+    }
+   ],
+   "source": [
+    "persona_data = [\n",
+    "    {\n",
+    "        \"username\": \"Emma35\",\n",
+    "        \"age\": 38,\n",
+    "        \"sex\": \"female\",\n",
+    "        \"education_level\": \"Bachelor's\",\n",
+    "        \"sexual_orientation\": \"Heterosexual\",\n",
+    "        \"demographic_group\": \"Latino\",\n",
+    "        \"current_employment\": \"Registered Nurse\",\n",
+    "        \"special_instructions\": \"\",\n",
+    "        \"personality_characteristics\": [\n",
+    "            \"compassionate\",\n",
+    "            \"patient\",\n",
+    "            \"diligent\",\n",
+    "            \"overwhelmed\",\n",
+    "        ],\n",
+    "    },\n",
+    "    {\n",
+    "        \"username\": \"Giannis\",\n",
+    "        \"age\": 21,\n",
+    "        \"sex\": \"male\",\n",
+    "        \"education_level\": \"College\",\n",
+    "        \"sexual_orientation\": \"Pansexual\",\n",
+    "        \"demographic_group\": \"White\",\n",
+    "        \"current_employment\": \"Game Developer\",\n",
+    "        \"special_instructions\": \"\",\n",
+    "        \"personality_characteristics\": [\n",
+    "            \"strategic\",\n",
+    "            \"meticulous\",\n",
+    "            \"nerdy\",\n",
+    "            \"hyper-focused\",\n",
+    "        ],\n",
+    "    },\n",
+    "]\n",
+    "\n",
+    "personas = [syndisco.Persona(**data) for data in persona_data]\n",
+    "\n",
+    "for persona in personas:\n",
+    "    print(persona)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Since creating a lot of distinct users is essential in running large-scale experiments, users are usually defined in JSON format. That way, you can change anything without touching your code!\n",
+    "\n",
+    "[Here](https://github.com/dimits-ts/synthetic_moderation_experiments/blob/master/data/discussions_input/personas/personas.json) is an applied example of how to mass-define user personas through JSON files."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Creating the user-agents\n",
+    "\n",
+    "Having a `persona` and a `model` we can finally create an `actor`. The actor will personify the selected persona using the model to talk.\n",
+    "\n",
+    "Besides a persona and a model, the actors will also need instructions and a context. By convention, all actors share the same context, and all user-agents share the same instructions. Personalized instructions are defined in the actor's persona."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-04-04T13:17:17.045370Z",
+     "iopub.status.busy": "2025-04-04T13:17:17.045239Z",
+     "iopub.status.idle": "2025-04-04T13:17:17.048755Z",
+     "shell.execute_reply": "2025-04-04T13:17:17.048324Z"
+    }
+   },
+   "outputs": [],
+   "source": [
+    "CONTEXT = \"You are taking part in an online conversation\"\n",
+    "INSTRUCTIONS = \"Act like a human would\"\n",
+    "\n",
+    "actors = [\n",
+    "    syndisco.Actor(\n",
+    "        model=llm,\n",
+    "        persona=p,\n",
+    "        actor_type=syndisco.ActorType.USER,\n",
+    "        context=CONTEXT,\n",
+    "        instructions=INSTRUCTIONS\n",
+    "    )\n",
+    "    for p in personas\n",
+    "]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Managing turn-taking\n",
+    "\n",
+    "In real-life discussions, who gets to speak at each point in time is determined by complex social dynamics, which are difficult to realistically model.\n",
+    "However, there are ways with which we can simulate these dynamics. \n",
+    "\n",
+    "SynDisco uses the `TurnManager` class to model turn taking. Two implementations are available by default: Round Robin, and Random Weighted"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "- `Round Robin` is the simplest, most intuitive way to model turn-taking; everyone gets to talk once per round. Once everyone talks once, they get to talk again in the same sequence"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-04-04T13:17:17.051022Z",
+     "iopub.status.busy": "2025-04-04T13:17:17.050894Z",
+     "iopub.status.idle": "2025-04-04T13:17:17.054840Z",
+     "shell.execute_reply": "2025-04-04T13:17:17.054315Z"
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "John\n",
+      "Mary\n",
+      "Howard\n",
+      "Todd\n",
+      "John\n",
+      "Mary\n",
+      "Howard\n",
+      "Todd\n",
+      "John\n",
+      "Mary\n"
+     ]
+    }
+   ],
+   "source": [
+    "rrobin_turn_manager = syndisco.RoundRobin([\"John\", \"Mary\", \"Howard\", \"Todd\"])\n",
+    "\n",
+    "for i in range(10):\n",
+    "    print(next(rrobin_turn_manager))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "- `RandomWeighted` on the other hand throws a weighted coin on each round. If the coin flip succedes, the previous user gets to respond. If not, another user is selected at random"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-04-04T13:17:17.057039Z",
+     "iopub.status.busy": "2025-04-04T13:17:17.056846Z",
+     "iopub.status.idle": "2025-04-04T13:17:17.060907Z",
+     "shell.execute_reply": "2025-04-04T13:17:17.060380Z"
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "John\n",
+      "Howard\n",
+      "John\n",
+      "Howard\n",
+      "Todd\n",
+      "Howard\n",
+      "John\n",
+      "Todd\n",
+      "John\n",
+      "Todd\n"
+     ]
+    }
+   ],
+   "source": [
+    "rweighted_turn_manager = syndisco.RandomWeighted(\n",
+    "    names=[\"John\", \"Mary\", \"Howard\", \"Todd\"], p_respond=0.5\n",
+    ")\n",
+    "\n",
+    "for i in range(10):\n",
+    "    print(next(rweighted_turn_manager))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Generating a discussion\n",
+    "\n",
+    "Let's start with the most basic task; a single discussion between two user-agents."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Since we only have two users, a RoundRobin approach where each user takes a turn sequentially is sufficient."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now we can run a simple discussion"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-04-04T13:17:17.063253Z",
+     "iopub.status.busy": "2025-04-04T13:17:17.063053Z",
+     "iopub.status.idle": "2025-04-04T13:17:44.769808Z",
+     "shell.execute_reply": "2025-04-04T13:17:44.768924Z"
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "application/vnd.jupyter.widget-view+json": {
+       "model_id": "6ad389c5f54f43be828c8bebcaab2bfe",
+       "version_major": 2,
+       "version_minor": 0
+      },
+      "text/plain": [
+       "  0%|          | 0/5 [00:00<?, ?it/s]"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "The following generation flags are not valid and may be ignored: ['temperature', 'top_p']. Set `TRANSFORMERS_VERBOSITY=info` for more details.\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "User Emma35 posted:\n",
+      "\"Hey everyone, I just got back from a long shift at the hospital and\n",
+      "I'm exhausted. Anyone else have a crazy day at work? I feel like I've\n",
+      "been running non-stop since morning. How was your day?\" \n",
+      "\n",
+      "User Giannis posted:\n",
+      "{\"role\": \"Giannis\", \"content\": \"Hey Emma, sorry to hear that you're\n",
+      "exhausted. I had a pretty standard day at the office, just working on\n",
+      "some bug fixes for our new game. Nothing too crazy, but I did have to\n",
+      "troubleshoot a weird issue with the physics engine. Nothing a good\n",
+      "night's sleep couldn't fix, though. How about you, did anything\n",
+      "interesting happen at the hospital?\" \n",
+      "\n",
+      "User Emma35 posted:\n",
+      "\"Hey Giannis, thanks for the concern! I actually had a pretty crazy\n",
+      "day at the hospital. We had a code blue come in and I had to help with\n",
+      "the resuscitation. It was a tough situation, but we managed to get the\n",
+      "patient stabilized. I'm just glad everyone made it through okay. I'm\n",
+      "looking forward to a quiet night at home now. How was the game\n",
+      "development going? Did you guys make any progress on the new level?\" \n",
+      "\n",
+      "User Giannis posted:\n",
+      "\"Hey Emma, I'm glad to hear that the patient is okay. That must have\n",
+      "been a really intense situation. As for the game development, we\n",
+      "actually made some good progress on the new level. We're still\n",
+      "tweaking the difficulty curve, but it's starting to feel like it's\n",
+      "coming together. I'm thinking of adding some more environmental\n",
+      "hazards to make it more challenging. What do you think? Should we add\n",
+      "more obstacles or keep it relatively straightforward?\" \n",
+      "\n",
+      "User Emma35 posted:\n",
+      "\"Hey Giannis, I'm glad to hear that the patient is okay. That must\n",
+      "have been a really intense situation. As for the game development, I\n",
+      "think adding more environmental hazards would definitely make the\n",
+      "level more challenging and exciting. I've always been a fan of games\n",
+      "with obstacles to navigate around, it adds an extra layer of strategy\n",
+      "and makes the gameplay more engaging. Plus, it's always fun to see\n",
+      "players figure out creative ways to overcome the challenges. What kind\n",
+      "of environmental hazards were you \n",
+      "\n"
+     ]
+    }
+   ],
+   "source": [
+    "turn_manager = syndisco.RoundRobin([actor.get_name() for actor in actors])\n",
+    "conv = syndisco.Discussion(next_turn_manager=turn_manager, users=actors)\n",
+    "conv.begin()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Driving a discussion step by step\n",
+    "\n",
+    "`Discussion` implements Python's iterator protocol, so you are not limited\n",
+    "to running the whole conversation at once with `begin()`. You can drive it\n",
+    "one turn at a time, which is useful when you want to inspect or react to\n",
+    "each entry before the next speaker is prompted — for example to apply\n",
+    "early stopping, live logging, or conditional branching.\n",
+    "\n",
+    "Because `Discussion` is its own iterator (`__iter__` returns `self`), it\n",
+    "is **single-pass**: once `StopIteration` is raised the instance is\n",
+    "exhausted and should not be reused."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Calling `next()` manually\n",
+    "\n",
+    "Calling `iter()` on a `Discussion` performs the one-time setup (registering\n",
+    "participant names and inserting any seed opinions). Each subsequent `next()`\n",
+    "prompts one speaker and returns the new log entry as a plain dict."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "First speaker:  Emma35\n",
+      "Their message:  \"Hey everyone, I just got back from a long shift at the hospital and I'm exhausted. Anyone else have a crazy day at work? I feel like I've been running non-stop since morning. How was your day?\" ...\n",
+      "\n",
+      "Second speaker: Giannis\n",
+      "Their message:  {\"role\": \"Giannis\", \"content\": \"Hey Emma, sorry to hear that you're exhausted. I had a pretty standard day at the office, just working on some bug fixes for our new game. Nothing too crazy, but I did have to troubleshoot a weird issue with the physics engine. Nothing a good night's sleep couldn't fix, though. How about you, did anything interesting happen at the hospital?\" ...\n"
+     ]
+    }
+   ],
+   "source": [
+    "turn_manager = syndisco.RoundRobin([actor.get_name() for actor in actors])\n",
+    "conv = syndisco.Discussion(\n",
+    "    next_turn_manager=turn_manager, users=actors, conv_len=4\n",
+    ")\n",
+    "\n",
+    "it = iter(conv)  # one-time setup happens here\n",
+    "\n",
+    "first_entry = next(it)\n",
+    "print(\"First speaker: \", first_entry[\"name\"])\n",
+    "print(\"Their message: \", first_entry[\"text\"], \"...\")\n",
+    "\n",
+    "second_entry = next(it)\n",
+    "print(\"\\nSecond speaker:\", second_entry[\"name\"])\n",
+    "print(\"Their message: \", second_entry[\"text\"], \"...\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Using a `for` loop\n",
+    "\n",
+    "The same iterator works directly in a `for` loop. Here we stop early if\n",
+    "a particular word appears in an entry — something that is impossible with\n",
+    "`begin()`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Emma35: \"Hey everyone, I just got back from a long shift at the hospital and I'm exhausted. Anyone else have a crazy day at work? I feel like I've been running non-stop since morning. How was your day?\"...\n",
+      "\n",
+      "Stop word 'hospital' detected — halting early.\n",
+      "\n",
+      "Turns completed so far: 1\n"
+     ]
+    }
+   ],
+   "source": [
+    "turn_manager = syndisco.RoundRobin([actor.get_name() for actor in actors])\n",
+    "conv = syndisco.Discussion(\n",
+    "    next_turn_manager=turn_manager, users=actors, conv_len=10\n",
+    ")\n",
+    "\n",
+    "STOP_WORD = \"hospital\"\n",
+    "\n",
+    "for entry in conv:\n",
+    "    print(f\"{entry['name']}: {entry['text']}...\")\n",
+    "    if STOP_WORD in entry[\"text\"].lower():\n",
+    "        print(f\"\\nStop word '{STOP_WORD}' detected — halting early.\")\n",
+    "        break\n",
+    "\n",
+    "print(f\"\\nTurns completed so far: {conv._steps_taken}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Congratulations, you can now run fully synthetic discussions! You may want to experiment with adding more than 2 users or testing more realistic turn taking procedures (for example, check out the `RandomWeighted` turn manager)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Working with `Logs`\n",
+    "\n",
+    "All log state is held in `Discussion.logs`, an instance of `Logs`.\n",
+    "This object supports the standard sequence interface, so you can index,\n",
+    "slice, and iterate over it directly - no need to call `to_dict()` just to\n",
+    "inspect entries."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "application/vnd.jupyter.widget-view+json": {
+       "model_id": "ec094ff9db1b4db9b27b7e251a717fd9",
+       "version_major": 2,
+       "version_minor": 0
+      },
+      "text/plain": [
+       "  0%|          | 0/4 [00:00<?, ?it/s]"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Total entries : 4\n",
+      "First entry   : {'name': 'Emma35', 'text': '\"Hey everyone, I just got back from a long shift at the hospital and I\\'m exhausted. Anyone else have a crazy day at work? I feel like I\\'ve been running non-stop since morning. How was your day?\"', 'model': 'test_model', 'prompt': '{\"context\": \"You are taking part in an online conversation\", \"instructions\": \"Act like a human would\", \"type\": \"1\", \"persona\": {\"username\": \"Emma35\", \"age\": 38, \"sex\": \"female\", \"sexual_orientation\": \"Heterosexual\", \"demographic_group\": \"Latino\", \"current_employment\": \"Registered Nurse\", \"education_level\": \"Bachelor\\'s\", \"special_instructions\": \"\", \"personality_characteristics\": [\"compassionate\", \"patient\", \"diligent\", \"overwhelmed\"]}}'}\n",
+      "Last entry    : {'name': 'Giannis', 'text': '\"Hey Emma, I\\'m glad to hear that the patient is okay. That must have been a really intense situation. As for the game development, we actually made some good progress on the new level. We\\'re still tweaking the difficulty curve, but it\\'s starting to feel like it\\'s coming together. I\\'m thinking of adding some more environmental hazards to make it more challenging. What do you think? Should we add more obstacles or keep it relatively straightforward?\"', 'model': 'test_model', 'prompt': '{\"context\": \"You are taking part in an online conversation\", \"instructions\": \"Act like a human would\", \"type\": \"1\", \"persona\": {\"username\": \"Giannis\", \"age\": 21, \"sex\": \"male\", \"sexual_orientation\": \"Pansexual\", \"demographic_group\": \"White\", \"current_employment\": \"Game Developer\", \"education_level\": \"College\", \"special_instructions\": \"\", \"personality_characteristics\": [\"strategic\", \"meticulous\", \"nerdy\", \"hyper-focused\"]}}'}\n",
+      "\n",
+      "[Emma35] \"Hey everyone, I just got back from a long shift at the hosp...\n",
+      "[Giannis] {\"role\": \"Giannis\", \"content\": \"Hey Emma, sorry to hear that...\n",
+      "[Emma35] \"Hey Giannis, thanks for the concern! I actually had a prett...\n",
+      "[Giannis] \"Hey Emma, I'm glad to hear that the patient is okay. That m...\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Run a fresh discussion so the logs are fully populated\n",
+    "turn_manager = syndisco.RoundRobin([actor.get_name() for actor in actors])\n",
+    "conv = syndisco.Discussion(next_turn_manager=turn_manager, users=actors, conv_len=4)\n",
+    "conv.begin(verbose=False)\n",
+    "\n",
+    "logs = conv.logs\n",
+    "\n",
+    "print(f\"Total entries : {len(logs)}\")\n",
+    "print(f\"First entry   : {logs[0]}\")\n",
+    "print(f\"Last entry    : {logs[-1]}\")\n",
+    "print()\n",
+    "\n",
+    "# Iterate directly — each item is a dict with 'name', 'text', 'model'\n",
+    "for entry in logs:\n",
+    "    print(f\"[{entry['name']}] {entry['text'][:60]}...\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Exporting and importing discussions with `Logs`\n",
+    "\n",
+    "All persistent state in a `Discussion` is managed by a `Logs` object. This class you inspect, serialize, or pass saved conversations to an `Annotation` job without re-running the discussion.\n",
+    "\n",
+    "using `Logs.from_lists()`. \n",
+    "\n",
+    "`from_lists` accepts three parallel lists — names, texts, and (optionally)\n",
+    "model labels — and is the canonical way to construct a `Logs`\n",
+    "from an external source."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "{\n",
+      "    \"timestamp\": \"26-04-03-12-51\",\n",
+      "    \"logs\": [\n",
+      "        {\n",
+      "            \"name\": \"Emma35\",\n",
+      "            \"text\": \"\\\"Hey everyone, I just got back from a long shift at the hospital and I'm exhausted. Anyone else have a crazy day at work? I feel like I've been running non-stop since morning. How was your day?\\\"\",\n",
+      "            \"model\": \"test_model\",\n",
+      "            \"prompt\": \"{\\\"context\\\": \\\"You are taking part in an online conversation\\\", \\\"instructions\\\": \\\"Act like a human would\\\", \\\"type\\\": \\\"1\\\", \\\"persona\\\": {\\\"username\\\": \\\"Emma35\\\", \\\"age\\\": 38, \\\"sex\\\": \\\"female\\\", \\\"sexual_orientation\\\": \\\"Heterosexual\\\", \\\"demographic_group\\\": \\\"Latino\\\", \\\"current_employment\\\": \\\"Registered Nurse\\\", \\\"education_level\\\": \\\"Bachelor's\\\", \\\"special_instructions\\\": \\\"\\\", \\\"personality_characteristics\\\": [\\\"compassionate\\\", \\\"patient\\\", \\\"diligent\\\", \\\"overwhelmed\\\"]}}\"\n",
+      "        },\n",
+      "        {\n",
+      "            \"name\": \"Giannis\",\n",
+      "            \"text\": \"{\\\"role\\\": \\\"Giannis\\\", \\\"content\\\": \\\"Hey Emma, sorry to hear that you're exhausted. I had a pretty standard day at the office, just working on some bug fixes for our new game. Nothing too crazy, but I did have to troubleshoot a weird issue with the physics engine. Nothing a good night's sleep couldn't fix, though. How about you, did anything interesting happen at the hospital?\\\"\",\n",
+      "            \"model\": \"test_model\",\n",
+      "            \"prompt\": \"{\\\"context\\\": \\\"You are taking part in an online conversation\\\", \\\"instructions\\\": \\\"Act like a human would\\\", \\\"type\\\": \\\"1\\\", \\\"persona\\\": {\\\"username\\\": \\\"Giannis\\\", \\\"age\\\": 21, \\\"sex\\\": \\\"male\\\", \\\"sexual_orientation\\\": \\\"Pansexual\\\", \\\"demographic_group\\\": \\\"White\\\", \\\"current_employment\\\": \\\"Game Developer\\\", \\\"education_level\\\": \\\"College\\\", \\\"special_instructions\\\": \\\"\\\", \\\"personality_characteristics\\\": [\\\"strategic\\\", \\\"meticulous\\\", \\\"nerdy\\\", \\\"hyper-focused\\\"]}}\"\n",
+      "        },\n",
+      "        {\n",
+      "            \"name\": \"Emma35\",\n",
+      "            \"text\": \"\\\"Hey Giannis, thanks for the concern! I actually had a pretty crazy day at the hospital. We had a code blue come in and I had to help with the resuscitation. It was a tough situation, but we managed to get the patient stabilized. I'm just glad everyone made it through okay. I'm looking forward to a quiet night at home now. How was the game development going? Did you guys make any progress on the new level?\\\"\",\n",
+      "            \"model\": \"test_model\",\n",
+      "            \"prompt\": \"{\\\"context\\\": \\\"You are taking part in an online conversation\\\", \\\"instructions\\\": \\\"Act like a human would\\\", \\\"type\\\": \\\"1\\\", \\\"persona\\\": {\\\"username\\\": \\\"Emma35\\\", \\\"age\\\": 38, \\\"sex\\\": \\\"female\\\", \\\"sexual_orientation\\\": \\\"Heterosexual\\\", \\\"demographic_group\\\": \\\"Latino\\\", \\\"current_employment\\\": \\\"Registered Nurse\\\", \\\"education_level\\\": \\\"Bachelor's\\\", \\\"special_instructions\\\": \\\"\\\", \\\"personality_characteristics\\\": [\\\"compassionate\\\", \\\"patient\\\", \\\"diligent\\\", \\\"overwhelmed\\\"]}}\"\n",
+      "        },\n",
+      "        {\n",
+      "            \"name\": \"Giannis\",\n",
+      "            \"text\": \"\\\"Hey Emma, I'm glad to hear that the patient is okay. That must have been a really intense situation. As for the game development, we actually made some good progress on the new level. We're still tweaking the difficulty curve, but it's starting to feel like it's coming together. I'm thinking of adding some more environmental hazards to make it more challenging. What do you think? Should we add more obstacles or keep it relatively straightforward?\\\"\",\n",
+      "            \"model\": \"test_model\",\n",
+      "            \"prompt\": \"{\\\"context\\\": \\\"You are taking part in an online conversation\\\", \\\"instructions\\\": \\\"Act like a human would\\\", \\\"type\\\": \\\"1\\\", \\\"persona\\\": {\\\"username\\\": \\\"Giannis\\\", \\\"age\\\": 21, \\\"sex\\\": \\\"male\\\", \\\"sexual_orientation\\\": \\\"Pansexual\\\", \\\"demographic_group\\\": \\\"White\\\", \\\"current_employment\\\": \\\"Game Developer\\\", \\\"education_level\\\": \\\"College\\\", \\\"special_instructions\\\": \\\"\\\", \\\"personality_characteristics\\\": [\\\"strategic\\\", \\\"meticulous\\\", \\\"nerdy\\\", \\\"hyper-focused\\\"]}}\"\n",
+      "        }\n",
+      "    ],\n",
+      "    \"id\": \"b6d2e9c0424b0217b6433ec93450ac811eb456b5f02ede8783b13625e82d6649\"\n",
+      "}\n"
+     ]
+    }
+   ],
+   "source": [
+    "import json\n",
+    "import tempfile\n",
+    "\n",
+    "\n",
+    "tp = tempfile.NamedTemporaryFile(suffix=\".json\", delete=False)\n",
+    "logs = conv.get_logs()\n",
+    "logs.export(tp.name)\n",
+    "\n",
+    "with open(tp.name) as f:\n",
+    "    data = json.load(f)\n",
+    "\n",
+    "print(json.dumps(data, indent=4))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "{\n",
+      "    \"timestamp\": \"26-04-03-12-51\",\n",
+      "    \"logs\": [\n",
+      "        {\n",
+      "            \"name\": \"Emma35\",\n",
+      "            \"text\": \"\\\"Hey everyone, I just got back from a long shift at the hospital and I'm exhausted. Anyone else have a crazy day at work? I feel like I've been running non-stop since morning. How was your day?\\\"\",\n",
+      "            \"model\": \"test_model\",\n",
+      "            \"prompt\": \"\"\n",
+      "        },\n",
+      "        {\n",
+      "            \"name\": \"Giannis\",\n",
+      "            \"text\": \"{\\\"role\\\": \\\"Giannis\\\", \\\"content\\\": \\\"Hey Emma, sorry to hear that you're exhausted. I had a pretty standard day at the office, just working on some bug fixes for our new game. Nothing too crazy, but I did have to troubleshoot a weird issue with the physics engine. Nothing a good night's sleep couldn't fix, though. How about you, did anything interesting happen at the hospital?\\\"\",\n",
+      "            \"model\": \"test_model\",\n",
+      "            \"prompt\": \"\"\n",
+      "        },\n",
+      "        {\n",
+      "            \"name\": \"Emma35\",\n",
+      "            \"text\": \"\\\"Hey Giannis, thanks for the concern! I actually had a pretty crazy day at the hospital. We had a code blue come in and I had to help with the resuscitation. It was a tough situation, but we managed to get the patient stabilized. I'm just glad everyone made it through okay. I'm looking forward to a quiet night at home now. How was the game development going? Did you guys make any progress on the new level?\\\"\",\n",
+      "            \"model\": \"test_model\",\n",
+      "            \"prompt\": \"\"\n",
+      "        },\n",
+      "        {\n",
+      "            \"name\": \"Giannis\",\n",
+      "            \"text\": \"\\\"Hey Emma, I'm glad to hear that the patient is okay. That must have been a really intense situation. As for the game development, we actually made some good progress on the new level. We're still tweaking the difficulty curve, but it's starting to feel like it's coming together. I'm thinking of adding some more environmental hazards to make it more challenging. What do you think? Should we add more obstacles or keep it relatively straightforward?\\\"\",\n",
+      "            \"model\": \"test_model\",\n",
+      "            \"prompt\": \"\"\n",
+      "        }\n",
+      "    ],\n",
+      "    \"id\": \"163bc0db2cb8cef56593c289519ef634230dda045a73160854bd97f694904cbb\"\n",
+      "}\n"
+     ]
+    }
+   ],
+   "source": [
+    "logs2 = syndisco.Logs.from_file(tp.name)\n",
+    "print(logs2)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "{\n",
+      "    \"timestamp\": \"26-04-03-12-51\",\n",
+      "    \"logs\": [\n",
+      "        {\n",
+      "            \"name\": \"Alice\",\n",
+      "            \"text\": \"What do you think about the new policy?\",\n",
+      "            \"model\": \"hardcoded\",\n",
+      "            \"prompt\": \"\"\n",
+      "        },\n",
+      "        {\n",
+      "            \"name\": \"Bob\",\n",
+      "            \"text\": \"Honestly, I think it goes too far.\",\n",
+      "            \"model\": \"hardcoded\",\n",
+      "            \"prompt\": \"\"\n",
+      "        },\n",
+      "        {\n",
+      "            \"name\": \"Alice\",\n",
+      "            \"text\": \"I can see that perspective, though I'm not sure I agree.\",\n",
+      "            \"model\": \"hardcoded\",\n",
+      "            \"prompt\": \"\"\n",
+      "        }\n",
+      "    ],\n",
+      "    \"id\": \"c148dc4f3a8d305962c48bd967dcb5aaa85ee136fafb7acf2b1479be5b596d74\"\n",
+      "}\n"
+     ]
+    }
+   ],
+   "source": [
+    "names=[\"Alice\", \"Bob\", \"Alice\"]\n",
+    "texts=[\n",
+    "    \"What do you think about the new policy?\",\n",
+    "    \"Honestly, I think it goes too far.\",\n",
+    "    \"I can see that perspective, though I'm not sure I agree.\",\n",
+    "]\n",
+    "handcrafted = syndisco.Logs()\n",
+    "\n",
+    "for name, text in zip(names, texts):\n",
+    "    handcrafted.append(name, text)\n",
+    "\n",
+    "print(handcrafted)"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "syndisco-dev",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.14.2"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}

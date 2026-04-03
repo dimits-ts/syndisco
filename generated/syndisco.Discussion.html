@@ -1,0 +1,190 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>syndisco.Discussion &mdash; SynDisco 2.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=33f7ffd5" />
+
+  
+    <link rel="shortcut icon" href="../_static/logo.svg"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=20623aea"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="syndisco.Annotation" href="syndisco.Annotation.html" />
+    <link rel="prev" title="API Reference" href="../api.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SynDisco
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#how-to-customize-your-discussion">How to Customize Your Discussion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides.html">Guides</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#single-job-management">Single Job Management</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">syndisco.Discussion</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#syndisco.Discussion"><code class="docutils literal notranslate"><span class="pre">Discussion</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="syndisco.Annotation.html">syndisco.Annotation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="syndisco.Logs.html">syndisco.Logs</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#multi-job-management">Multi-Job Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#actors">Actors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#models">Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#turn-management">Turn Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#utilities">Utilities</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SynDisco</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API Reference</a></li>
+      <li class="breadcrumb-item active">syndisco.Discussion</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/generated/syndisco.Discussion.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="syndisco-discussion">
+<h1>syndisco.Discussion<a class="headerlink" href="#syndisco-discussion" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="syndisco.Discussion">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Discussion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">next_turn_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TurnManager</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">users</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="syndisco.Actor.html#syndisco.Actor" title="syndisco.actors.Actor"><span class="pre">Actor</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">history_context_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conv_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed_opinions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed_opinion_usernames</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#syndisco.Discussion" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterator</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</p>
+<p>A job conducting a discussion between different actors
+(<a class="reference internal" href="syndisco.Actor.html#syndisco.Actor" title="syndisco.actors.Actor"><code class="xref py py-class docutils literal notranslate"><span class="pre">actors.Actor</span></code></a>).</p>
+<p><code class="docutils literal notranslate"><span class="pre">Discussion</span></code> implements the iterator protocol: each call to
+<code class="xref py py-func docutils literal notranslate"><span class="pre">next()</span></code> prompts the next speaker and returns the resulting log
+entry.  This means it can be driven step-by-step:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">discussion</span> <span class="o">=</span> <span class="n">Discussion</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">discussion</span><span class="p">:</span>          <span class="c1"># full run</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>or consumed one turn at a time:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">it</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">discussion</span><span class="p">)</span>
+<span class="n">first</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
+<span class="n">second</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#syndisco.Discussion.begin" title="syndisco.Discussion.begin"><code class="xref py py-meth docutils literal notranslate"><span class="pre">begin()</span></code></a> is a convenience wrapper that exhausts the iterator
+while printing output, matching the original one-shot API.</p>
+<p>Because <code class="docutils literal notranslate"><span class="pre">Discussion</span></code> is its own iterator (<code class="docutils literal notranslate"><span class="pre">__iter__</span></code> returns
+<code class="docutils literal notranslate"><span class="pre">self</span></code>), it is single-pass: once <code class="docutils literal notranslate"><span class="pre">StopIteration</span></code> is raised the
+instance is exhausted and should not be reused.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="syndisco.Discussion.begin">
+<span class="sig-name descname"><span class="pre">begin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#syndisco.Discussion.begin" title="Link to this definition"></a></dt>
+<dd><p>Run the entire discussion to completion, printing each entry when
+<em>verbose</em> is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+<p>This is a thin wrapper that exhausts the iterator via
+<code class="xref py py-func docutils literal notranslate"><span class="pre">tqdm()</span></code>, applying <em>verbose</em> printing along the way.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to print each comment to stdout,
+defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="syndisco.Discussion.get_logs">
+<span class="sig-name descname"><span class="pre">get_logs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="syndisco.Logs.html#syndisco.Logs" title="syndisco.jobs.Logs"><span class="pre">Logs</span></a></span></span><a class="headerlink" href="#syndisco.Discussion.get_logs" title="Link to this definition"></a></dt>
+<dd><p>Get the logs of the discussion. Can be used to export the logs
+to a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A copy of the discussion logs.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>DiscussionLogs</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../api.html" class="btn btn-neutral float-left" title="API Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="syndisco.Annotation.html" class="btn btn-neutral float-right" title="syndisco.Annotation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Dimitris Tsirmpas.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
