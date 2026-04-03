@@ -24,17 +24,17 @@ in the syndisco.jobs module.
 import copy
 import time
 import random
-import logging
+import logging as pylog
 from pathlib import Path
 
 from tqdm.auto import tqdm
 
 from . import actors, turn_manager
-from . import logging_util, _file_util
+from . import logging, _file_util
 from . import jobs
 
 
-logger = logging.getLogger(Path(__file__).name)
+logger = pylog.getLogger(Path(__file__).name)
 
 
 class DiscussionExperiment:
@@ -140,7 +140,7 @@ class DiscussionExperiment:
             next_turn_manager=self.next_turn_manager,
         )
 
-    @logging_util.timing
+    @logging.timing
     def _run_all_discussions(
         self,
         discussions: list[jobs.Discussion],
@@ -160,7 +160,7 @@ class DiscussionExperiment:
         output_dir.mkdir(parents=True, exist_ok=True)
 
         for i, discussion in tqdm(list(enumerate(discussions))):
-            logging.info(
+            pylog.info(
                 f"Running experiment {i + 1}/{len(discussions) + 1}..."
             )
             self._run_single_discussion(
@@ -169,7 +169,7 @@ class DiscussionExperiment:
 
         logger.info("Finished synthetic discussion generation.")
 
-    @logging_util.timing
+    @logging.timing
     def _run_single_discussion(
         self, discussion: jobs.Discussion, output_dir: Path, verbose: bool
     ) -> None:
@@ -191,7 +191,7 @@ class DiscussionExperiment:
             output_path = _file_util.generate_datetime_filename(
                 output_dir=output_dir, file_ending=".json"
             )
-            logging.debug(
+            pylog.debug(
                 f"Finished discussion in {(time.time() - start_time)} seconds."
             )
             logs = discussion.get_logs()
@@ -278,14 +278,14 @@ class AnnotationExperiment:
         :return: Configured Annotation task.
         :rtype: jobs.Annotation
         """
-        discussion_logs = jobs.DiscussionLogs.from_file(conv_logs_path)
+        discussion_logs = jobs.Logs.from_file(conv_logs_path)
         return jobs.Annotation(
             annotator=annotator,
             discussion_logs=discussion_logs,
             history_ctx_len=self.history_ctx_len
         )
 
-    @logging_util.timing
+    @logging.timing
     def _run_all_annotations(
         self,
         annotation_tasks: list[jobs.Annotation],
@@ -307,7 +307,7 @@ class AnnotationExperiment:
 
         logger.info("Finished annotation generation.")
 
-    @logging_util.timing
+    @logging.timing
     def _run_single_annotation(
         self, annotation_task: jobs.Annotation, output_dir: Path, verbose: bool
     ) -> None:

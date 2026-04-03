@@ -2,7 +2,7 @@ import collections
 import collections.abc
 import datetime
 import json
-import logging
+import logging as pylog
 import hashlib
 import copy
 import textwrap
@@ -16,10 +16,10 @@ from . import actors, turn_manager
 from . import _file_util
 
 
-logger = logging.getLogger(Path(__file__).name)
+logger = pylog.getLogger(Path(__file__).name)
 
 
-class DiscussionLogs:
+class Logs:
     """
     Stores and serializes the log entries of a discussion.
 
@@ -33,7 +33,7 @@ class DiscussionLogs:
         self._entries: list[dict[str, str]] = []
 
     @classmethod
-    def from_file(cls, path: str | Path) -> "DiscussionLogs":
+    def from_file(cls, path: str | Path) -> "Logs":
         """
         Load a :class:`DiscussionLogs` from a JSON file previously written
         by :meth:`to_json_file`.
@@ -65,7 +65,7 @@ class DiscussionLogs:
                     f"Log entry {i} is missing required keys: {missing}."
                 )
 
-        instance = DiscussionLogs()
+        instance = Logs()
         for entry in data["logs"]:
             instance.append(
                 name=entry["name"], text=entry["text"], model=entry["model"]
@@ -226,7 +226,7 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
         )
 
         # all persistent log state is owned by DiscussionLogs
-        self.logs = DiscussionLogs()
+        self.logs = Logs()
 
         self.seed_opinions = seed_opinions or []
         self.seed_opinion_usernames = seed_opinion_usernames
@@ -281,7 +281,7 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
                 formatted = _format_chat_message(entry["name"], entry["text"])
                 print(formatted, "\n")
 
-    def get_logs(self) -> DiscussionLogs:
+    def get_logs(self) -> Logs:
         """
         Get the logs of the discussion. Can be used to export the logs
         to a file.
@@ -349,7 +349,7 @@ class Annotation:
     def __init__(
         self,
         annotator: actors.Actor,
-        discussion_logs: DiscussionLogs,
+        discussion_logs: Logs,
         history_ctx_len: int = 2,
     ):
         """
@@ -367,7 +367,7 @@ class Annotation:
         self.annotator = annotator
         self.history_ctx_len = history_ctx_len
         self.discussion_logs = copy.deepcopy(discussion_logs)
-        self.annotation_logs = DiscussionLogs()
+        self.annotation_logs = Logs()
 
     def begin(self, verbose: bool = True) -> None:
         ctx_history: collections.deque[str] = collections.deque(
@@ -392,7 +392,7 @@ class Annotation:
                 print(textwrap.fill(formatted_message))
                 print(annotation)
 
-    def get_logs(self) -> DiscussionLogs:
+    def get_logs(self) -> Logs:
         """
         Get the annotation logs for this job.
 
