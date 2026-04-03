@@ -3,7 +3,7 @@ import collections.abc
 import datetime
 import json
 import logging
-import uuid
+import hashlib
 import copy
 import textwrap
 import random
@@ -32,53 +32,49 @@ class DiscussionLogs:
     def __init__(self) -> None:
         self._entries: list[dict[str, str]] = []
 
-    # ------------------------------------------------------------------
-    # Alternative constructors
-    # ------------------------------------------------------------------
-
     @classmethod
-    def from_lists(
-        cls,
-        names: list[str],
-        texts: list[str],
-        models: list[str] | None = None,
-    ) -> "DiscussionLogs":
+    def from_file(cls, path: str | Path) -> "DiscussionLogs":
         """
-        Build a :class:`DiscussionLogs` from parallel lists of names and
-        texts, optionally with model labels.
+        Load a :class:`DiscussionLogs` from a JSON file previously written
+        by :meth:`to_json_file`.
 
-        :param names: The username for each entry.
-        :type names: list[str]
-        :param texts: The message text for each entry.
-        :type texts: list[str]
-        :param models: The model label for each entry.  Defaults to
-            ``"hardcoded"`` for every entry when *None*.
-        :type models: list[str] | None, optional
-        :raises ValueError: if *names* and *texts* (and, when provided,
-            *models*) differ in length.
+        :param path: Path to the JSON file.
+        :type path: str | Path
+        :raises FileNotFoundError: if *path* does not exist.
+        :raises ValueError: if the JSON does not match the expected schema.
         :return: A populated :class:`DiscussionLogs` instance.
         :rtype: DiscussionLogs
         """
-        if len(names) != len(texts):
-            raise ValueError(
-                f"names and texts must have the same length "
-                f"(got {len(names)} and {len(texts)})."
-            )
-        if models is not None and len(models) != len(names):
-            raise ValueError(
-                f"models must have the same length as names and texts "
-                f"(got {len(models)} vs {len(names)})."
-            )
+        with open(path, "r", encoding="utf8") as f:
+            try:
+                data = json.load(f)
+            except json.JSONDecodeError as e:
+                raise ValueError(f"File is not valid JSON: {e}") from e
 
-        instance = cls()
-        resolved_models = (
-            models if models is not None else ["hardcoded"] * len(names)
-        )
-        for name, text, model in zip(names, texts, resolved_models):
-            instance.append(name=name, text=text, model=model)
+        if "logs" not in data:
+            raise ValueError("Missing required key 'logs' in JSON schema.")
+
+        if not isinstance(data["logs"], list):
+            raise ValueError("'logs' must be a list.")
+
+        required_entry_keys = {"name", "text", "model"}
+        for i, entry in enumerate(data["logs"]):
+            missing = required_entry_keys - entry.keys()
+            if missing:
+                raise ValueError(
+                    f"Log entry {i} is missing required keys: {missing}."
+                )
+
+        instance = DiscussionLogs()
+        for entry in data["logs"]:
+            instance.append(
+                name=entry["name"], text=entry["text"], model=entry["model"]
+            )
         return instance
 
-    def append(self, *, name: str, text: str, model: str) -> None:
+    def append(
+        self, name: str, text: str, model: str = "hardcoded", prompt: str = ""
+    ) -> None:
         """
         Add a single log entry.
 
@@ -88,8 +84,14 @@ class DiscussionLogs:
         :type text: str
         :param model: The model (or ``"hardcoded"`` for seed entries).
         :type model: str
+        :param prompt:
+            The prompt given to the LLM user that generated the response.
+            Empty string if the user is not an LLM.
+        :type prompt: str:
         """
-        self._entries.append({"name": name, "text": text, "model": model})
+        self._entries.append(
+            {"name": name, "text": text, "model": model, "prompt": prompt}
+        )
 
     def __iter__(self):
         return iter(self._entries)
@@ -106,37 +108,30 @@ class DiscussionLogs:
 
     def to_dict(
         self,
-        *,
-        extra: dict[str, typing.Any] | None = None,
         timestamp_format: str = "%y-%m-%d-%H-%M",
     ) -> dict[str, typing.Any]:
         """
-        Serialize the logs to a dict, optionally merging caller-supplied
-        metadata via *extra*.
+        Serialize the logs to a dict.
 
-        :param extra: Additional key/value pairs to include in the output
-            dict.  Values in *extra* take precedence over the default keys
-            (``timestamp``, ``logs``).
-        :type extra: dict[str, Any] | None, optional
         :param timestamp_format: strftime format for the ``timestamp``
             field, defaults to ``"%y-%m-%d-%H-%M"``.
         :type timestamp_format: str, optional
         :return: A serializable dict representation of the logs.
         :rtype: dict[str, Any]
         """
-        base: dict[str, typing.Any] = {
+        export_dict: dict[str, typing.Any] = {
             "timestamp": datetime.datetime.now().strftime(timestamp_format),
             "logs": self.to_list(),
         }
-        if extra:
-            base.update(extra)
-        return base
+        export_dict["id"] = hashlib.sha256(
+            json.dumps(self.to_list(), sort_keys=True).encode()
+        ).hexdigest()
 
-    def to_json_file(
+        return export_dict
+
+    def export(
         self,
         output_path: str | Path,
-        *,
-        extra: dict[str, typing.Any] | None = None,
         timestamp_format: str = "%y-%m-%d-%H-%M",
     ) -> None:
         """
@@ -144,14 +139,11 @@ class DiscussionLogs:
 
         :param output_path: Destination path for the JSON file.
         :type output_path: str | Path
-        :param extra: Additional metadata to embed alongside the log
-            entries (forwarded to :meth:`to_dict`).
-        :type extra: dict[str, Any] | None, optional
         :param timestamp_format: strftime format for the timestamp field.
         :type timestamp_format: str, optional
         """
         _file_util.dict_to_json(
-            self.to_dict(extra=extra, timestamp_format=timestamp_format),
+            self.to_dict(timestamp_format=timestamp_format),
             output_path,
         )
 
@@ -225,14 +217,7 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
         self.next_turn_manager = next_turn_manager
         self.next_turn_manager.set_names([user.get_name() for user in users])
 
-        # used only during export, tags underlying models
-        self.user_types = [
-            type(user).__name__ for user in self.username_user_map
-        ]
         self.conv_len = conv_len
-
-        # unique id for each conversation
-        self.id = uuid.uuid4()
 
         # keep a limited context of the conversation to feed to the models
         self.ctx_len = history_context_len
@@ -296,51 +281,15 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
                 formatted = _format_chat_message(entry["name"], entry["text"])
                 print(formatted, "\n")
 
-    def to_dict(
-        self, timestamp_format: str = "%y-%m-%d-%H-%M"
-    ) -> dict[str, typing.Any]:
+    def get_logs(self) -> DiscussionLogs:
         """
-        Get a dictionary view of the data and metadata contained in the
-        discussion.
+        Get the logs of the discussion. Can be used to export the logs
+        to a file.
 
-        :param timestamp_format: the format for the conversation's creation
-            time, defaults to "%y-%m-%d-%H-%M"
-        :type timestamp_format: str, optional
-        :return: a dict representing the conversation
-        :rtype: dict[str, Any]
+        :return: A copy of the discussion logs.
+        :rtype: DiscussionLogs
         """
-        extra = {
-            "id": str(self.id),
-            "users": [
-                user.get_name() for user in self.username_user_map.values()
-            ],
-            "user_prompts": [
-                user.describe() for user in self.username_user_map.values()
-            ],
-            "ctx_length": self.ctx_len,
-        }
-        return self.logs.to_dict(
-            extra=extra, timestamp_format=timestamp_format
-        )
-
-    def to_json_file(self, output_path: str | Path) -> None:
-        """
-        Export the data and metadata of the conversation as a JSON file.
-
-        :param output_path: the path for the exported file
-        :type output_path: str | Path
-        """
-        extra = {
-            "id": str(self.id),
-            "users": [
-                user.get_name() for user in self.username_user_map.values()
-            ],
-            "user_prompts": [
-                user.describe() for user in self.username_user_map.values()
-            ],
-            "ctx_length": self.ctx_len,
-        }
-        self.logs.to_json_file(output_path, extra=extra)
+        return copy.deepcopy(self.logs)
 
     def _add_seed_opinions(self) -> None:
         if len(self.seed_opinions) > 0:
@@ -379,24 +328,28 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
         model_name = (
             user.model.get_name() if user.model is not None else "hardcoded"
         )
-        self.logs.append(name=user.get_name(), text=comment, model=model_name)
+        self.logs.append(
+            name=user.get_name(),
+            text=comment,
+            model=model_name,
+            prompt=user.describe(),
+        )
         formatted = _format_chat_message(user.get_name(), comment)
         self.ctx_history.append(formatted)
-
-    def __str__(self) -> str:
-        return json.dumps(self.to_dict(), indent=4)
 
 
 class Annotation:
     """
-    An annotation job modelled as a discussion between the system writing
-    the logs of a finished discussion, and the LLM Annotator.
+    An annotation job applied on a single discussion.
+
+    Modelled as a discussion between the system writing
+    the logs of a finished discussion, and a single LLM Annotator.
     """
 
     def __init__(
         self,
         annotator: actors.Actor,
-        conv_logs_path: str | Path,
+        discussion_logs: DiscussionLogs,
         history_ctx_len: int = 2,
     ):
         """
@@ -413,79 +366,42 @@ class Annotation:
         """
         self.annotator = annotator
         self.history_ctx_len = history_ctx_len
-        self.logs = DiscussionLogs()
-
-        with open(conv_logs_path, "r", encoding="utf8") as fin:
-            self.conv_data_dict = json.load(fin)
+        self.discussion_logs = copy.deepcopy(discussion_logs)
+        self.annotation_logs = DiscussionLogs()
 
     def begin(self, verbose: bool = True) -> None:
-        """
-        Begin the conversation-modelled annotation job.
-
-        :param verbose: Whether to print annotation results to the console,
-            defaults to True.
-        :type verbose: bool, optional
-        """
         ctx_history: collections.deque[str] = collections.deque(
             maxlen=self.history_ctx_len
         )
 
-        for message_data in tqdm(self.conv_data_dict["logs"]):
+        for message_data in tqdm(self.discussion_logs):
             username = message_data["name"]
             message = message_data["text"]
 
             formatted_message = _format_chat_message(username, message)
             ctx_history.append(formatted_message)
             annotation = self.annotator.speak(list(ctx_history))
-            self.logs.append(
+            self.annotation_logs.append(
                 name=username,
                 text=annotation,
                 model=self.annotator.model.get_name(),
+                prompt=self.annotator.describe()
             )
 
             if verbose:
                 print(textwrap.fill(formatted_message))
                 print(annotation)
 
-    def to_dict(
-        self, timestamp_format: str = "%y-%m-%d-%H-%M"
-    ) -> dict[str, typing.Any]:
+    def get_logs(self) -> DiscussionLogs:
         """
-        Get a dictionary view of the annotation data and metadata.
+        Get the annotation logs for this job.
 
-        :param timestamp_format: strftime format for the timestamp field,
-            defaults to ``"%y-%m-%d-%H-%M"``.
-        :type timestamp_format: str, optional
-        :return: a dict representing the annotation run.
-        :rtype: dict[str, Any]
+        :return:
+            A copied DiscussionLogs object containing the annotator's
+            judgements for each comment in the provided discussion.
+        :rtype: DiscussionLogs
         """
-        extra = {
-            "conv_id": str(self.conv_data_dict["id"]),
-            "annotator_model": self.annotator.model.get_name(),
-            "annotator_prompt": self.annotator.describe(),
-            "ctx_length": self.history_ctx_len,
-        }
-        return self.logs.to_dict(
-            extra=extra, timestamp_format=timestamp_format
-        )
-
-    def to_json_file(self, output_path: str | Path) -> None:
-        """
-        Export the annotation data and metadata as a JSON file.
-
-        :param output_path: the path for the exported file.
-        :type output_path: str | Path
-        """
-        extra = {
-            "conv_id": str(self.conv_data_dict["id"]),
-            "annotator_model": self.annotator.model.get_name(),
-            "annotator_prompt": self.annotator.describe(),
-            "ctx_length": self.history_ctx_len,
-        }
-        self.logs.to_json_file(output_path, extra=extra)
-
-    def __str__(self) -> str:
-        return json.dumps(self.to_dict(), indent=4)
+        return copy.deepcopy(self.annotation_logs)
 
 
 def _format_chat_message(username: str, message: str) -> str:
