@@ -114,7 +114,6 @@ class Actor:
         context: str,
         instructions: str,
         actor_type: ActorType,
-        stop_words: list[str] = [],
     ) -> None:
         """
         Create an Actor controlled by an LLM instance with a specific persona.
@@ -151,7 +150,11 @@ class Actor:
             "context": self.context,
             "instructions": self.instructions,
             "type": self.actor_type,
-            "persona": self.persona.to_dict(),
+            "persona": {
+                item[0]: item[1]
+                for item in self.persona.to_dict().items()
+                if item[1] != "" and item[1] != -1
+            },
         }
         return json.dumps(prompt)
 
