@@ -194,8 +194,8 @@ class DiscussionExperiment:
             logging.debug(
                 f"Finished discussion in {(time.time() - start_time)} seconds."
             )
-
-            discussion.to_json_file(output_path)
+            logs = discussion.get_logs()
+            logs.export(output_path)
         except Exception:
             logger.exception("Experiment aborted due to error.")
 
@@ -278,9 +278,10 @@ class AnnotationExperiment:
         :return: Configured Annotation task.
         :rtype: jobs.Annotation
         """
+        discussion_logs = jobs.DiscussionLogs.from_file(conv_logs_path)
         return jobs.Annotation(
             annotator=annotator,
-            conv_logs_path=conv_logs_path,
+            discussion_logs=discussion_logs,
             history_ctx_len=self.history_ctx_len
         )
 
@@ -326,6 +327,7 @@ class AnnotationExperiment:
             output_path = _file_util.generate_datetime_filename(
                 output_dir=output_dir, file_ending=".json"
             )
-            annotation_task.to_json_file(output_path)
+            annotation_logs = annotation_task.get_logs()
+            annotation_logs.export(output_path)
         except Exception:
             logger.exception("Annotation experiment aborted due to error.")
