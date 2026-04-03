@@ -40,12 +40,13 @@ Features
 Introduction
 ====================================
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 2
+   :caption: Contents:
 
    overview
    installation
    guides
-   syndisco
+   api
 
 
 Indices and tables

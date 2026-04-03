@@ -47,6 +47,8 @@ classes. Instead, all persistent state is managed by the new `Logs` class.
     - This minor change will make some prompts shorter, which should make a difference
     when using local models at scale.
 
+- Improved documentation website and expand tutorials.
+
 
 ## 2.0.8 (17/3/2026)
 - Reworked discussion and annotation exports to be more robust, intuitive and maintainable.
