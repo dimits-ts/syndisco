@@ -1,5 +1,53 @@
 # What's new
 
+## 2.1.0 (03/04/2026)
+Version 2.1.0 simplifies the API even more. The library is exclusively focused on 
+general discussion generation (instead of facilitative discussions), 
+and extraneous, easy-to-break, and hard-to-maintain functions have been retired.
+
+
+### Features
+- The `Discussion`, `Annotation`, `DiscussionExperiment`, and `AnnotationExperiment` classes
+no longer natively support facilitator (moderator) agents by default.
+    - Instead, moderator agents can be modelled as regular agents with special 
+    instruction prompts, with a slight modification of the turn-taking function
+    to pass them priority after every comment.
+
+- Data import and export is no longer handled by the `Discussion` and `Annotation` 
+classes. Instead, all persistent state is managed by the new `Logs` class.
+    - This distinction merges the unreliable and unintuitive ways of loading 
+    serialized outputs into a single, simple API for both classes.
+    - The `Discussion` and `Annotation` classes are now exclusively used for
+    runtime execution, which should simplify the API for new users.
+
+- The `Discussion` class now allows for step-by-step execution.
+    - Specifically, it's now an iterator that can be called in the same way as 
+    a `list` or `range` would.
+    - This change allows for interactive approaches or the implementation of
+    a REST API in the future.
+
+- The `postprocessing` module has been retired.
+    - Since all logs are serialized in a standard JSON format, it makes little 
+    sense also supporting CSV exports.
+    - This module historically had the most problematic support, with frequent 
+    bugs and schema breaks. It was also very hard to maintain, since any implicit
+    change in any dataclass broke the code.
+    - Instead of rewriting the entire module, we are retiring it and instead
+    pull our efforts into making the JSON serializer more intuitive.
+
+
+### Fixes
+
+- Common classes have now (finally) been moved up to the top module.
+    - This change allows users to call `syndisco.Discussion` instead of
+    `syndisco.jobs.Discussion`, which had quickly become annoying.
+
+- Persona prompts now only include specified demographic dimensions.
+    - Up until now, leaving fields blank would include these fields in the prompt.
+    - This minor change will make some prompts shorter, which should make a difference
+    when using local models at scale.
+
+
 ## 2.0.8 (17/3/2026)
 - Reworked discussion and annotation exports to be more robust, intuitive and maintainable.
 - Transformer models are now loaded in eval mode and run on inference mode.
