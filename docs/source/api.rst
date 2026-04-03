@@ -1,8 +1,20 @@
 API Reference
 =============
 
-Core Experiments
-----------------
+Single Job Management
+---------------------
+
+.. autosummary::
+   :toctree: generated/
+   :nosignatures:
+
+   syndisco.Discussion
+   syndisco.Annotation
+   syndisco.Logs
+
+
+Multi-Job Management
+--------------------
 
 .. autosummary::
    :toctree: generated/
@@ -22,18 +34,6 @@ Actors
    syndisco.Actor
    syndisco.Persona
    syndisco.ActorType
-
-
-Jobs & Outputs
---------------
-
-.. autosummary::
-   :toctree: generated/
-   :nosignatures:
-
-   syndisco.Discussion
-   syndisco.Annotation
-   syndisco.Logs
 
 
 Models
@@ -65,5 +65,5 @@ Utilities
    :toctree: generated/
    :nosignatures:
 
-   syndisco.logging_setup
+   syndisco.logging
    syndisco.timing

@@ -46,7 +46,6 @@ Introduction
    overview
    installation
    guides
-   syndisco
    api
 
 
