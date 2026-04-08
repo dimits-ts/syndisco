@@ -145,7 +145,7 @@ class Actor:
         self.instructions = instructions
         self.actor_type = actor_type
 
-    def _system_prompt(self) -> str:
+    def system_prompt(self) -> str:
         prompt = {
             "context": self.context,
             "instructions": self.instructions,
@@ -158,7 +158,7 @@ class Actor:
         }
         return json.dumps(prompt)
 
-    def _message_prompt(self, history: list[str]) -> str:
+    def message_prompt(self, history: list[str]) -> str:
         return _apply_template(self.actor_type, self.get_name(), history)
 
     @typing.final
@@ -172,19 +172,10 @@ class Actor:
         :return: The actor's new message
         :rtype: str
         """
-        system_prompt = self._system_prompt()
-        message_prompt = self._message_prompt(history)
+        system_prompt = self.system_prompt()
+        message_prompt = self.message_prompt(history)
         response = self.model.prompt(system_prompt, message_prompt)
         return response
-
-    def describe(self) -> str:
-        """
-        Get a description of the actor's internals.
-
-        :return: A brief description of the actor
-        :rtype: dict
-        """
-        return self._system_prompt()
 
     @typing.final
     def get_name(self) -> str:
