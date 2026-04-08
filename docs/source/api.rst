@@ -33,7 +33,6 @@ Actors
 
    syndisco.Actor
    syndisco.Persona
-   syndisco.ActorType
 
 
 Models

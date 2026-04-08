@@ -1,5 +1,5 @@
 from .experiments import DiscussionExperiment, AnnotationExperiment
-from .actors import Actor, Persona, ActorType
+from .actors import Actor, Persona
 from .jobs import Discussion, Annotation, Logs
 from .logging import logging_setup, timing
 from .model import TransformersModel, OpenAIModel
@@ -18,6 +18,5 @@ __all__ = [
     "TransformersModel",
     "OpenAIModel",
     "RandomWeighted",
-    "RoundRobin",
-    "ActorType"
+    "RoundRobin"
 ]

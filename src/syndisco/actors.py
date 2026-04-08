@@ -25,19 +25,9 @@ import typing
 import dataclasses
 from pathlib import Path
 import json
-from enum import Enum, auto
 
 from . import model
 from . import _file_util
-
-
-class ActorType(str, Enum):
-    """
-    The purpose of the LLMActor, used to determine proper prompt structure
-    """
-
-    USER = auto()
-    ANNOTATOR = auto()
 
 
 @dataclasses.dataclass
@@ -113,7 +103,7 @@ class Actor:
         persona: Persona,
         context: str,
         instructions: str,
-        actor_type: ActorType,
+        is_annotator: bool = False,
     ) -> None:
         """
         Create an Actor controlled by an LLM instance with a specific persona.
@@ -134,22 +124,22 @@ class Actor:
             The actor instructions for the discussion.
         :type instructions:
             str
-        :param actor_type:
-            Whether the actor is an annotator or participant.
+        :param is_annotator:
+            Whether the actor is an annotator or discussion participant.
         :type actor_type:
-            ActorType
+            bool
         """
         self.model = model
         self.persona = persona
         self.context = context
         self.instructions = instructions
-        self.actor_type = actor_type
+        self.is_annotator = is_annotator
 
-    def system_prompt(self) -> str:
+    def get_system_prompt(self) -> str:
         prompt = {
             "context": self.context,
             "instructions": self.instructions,
-            "type": self.actor_type,
+            "type": "annotator" if self.is_annotator else "user",
             "persona": {
                 item[0]: item[1]
                 for item in self.persona.to_dict().items()
@@ -158,8 +148,25 @@ class Actor:
         }
         return json.dumps(prompt)
 
-    def message_prompt(self, history: list[str]) -> str:
-        return _apply_template(self.actor_type, self.get_name(), history)
+    def get_message_prompt(self, history: list[str]) -> str:
+        if self.is_annotator:
+            json_input = {
+                "role": "user",
+                "content": (
+                    f"{"\n".join(history)}"
+                    f"\nUser {self.persona.username} posted:"
+                ),
+            }
+        else:
+            # LLMActor asks the model to respond as its username
+            # we instead prompt it to write the annotation
+            json_input = {
+                "role": "user",
+                "content": (
+                    f"Conversation so far:\n{"\n".join(history)}\nOutput:"
+                ),
+            }
+        return json.dumps(json_input)
 
     @typing.final
     def speak(self, history: list[str]) -> str:
@@ -172,8 +179,8 @@ class Actor:
         :return: The actor's new message
         :rtype: str
         """
-        system_prompt = self.system_prompt()
-        message_prompt = self.message_prompt(history)
+        system_prompt = self.get_system_prompt()
+        message_prompt = self.get_message_prompt(history)
         response = self.model.prompt(system_prompt, message_prompt)
         return response
 
@@ -186,23 +193,3 @@ class Actor:
         :rtype: str
         """
         return self.persona.username
-
-
-def _apply_template(
-    actor_type: ActorType, username: str, history: list[str]
-) -> str:
-
-    if actor_type == ActorType.USER:
-        json_input = {
-            "role": "user",
-            "content": f"{"\n".join(history)}\nUser {username} posted:",
-        }
-    elif actor_type == ActorType.ANNOTATOR:
-        # LLMActor asks the model to respond as its username
-        # by modifying this protected method, we instead prompt
-        # it to write the annotation
-        json_input = {
-            "role": "user",
-            "content": f"Conversation so far:\n{"\n".join(history)}\nOutput:",
-        }
-    return json.dumps(json_input)

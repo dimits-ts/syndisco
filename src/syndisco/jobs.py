@@ -310,8 +310,7 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
                     model=None,  # type: ignore
                     persona=actors.Persona(username=username),
                     context="",
-                    instructions="",
-                    actor_type=actors.ActorType.USER,
+                    instructions=""
                 )
                 if comment.strip() != "":
                     self._archive_response(seed_user, comment)
@@ -332,7 +331,7 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
             name=user.get_name(),
             text=comment,
             model=model_name,
-            prompt=user.describe(),
+            prompt=user.get_system_prompt(),
         )
         formatted = _format_chat_message(user.get_name(), comment)
         self.ctx_history.append(formatted)
