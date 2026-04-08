@@ -1,5 +1,5 @@
 from .experiments import DiscussionExperiment, AnnotationExperiment
-from .actors import Actor, Persona
+from .actors import Actor
 from .jobs import Discussion, Annotation, Logs
 from .logging import logging_setup
 from .model import TransformersModel, OpenAIModel
@@ -9,7 +9,6 @@ __all__ = [
     "DiscussionExperiment",
     "AnnotationExperiment",
     "Actor",
-    "Persona",
     "Discussion",
     "Annotation",
     "Logs",

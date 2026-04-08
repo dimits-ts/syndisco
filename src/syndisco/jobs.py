@@ -308,9 +308,9 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
             for username, comment in zip(usernames, self.seed_opinions):
                 seed_user = actors.Actor(
                     model=None,  # type: ignore
-                    persona=actors.Persona(username=username),
+                    persona={"username": username},
                     context="",
-                    instructions=""
+                    instructions="",
                 )
                 if comment.strip() != "":
                     self._archive_response(seed_user, comment)
@@ -384,7 +384,7 @@ class Annotation:
                 name=username,
                 text=annotation,
                 model=self.annotator.model.get_name(),
-                prompt=self.annotator.describe()
+                prompt=self.annotator.get_user_prompt(),
             )
 
             if verbose:

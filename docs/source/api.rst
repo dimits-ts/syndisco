@@ -1,6 +1,19 @@
 API Reference
 =============
 
+
+Generation
+------
+
+.. autosummary::
+   :toctree: generated/
+   :nosignatures:
+
+   syndisco.Actor
+   syndisco.TransformersModel
+   syndisco.OpenAIModel
+
+
 Single Job Management
 ---------------------
 
@@ -22,28 +35,6 @@ Multi-Job Management
 
    syndisco.DiscussionExperiment
    syndisco.AnnotationExperiment
-
-
-Actors
-------
-
-.. autosummary::
-   :toctree: generated/
-   :nosignatures:
-
-   syndisco.Actor
-   syndisco.Persona
-
-
-Models
-------
-
-.. autosummary::
-   :toctree: generated/
-   :nosignatures:
-
-   syndisco.TransformersModel
-   syndisco.OpenAIModel
 
 
 Turn Management

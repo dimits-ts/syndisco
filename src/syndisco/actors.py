@@ -22,73 +22,9 @@ Module defining LLM users in discussions and their characteristics.
 
 
 import typing
-import dataclasses
-from pathlib import Path
 import json
 
 from . import model
-from . import _file_util
-
-
-@dataclasses.dataclass
-class Persona:
-    """
-    A dataclass holding information about the synthetic persona of a LLM actor.
-    Includes name, Sociodemographic Background, personality
-    and special instructions.
-    """
-
-    username: str = ""
-    age: int = -1
-    sex: str = ""
-    sexual_orientation: str = ""
-    demographic_group: str = ""
-    current_employment: str = ""
-    education_level: str = ""
-    special_instructions: str = ""
-    personality_characteristics: list[str] = dataclasses.field(
-        default_factory=list
-    )
-
-    @staticmethod
-    def from_json_file(file_path: Path) -> list:
-        """
-        Generate a list of personas from a properly formatted persona JSON
-        file.
-
-        :param file_path: the path to the JSON file containing the personas
-        :type file_path: Path
-        :return: a list of LlmPersona objects for each of the file entries
-        :rtype: list[LlmPersona]
-        """
-        all_personas = _file_util.read_json_file(file_path)
-
-        persona_objs = []
-        for data_dict in all_personas:
-            # code from https://stackoverflow.com/questions/68417319/initialize-python-dataclass-from-dictionary # noqa: E501
-            field_set = {f.name for f in dataclasses.fields(Persona) if f.init}
-            filtered_arg_dict = {
-                k: v for k, v in data_dict.items() if k in field_set
-            }
-            persona_obj = Persona(**filtered_arg_dict)
-            persona_objs.append(persona_obj)
-
-        return persona_objs
-
-    def to_dict(self):
-        return dataclasses.asdict(self)
-
-    def to_json_file(self, output_path: str) -> None:
-        """
-        Serialize the data to a .json file.
-
-        :param output_path: The path of the new file
-        :type output_path: str
-        """
-        _file_util.dict_to_json(self.to_dict(), output_path)
-
-    def __str__(self):
-        return json.dumps(self.to_dict())
 
 
 class Actor:
@@ -100,10 +36,11 @@ class Actor:
     def __init__(
         self,
         model: model.BaseModel,
-        persona: Persona,
+        persona: dict[str, str],
         context: str,
         instructions: str,
         is_annotator: bool = False,
+        name: str = "<Unnamed>"
     ) -> None:
         """
         Create an Actor controlled by an LLM instance with a specific persona.
@@ -115,7 +52,7 @@ class Actor:
         :param persona:
             The actor's persona.
         :type persona:
-            persona.LLMPersona
+            dict[str, str]
         :param context:
             The context of the discussion.
         :type context:
@@ -134,6 +71,7 @@ class Actor:
         self.context = context
         self.instructions = instructions
         self.is_annotator = is_annotator
+        self.name = name
 
     def get_system_prompt(self) -> str:
         """
@@ -147,8 +85,7 @@ class Actor:
             "type": "annotator" if self.is_annotator else "user",
             "persona": {
                 item[0]: item[1]
-                for item in self.persona.to_dict().items()
-                if item[1] != "" and item[1] != -1 and item[1] != []
+                for item in self.persona.items()
             },
         }
         return json.dumps(prompt)
@@ -183,7 +120,7 @@ class Actor:
             json_input = {
                 "role": "user",
                 "content": (
-                    history_str + f"\nUser {self.persona.username} posted:"
+                    history_str + f"\nUser {self.name} posted:"
                 ),
             }
 
@@ -217,8 +154,4 @@ class Actor:
         :return: The name of the actor.
         :rtype: str
         """
-        return (
-            self.persona.username
-            if self.persona.username != ""
-            else "<Unnamed>"
-        )
+        return self.name

@@ -44,8 +44,7 @@ There are several ways to customize the type of discussion experiments SynDisco 
 - **Participant personas**:  
   In order to achieve more "realistic" (or at least varied) discussions [#f1]_
   we can supply each simulated user with a list of socio-demographic and
-  personality traits. This is achieved using a unified ``Persona`` dataclass.
-  Personas can be serialized/loaded as a JSON file using the following schema:
+  personality traits. This is achieved using any JSON schema such as:
 
   .. code-block:: json
 
