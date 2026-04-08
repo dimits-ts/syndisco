@@ -30,7 +30,7 @@ from pathlib import Path
 from tqdm.auto import tqdm
 
 from . import actors, turn_manager
-from . import logging, _file_util
+from . import _file_util
 from . import jobs
 
 
@@ -107,8 +107,10 @@ class DiscussionExperiment:
         :param verbose: Whether to print intermediate progress and outputs.
         :type verbose: bool
         """
+        logger.info("Starting synthetic discussion generation.")
         discussions = self._generate_discussions()
         self._run_all_discussions(discussions, discussions_output_dir, verbose)
+        logger.info("Finished synthetic discussion generation.")
 
     def _generate_discussions(self) -> list[jobs.Discussion]:
         """
@@ -140,7 +142,6 @@ class DiscussionExperiment:
             next_turn_manager=self.next_turn_manager,
         )
 
-    @logging.timing
     def _run_all_discussions(
         self,
         discussions: list[jobs.Discussion],
@@ -167,9 +168,6 @@ class DiscussionExperiment:
                 discussion=discussion, output_dir=output_dir, verbose=verbose
             )
 
-        logger.info("Finished synthetic discussion generation.")
-
-    @logging.timing
     def _run_single_discussion(
         self, discussion: jobs.Discussion, output_dir: Path, verbose: bool
     ) -> None:
@@ -285,7 +283,6 @@ class AnnotationExperiment:
             history_ctx_len=self.history_ctx_len
         )
 
-    @logging.timing
     def _run_all_annotations(
         self,
         annotation_tasks: list[jobs.Annotation],
@@ -307,7 +304,6 @@ class AnnotationExperiment:
 
         logger.info("Finished annotation generation.")
 
-    @logging.timing
     def _run_single_annotation(
         self, annotation_task: jobs.Annotation, output_dir: Path, verbose: bool
     ) -> None:

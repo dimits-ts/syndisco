@@ -65,4 +65,3 @@ Utilities
    :nosignatures:
 
    syndisco.logging
-   syndisco.timing

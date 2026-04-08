@@ -92,31 +92,6 @@ def logging_setup(
     pylog.captureWarnings(log_warnings)
 
 
-# https://stackoverflow.com/questions/1622943/timeit-versus-timing-decorator
-def timing(f: typing.Callable) -> typing.Any:
-    """
-    Decorator which logs the execution time of a function.
-
-    :param f: the function to be timed
-    :type f: Function
-    :return: the result of the function
-    :rtype: _type_
-    """
-
-    @functools.wraps(f)
-    def wrap(*args, **kw):
-        ts = time.time()
-        result = f(*args, **kw)
-        te = time.time()
-        exec_time_mins = (te - ts) / 60
-        logger.debug(
-            f"Procedure {f.__name__} executed in {exec_time_mins:2.4f} minutes"
-        )
-        return result
-
-    return wrap
-
-
 def _str_to_log_level(level_str: str):
     match level_str.lower().strip():
         case "debug":
