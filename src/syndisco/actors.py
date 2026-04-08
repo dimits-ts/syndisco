@@ -136,6 +136,11 @@ class Actor:
         self.is_annotator = is_annotator
 
     def get_system_prompt(self) -> str:
+        """
+        Get the system prompt provided to the agent.
+        :return: The system prompt provided to the agent.
+        :rtype: str
+        """
         prompt = {
             "context": self.context,
             "instructions": self.instructions,
@@ -143,36 +148,56 @@ class Actor:
             "persona": {
                 item[0]: item[1]
                 for item in self.persona.to_dict().items()
-                if item[1] != "" and item[1] != -1
+                if item[1] != "" and item[1] != -1 and item[1] != []
             },
         }
         return json.dumps(prompt)
 
-    def get_message_prompt(self, history: list[str]) -> str:
+    def get_user_prompt(self, history: list[str] | None = None) -> str:
+        """
+        Get the message prompt provided to the agent.
+        Changes depending on whether the agent is an annotator or a user.
+
+        :param history:
+            The history of previous messages. Each element in the list
+            corresponds to one message, including relevant information
+            (such as the name of the user who posted it).
+            None if no discussion history exists.
+        :type history: list[str] | None
+        :return: The message prompt provided to the agent.
+        :rtype: str
+        """
+        history_str = (
+            f"Conversation so far:\n{"\n".join(history)}"
+            if history is not None
+            else ""
+        )
         if self.is_annotator:
-            json_input = {
-                "role": "user",
-                "content": (
-                    f"{"\n".join(history)}"
-                    f"\nUser {self.persona.username} posted:"
-                ),
-            }
-        else:
             # LLMActor asks the model to respond as its username
             # we instead prompt it to write the annotation
             json_input = {
+                "role": "user",  # do not confuse this with our own roles
+                "content": history_str + "\nOutput:",
+            }
+        else:
+            json_input = {
                 "role": "user",
                 "content": (
-                    f"Conversation so far:\n{"\n".join(history)}\nOutput:"
+                    history_str + f"\nUser {self.persona.username} posted:"
                 ),
             }
+
         return json.dumps(json_input)
 
     @typing.final
-    def speak(self, history: list[str]) -> str:
+    def speak(self, history: list[str] | None = None) -> str:
         """
         Prompt the actor to speak, given a history of previous messages
-        in the conversation.
+        in the conversation (None if no history).
+
+        This method should not be modified. If you are subclassing Actor,
+        modify the :meth:get_user_prompt and :meth:get_system_prompt methods
+        instead.
 
         :param history: A list of previous messages.
         :type history: list[str]
@@ -180,7 +205,7 @@ class Actor:
         :rtype: str
         """
         system_prompt = self.get_system_prompt()
-        message_prompt = self.get_message_prompt(history)
+        message_prompt = self.get_user_prompt(history)
         response = self.model.prompt(system_prompt, message_prompt)
         return response
 
@@ -192,4 +217,8 @@ class Actor:
         :return: The name of the actor.
         :rtype: str
         """
-        return self.persona.username
+        return (
+            self.persona.username
+            if self.persona.username != ""
+            else "<Unnamed>"
+        )
