@@ -35,22 +35,24 @@ class Actor:
 
     def __init__(
         self,
-        model: model.BaseModel,
-        persona: dict[str, str],
-        context: str,
-        instructions: str,
+        model: model.BaseModel | None = None,
+        persona: dict[str, str] | None = None,
+        context: str = "",
+        instructions: str = "",
         is_annotator: bool = False,
-        name: str = "<Unnamed>"
+        name: str = "<Unnamed>",
     ) -> None:
         """
         Create an Actor controlled by an LLM instance with a specific persona.
 
         :param model:
             A wrapper encapsulating a promptable LLM instance.
+            None if the actor does not use an LLM.
         :type model:
             model.BaseModel
         :param persona:
-            The actor's persona.
+            The actor's persona as a dictionary of `attribute: value`,
+            e.g., `age: 24`. None if no persona.
         :type persona:
             dict[str, str]
         :param context:
@@ -66,8 +68,8 @@ class Actor:
         :type actor_type:
             bool
         """
-        self.model = model
-        self.persona = persona
+        self._model = model
+        self.persona = persona if persona is not None else {}
         self.context = context
         self.instructions = instructions
         self.is_annotator = is_annotator
@@ -83,10 +85,7 @@ class Actor:
             "context": self.context,
             "instructions": self.instructions,
             "type": "annotator" if self.is_annotator else "user",
-            "persona": {
-                item[0]: item[1]
-                for item in self.persona.items()
-            },
+            "persona": {item[0]: item[1] for item in self.persona.items()},
         }
         return json.dumps(prompt)
 
@@ -120,7 +119,7 @@ class Actor:
             json_input = {
                 "role": "user",
                 "content": (
-                    history_str + f"\nUser {self.name} posted:"
+                    history_str + f"\nUser {self.get_actor_name()} posted:"
                 ),
             }
 
@@ -141,13 +140,16 @@ class Actor:
         :return: The actor's new message
         :rtype: str
         """
+        if self._model is None:
+            raise ValueError("No model provided for generation.")
+
         system_prompt = self.get_system_prompt()
         message_prompt = self.get_user_prompt(history)
-        response = self.model.prompt(system_prompt, message_prompt)
+        response = self._model.prompt(system_prompt, message_prompt)
         return response
 
     @typing.final
-    def get_name(self) -> str:
+    def get_actor_name(self) -> str:
         """
         Get the actor's assigned name within the conversation.
 
@@ -155,3 +157,16 @@ class Actor:
         :rtype: str
         """
         return self.name
+
+    @typing.final
+    def get_model_name(self) -> str:
+        """
+        Get the actor's assigned name within the conversation.
+
+        :return: The name of the actor.
+        :rtype: str
+        """
+        if self._model is None:
+            raise ValueError("No model provided.")
+
+        return self._model.name

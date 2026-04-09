@@ -6,8 +6,9 @@ successive calls — so tests are hermetic and never hit a real LLM.
 """
 
 import pytest
-from .model import DummyModel
 from syndisco import Actor
+
+from .dummy import DummyModel
 
 
 PERSONA_ALICE: dict[str, str] = {
@@ -58,20 +59,26 @@ def annotator_actor(dummy_model: DummyModel):
 
 class TestActorConstruction:
     def test_name_is_stored(self, actor) -> None:
-        assert actor.get_name() == "Alice"
+        assert actor.get_actor_name() == "Alice"
+        assert actor.get_model_name() == "dummy"
+        assert isinstance(actor.get_actor_name(), str)
+        assert isinstance(actor.get_model_name(), str)
+
+    def test_name_unchanged_after_speak(self, actor) -> None:
+        actor.speak()
+        assert actor.get_actor_name() == "Alice"
+        assert actor.get_model_name() == "dummy"
 
     def test_default_name(self, dummy_model) -> None:
-
         unnamed = Actor(
             model=dummy_model,
             persona=PERSONA_ALICE,
             context=CONTEXT,
             instructions=INSTRUCTIONS,
         )
-        assert unnamed.get_name() == "<Unnamed>"
+        assert unnamed.get_actor_name() == "<Unnamed>"
 
     def test_is_annotator_false_by_default(self, dummy_model) -> None:
-
         a = Actor(
             model=dummy_model,
             persona=PERSONA_ALICE,
@@ -235,15 +242,3 @@ class TestSpeak:
     def test_annotator_speak_produces_output(self, annotator_actor) -> None:
         result = annotator_actor.speak(history=["Alice: Interesting point."])
         assert isinstance(result, str) and len(result) > 0
-
-
-class TestGetName:
-    def test_returns_string(self, actor) -> None:
-        assert isinstance(actor.get_name(), str)
-
-    def test_correct_name(self, actor) -> None:
-        assert actor.get_name() == "Alice"
-
-    def test_name_unchanged_after_speak(self, actor) -> None:
-        actor.speak()
-        assert actor.get_name() == "Alice"

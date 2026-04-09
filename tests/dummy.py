@@ -1,4 +1,4 @@
-from syndisco.model import BaseModel
+from syndisco import BaseModel, Actor
 
 
 class DummyModel(BaseModel):
@@ -36,3 +36,22 @@ class DummyModel(BaseModel):
     def call_count(self) -> int:
         """Total number of times prompt() has been called."""
         return self._index
+
+
+class DummyActor(Actor):
+    """Minimal Actor stub whose speak() cycles through preset strings."""
+
+    def __init__(
+        self,
+        name: str = "Bot",
+        responses: list[str] | None = None,
+        is_annotator: bool = False,
+    ) -> None:
+        self.name = name
+        self._responses = responses or [f"{name} says something."]
+        self._index = 0
+        self.is_annotator = is_annotator
+        self._model = DummyModel(["r1", "r2", "r3", "r4"])
+        self.context = "context"
+        self.instructions = "instructions"
+        self.persona = {"persona": "exists"}

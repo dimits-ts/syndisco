@@ -181,7 +181,7 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
     def __init__(
         self,
         next_turn_manager: turn_manager.TurnManager,
-        users: list[actors.Actor],
+        users: collections.abc.Iterable[actors.Actor],
         history_context_len: int = 5,
         conv_len: int = 5,
         seed_opinions: list[str] | None = None,
@@ -212,15 +212,20 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
             than participants.
         """
         users = copy.copy(users)
-        self._users = users
+        if any([actor.is_annotator for actor in users]):
+            raise ValueError(
+                "Annotator users can not participate in discussions."
+            )
+        self._users = list(users)
 
         self._next_turn_manager = next_turn_manager
         self._next_turn_manager.set_actors(users)
+        # iterator state
+        self._steps_taken: int = 0
 
         self.conv_len = conv_len
 
         # keep a limited context of the conversation to feed to the models
-        self.ctx_len = history_context_len
         self._ctx_history: collections.deque[str] = collections.deque(
             maxlen=history_context_len
         )
@@ -228,11 +233,43 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
         # all persistent log state is owned by DiscussionLogs
         self._logs = Logs()
 
-        self._seed_opinions = seed_opinions or []
-        self._seed_opinion_usernames = seed_opinion_usernames
+        if (seed_opinions is None) ^ (seed_opinion_usernames is None):
+            raise ValueError(
+                "Seed opinions and their respective usernames should either "
+                "be both None, or both defined."
+            )
 
-        # iterator state
-        self._steps_taken: int = 0
+        if (
+            seed_opinions is not None
+            and seed_opinion_usernames is not None
+            and len(seed_opinions) != len(seed_opinion_usernames)
+        ):
+            raise ValueError(
+                f"Length of seed opinions ({len(seed_opinions)}) differs from "
+                f"length of seed usernames ({len(seed_opinion_usernames)})"
+            )
+
+        if (
+            seed_opinions is not None
+            and seed_opinion_usernames is not None
+            and any(
+                [
+                    entry is None
+                    for entry in seed_opinions + seed_opinion_usernames
+                ]
+            )
+        ):
+            raise ValueError("Seed opinions and usernames should be non-None.")
+
+        self._seed_opinions = seed_opinions or []
+        self._seed_opinion_usernames = seed_opinion_usernames or []
+
+        for opinion, name in zip(
+            self._seed_opinions, self._seed_opinion_usernames
+        ):
+            self._archive_response(
+                user=actors.Actor(name=name), comment=opinion
+            )
 
     def __next__(self) -> dict[str, str]:
         """
@@ -260,7 +297,7 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
 
         # Whitespace response: return a placeholder entry so the caller
         # always receives one value per next() call.
-        return {"name": actor.get_name(), "text": "", "model": ""}
+        return {"name": actor.get_actor_name(), "text": "", "model": ""}
 
     # Convenience one-shot API
     def begin(self, verbose: bool = True) -> None:
@@ -300,7 +337,7 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
                         "for seed opinions."
                     )
                 usernames = random.sample(
-                    list([user.get_name() for user in self._users]),
+                    list([user.get_actor_name() for user in self._users]),
                     len(self._seed_opinions),
                 )
 
@@ -324,15 +361,15 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
         :type comment: str
         """
         model_name = (
-            user.model.get_name() if user.model is not None else "hardcoded"
+            user._model.get_name() if user._model is not None else "hardcoded"
         )
         self._logs.append(
-            name=user.get_name(),
+            name=user.get_actor_name(),
             text=comment,
             model=model_name,
             prompt=user.get_system_prompt(),
         )
-        formatted = _format_chat_message(user.get_name(), comment)
+        formatted = _format_chat_message(user.get_actor_name(), comment)
         self._ctx_history.append(formatted)
 
 
@@ -362,6 +399,10 @@ class Annotation:
             will remember, defaults to 2.
         :type history_ctx_len: int, optional
         """
+        if not annotator.is_annotator:
+            annotator = copy.deepcopy(annotator)
+            annotator.is_annotator = True
+
         self._annotator = annotator
         self._history_ctx_len = history_ctx_len
         self._discussion_logs = copy.deepcopy(discussion_logs)
@@ -390,7 +431,7 @@ class Annotation:
             self._annotation_logs.append(
                 name=username,
                 text=annotation,
-                model=self._annotator.model.get_name(),
+                model=self._annotator.get_model_name(),
                 prompt=self._annotator.get_user_prompt(),
             )
 

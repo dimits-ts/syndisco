@@ -22,7 +22,6 @@ Module handling the turn order of LLM participants in discussions.
 
 import abc
 import random
-import warnings
 import typing
 from collections.abc import Iterable
 from .actors import Actor
@@ -107,24 +106,27 @@ class RandomWeighted(TurnManager):
     another participant.
     """
 
-    DEFAULT_RESPOND_PROBABILITY = 0.5
-
     def __init__(
-        self, p_respond: float = -1, actors: Iterable[Actor] | None = None
+        self,
+        actors: Iterable[Actor] | None = None,
+        p_respond: float = 0,
     ):
+        """
+        A TurnManager that either selects a random participant, or lets the
+        second-to-last participant to respond to the last comment.
+
+        :param actors: The participants, None to set later. Defaults to None
+        :type actors: Iterable[Actor] | None, optional
+        :param p_respond: The chance within [0,1] that the second-to-last
+        participant is given priority, defaults to 0
+        :type p_respond: float, optional
+        """
         super().__init__(actors)
 
-        if p_respond == -1:
-            warnings.warn(
-                "Warning: No p_respond set in RandomWeighted instance, "
-                f"defaulting to {RandomWeighted.DEFAULT_RESPOND_PROBABILITY}"
-            )
-            self.chance_to_respond = RandomWeighted.DEFAULT_RESPOND_PROBABILITY
-        else:
-            self.chance_to_respond = p_respond
-            assert (
-                0 <= self.chance_to_respond <= 1
-            ), f"p_respond must be between 0 and 1, but is {p_respond}"
+        self.chance_to_respond = p_respond
+        assert (
+            0 <= self.chance_to_respond <= 1
+        ), f"p_respond must be between 0 and 1, but is {p_respond}"
 
         self.second_to_last_speaker = None
         self.last_speaker = None
