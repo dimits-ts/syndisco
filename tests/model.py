@@ -3,23 +3,36 @@ from syndisco.model import BaseModel
 
 class DummyModel(BaseModel):
     """
-    A deterministic test double for BaseModel.
-    Returns a configurable fixed response and records every call made to it.
+    Deterministic test double for BaseModel.
+
+    Returns responses from *responses* in order.  Once exhausted the list
+    wraps around (cycling), so a test that calls prompt() more times than
+    there are canned responses never raises StopIteration.
+
+    Example
+    -------
+    >>> m = DummyModel(["hello", "world"])
+    >>> m.prompt("sys", "usr")
+    'hello'
+    >>> m.prompt("sys", "usr")
+    'world'
+    >>> m.prompt("sys", "usr")   # wraps
+    'hello'
     """
 
-    def __init__(
-        self,
-        name: str = "dummy",
-        max_out_tokens: int = 256,
-        stop_list: list[str] | None = None,
-        fixed_response: str = "dummy response",
-    ):
-        super().__init__(name, max_out_tokens, stop_list)
-        self.fixed_response = fixed_response
-        self.calls: list[dict] = (
-            []
-        )  # stores (system_prompt, user_prompt) pairs
+    def __init__(self, responses: list[str]) -> None:
+        super().__init__("dummy", 5, [])
+        if not responses:
+            raise ValueError("DummyModel requires at least one response.")
+        self._responses = responses
+        self._index = 0
 
     def _generate_response(self, system_prompt: str, user_prompt: str) -> str:
-        self.calls.append({"system": system_prompt, "user": user_prompt})
-        return self.fixed_response
+        response = self._responses[self._index % len(self._responses)]
+        self._index += 1
+        return response
+
+    @property
+    def call_count(self) -> int:
+        """Total number of times prompt() has been called."""
+        return self._index

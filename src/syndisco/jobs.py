@@ -369,6 +369,14 @@ class Annotation:
         self.annotation_logs = Logs()
 
     def begin(self, verbose: bool = True) -> None:
+        """
+        Run annotation on the entire discussion, printing each entry when
+        *verbose* is ``True``.
+
+        :param verbose: Whether to print each comment to stdout,
+            defaults to ``True``.
+        :type verbose: bool, optional
+        """
         ctx_history: collections.deque[str] = collections.deque(
             maxlen=self.history_ctx_len
         )

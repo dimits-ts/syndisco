@@ -59,7 +59,8 @@ dev = [
   "ipywidgets",
   "pandoc",
   "build",
-  "twine"
+  "twine",
+  "pytest"
 ]
 
 [build-system]
