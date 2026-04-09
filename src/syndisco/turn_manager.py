@@ -25,36 +25,41 @@ import random
 import warnings
 import typing
 from collections.abc import Iterable
+from .actors import Actor
 
 
-class TurnManager(Iterable):
+class TurnManager(Iterable, abc.ABC):
     """
-    A class that handles which handles turns between users.
+    An abstract class specifying the selection of the next speaker in a
+    :class:Discussion.
     """
 
-    def __init__(self, names: Iterable[str] | None = None):
+    def __init__(self, actors: Iterable[Actor] | None = None):
         """
         Construct a new TurnManager.
 
-        :param names: The usernames of the participants.
-            Can be left null if names are to be decided
+        :param actors: The participants.
+            Can be left null if the participants are to be decided
             after this object's creation.
-        :type config: dict[str, float], optional
+        :type actors: Iterable[Actor]
         """
-        self.names = [] if names is None else list(names)
+        if actors is None:
+            self.actors = []
+        else:
+            self.actors = list(actors)
 
     @typing.final
-    def set_names(self, names: Iterable[str]) -> None:
+    def set_actors(self, actors: Iterable[Actor]) -> None:
         """
         Initialize the manager by providing the names of the users.
 
         :param names: the usernames of the participants
         :type names: Iterable[str]
         """
-        self.names = list(names)
+        self.names = list(actors)
 
     @typing.final
-    def next(self) -> str:
+    def next(self) -> Actor:
         """
         Get the username of the next speaker.
 
@@ -77,7 +82,7 @@ class TurnManager(Iterable):
         return self.next()
 
     @abc.abstractmethod
-    def _next_impl(self) -> str:
+    def _next_impl(self) -> Actor:
         raise NotImplementedError("Abstract method called")
 
 
@@ -86,14 +91,14 @@ class RoundRobin(TurnManager):
     A simple turn manager which gives priority to the next user in the queue.
     """
 
-    def __init__(self, names: Iterable[str] | None = None):
-        super().__init__(names)
+    def __init__(self, actors: Iterable[Actor] | None = None):
+        super().__init__(actors)
         self.curr_turn = -1
 
-    def _next_impl(self) -> str:
+    def _next_impl(self) -> Actor:
         self.curr_turn += 1
-        new_speaker_index = self.curr_turn % len(self.names)
-        return self.names[new_speaker_index]
+        new_speaker_index = self.curr_turn % len(self.actors)
+        return self.actors[new_speaker_index]
 
 
 class RandomWeighted(TurnManager):
@@ -105,9 +110,9 @@ class RandomWeighted(TurnManager):
     DEFAULT_RESPOND_PROBABILITY = 0.5
 
     def __init__(
-        self, p_respond: float = -1, names: Iterable[str] | None = None
+        self, p_respond: float = -1, actors: Iterable[Actor] | None = None
     ):
-        super().__init__(names)
+        super().__init__(actors)
 
         if p_respond == -1:
             warnings.warn(
@@ -124,7 +129,7 @@ class RandomWeighted(TurnManager):
         self.second_to_last_speaker = None
         self.last_speaker = None
 
-    def _next_impl(self) -> str:
+    def _next_impl(self) -> Actor:
         # If first time asking for a speaker, return random speaker
         if self.second_to_last_speaker is None:
             next_speaker = self._select_other_random_speaker()
@@ -147,7 +152,7 @@ class RandomWeighted(TurnManager):
     def _weighted_coin_flip(self) -> bool:
         return self.chance_to_respond > random.uniform(0, 1)
 
-    def _select_other_random_speaker(self) -> str:
+    def _select_other_random_speaker(self) -> Actor:
         other_usernames = [
             username
             for username in self.names

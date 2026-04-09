@@ -10,6 +10,7 @@ Generation
    :nosignatures:
 
    syndisco.Actor
+   syndisco.BaseModel
    syndisco.TransformersModel
    syndisco.OpenAIModel
 
@@ -44,6 +45,7 @@ Turn Management
    :toctree: generated/
    :nosignatures:
 
+   syndisco.TurnManager
    syndisco.RandomWeighted
    syndisco.RoundRobin
 

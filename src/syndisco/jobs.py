@@ -212,24 +212,24 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
             than participants.
         """
         users = copy.copy(users)
-        self.username_user_map = {user.get_name(): user for user in users}
+        self._users = users
 
-        self.next_turn_manager = next_turn_manager
-        self.next_turn_manager.set_names([user.get_name() for user in users])
+        self._next_turn_manager = next_turn_manager
+        self._next_turn_manager.set_actors(users)
 
         self.conv_len = conv_len
 
         # keep a limited context of the conversation to feed to the models
         self.ctx_len = history_context_len
-        self.ctx_history: collections.deque[str] = collections.deque(
+        self._ctx_history: collections.deque[str] = collections.deque(
             maxlen=history_context_len
         )
 
         # all persistent log state is owned by DiscussionLogs
-        self.logs = Logs()
+        self._logs = Logs()
 
-        self.seed_opinions = seed_opinions or []
-        self.seed_opinion_usernames = seed_opinion_usernames
+        self._seed_opinions = seed_opinions or []
+        self._seed_opinion_usernames = seed_opinion_usernames
 
         # iterator state
         self._steps_taken: int = 0
@@ -250,14 +250,13 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
         if self._steps_taken >= self.conv_len:
             raise StopIteration
 
-        speaker_name = self.next_turn_manager.next()
-        actor = self.username_user_map[speaker_name]
-        res = actor.speak(list(self.ctx_history))
+        actor = self._next_turn_manager.next()
+        res = actor.speak(list(self._ctx_history))
         self._steps_taken += 1
 
         if res.strip():
             self._archive_response(actor, res)
-            return self.logs[-1]
+            return self._logs[-1]
 
         # Whitespace response: return a placeholder entry so the caller
         # always receives one value per next() call.
@@ -289,23 +288,23 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
         :return: A copy of the discussion logs.
         :rtype: DiscussionLogs
         """
-        return copy.deepcopy(self.logs)
+        return copy.deepcopy(self._logs)
 
     def _add_seed_opinions(self) -> None:
-        if len(self.seed_opinions) > 0:
-            usernames = self.seed_opinion_usernames
+        if len(self._seed_opinions) > 0:
+            usernames = self._seed_opinion_usernames
             if usernames is None:
-                if len(self.seed_opinions) > len(self.username_user_map):
+                if len(self._seed_opinions) > len(self._users):
                     raise ValueError(
                         "Not enough users to assign unique usernames "
                         "for seed opinions."
                     )
                 usernames = random.sample(
-                    list(self.username_user_map.keys()),
-                    len(self.seed_opinions),
+                    list([user.get_name() for user in self._users]),
+                    len(self._seed_opinions),
                 )
 
-            for username, comment in zip(usernames, self.seed_opinions):
+            for username, comment in zip(usernames, self._seed_opinions):
                 seed_user = actors.Actor(
                     model=None,  # type: ignore
                     persona={"username": username},
@@ -327,14 +326,14 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
         model_name = (
             user.model.get_name() if user.model is not None else "hardcoded"
         )
-        self.logs.append(
+        self._logs.append(
             name=user.get_name(),
             text=comment,
             model=model_name,
             prompt=user.get_system_prompt(),
         )
         formatted = _format_chat_message(user.get_name(), comment)
-        self.ctx_history.append(formatted)
+        self._ctx_history.append(formatted)
 
 
 class Annotation:
@@ -363,10 +362,10 @@ class Annotation:
             will remember, defaults to 2.
         :type history_ctx_len: int, optional
         """
-        self.annotator = annotator
-        self.history_ctx_len = history_ctx_len
-        self.discussion_logs = copy.deepcopy(discussion_logs)
-        self.annotation_logs = Logs()
+        self._annotator = annotator
+        self._history_ctx_len = history_ctx_len
+        self._discussion_logs = copy.deepcopy(discussion_logs)
+        self._annotation_logs = Logs()
 
     def begin(self, verbose: bool = True) -> None:
         """
@@ -378,21 +377,21 @@ class Annotation:
         :type verbose: bool, optional
         """
         ctx_history: collections.deque[str] = collections.deque(
-            maxlen=self.history_ctx_len
+            maxlen=self._history_ctx_len
         )
 
-        for message_data in tqdm(self.discussion_logs):
+        for message_data in tqdm(self._discussion_logs):
             username = message_data["name"]
             message = message_data["text"]
 
             formatted_message = _format_chat_message(username, message)
             ctx_history.append(formatted_message)
-            annotation = self.annotator.speak(list(ctx_history))
-            self.annotation_logs.append(
+            annotation = self._annotator.speak(list(ctx_history))
+            self._annotation_logs.append(
                 name=username,
                 text=annotation,
-                model=self.annotator.model.get_name(),
-                prompt=self.annotator.get_user_prompt(),
+                model=self._annotator.model.get_name(),
+                prompt=self._annotator.get_user_prompt(),
             )
 
             if verbose:
@@ -408,7 +407,7 @@ class Annotation:
             judgements for each comment in the provided discussion.
         :rtype: DiscussionLogs
         """
-        return copy.deepcopy(self.annotation_logs)
+        return copy.deepcopy(self._annotation_logs)
 
 
 def _format_chat_message(username: str, message: str) -> str:
