@@ -58,13 +58,14 @@ class DiscussionExperiment:
         Initialize a synthetic discussion experiment.
 
         :param users: List of all possible participants (LLM agents).
-        :type users: list[actors.Actor]
+        :type users: list[Actor]
         :param seed_opinions: Hardcoded seed discussion
-            segements to initiate synthetic discussions.
+            segments to initiate synthetic discussions.
+            Each segment is a sequence of comments (strings).
             One segment will be selected randomly for each new synthetic
             discussion and will be uttered by random synthetic participants.
             None if no seed opinions are to be provided.
-        :type seed_opinions: list[list[str]], optional
+        :type seed_opinions: Sequence[Sequence[str]], optional
         :param next_turn_manager: Strategy for selecting the next speaker.
             Defaults to round-robin if None.
         :type next_turn_manager: turn_manager.TurnManager or None
@@ -97,13 +98,16 @@ class DiscussionExperiment:
 
     def begin(
         self,
-        discussions_output_dir: Path = Path("./output"),
+        discussions_output_dir: Path,
         verbose: bool = True,
     ) -> None:
         """
         Generate and run all configured discussions.
+        The method serializes each discussion immediately upon completion.
+        Thus, limited data is lost upon even fatal errors during execution.
 
-        :param discussions_output_dir: Directory to write output JSON files.
+        :param discussions_output_dir:
+            Directory to place the serialized :class:Logs for each discussion.
         :type discussions_output_dir: Path
         :param verbose: Whether to print intermediate progress and outputs.
         :type verbose: bool
@@ -118,7 +122,7 @@ class DiscussionExperiment:
         Internal helper to generate Discussion objects from configuration.
 
         :return: A list of configured Discussion objects.
-        :rtype: list[jobs.Discussion]
+        :rtype: list[Discussion]
         """
         experiments = []
         for _ in range(self.num_discussions):
@@ -130,7 +134,7 @@ class DiscussionExperiment:
         Create and return a single randomized Discussion instance.
 
         :return: A synthetic Discussion object.
-        :rtype: jobs.Discussion
+        :rtype: Discussion
         """
         rand_topic = random.choice(self.seed_opinions)
         rand_users = list(random.sample(self.users, k=self.num_active_users))
@@ -153,7 +157,7 @@ class DiscussionExperiment:
         Execute all generated discussions and write their outputs to disk.
 
         :param discussions: List of Discussion instances to run.
-        :type discussions: Sequence[jobs.Discussion]
+        :type discussions: Sequence[Discussion]
         :param output_dir: Directory to save output JSON files.
         :type output_dir: Path
         :param verbose: Whether to print discussion progress.
@@ -162,9 +166,7 @@ class DiscussionExperiment:
         output_dir.mkdir(parents=True, exist_ok=True)
 
         for i, discussion in tqdm(list(enumerate(discussions))):
-            pylog.info(
-                f"Running experiment {i + 1}/{len(discussions) + 1}..."
-            )
+            pylog.info(f"Running experiment {i + 1}/{len(discussions) + 1}...")
             self._run_single_discussion(
                 discussion=discussion, output_dir=output_dir, verbose=verbose
             )
@@ -207,81 +209,72 @@ class AnnotationExperiment:
     def __init__(
         self,
         annotators: Sequence[actors.Actor],
+        discussion_logs: jobs.Logs,
         history_ctx_len: int = 3,
     ):
         """
         Initialize an annotation experiment using LLM-based annotators.
 
         :param annotators: List of annotator agents.
-        :type annotators: Sequence[actors.Actor]
+        :type annotators: Sequence[Actor]
+        :param discussion_logs: The discussions to be annotated.
+        :type discussion_logs: Sequence[Actor]
         :param history_ctx_len: Number of previous comments visible to the
             annotator.
         :type history_ctx_len: int
         """
         self.annotators = annotators
         self.history_ctx_len = history_ctx_len
+        self.discussion_logs = discussion_logs
 
-    def begin(
-        self, discussions_dir: Path, output_dir: Path, verbose: bool = True
-    ) -> None:
+    def begin(self, output_dir: Path, verbose: bool = True) -> None:
         """
-        Start the annotation process over all discussion logs in a directory.
+        Start the annotation process.
+        The method serializes each discussion immediately upon completion.
+        Thus, limited data is lost upon even fatal errors during execution.
 
-        :param discussions_dir: Directory containing discussion logs.
-        :type discussions_dir: Path
         :param output_dir: Directory to write annotation outputs.
         :type output_dir: Path
         :param verbose: Whether to display annotation progress.
         :type verbose: bool, defaults to True
         """
-        if not discussions_dir.is_dir():
-            raise OSError(
-                f"Discussions directory ({discussions_dir}) is not a directory"
-            ) from None
-
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        annotation_tasks = self._generate_annotation_tasks(discussions_dir)
+        annotation_tasks = self._generate_annotation_tasks()
         self._run_all_annotations(annotation_tasks, output_dir, verbose)
 
-    def _generate_annotation_tasks(
-        self, discussions_dir: Path
-    ) -> Sequence[jobs.Annotation]:
+    def _generate_annotation_tasks(self) -> Sequence[jobs.Annotation]:
         """
         Create annotation tasks by pairing each annotator with each discussion.
 
-        :param discussions_dir: Path to discussion log files.
-        :type discussions_dir: Path
         :return: List of Annotation tasks.
-        :rtype: Sequence[jobs.Annotation]
+        :rtype: Sequence[Annotation]
         """
         annotation_tasks = []
         for annotator in self.annotators:
-            for discussion_path in discussions_dir.iterdir():
-                annotation_task = self._create_annotation_task(
-                    copy.deepcopy(annotator), discussion_path
-                )
-                annotation_tasks.append(annotation_task)
+            annotation_task = self._create_annotation_task(
+                copy.deepcopy(annotator)
+            )
+            annotation_tasks.append(annotation_task)
         return annotation_tasks
 
     def _create_annotation_task(
-        self, annotator: actors.Actor, conv_logs_path: Path
+        self, annotator: actors.Actor
     ) -> jobs.Annotation:
         """
         Construct a single Annotation task.
 
         :param annotator: The LLM-based annotator.
-        :type annotator: actors.Actor
+        :type annotator: Actor
         :param conv_logs_path: Path to the discussion log file.
         :type conv_logs_path: Path
         :return: Configured Annotation task.
-        :rtype: jobs.Annotation
+        :rtype: Annotation
         """
-        discussion_logs = jobs.Logs.from_file(conv_logs_path)
         return jobs.Annotation(
             annotator=annotator,
-            discussion_logs=discussion_logs,
-            history_ctx_len=self.history_ctx_len
+            discussion_logs=self.discussion_logs,
+            history_ctx_len=self.history_ctx_len,
         )
 
     def _run_all_annotations(
@@ -294,7 +287,7 @@ class AnnotationExperiment:
         Execute and store all annotation tasks.
 
         :param annotation_tasks: List of Annotation objects.
-        :type annotation_tasks: Sequence[jobs.Annotation]
+        :type annotation_tasks: Sequence[Annotation]
         :param output_dir: Directory to save results.
         :type output_dir: Path
         :param verbose: Whether to log intermediate steps.
@@ -312,7 +305,7 @@ class AnnotationExperiment:
         Execute one annotation task and write its output.
 
         :param annotation_task: Single Annotation object to run.
-        :type annotation_task: jobs.Annotation
+        :type annotation_task: Annotation
         :param output_dir: Directory for output file.
         :type output_dir: Path
         :param verbose: Whether to show debug output.
