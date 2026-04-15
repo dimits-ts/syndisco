@@ -12,7 +12,6 @@ from pathlib import Path
 from tqdm.auto import tqdm
 
 from . import actors, turn_manager
-from . import _file_util
 
 
 logger = pylog.getLogger(Path(__file__).name)
@@ -143,10 +142,13 @@ class Logs:
         :param timestamp_format: strftime format for the timestamp field.
         :type timestamp_format: str, optional
         """
-        _file_util.dict_to_json(
-            self.to_dict(timestamp_format=timestamp_format),
-            output_path,
-        )
+        output_path = Path(output_path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        dictionary = self.to_dict(timestamp_format=timestamp_format)
+
+        with open(output_path, "w", encoding="utf8") as fout:
+            json.dump(dictionary, fout, indent=4)
 
     def __str__(self) -> str:
         return json.dumps(self.to_dict(), indent=4)
@@ -182,7 +184,7 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
     def __init__(
         self,
         next_turn_manager: turn_manager.TurnManager,
-        users: collections.abc.Iterable[actors.Actor],
+        users: typing.Sequence[actors.Actor],
         history_context_len: int = 5,
         conv_len: int = 5,
         seed_opinions: typing.Sequence[str] | None = None,
@@ -195,7 +197,7 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
             the participants.
         :type next_turn_manager: turn_manager.TurnManager
         :param users: Any iterable containing the discussion participants.
-        :type users: Iterable[actors.Actor]
+        :type users: Sequence[Actor]
         :param history_context_len: How many prior messages are included
             in the LLM's prompt as context, defaults to 5.
         :type history_context_len: int, optional
@@ -256,7 +258,8 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
             and any(
                 [
                     entry is None
-                    for entry in seed_opinions + seed_opinion_usernames
+                    for entry in list(seed_opinions)
+                    + list(seed_opinion_usernames)
                 ]
             )
         ):
@@ -475,3 +478,5 @@ def _format_chat_message(username: str, message: str) -> str:
         formatted_res = ""
 
     return formatted_res
+
+

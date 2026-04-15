@@ -24,6 +24,7 @@ in the syndisco.jobs module.
 import copy
 import random
 import typing
+import datetime
 import logging as pylog
 from pathlib import Path
 
@@ -31,7 +32,6 @@ from tqdm.auto import tqdm
 
 from . import actors
 from . import turn_manager as tmanager
-from . import _file_util
 from . import jobs
 
 
@@ -206,9 +206,7 @@ class DiscussionExperiment:
             logger.debug(f"Experiment parameters: {str(discussion)}")
 
             discussion.begin(verbose=verbose)
-            output_path = _file_util.generate_datetime_filename(
-                output_dir=output_dir, file_ending=".json"
-            )
+            output_path = _generate_datetime_filename(output_dir=output_dir)
             logs = discussion.get_logs()
             logs.export(output_path)
         except Exception as e:
@@ -328,10 +326,30 @@ class AnnotationExperiment:
         try:
             logger.debug(f"Experiment parameters: {str(annotation_task)}")
             annotation_task.begin(verbose=verbose)
-            output_path = _file_util.generate_datetime_filename(
-                output_dir=output_dir, file_ending=".json"
-            )
+            output_path = _generate_datetime_filename(output_dir=output_dir)
             annotation_logs = annotation_task.get_logs()
             annotation_logs.export(output_path)
         except Exception:
             logger.exception("Annotation experiment aborted due to error.")
+
+
+def _generate_datetime_filename(
+    output_dir: Path, timestamp_format: str = "%y-%m-%d-%H-%M-%S"
+) -> Path:
+    """
+    Generate a filename based on the current date and time.
+
+    :param output_dir: The path to the generated file.
+    :type output_dir: Path
+    :param timestamp_format: strftime format, defaults to "%y-%m-%d-%H-%M-%S"
+    :type timestamp_format: str, optional
+    :return: the full path for the generated file
+    :rtype: str
+    """
+    datetime_name = (
+        datetime.datetime.now().strftime(timestamp_format) + ".json"
+    )
+    path = Path(output_dir / datetime_name)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.touch()
+    return path
