@@ -79,7 +79,6 @@ class TestLogsEquality:
 class TestLogsConstruction:
 
     def test_empty_on_init(self) -> None:
-
         assert len(Logs()) == 0
 
     def test_append_increases_length(self) -> None:

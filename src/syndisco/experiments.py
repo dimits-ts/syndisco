@@ -22,15 +22,15 @@ in the syndisco.jobs module.
 # You may contact the author at dim.tsirmpas@aueb.gr
 
 import copy
-import time
 import random
+import typing
 import logging as pylog
 from pathlib import Path
-from typing import Sequence
 
 from tqdm.auto import tqdm
 
-from . import actors, turn_manager
+from . import actors
+from . import turn_manager as tmanager
 from . import _file_util
 from . import jobs
 
@@ -46,9 +46,11 @@ class DiscussionExperiment:
 
     def __init__(
         self,
-        users: Sequence[actors.Actor],
-        seed_opinions: Sequence[Sequence[str]] | None = None,
-        next_turn_manager: turn_manager.TurnManager | None = None,
+        users: typing.Sequence[actors.Actor],
+        seed_opinions: typing.Sequence[typing.Sequence[str]] | None = None,
+        turn_manager_factory: typing.Callable[
+            [], tmanager.TurnManager
+        ] = tmanager.RoundRobin,
         history_ctx_len: int = 3,
         num_turns: int = 10,
         num_active_users: int = 2,
@@ -66,9 +68,10 @@ class DiscussionExperiment:
             discussion and will be uttered by random synthetic participants.
             None if no seed opinions are to be provided.
         :type seed_opinions: Sequence[Sequence[str]], optional
-        :param next_turn_manager: Strategy for selecting the next speaker.
-            Defaults to round-robin if None.
-        :type next_turn_manager: turn_manager.TurnManager or None
+        :param turn_manager_factory:
+            The class representing the strategy for selecting the next speaker.
+            Defaults to :class:RoundRobin.
+        :type turn_manager_factory: Callable[[], TurnManager]
         :param history_ctx_len: Number of past comments visible as context.
         :type history_ctx_len: int
         :param num_turns: Number of turns per discussion.
@@ -83,18 +86,25 @@ class DiscussionExperiment:
         )
         self.users = users
 
-        if next_turn_manager is None:
-            logger.warning(
-                "No TurnManager selected: Defaulting to round robin strategy."
+        if len(self.users) < num_active_users:
+            raise ValueError(
+                f"Number of given users ({len(self.users)}) "
+                "is inadequeate for number of requested users per discussion"
+                f"({num_active_users})."
             )
-            self.next_turn_manager = turn_manager.RoundRobin()
-        else:
-            self.next_turn_manager = next_turn_manager
 
-        self.history_ctx_len = history_ctx_len
-        self.num_active_users = num_active_users
-        self.num_discussions = num_discussions
-        self.num_turns = num_turns
+        if num_discussions < 1:
+            raise ValueError("num_discussions must be at least 1.")
+        if num_turns < 2:
+            raise ValueError("num_discussions must be at least 2.")
+        if num_active_users < 2:
+            raise ValueError("num_active_users must be at least 2.")
+
+        self.turn_manager_factory = turn_manager_factory
+        self._history_ctx_len = history_ctx_len
+        self._num_active_users = num_active_users
+        self._num_discussions = num_discussions
+        self._num_turns = num_turns
 
     def begin(
         self,
@@ -125,7 +135,7 @@ class DiscussionExperiment:
         :rtype: list[Discussion]
         """
         experiments = []
-        for _ in range(self.num_discussions):
+        for _ in range(self._num_discussions):
             experiments.append(self._create_synthetic_discussion())
         return experiments
 
@@ -137,19 +147,27 @@ class DiscussionExperiment:
         :rtype: Discussion
         """
         rand_topic = random.choice(self.seed_opinions)
-        rand_users = list(random.sample(self.users, k=self.num_active_users))
+        rand_users = list(random.choices(self.users, k=self._num_active_users))
+        rand_seeds_users = (
+            [actor.get_actor_name() for actor in rand_users[: len(rand_topic)]]
+            if rand_topic is not None
+            else None
+        )
+        tm = self.turn_manager_factory()
+        tm.set_actors(rand_users)
 
         return jobs.Discussion(
             users=rand_users,
-            history_context_len=self.history_ctx_len,
-            conv_len=self.num_turns,
+            history_context_len=self._history_ctx_len,
+            conv_len=self._num_turns,
             seed_opinions=rand_topic,
-            next_turn_manager=self.next_turn_manager,
+            seed_opinion_usernames=rand_seeds_users,
+            next_turn_manager=tm,
         )
 
     def _run_all_discussions(
         self,
-        discussions: Sequence[jobs.Discussion],
+        discussions: typing.Sequence[jobs.Discussion],
         output_dir: Path,
         verbose: bool,
     ) -> None:
@@ -187,18 +205,14 @@ class DiscussionExperiment:
         try:
             logger.debug(f"Experiment parameters: {str(discussion)}")
 
-            start_time = time.time()
             discussion.begin(verbose=verbose)
             output_path = _file_util.generate_datetime_filename(
                 output_dir=output_dir, file_ending=".json"
             )
-            pylog.debug(
-                f"Finished discussion in {(time.time() - start_time)} seconds."
-            )
             logs = discussion.get_logs()
             logs.export(output_path)
-        except Exception:
-            logger.exception("Experiment aborted due to error.")
+        except Exception as e:
+            logger.exception(f"Experiment aborted due to error: {e}")
 
 
 class AnnotationExperiment:
@@ -208,7 +222,7 @@ class AnnotationExperiment:
 
     def __init__(
         self,
-        annotators: Sequence[actors.Actor],
+        annotators: typing.Sequence[actors.Actor],
         discussion_logs: jobs.Logs,
         history_ctx_len: int = 3,
     ):
@@ -243,7 +257,7 @@ class AnnotationExperiment:
         annotation_tasks = self._generate_annotation_tasks()
         self._run_all_annotations(annotation_tasks, output_dir, verbose)
 
-    def _generate_annotation_tasks(self) -> Sequence[jobs.Annotation]:
+    def _generate_annotation_tasks(self) -> typing.Sequence[jobs.Annotation]:
         """
         Create annotation tasks by pairing each annotator with each discussion.
 
@@ -279,7 +293,7 @@ class AnnotationExperiment:
 
     def _run_all_annotations(
         self,
-        annotation_tasks: Sequence[jobs.Annotation],
+        annotation_tasks: typing.Sequence[jobs.Annotation],
         output_dir: Path,
         verbose: bool = True,
     ) -> None:

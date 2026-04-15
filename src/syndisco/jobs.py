@@ -155,7 +155,7 @@ class Logs:
 class Discussion(collections.abc.Iterator[dict[str, str]]):
     """
     A job conducting a discussion between different actors
-    (:class:`actors.Actor`).
+    (:class:`Actor`).
 
     ``Discussion`` implements the iterator protocol: each call to
     :func:`next` prompts the next speaker and returns the resulting log
@@ -401,10 +401,12 @@ class Annotation:
         :type history_ctx_len: int, optional
         """
         if not annotator.is_annotator:
-            annotator = copy.deepcopy(annotator)
-            annotator.is_annotator = True
+            raise ValueError(
+                "The actor used for annotation should be an annotator "
+                "(see Actor.__init__())."
+            )
 
-        self._annotator = annotator
+        self._annotator = copy.deepcopy(annotator)
         self._history_ctx_len = history_ctx_len
         self._discussion_logs = copy.deepcopy(discussion_logs)
         self._annotation_logs = Logs()

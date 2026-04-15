@@ -30,7 +30,7 @@ from .actors import Actor
 class TurnManager(Iterable, abc.ABC):
     """
     An abstract class specifying the selection of the next speaker in a
-    :class:Discussion.
+    :class:`Discussion`.
     """
 
     def __init__(self, actors: Iterable[Actor] | None = None):
@@ -43,31 +43,32 @@ class TurnManager(Iterable, abc.ABC):
         :type actors: Iterable[Actor]
         """
         if actors is None:
-            self.actors = []
+            self._actors = []
         else:
-            self.actors = list(actors)
+            self._actors = list(actors)
 
     @typing.final
-    def set_actors(self, actors: Iterable[Actor]) -> None:
+    def set_actors(self, actors: typing.Sequence[Actor]) -> None:
         """
         Initialize the manager by providing the names of the users.
 
-        :param names: the usernames of the participants
-        :type names: Iterable[str]
+        :param names: The participants.
+        :type names: Sequence[Actor]
         """
-        self.names = list(actors)
+        self._actors = list(actors)
 
     @typing.final
     def next(self) -> Actor:
         """
         Get the username of the next speaker.
 
-        :raises ValueError: if no names have been provided from the
-            constructor, or from the TurnManager.set() method
+        :raises ValueError:
+            if no names have been provided from the
+            constructor, or from the :meth:`set_actors()` method
         :return: the next speaker's username
-        :rtype: str
+        :rtype: Actor
         """
-        if self.names == []:
+        if self._actors == []:
             raise ValueError(
                 "No usernames have been provided for the turn manager. "
                 "Use self.initialize_names()"
@@ -96,8 +97,8 @@ class RoundRobin(TurnManager):
 
     def _next_impl(self) -> Actor:
         self.curr_turn += 1
-        new_speaker_index = self.curr_turn % len(self.actors)
-        return self.actors[new_speaker_index]
+        new_speaker_index = self.curr_turn % len(self._actors)
+        return self._actors[new_speaker_index]
 
 
 class RandomWeighted(TurnManager):
@@ -111,53 +112,47 @@ class RandomWeighted(TurnManager):
         actors: Iterable[Actor] | None = None,
         p_respond: float = 0,
     ):
-        """
-        A TurnManager that either selects a random participant, or lets the
-        second-to-last participant to respond to the last comment.
-
-        :param actors: The participants, None to set later. Defaults to None
-        :type actors: Iterable[Actor] | None, optional
-        :param p_respond: The chance within [0,1] that the second-to-last
-        participant is given priority, defaults to 0
-        :type p_respond: float, optional
-        """
         super().__init__(actors)
 
-        self.chance_to_respond = p_respond
         assert (
-            0 <= self.chance_to_respond <= 1
+            0 <= p_respond <= 1
         ), f"p_respond must be between 0 and 1, but is {p_respond}"
 
-        self.second_to_last_speaker = None
-        self.last_speaker = None
+        self.chance_to_respond = p_respond
+
+        # Track history
+        self.last_speaker: Actor | None = None
+        self.second_to_last_speaker: Actor | None = None
 
     def _next_impl(self) -> Actor:
-        # If first time asking for a speaker, return random speaker
-        if self.second_to_last_speaker is None:
-            next_speaker = self._select_other_random_speaker()
-            self.last_speaker = next_speaker
-            return next_speaker
-
-        # Check if the last speaker will respond based on weighted coin flip
-        if self._weighted_coin_flip():
-            next_speaker = self.last_speaker
+        # First turn: no history yet → pick random
+        if self.last_speaker is None:
+            next_speaker = self._random_actor()
         else:
-            next_speaker = self._select_other_random_speaker()
+            if self._should_repeat_last_speaker():
+                next_speaker = self.last_speaker
+            else:
+                next_speaker = self._random_actor(exclude=self.last_speaker)
 
-        # Update the speaker history
+        # Update history
         self.second_to_last_speaker = self.last_speaker
         self.last_speaker = next_speaker
 
-        assert next_speaker is not None
         return next_speaker
 
-    def _weighted_coin_flip(self) -> bool:
-        return self.chance_to_respond > random.uniform(0, 1)
+    def _should_repeat_last_speaker(self) -> bool:
+        """Return True if the last speaker should respond again."""
+        return random.random() < self.chance_to_respond
 
-    def _select_other_random_speaker(self) -> Actor:
-        other_usernames = [
-            username
-            for username in self.names
-            if username != self.last_speaker
-        ]
-        return random.choice(other_usernames)
+    def _random_actor(self, exclude: Actor | None = None) -> Actor:
+        """Select a random actor, optionally excluding one."""
+        if exclude is None:
+            return random.choice(self._actors)
+
+        candidates = [actor for actor in self._actors if actor != exclude]
+
+        # Fallback: if only one actor exists
+        if not candidates:
+            return exclude
+
+        return random.choice(candidates)
