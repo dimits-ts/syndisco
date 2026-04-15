@@ -3,7 +3,6 @@ import collections.abc
 import datetime
 import json
 import logging as pylog
-import hashlib
 import copy
 import textwrap
 import random
@@ -21,7 +20,7 @@ logger = pylog.getLogger(Path(__file__).name)
 
 class Logs:
     """
-    Stores and serializes the log entries of a discussion.
+    A mutable container for comments made in a discussion.
 
     Each entry is a dict with keys ``name``, ``text``, and ``model``.
     The class can be constructed incrementally via :meth:`append`, or
@@ -102,6 +101,11 @@ class Logs:
     def __getitem__(self, index: int) -> dict[str, str]:
         return self._entries[index]
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Logs):
+            return NotImplemented
+        return self._entries == other._entries
+
     def to_list(self) -> list[dict[str, str]]:
         """Return a shallow copy of the raw entry list."""
         return list(self._entries)
@@ -123,9 +127,6 @@ class Logs:
             "timestamp": datetime.datetime.now().strftime(timestamp_format),
             "logs": self.to_list(),
         }
-        export_dict["id"] = hashlib.sha256(
-            json.dumps(self.to_list(), sort_keys=True).encode()
-        ).hexdigest()
 
         return export_dict
 

@@ -46,6 +46,36 @@ def make_discussion(
     )
 
 
+class TestLogsEquality:
+
+    def test_equal_empty_logs(self) -> None:
+        assert Logs() == Logs()
+
+    def test_equal_same_entries(self) -> None:
+        a = make_logs([("Alice", "Hello", "m")])
+        b = make_logs([("Alice", "Hello", "m")])
+        assert a == b
+
+    def test_not_equal_different_text(self) -> None:
+        a = make_logs([("Alice", "Hello", "m")])
+        b = make_logs([("Alice", "Goodbye", "m")])
+        assert a != b
+
+    def test_not_equal_different_order(self) -> None:
+        a = make_logs([("Alice", "first", "m"), ("Bob", "second", "m")])
+        b = make_logs([("Bob", "second", "m"), ("Alice", "first", "m")])
+        assert a != b
+
+    def test_not_equal_different_length(self) -> None:
+        a = make_logs([("Alice", "Hello", "m")])
+        b = make_logs([("Alice", "Hello", "m"), ("Bob", "Hi", "m")])
+        assert a != b
+
+    def test_not_equal_to_non_logs(self) -> None:
+        logs = make_logs([("Alice", "Hello", "m")])
+        assert logs != [{"name": "Alice", "text": "Hello", "model": "m"}]
+
+
 class TestLogsConstruction:
 
     def test_empty_on_init(self) -> None:
