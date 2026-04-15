@@ -185,8 +185,8 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
         users: collections.abc.Iterable[actors.Actor],
         history_context_len: int = 5,
         conv_len: int = 5,
-        seed_opinions: list[str] | None = None,
-        seed_opinion_usernames: list[str] | None = None,
+        seed_opinions: typing.Sequence[str] | None = None,
+        seed_opinion_usernames: typing.Sequence[str] | None = None,
     ) -> None:
         """
         Construct the framework for a conversation to take place.
@@ -194,8 +194,8 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
         :param next_turn_manager: An object handling the speaker order of
             the participants.
         :type next_turn_manager: turn_manager.TurnManager
-        :param users: A list of discussion participants.
-        :type users: list[actors.Actor]
+        :param users: Any iterable containing the discussion participants.
+        :type users: Iterable[actors.Actor]
         :param history_context_len: How many prior messages are included
             in the LLM's prompt as context, defaults to 5.
         :type history_context_len: int, optional
@@ -204,10 +204,10 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
         :type conv_len: int, optional
         :param seed_opinions: Hardcoded opening comments inserted before
             the first prompted turn, top-to-bottom in list order.
-        :type seed_opinions: list[str], optional
+        :type seed_opinions: Sequence[str], optional
         :param seed_opinion_usernames: The username for each seed opinion.
             Sampled randomly (without replacement) when *None*.
-        :type seed_opinion_usernames: list[str], optional
+        :type seed_opinion_usernames: Sequence[str], optional
         :raises ValueError: if the number of seed opinions and seed
             opinion usernames differ, or if there are more seed opinions
             than participants.

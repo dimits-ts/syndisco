@@ -26,6 +26,7 @@ import time
 import random
 import logging as pylog
 from pathlib import Path
+from typing import Sequence
 
 from tqdm.auto import tqdm
 
@@ -45,8 +46,8 @@ class DiscussionExperiment:
 
     def __init__(
         self,
-        users: list[actors.Actor],
-        seed_opinions: list[list[str]] | None = None,
+        users: Sequence[actors.Actor],
+        seed_opinions: Sequence[Sequence[str]] | None = None,
         next_turn_manager: turn_manager.TurnManager | None = None,
         history_ctx_len: int = 3,
         num_turns: int = 10,
@@ -144,7 +145,7 @@ class DiscussionExperiment:
 
     def _run_all_discussions(
         self,
-        discussions: list[jobs.Discussion],
+        discussions: Sequence[jobs.Discussion],
         output_dir: Path,
         verbose: bool,
     ) -> None:
@@ -152,7 +153,7 @@ class DiscussionExperiment:
         Execute all generated discussions and write their outputs to disk.
 
         :param discussions: List of Discussion instances to run.
-        :type discussions: list[jobs.Discussion]
+        :type discussions: Sequence[jobs.Discussion]
         :param output_dir: Directory to save output JSON files.
         :type output_dir: Path
         :param verbose: Whether to print discussion progress.
@@ -205,14 +206,14 @@ class AnnotationExperiment:
 
     def __init__(
         self,
-        annotators: list[actors.Actor],
+        annotators: Sequence[actors.Actor],
         history_ctx_len: int = 3,
     ):
         """
         Initialize an annotation experiment using LLM-based annotators.
 
         :param annotators: List of annotator agents.
-        :type annotators: list[actors.Actor]
+        :type annotators: Sequence[actors.Actor]
         :param history_ctx_len: Number of previous comments visible to the
             annotator.
         :type history_ctx_len: int
@@ -245,14 +246,14 @@ class AnnotationExperiment:
 
     def _generate_annotation_tasks(
         self, discussions_dir: Path
-    ) -> list[jobs.Annotation]:
+    ) -> Sequence[jobs.Annotation]:
         """
         Create annotation tasks by pairing each annotator with each discussion.
 
         :param discussions_dir: Path to discussion log files.
         :type discussions_dir: Path
         :return: List of Annotation tasks.
-        :rtype: list[jobs.Annotation]
+        :rtype: Sequence[jobs.Annotation]
         """
         annotation_tasks = []
         for annotator in self.annotators:
@@ -285,7 +286,7 @@ class AnnotationExperiment:
 
     def _run_all_annotations(
         self,
-        annotation_tasks: list[jobs.Annotation],
+        annotation_tasks: Sequence[jobs.Annotation],
         output_dir: Path,
         verbose: bool = True,
     ) -> None:
@@ -293,7 +294,7 @@ class AnnotationExperiment:
         Execute and store all annotation tasks.
 
         :param annotation_tasks: List of Annotation objects.
-        :type annotation_tasks: list[jobs.Annotation]
+        :type annotation_tasks: Sequence[jobs.Annotation]
         :param output_dir: Directory to save results.
         :type output_dir: Path
         :param verbose: Whether to log intermediate steps.
