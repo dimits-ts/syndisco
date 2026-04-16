@@ -1,3 +1,20 @@
+# SynDisco: Automated experiment creation and execution using only LLM agents
+# Copyright (C) 2025 Dimitris Tsirmpas
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# You may contact the author at dim.tsirmpas@aueb.gr
 import pytest
 from typing import Iterable
 
@@ -99,7 +116,7 @@ class TestRounRobin:
         seen = [rr.next() for _ in range(len(actors) * 2)]
 
         # Expect repetition of same order
-        assert seen[: len(actors)] == seen[len(actors) :]
+        assert seen[: len(actors)] == seen[len(actors):]
 
     def test_round_robin_returns_valid_actor(self, actors):
         rr = RoundRobin(actors)

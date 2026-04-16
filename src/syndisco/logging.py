@@ -1,7 +1,3 @@
-"""
-Module handling logging for LLM discussion and annotation tasks.
-"""
-
 # SynDisco: Automated experiment creation and execution using only LLM agents
 # Copyright (C) 2025 Dimitris Tsirmpas
 
@@ -19,6 +15,9 @@ Module handling logging for LLM discussion and annotation tasks.
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # You may contact the author at dim.tsirmpas@aueb.gr
+"""
+Module handling logging for LLM discussion and annotation tasks.
+"""
 
 import time
 import logging as pylog

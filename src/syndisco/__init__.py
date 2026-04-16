@@ -1,3 +1,7 @@
+"""
+A lightweight framework for creating, managing, annotating, and analyzing
+synthetic discussions between Large Language Model (LLM) user-agents.
+"""
 from .experiments import DiscussionExperiment, AnnotationExperiment
 from .actors import Actor
 from .jobs import Discussion, Annotation, Logs

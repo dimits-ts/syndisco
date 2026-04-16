@@ -1,8 +1,3 @@
-"""
-Module automating and managing batches of discussion/annotation tasks defined
-in the syndisco.jobs module.
-"""
-
 # SynDisco: Automated experiment creation and execution using only LLM agents
 # Copyright (C) 2025 Dimitris Tsirmpas
 
@@ -20,6 +15,10 @@ in the syndisco.jobs module.
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # You may contact the author at dim.tsirmpas@aueb.gr
+"""
+Module automating and managing batches of discussion/annotation tasks defined
+in the syndisco.jobs module.
+"""
 
 import random
 import typing

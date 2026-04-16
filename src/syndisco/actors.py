@@ -1,7 +1,3 @@
-"""
-Module defining LLM users in discussions and their characteristics.
-"""
-
 # SynDisco: Automated experiment creation and execution using only LLM agents
 # Copyright (C) 2025 Dimitris Tsirmpas
 
@@ -19,7 +15,9 @@ Module defining LLM users in discussions and their characteristics.
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # You may contact the author at dim.tsirmpas@aueb.gr
-
+"""
+Module defining LLM users in discussions and their characteristics.
+"""
 
 import typing
 import json
