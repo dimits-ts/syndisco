@@ -1,10 +1,7 @@
 Overview
 ========
 
-An example use-case of SynDisco on online discussions. The framework can be adapted to many use cases.
-
-
-SynDisco is a Python library which creates, manages, and stores the logs of synthetic ``discussions`` (discussions performed entirely by LLMs).
+SynDisco is a Python library that creates, manages, and stores the logs of synthetic ``discussions`` (discussions performed entirely by LLMs).
 
 Each synthetic discussion is performed by ``actors``; actors can be ``user-agents`` (who simulate human users), or ``annotator-agents`` (who judge the discussions after they have concluded).
 
@@ -41,7 +38,7 @@ There are several ways to customize the type of discussion experiments SynDisco 
   and annotators would be something like:  
   *"This is an online discussion."*
 
-- **Participant personas**:  
+- **Participant roles and personas**:  
   In order to achieve more "realistic" (or at least varied) discussions [#f1]_
   we can supply each simulated user with a list of socio-demographic and
   personality traits. This is achieved using any JSON schema such as:
@@ -56,20 +53,16 @@ There are several ways to customize the type of discussion experiments SynDisco 
         "demographic_group": "White",
         "current_employment": "Unemployed",
         "education_level": "Primary education",
-        "special_instructions": "",
         "personality_characteristics": [
           "Active",
           "Enjoys playing with technology and gadgets"
         ]
       }
-
-- **Participant roles**:  
-  Some of you may have noticed a sneaky trait in the example above that is
-  neither socio-demographic nor psychological in nature: ``special_instructions``.
-  This field gives each *individual* actor unique instructions. If we want to simulate online discussions, this field could be used to turn some users into trolls.
+  
+  The code above only specifies socio-demographic and personality traits, but special instructions can be trivially inserted. For example specifying `"special_instructions": "Be combative and provoke other users"` can be used to emulate human trolls in online discussions. 
 
 - **Seed comments**:  
-  Discussions usually have to start from somewhere—an observation, small talk, or an ideological rant [#f2]_.  
+  Discussions usually have to start from somewhere—an observation, small talk, or an ideological rant.  
   You can supply different starting points ("seed comments") for each
   discussion. These can be one comment or several. You can create your own or use datasets such as Reddit threads.  
   This also enables “restarting” synthetic discussions to examine how changing a single initial response impacts the rest of the conversation.
@@ -80,5 +73,4 @@ There are several ways to customize the type of discussion experiments SynDisco 
          can *ever* be considered realistic, is one of those opinions that can
          get you punched at an academic conference — but bear with me.
 
-.. [#f2] Admittedly, ideological rants are more prevalent online.
 
