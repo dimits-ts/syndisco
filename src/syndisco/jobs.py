@@ -438,7 +438,7 @@ class Annotation:
                 name=username,
                 text=annotation,
                 model=self._annotator.get_model_name(),
-                prompt=self._annotator.get_user_prompt(),
+                prompt=self._annotator.get_system_prompt(),
             )
 
             if verbose:

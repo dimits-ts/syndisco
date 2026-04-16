@@ -46,6 +46,7 @@ class DummyActor(Actor):
         name: str = "Bot",
         responses: list[str] | None = None,
         is_annotator: bool = False,
+        instructions: str = "",
     ) -> None:
         self.name = name
         self._responses = responses or [f"{name} says something."]
@@ -53,5 +54,7 @@ class DummyActor(Actor):
         self.is_annotator = is_annotator
         self._model = DummyModel(["r1", "r2", "r3", "r4"])
         self.context = "context"
-        self.instructions = "instructions"
+        self.instructions = (
+            "default" if instructions == "" else instructions
+        )
         self.persona = {"persona": "exists"}

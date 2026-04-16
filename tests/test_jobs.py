@@ -510,6 +510,39 @@ class TestDiscussionBegin:
         with pytest.raises(StopIteration):
             next(d)
 
+    def test_discussion_entries_include_prompt_field(self) -> None:
+        d = make_discussion(conv_len=3)
+        list(d)
+        logs = d.get_logs()
+
+        for entry in logs:
+            assert "prompt" in entry
+
+    def test_discussion_prompt_is_non_null_string(self) -> None:
+        d = make_discussion(conv_len=3)
+        list(d)
+        logs = d.get_logs()
+
+        for entry in logs:
+            assert isinstance(entry["prompt"], str)
+            assert entry["prompt"] != ""
+
+    def test_seed_entries_have_empty_prompt(self) -> None:
+        d = make_discussion(
+            conv_len=2,
+            seed_opinions=["Seed text."],
+            seed_opinion_usernames=["User0"],
+        )
+        list(d)
+        logs = d.get_logs()
+
+        seed_entries = [e for e in logs if e["model"] == "hardcoded"]
+        assert all(
+            e["prompt"]
+            == '{"context": "", "instructions": "", "type": "user", "persona": {}}'
+            for e in seed_entries
+        )
+
 
 class TestDiscussionGetLogs:
 
@@ -608,7 +641,90 @@ class TestAnnotationGetLogs:
         assert l1 is not l2
 
     def test_empty_discussion_produces_empty_annotation_logs(self) -> None:
-
         annotator = DummyActor(name="Annotator", is_annotator=True)
         ann = Annotation(annotator=annotator, discussion_logs=Logs())
         assert len(ann.get_logs()) == 0
+
+    def test_annotation_prompt_overwrites_original_prompt(self) -> None:
+        logs = Logs()
+        logs.append(
+            name="User0",
+            text="Text",
+            model="m",
+            prompt="ORIGINAL_PROMPT",
+        )
+
+        annotator = DummyActor(
+            name="Annotator",
+            is_annotator=True,
+            responses=["label"],
+        )
+
+        ann = Annotation(annotator=annotator, discussion_logs=logs)
+        ann.begin()
+
+        entry = ann.get_logs()[0]
+
+        # The original prompt should NOT survive
+        assert entry["prompt"] != "ORIGINAL_PROMPT"
+
+    def test_annotation_prompt_equals_annotator_prompt(self) -> None:
+        annotator_prompt = "<ANNOTATOR_SYSTEM_PROMPT>"
+
+        annotator = DummyActor(
+            name="Annotator",
+            is_annotator=True,
+            responses=["label"],
+            instructions=annotator_prompt,
+        )
+
+        logs = make_logs([("User0", "Text", "m")])
+
+        ann = Annotation(annotator=annotator, discussion_logs=logs)
+        ann.begin()
+
+        entry = ann.get_logs()[0]
+
+        assert annotator_prompt in entry["prompt"]
+
+    def test_all_annotation_entries_use_same_prompt(self) -> None:
+        annotator_prompt = "<ANNOTATOR_PROMPT>"
+
+        annotator = DummyActor(
+            name="Annotator",
+            is_annotator=True,
+            responses=["l1", "l2", "l3"],
+            instructions=annotator_prompt,
+        )
+
+        logs = make_logs(
+            [
+                ("User0", "Text0", "m"),
+                ("User1", "Text1", "m"),
+                ("User2", "Text2", "m"),
+            ]
+        )
+
+        ann = Annotation(annotator=annotator, discussion_logs=logs)
+        ann.begin()
+
+        prompts = [e["prompt"] for e in ann.get_logs()]
+        assert all(annotator_prompt in p for p in prompts)
+
+    def test_annotation_prompt_is_nonempty_when_annotator_has_prompt(
+        self,
+    ) -> None:
+        annotator = DummyActor(
+            name="Annotator",
+            is_annotator=True,
+            responses=["label"],
+            instructions="ANNOTATOR_PROMPT",
+        )
+
+        logs = make_logs([("User0", "Text", "m")])
+
+        ann = Annotation(annotator=annotator, discussion_logs=logs)
+        ann.begin()
+
+        entry = ann.get_logs()[0]
+        assert "ANNOTATOR_PROMPT" in entry["prompt"]
