@@ -350,6 +350,18 @@ class TestDiscussionConstruction:
                 seed_opinion_usernames=["A", None],  # type: ignore
             )
 
+    def test_single_seed_does_not_raise(self) -> None:
+        actors = [DummyActor("A")]
+        tm = RandomWeighted(actors, p_respond=0)
+        with pytest.raises(ValueError):
+            Discussion(
+                next_turn_manager=tm,
+                users=actors,
+                conv_len=1,
+                seed_opinions="hi",
+                seed_opinion_usernames="A",
+            )
+
     def test_weird_seed_config_raise(self) -> None:
         actors = [DummyActor("A")]
         tm = RandomWeighted(actors, p_respond=0)

@@ -10,6 +10,11 @@ def actors():
     return [DummyActor("A"), DummyActor("B"), DummyActor("C")]
 
 
+def assert_no_consecutive_repetition(sequence):
+    for i in range(1, len(sequence)):
+        assert sequence[i] != sequence[i - 1]
+
+
 class TestSuperclass:
     def test_turn_manager_requires_names(self):
         class DummyTM(TurnManager):
@@ -94,7 +99,7 @@ class TestRounRobin:
         seen = [rr.next() for _ in range(len(actors) * 2)]
 
         # Expect repetition of same order
-        assert seen[: len(actors)] == seen[len(actors):]
+        assert seen[: len(actors)] == seen[len(actors) :]
 
     def test_round_robin_returns_valid_actor(self, actors):
         rr = RoundRobin(actors)
@@ -118,6 +123,14 @@ class TestRounRobin:
 
         for _ in range(5):
             assert rr.next() == single[0]
+
+    def test_no_consecutive_repetition(self, actors):
+        tm = RoundRobin(actors)
+        tm.set_actors(actors)
+
+        sequence = [tm.next() for _ in range(20)]
+
+        assert_no_consecutive_repetition(sequence)
 
 
 class TestRandomWeighted:
@@ -143,5 +156,13 @@ class TestRandomWeighted:
     def test_random_weighted_initial_state(self, actors):
         rw = RandomWeighted(actors, p_respond=0.5)
 
-        assert rw.last_speaker is None
-        assert rw.second_to_last_speaker is None
+        assert rw._last_speaker is None
+        assert rw._second_to_last_speaker is None
+
+    def test_no_repetition_when_p_zero(self, actors):
+        tm = RandomWeighted(actors, p_respond=0.0)
+        tm.set_actors(actors)
+
+        sequence = [tm.next() for _ in range(50)]
+
+        assert_no_consecutive_repetition(sequence)

@@ -118,25 +118,45 @@ class RandomWeighted(TurnManager):
             0 <= p_respond <= 1
         ), f"p_respond must be between 0 and 1, but is {p_respond}"
 
-        self.chance_to_respond = p_respond
+        self._chance_to_respond = p_respond
 
         # Track history
-        self.last_speaker: Actor | None = None
-        self.second_to_last_speaker: Actor | None = None
+        self._last_speaker: Actor | None = None
+        self._second_to_last_speaker: Actor | None = None
+
+    @property
+    def chance_to_respond(self) -> float:
+        """
+        The chance that the second-to-last speaker will respond to the
+        last speaker. Between 0 and 1.
+
+        :return: The chance of responding.
+        :rtype: float
+        """
+        return self._chance_to_respond
+
+    @chance_to_respond.setter
+    def chance_to_respond(self, p_respond: float) -> None:
+        assert (
+            0 <= p_respond <= 1
+        ), f"p_respond must be between 0 and 1, but is {p_respond}"
+        self._chance_to_respond = p_respond
 
     def _next_impl(self) -> Actor:
-        # First turn: no history yet → pick random
-        if self.last_speaker is None:
+        # First turn: no history yet, pick random
+        if self._last_speaker is None:
             next_speaker = self._random_actor()
+        elif self._second_to_last_speaker is None:
+            next_speaker = self._random_actor(exclude=self._last_speaker)
         else:
             if self._should_repeat_last_speaker():
-                next_speaker = self.last_speaker
+                next_speaker = self._second_to_last_speaker
             else:
-                next_speaker = self._random_actor(exclude=self.last_speaker)
+                next_speaker = self._random_actor(exclude=self._last_speaker)
 
         # Update history
-        self.second_to_last_speaker = self.last_speaker
-        self.last_speaker = next_speaker
+        self._second_to_last_speaker = self._last_speaker
+        self._last_speaker = next_speaker
 
         return next_speaker
 
