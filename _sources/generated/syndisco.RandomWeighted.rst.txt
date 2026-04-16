@@ -1,0 +1,7 @@
+﻿syndisco.RandomWeighted
+=======================
+
+.. autoclass:: syndisco.RandomWeighted
+   :members:
+   :undoc-members:
+   :show-inheritance:

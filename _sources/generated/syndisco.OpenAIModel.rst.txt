@@ -1,0 +1,7 @@
+﻿syndisco.OpenAIModel
+====================
+
+.. autoclass:: syndisco.OpenAIModel
+   :members:
+   :undoc-members:
+   :show-inheritance:

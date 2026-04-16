@@ -1,0 +1,752 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Creating a Discussion &mdash; SynDisco 2.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=33f7ffd5" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+    <link rel="shortcut icon" href="../_static/logo.svg"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=20623aea"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SynDisco
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#how-to-customize-your-discussion">How to Customize Your Discussion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SynDisco</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Creating a Discussion</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/guides/creating_discussions.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Creating-a-Discussion">
+<h1>Creating a Discussion<a class="headerlink" href="#Creating-a-Discussion" title="Link to this heading"></a></h1>
+<p>The simplest task you can accomplish with this library is to create a small discussion between LLMs.</p>
+<p>This guide will teach you the basic setup of the library. You will understand how to setup models, user-agents and how to coordinate them in a discussion. By the end of htis guide, you will be able to run a small discussion with a moderator and save it to the disk for persistence.</p>
+<section id="Basics">
+<h2>Basics<a class="headerlink" href="#Basics" title="Link to this heading"></a></h2>
+<section id="The-Model">
+<h3>The Model<a class="headerlink" href="#The-Model" title="Link to this heading"></a></h3>
+<p>SynDisco can theoretically support any LLM, as long as it is wrapped in a <code class="docutils literal notranslate"><span class="pre">BaseModel</span></code> wrapper. The <code class="docutils literal notranslate"><span class="pre">BaseModel</span></code> class is a very simple interface with one method. This method gives the underlying LLM input, and returns its output to the library.</p>
+<p>There already exists a <code class="docutils literal notranslate"><span class="pre">TransformersModel</span></code> class which handles models from the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> python library. In 90% of your applications, this will be enough. We can load a TransformersModel using the following code:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">syndisco</span>
+
+<span class="n">llm</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">TransformersModel</span><span class="p">(</span>
+    <span class="n">model_path</span><span class="o">=</span><span class="s2">&quot;unsloth/Qwen2.5-7B-Instruct-bnb-4bit&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test_model&quot;</span><span class="p">,</span>
+    <span class="n">max_out_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>This will download a small LLM from huggingface. You can substitute the model_path for any similar model in <a class="reference external" href="https://huggingface.co/">HuggingFace</a> supporting the Transformers library.</p>
+</section>
+<section id="Creating-personas">
+<h3>Creating personas<a class="headerlink" href="#Creating-personas" title="Link to this heading"></a></h3>
+<p>All <code class="docutils literal notranslate"><span class="pre">actors</span></code> can be defined by a <code class="docutils literal notranslate"><span class="pre">persona</span></code>, aka a set of attributes that define them. These attributes can be age, ethnicity, and even include special instructions on how they should behave.</p>
+<p>Syndisco uses any python dictionary for defining personas. These dictionaries are given as-is to the underlying prompt, and saved as JSON in the exported discussion logs.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">personas</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;Gwx31&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="mi">38</span><span class="p">,</span>
+        <span class="s2">&quot;sex&quot;</span><span class="p">:</span> <span class="s2">&quot;female&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;education_level&quot;</span><span class="p">:</span> <span class="s2">&quot;Bachelor&#39;s&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sexual_orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;Heterosexual&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;demographic_group&quot;</span><span class="p">:</span> <span class="s2">&quot;Latino&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;current_employment&quot;</span><span class="p">:</span> <span class="s2">&quot;Registered Nurse&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;personality_characteristics&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;compassionate&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;patient&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;diligent&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;overwhelmed&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;Giannis&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="mi">21</span><span class="p">,</span>
+        <span class="s2">&quot;sex&quot;</span><span class="p">:</span> <span class="s2">&quot;male&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;education_level&quot;</span><span class="p">:</span> <span class="s2">&quot;College&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sexual_orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;Pansexual&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;demographic_group&quot;</span><span class="p">:</span> <span class="s2">&quot;White&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;current_employment&quot;</span><span class="p">:</span> <span class="s2">&quot;Game Developer&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;personality_characteristics&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;strategic&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;meticulous&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;nerdy&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;hyper-focused&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;Kimya&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="mi">67</span><span class="p">,</span>
+        <span class="s2">&quot;sex&quot;</span><span class="p">:</span> <span class="s2">&quot;female&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;education_level&quot;</span><span class="p">:</span> <span class="s2">&quot;PhD&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sexual_orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;Heterosexual&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;demographic_group&quot;</span><span class="p">:</span> <span class="s2">&quot;White&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;personality_characteristics&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;strict&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;grumpy&quot;</span>
+        <span class="p">],</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<p>Since creating a lot of distinct users is essential in running large-scale experiments, users are usually defined in JSON format. That way, you can change anything without touching your code!</p>
+<p><a class="reference external" href="https://github.com/dimits-ts/synthetic_moderation_experiments/blob/master/data/discussions_input/personas/personas.json">Here</a> is an applied example of how to mass-define user personas through JSON files.</p>
+</section>
+<section id="Creating-the-user-agents">
+<h3>Creating the user-agents<a class="headerlink" href="#Creating-the-user-agents" title="Link to this heading"></a></h3>
+<p>Having a <code class="docutils literal notranslate"><span class="pre">persona</span></code> and a <code class="docutils literal notranslate"><span class="pre">model</span></code> we can finally create an <code class="docutils literal notranslate"><span class="pre">actor</span></code>. The actor will personify the selected persona using the model to talk.</p>
+<p>Besides a persona and a model, the actors will also need instructions and a context. By convention, all actors share the same context, and all user-agents share the same instructions. Personalized instructions are defined in the actor’s persona.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">CONTEXT</span> <span class="o">=</span> <span class="s2">&quot;You are taking part in an online conversation&quot;</span>
+<span class="n">INSTRUCTIONS</span> <span class="o">=</span> <span class="s2">&quot;Act like a human would&quot;</span>
+
+<span class="n">actors</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">syndisco</span><span class="o">.</span><span class="n">Actor</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
+        <span class="n">persona</span><span class="o">=</span><span class="n">p</span><span class="p">,</span>
+        <span class="n">context</span><span class="o">=</span><span class="n">CONTEXT</span><span class="p">,</span>
+        <span class="n">instructions</span><span class="o">=</span><span class="n">INSTRUCTIONS</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;username&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">personas</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Managing-turn-taking">
+<h3>Managing turn-taking<a class="headerlink" href="#Managing-turn-taking" title="Link to this heading"></a></h3>
+<p>In real-life discussions, who gets to speak at each point in time is determined by complex social dynamics, which are difficult to realistically model. However, there are ways with which we can simulate these dynamics.</p>
+<p>SynDisco uses the <code class="docutils literal notranslate"><span class="pre">TurnManager</span></code> class to model turn taking. Two implementations are available by default: Round Robin, and Random Weighted</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Round</span> <span class="pre">Robin</span></code> is the simplest, most intuitive way to model turn-taking; everyone gets to talk once per round. Once everyone talks once, they get to talk again in the same sequence</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rrobin_turn_manager</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">RoundRobin</span><span class="p">(</span><span class="n">actors</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="n">speaker</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">rrobin_turn_manager</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">speaker</span><span class="o">.</span><span class="n">get_actor_name</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Gwx31
+Giannis
+Kimya
+Gwx31
+Giannis
+Kimya
+Gwx31
+Giannis
+Kimya
+Gwx31
+</pre></div></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">RandomWeighted</span></code> on the other hand throws a weighted coin on each round. If the coin flip succedes, the previous user gets to respond. If not, another user is selected at random</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rweighted_turn_manager</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">RandomWeighted</span><span class="p">(</span><span class="n">actors</span><span class="p">,</span> <span class="n">p_respond</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="n">speaker</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">rweighted_turn_manager</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">speaker</span><span class="o">.</span><span class="n">get_actor_name</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Gwx31
+Giannis
+Gwx31
+Giannis
+Gwx31
+Kimya
+Gwx31
+Kimya
+Gwx31
+Giannis
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="Generating-a-discussion">
+<h2>Generating a discussion<a class="headerlink" href="#Generating-a-discussion" title="Link to this heading"></a></h2>
+<p>Let’s start with the most basic task; a single discussion between two users. Let’s also add a few starting comments, supposedly made by the first user, to get the ball rolling.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">turn_manager</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">RoundRobin</span><span class="p">(</span><span class="n">actors</span><span class="p">)</span>
+<span class="n">conv</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">Discussion</span><span class="p">(</span>
+    <span class="n">next_turn_manager</span><span class="o">=</span><span class="n">turn_manager</span><span class="p">,</span>
+    <span class="n">users</span><span class="o">=</span><span class="n">actors</span><span class="p">,</span>
+    <span class="n">seed_opinions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;I hate the concept of chairs.&quot;</span><span class="p">],</span>
+    <span class="n">seed_opinion_usernames</span><span class="o">=</span><span class="p">[</span><span class="n">personas</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;username&quot;</span><span class="p">]]</span>
+<span class="p">)</span>
+<span class="n">conv</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "4bcbb7bbbe17421c9b4bb1119119dbf7", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+The following generation flags are not valid and may be ignored: [&#39;temperature&#39;, &#39;top_p&#39;, &#39;top_k&#39;]. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User Gwx31 posted:
+Oh, wow! That&#39;s quite a strong stance on chairs. I can understand how
+sitting for long periods could be uncomfortable, especially as a nurse
+who likely spends a lot of time on your feet. Sometimes, finding the
+right kind of chair that supports your posture can make a big
+difference. Have you tried any ergonomic chairs that might help with
+your discomfort?
+
+User Giannis posted:
+I get where you&#39;re coming from, Gwx31. While chairs can be a pain to
+sit on for long periods, they serve a pretty important function.
+Personally, I&#39;ve been into gaming and development for a while now, so
+I don&#39;t spend much time sitting at all—usually just coding or playing
+games. But if you&#39;re looking for ergonomic chairs, I&#39;d recommend
+checking out some of the adjustable ones with good lumbar support.
+They can really make a difference in reducing back pain
+
+User Kimya posted:
+User Kimya posted: Well, Gwx31, if you truly hate chairs, perhaps you
+should consider standing more often. As someone who has spent decades
+in academia, I can attest to the importance of having a good chair,
+but also to the value of standing desks. They can be quite liberating
+once you get used to them. Plus, it&#39;s a great way to stay active
+throughout the day.
+
+User Gwx31 posted:
+User Gwx31 posted: Thanks for the suggestions, everyone! It&#39;s true
+that sitting for long periods can be tough, especially when you&#39;re on
+your feet a lot as a nurse. I do try to move around and stand when I
+can, but sometimes it feels like I&#39;m stuck in a chair for too long.
+Standing desks sound interesting, but I&#39;m not sure if my workplace
+would allow that. Do you think getting an ergonomic chair could be a
+better solution? Or maybe I should
+
+User Giannis posted:
+User Giannis posted: Absolutely, Gwx31! If standing desks aren&#39;t an
+option, investing in an ergonomic chair could definitely be a better
+solution. Look for one that offers good lower back support and is
+adjustable for height and tilt. This can help reduce strain on your
+back and improve your posture. Plus, many companies offer some
+flexibility in allowing employees to choose their own seating options,
+so it might be worth talking to your supervisor about it.  On the
+other hand, if you decide to
+
+</pre></div></div>
+</div>
+</section>
+<section id="Driving-a-discussion-step-by-step">
+<h2>Driving a discussion step by step<a class="headerlink" href="#Driving-a-discussion-step-by-step" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">Discussion</span></code> implements Python’s iterator protocol, so you are not limited to running the whole conversation at once with <code class="docutils literal notranslate"><span class="pre">begin()</span></code>. You can drive it one turn at a time, which is useful when you want to inspect or react to each entry before the next speaker is prompted — for example to apply early stopping, live logging, or conditional branching.</p>
+<p>Because <code class="docutils literal notranslate"><span class="pre">Discussion</span></code> is its own iterator (<code class="docutils literal notranslate"><span class="pre">__iter__</span></code> returns <code class="docutils literal notranslate"><span class="pre">self</span></code>), it is <strong>single-pass</strong>: once <code class="docutils literal notranslate"><span class="pre">StopIteration</span></code> is raised the instance is exhausted and should not be reused.</p>
+<section id="Calling-next()-manually">
+<h3>Calling <code class="docutils literal notranslate"><span class="pre">next()</span></code> manually<a class="headerlink" href="#Calling-next()-manually" title="Link to this heading"></a></h3>
+<p>Calling <code class="docutils literal notranslate"><span class="pre">iter()</span></code> on a <code class="docutils literal notranslate"><span class="pre">Discussion</span></code> performs the one-time setup (registering participant names and inserting any seed opinions). Each subsequent <code class="docutils literal notranslate"><span class="pre">next()</span></code> prompts one speaker and returns the new log entry as a plain dict.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">turn_manager</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">RoundRobin</span><span class="p">(</span><span class="n">actors</span><span class="p">)</span>
+<span class="n">conv</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">Discussion</span><span class="p">(</span>
+    <span class="n">next_turn_manager</span><span class="o">=</span><span class="n">turn_manager</span><span class="p">,</span>
+    <span class="n">users</span><span class="o">=</span><span class="n">actors</span><span class="p">,</span>
+    <span class="n">conv_len</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">seed_opinions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;I hate the concept of chairs.&quot;</span><span class="p">],</span>
+    <span class="n">seed_opinion_usernames</span><span class="o">=</span><span class="p">[</span><span class="n">personas</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;username&quot;</span><span class="p">]],</span>
+<span class="p">)</span>
+
+<span class="n">it</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">conv</span><span class="p">)</span>  <span class="c1"># one-time setup happens here</span>
+
+<span class="n">first_entry</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;First speaker: &quot;</span><span class="p">,</span> <span class="n">first_entry</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Their message: &quot;</span><span class="p">,</span> <span class="n">first_entry</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">],</span> <span class="s2">&quot;...&quot;</span><span class="p">)</span>
+
+<span class="n">second_entry</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Second speaker:&quot;</span><span class="p">,</span> <span class="n">second_entry</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Their message: &quot;</span><span class="p">,</span> <span class="n">second_entry</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">],</span> <span class="s2">&quot;...&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+First speaker:  Gwx31
+Their message:  Oh, wow! That&#39;s quite a strong stance on chairs. I can understand how sitting for long periods could be uncomfortable, especially as a nurse who likely spends a lot of time on your feet. Sometimes, finding the right kind of chair that supports your posture can make a big difference. Have you tried any ergonomic chairs that might help with your discomfort? ...
+
+Second speaker: Giannis
+Their message:  I get where you&#39;re coming from, Gwx31. While chairs can be a pain to sit on for long periods, they serve a pretty important function. Personally, I&#39;ve been into gaming and development for a while now, so I don&#39;t spend much time sitting at all—usually just coding or playing games. But if you&#39;re looking for ergonomic chairs, I&#39;d recommend checking out some of the adjustable ones with good lumbar support. They can really make a difference in reducing back pain ...
+</pre></div></div>
+</div>
+</section>
+<section id="Using-a-for-loop">
+<h3>Using a <code class="docutils literal notranslate"><span class="pre">for</span></code> loop<a class="headerlink" href="#Using-a-for-loop" title="Link to this heading"></a></h3>
+<p>The same iterator works directly in a <code class="docutils literal notranslate"><span class="pre">for</span></code> loop. Here we stop early if a particular word appears in an entry - something that is impossible with <code class="docutils literal notranslate"><span class="pre">begin()</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">turn_manager</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">RoundRobin</span><span class="p">(</span><span class="n">actors</span><span class="p">)</span>
+<span class="n">conv</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">Discussion</span><span class="p">(</span>
+    <span class="n">next_turn_manager</span><span class="o">=</span><span class="n">turn_manager</span><span class="p">,</span>
+    <span class="n">users</span><span class="o">=</span><span class="n">actors</span><span class="p">,</span>
+    <span class="n">conv_len</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">seed_opinions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;I hate the concept of chairs.&quot;</span><span class="p">],</span>
+    <span class="n">seed_opinion_usernames</span><span class="o">=</span><span class="p">[</span><span class="n">personas</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;username&quot;</span><span class="p">]],</span>
+<span class="p">)</span>
+
+<span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">conv</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Turns completed so far: </span><span class="si">{</span><span class="n">conv</span><span class="o">.</span><span class="n">_steps_taken</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Oh, wow! That&#39;s quite a strong stance on chairs. I can understand how sitting for long periods could be uncomfortable, especially as a nurse who likely spends a lot of time on your feet. Sometimes, finding the right kind of chair that supports your posture can make a big difference. Have you tried any ergonomic chairs that might help with your discomfort?
+I get where you&#39;re coming from, Gwx31. While chairs can be a pain to sit on for long periods, they serve a pretty important function. Personally, I&#39;ve been into gaming and development for a while now, so I don&#39;t spend much time sitting at all—usually just coding or playing games. But if you&#39;re looking for ergonomic chairs, I&#39;d recommend checking out some of the adjustable ones with good lumbar support. They can really make a difference in reducing back pain
+User Kimya posted: Well, Gwx31, if you truly hate chairs, perhaps you should consider standing more often. As someone who has spent decades in academia, I can attest to the importance of having a good chair, but also to the value of standing desks. They can be quite liberating once you get used to them. Plus, it&#39;s a great way to stay active throughout the day.
+User Gwx31 posted: Thanks for the suggestions, everyone! It&#39;s true that sitting for long periods can be tough, especially when you&#39;re on your feet a lot as a nurse. I do try to move around and stand when I can, but sometimes it feels like I&#39;m stuck in a chair for too long. Standing desks sound interesting, but I&#39;m not sure if my workplace would allow that. Do you think getting an ergonomic chair could be a better solution? Or maybe I should
+User Giannis posted: Absolutely, Gwx31! If standing desks aren&#39;t an option, investing in an ergonomic chair could definitely be a better solution. Look for one that offers good lower back support and is adjustable for height and tilt. This can help reduce strain on your back and improve your posture. Plus, many companies offer some flexibility in allowing employees to choose their own seating options, so it might be worth talking to your supervisor about it.
+
+On the other hand, if you decide to
+User Kimya posted: I agree with Giannis, Gwx31. An ergonomic chair can indeed make a significant difference. Make sure to look for features like lumbar support, armrests that fit your body, and the ability to adjust the seat height and angle. These details can greatly enhance your comfort and reduce the strain on your back and neck. Additionally, you might want to check if your workplace has any policies regarding flexible seating options or if they offer reimbursement for such purchases. It
+User Gwx31 posted: Thanks again, both of you! I&#39;ll definitely look into getting an ergonomic chair. I appreciate the advice about checking with my supervisor and looking for features like lumbar support and adjustable height. I&#39;ll start doing some research online and see what options are available. Hopefully, I can find something that works well for me without causing too much of a hassle.
+User Giannis posted: You&#39;re welcome, Gwx31! Taking the time to find the right chair is definitely worth it. Once you have a few options in mind, don&#39;t hesitate to discuss them with your supervisor. They might even have some recommendations or resources available. Also, consider checking out reviews and maybe even try out a chair before you buy one if possible. That way, you can ensure it’s the best fit for your needs.
+
+And remember, small changes can make a big
+User Kimya posted: Small changes indeed can make a big difference, Gwx31. I completely agree with Giannis about trying out chairs if possible. Sometimes, just sitting in a chair for a short test can give you a better idea of how comfortable it will be over longer periods. Also, consider asking for a trial period if your workplace allows it. This way, you can be sure the chair meets your needs before committing to a purchase. And remember, investing in your health now can
+User Gwx31 posted: Thanks, everyone! I really appreciate all the tips and encouragement. I&#39;m feeling more hopeful about finding a solution that works for me. I&#39;ll definitely reach out to my supervisor and maybe even visit a store to test out some chairs. It&#39;s nice to know there are options out there that can help with my discomfort. I&#39;m going to take it one step at a time and see where this leads.
+
+Turns completed so far: 10
+</pre></div></div>
+</div>
+<p>Congratulations, you can now run fully synthetic discussions! You may want to experiment with adding more than 2 users or testing more realistic turn taking procedures (for example, check out the <code class="docutils literal notranslate"><span class="pre">RandomWeighted</span></code> turn manager).</p>
+</section>
+</section>
+<section id="Working-with-Logs">
+<h2>Working with <code class="docutils literal notranslate"><span class="pre">Logs</span></code><a class="headerlink" href="#Working-with-Logs" title="Link to this heading"></a></h2>
+<p>All log state is held in <code class="docutils literal notranslate"><span class="pre">Discussion.logs</span></code>, an instance of <code class="docutils literal notranslate"><span class="pre">Logs</span></code>. This object supports the standard sequence interface, so you can index, slice, and iterate over it directly - no need to call <code class="docutils literal notranslate"><span class="pre">to_dict()</span></code> just to inspect entries.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">logs</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_logs</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total entries : </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">logs</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;First entry   : </span><span class="si">{</span><span class="n">logs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Last entry    : </span><span class="si">{</span><span class="n">logs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="c1"># Iterate directly — each item is a dict with &#39;name&#39;, &#39;text&#39;, &#39;model&#39;</span>
+<span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">logs</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">][:</span><span class="mi">60</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Total entries : 11
+First entry   : {&#39;name&#39;: &#39;Gwx31&#39;, &#39;text&#39;: &#39;I hate the concept of chairs.&#39;, &#39;model&#39;: &#39;hardcoded&#39;, &#39;prompt&#39;: &#39;{&#34;context&#34;: &#34;&#34;, &#34;instructions&#34;: &#34;&#34;, &#34;type&#34;: &#34;user&#34;, &#34;persona&#34;: {}}&#39;}
+Last entry    : {&#39;name&#39;: &#39;Gwx31&#39;, &#39;text&#39;: &#34;User Gwx31 posted: Thanks, everyone! I really appreciate all the tips and encouragement. I&#39;m feeling more hopeful about finding a solution that works for me. I&#39;ll definitely reach out to my supervisor and maybe even visit a store to test out some chairs. It&#39;s nice to know there are options out there that can help with my discomfort. I&#39;m going to take it one step at a time and see where this leads.&#34;, &#39;model&#39;: &#39;test_model&#39;, &#39;prompt&#39;: &#39;{&#34;context&#34;: &#34;You are taking part in an online conversation&#34;, &#34;instructions&#34;: &#34;Act like a human would&#34;, &#34;type&#34;: &#34;user&#34;, &#34;persona&#34;: {&#34;username&#34;: &#34;Gwx31&#34;, &#34;age&#34;: 38, &#34;sex&#34;: &#34;female&#34;, &#34;education_level&#34;: &#34;Bachelor\&#39;s&#34;, &#34;sexual_orientation&#34;: &#34;Heterosexual&#34;, &#34;demographic_group&#34;: &#34;Latino&#34;, &#34;current_employment&#34;: &#34;Registered Nurse&#34;, &#34;personality_characteristics&#34;: [&#34;compassionate&#34;, &#34;patient&#34;, &#34;diligent&#34;, &#34;overwhelmed&#34;]}}&#39;}
+
+[Gwx31] I hate the concept of chairs....
+[Gwx31] Oh, wow! That&#39;s quite a strong stance on chairs. I can under...
+[Giannis] I get where you&#39;re coming from, Gwx31. While chairs can be a...
+[Kimya] User Kimya posted: Well, Gwx31, if you truly hate chairs, pe...
+[Gwx31] User Gwx31 posted: Thanks for the suggestions, everyone! It&#39;...
+[Giannis] User Giannis posted: Absolutely, Gwx31! If standing desks ar...
+[Kimya] User Kimya posted: I agree with Giannis, Gwx31. An ergonomic...
+[Gwx31] User Gwx31 posted: Thanks again, both of you! I&#39;ll definitel...
+[Giannis] User Giannis posted: You&#39;re welcome, Gwx31! Taking the time ...
+[Kimya] User Kimya posted: Small changes indeed can make a big diffe...
+[Gwx31] User Gwx31 posted: Thanks, everyone! I really appreciate all...
+</pre></div></div>
+</div>
+<section id="Exporting-and-importing-discussions-with-Logs">
+<h3>Exporting and importing discussions with <code class="docutils literal notranslate"><span class="pre">Logs</span></code><a class="headerlink" href="#Exporting-and-importing-discussions-with-Logs" title="Link to this heading"></a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+
+
+<span class="n">tp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;.json&quot;</span><span class="p">,</span> <span class="n">delete</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">logs</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_logs</span><span class="p">()</span>
+<span class="n">logs</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{
+    &#34;timestamp&#34;: &#34;26-04-16-11-29&#34;,
+    &#34;logs&#34;: [
+        {
+            &#34;name&#34;: &#34;Gwx31&#34;,
+            &#34;text&#34;: &#34;I hate the concept of chairs.&#34;,
+            &#34;model&#34;: &#34;hardcoded&#34;,
+            &#34;prompt&#34;: &#34;{\&#34;context\&#34;: \&#34;\&#34;, \&#34;instructions\&#34;: \&#34;\&#34;, \&#34;type\&#34;: \&#34;user\&#34;, \&#34;persona\&#34;: {}}&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Gwx31&#34;,
+            &#34;text&#34;: &#34;Oh, wow! That&#39;s quite a strong stance on chairs. I can understand how sitting for long periods could be uncomfortable, especially as a nurse who likely spends a lot of time on your feet. Sometimes, finding the right kind of chair that supports your posture can make a big difference. Have you tried any ergonomic chairs that might help with your discomfort?&#34;,
+            &#34;model&#34;: &#34;test_model&#34;,
+            &#34;prompt&#34;: &#34;{\&#34;context\&#34;: \&#34;You are taking part in an online conversation\&#34;, \&#34;instructions\&#34;: \&#34;Act like a human would\&#34;, \&#34;type\&#34;: \&#34;user\&#34;, \&#34;persona\&#34;: {\&#34;username\&#34;: \&#34;Gwx31\&#34;, \&#34;age\&#34;: 38, \&#34;sex\&#34;: \&#34;female\&#34;, \&#34;education_level\&#34;: \&#34;Bachelor&#39;s\&#34;, \&#34;sexual_orientation\&#34;: \&#34;Heterosexual\&#34;, \&#34;demographic_group\&#34;: \&#34;Latino\&#34;, \&#34;current_employment\&#34;: \&#34;Registered Nurse\&#34;, \&#34;personality_characteristics\&#34;: [\&#34;compassionate\&#34;, \&#34;patient\&#34;, \&#34;diligent\&#34;, \&#34;overwhelmed\&#34;]}}&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Giannis&#34;,
+            &#34;text&#34;: &#34;I get where you&#39;re coming from, Gwx31. While chairs can be a pain to sit on for long periods, they serve a pretty important function. Personally, I&#39;ve been into gaming and development for a while now, so I don&#39;t spend much time sitting at all\u2014usually just coding or playing games. But if you&#39;re looking for ergonomic chairs, I&#39;d recommend checking out some of the adjustable ones with good lumbar support. They can really make a difference in reducing back pain&#34;,
+            &#34;model&#34;: &#34;test_model&#34;,
+            &#34;prompt&#34;: &#34;{\&#34;context\&#34;: \&#34;You are taking part in an online conversation\&#34;, \&#34;instructions\&#34;: \&#34;Act like a human would\&#34;, \&#34;type\&#34;: \&#34;user\&#34;, \&#34;persona\&#34;: {\&#34;username\&#34;: \&#34;Giannis\&#34;, \&#34;age\&#34;: 21, \&#34;sex\&#34;: \&#34;male\&#34;, \&#34;education_level\&#34;: \&#34;College\&#34;, \&#34;sexual_orientation\&#34;: \&#34;Pansexual\&#34;, \&#34;demographic_group\&#34;: \&#34;White\&#34;, \&#34;current_employment\&#34;: \&#34;Game Developer\&#34;, \&#34;personality_characteristics\&#34;: [\&#34;strategic\&#34;, \&#34;meticulous\&#34;, \&#34;nerdy\&#34;, \&#34;hyper-focused\&#34;]}}&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Kimya&#34;,
+            &#34;text&#34;: &#34;User Kimya posted: Well, Gwx31, if you truly hate chairs, perhaps you should consider standing more often. As someone who has spent decades in academia, I can attest to the importance of having a good chair, but also to the value of standing desks. They can be quite liberating once you get used to them. Plus, it&#39;s a great way to stay active throughout the day.&#34;,
+            &#34;model&#34;: &#34;test_model&#34;,
+            &#34;prompt&#34;: &#34;{\&#34;context\&#34;: \&#34;You are taking part in an online conversation\&#34;, \&#34;instructions\&#34;: \&#34;Act like a human would\&#34;, \&#34;type\&#34;: \&#34;user\&#34;, \&#34;persona\&#34;: {\&#34;username\&#34;: \&#34;Kimya\&#34;, \&#34;age\&#34;: 67, \&#34;sex\&#34;: \&#34;female\&#34;, \&#34;education_level\&#34;: \&#34;PhD\&#34;, \&#34;sexual_orientation\&#34;: \&#34;Heterosexual\&#34;, \&#34;demographic_group\&#34;: \&#34;White\&#34;, \&#34;personality_characteristics\&#34;: [\&#34;strict\&#34;, \&#34;grumpy\&#34;]}}&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Gwx31&#34;,
+            &#34;text&#34;: &#34;User Gwx31 posted: Thanks for the suggestions, everyone! It&#39;s true that sitting for long periods can be tough, especially when you&#39;re on your feet a lot as a nurse. I do try to move around and stand when I can, but sometimes it feels like I&#39;m stuck in a chair for too long. Standing desks sound interesting, but I&#39;m not sure if my workplace would allow that. Do you think getting an ergonomic chair could be a better solution? Or maybe I should&#34;,
+            &#34;model&#34;: &#34;test_model&#34;,
+            &#34;prompt&#34;: &#34;{\&#34;context\&#34;: \&#34;You are taking part in an online conversation\&#34;, \&#34;instructions\&#34;: \&#34;Act like a human would\&#34;, \&#34;type\&#34;: \&#34;user\&#34;, \&#34;persona\&#34;: {\&#34;username\&#34;: \&#34;Gwx31\&#34;, \&#34;age\&#34;: 38, \&#34;sex\&#34;: \&#34;female\&#34;, \&#34;education_level\&#34;: \&#34;Bachelor&#39;s\&#34;, \&#34;sexual_orientation\&#34;: \&#34;Heterosexual\&#34;, \&#34;demographic_group\&#34;: \&#34;Latino\&#34;, \&#34;current_employment\&#34;: \&#34;Registered Nurse\&#34;, \&#34;personality_characteristics\&#34;: [\&#34;compassionate\&#34;, \&#34;patient\&#34;, \&#34;diligent\&#34;, \&#34;overwhelmed\&#34;]}}&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Giannis&#34;,
+            &#34;text&#34;: &#34;User Giannis posted: Absolutely, Gwx31! If standing desks aren&#39;t an option, investing in an ergonomic chair could definitely be a better solution. Look for one that offers good lower back support and is adjustable for height and tilt. This can help reduce strain on your back and improve your posture. Plus, many companies offer some flexibility in allowing employees to choose their own seating options, so it might be worth talking to your supervisor about it.\n\nOn the other hand, if you decide to&#34;,
+            &#34;model&#34;: &#34;test_model&#34;,
+            &#34;prompt&#34;: &#34;{\&#34;context\&#34;: \&#34;You are taking part in an online conversation\&#34;, \&#34;instructions\&#34;: \&#34;Act like a human would\&#34;, \&#34;type\&#34;: \&#34;user\&#34;, \&#34;persona\&#34;: {\&#34;username\&#34;: \&#34;Giannis\&#34;, \&#34;age\&#34;: 21, \&#34;sex\&#34;: \&#34;male\&#34;, \&#34;education_level\&#34;: \&#34;College\&#34;, \&#34;sexual_orientation\&#34;: \&#34;Pansexual\&#34;, \&#34;demographic_group\&#34;: \&#34;White\&#34;, \&#34;current_employment\&#34;: \&#34;Game Developer\&#34;, \&#34;personality_characteristics\&#34;: [\&#34;strategic\&#34;, \&#34;meticulous\&#34;, \&#34;nerdy\&#34;, \&#34;hyper-focused\&#34;]}}&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Kimya&#34;,
+            &#34;text&#34;: &#34;User Kimya posted: I agree with Giannis, Gwx31. An ergonomic chair can indeed make a significant difference. Make sure to look for features like lumbar support, armrests that fit your body, and the ability to adjust the seat height and angle. These details can greatly enhance your comfort and reduce the strain on your back and neck. Additionally, you might want to check if your workplace has any policies regarding flexible seating options or if they offer reimbursement for such purchases. It&#34;,
+            &#34;model&#34;: &#34;test_model&#34;,
+            &#34;prompt&#34;: &#34;{\&#34;context\&#34;: \&#34;You are taking part in an online conversation\&#34;, \&#34;instructions\&#34;: \&#34;Act like a human would\&#34;, \&#34;type\&#34;: \&#34;user\&#34;, \&#34;persona\&#34;: {\&#34;username\&#34;: \&#34;Kimya\&#34;, \&#34;age\&#34;: 67, \&#34;sex\&#34;: \&#34;female\&#34;, \&#34;education_level\&#34;: \&#34;PhD\&#34;, \&#34;sexual_orientation\&#34;: \&#34;Heterosexual\&#34;, \&#34;demographic_group\&#34;: \&#34;White\&#34;, \&#34;personality_characteristics\&#34;: [\&#34;strict\&#34;, \&#34;grumpy\&#34;]}}&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Gwx31&#34;,
+            &#34;text&#34;: &#34;User Gwx31 posted: Thanks again, both of you! I&#39;ll definitely look into getting an ergonomic chair. I appreciate the advice about checking with my supervisor and looking for features like lumbar support and adjustable height. I&#39;ll start doing some research online and see what options are available. Hopefully, I can find something that works well for me without causing too much of a hassle.&#34;,
+            &#34;model&#34;: &#34;test_model&#34;,
+            &#34;prompt&#34;: &#34;{\&#34;context\&#34;: \&#34;You are taking part in an online conversation\&#34;, \&#34;instructions\&#34;: \&#34;Act like a human would\&#34;, \&#34;type\&#34;: \&#34;user\&#34;, \&#34;persona\&#34;: {\&#34;username\&#34;: \&#34;Gwx31\&#34;, \&#34;age\&#34;: 38, \&#34;sex\&#34;: \&#34;female\&#34;, \&#34;education_level\&#34;: \&#34;Bachelor&#39;s\&#34;, \&#34;sexual_orientation\&#34;: \&#34;Heterosexual\&#34;, \&#34;demographic_group\&#34;: \&#34;Latino\&#34;, \&#34;current_employment\&#34;: \&#34;Registered Nurse\&#34;, \&#34;personality_characteristics\&#34;: [\&#34;compassionate\&#34;, \&#34;patient\&#34;, \&#34;diligent\&#34;, \&#34;overwhelmed\&#34;]}}&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Giannis&#34;,
+            &#34;text&#34;: &#34;User Giannis posted: You&#39;re welcome, Gwx31! Taking the time to find the right chair is definitely worth it. Once you have a few options in mind, don&#39;t hesitate to discuss them with your supervisor. They might even have some recommendations or resources available. Also, consider checking out reviews and maybe even try out a chair before you buy one if possible. That way, you can ensure it\u2019s the best fit for your needs.\n\nAnd remember, small changes can make a big&#34;,
+            &#34;model&#34;: &#34;test_model&#34;,
+            &#34;prompt&#34;: &#34;{\&#34;context\&#34;: \&#34;You are taking part in an online conversation\&#34;, \&#34;instructions\&#34;: \&#34;Act like a human would\&#34;, \&#34;type\&#34;: \&#34;user\&#34;, \&#34;persona\&#34;: {\&#34;username\&#34;: \&#34;Giannis\&#34;, \&#34;age\&#34;: 21, \&#34;sex\&#34;: \&#34;male\&#34;, \&#34;education_level\&#34;: \&#34;College\&#34;, \&#34;sexual_orientation\&#34;: \&#34;Pansexual\&#34;, \&#34;demographic_group\&#34;: \&#34;White\&#34;, \&#34;current_employment\&#34;: \&#34;Game Developer\&#34;, \&#34;personality_characteristics\&#34;: [\&#34;strategic\&#34;, \&#34;meticulous\&#34;, \&#34;nerdy\&#34;, \&#34;hyper-focused\&#34;]}}&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Kimya&#34;,
+            &#34;text&#34;: &#34;User Kimya posted: Small changes indeed can make a big difference, Gwx31. I completely agree with Giannis about trying out chairs if possible. Sometimes, just sitting in a chair for a short test can give you a better idea of how comfortable it will be over longer periods. Also, consider asking for a trial period if your workplace allows it. This way, you can be sure the chair meets your needs before committing to a purchase. And remember, investing in your health now can&#34;,
+            &#34;model&#34;: &#34;test_model&#34;,
+            &#34;prompt&#34;: &#34;{\&#34;context\&#34;: \&#34;You are taking part in an online conversation\&#34;, \&#34;instructions\&#34;: \&#34;Act like a human would\&#34;, \&#34;type\&#34;: \&#34;user\&#34;, \&#34;persona\&#34;: {\&#34;username\&#34;: \&#34;Kimya\&#34;, \&#34;age\&#34;: 67, \&#34;sex\&#34;: \&#34;female\&#34;, \&#34;education_level\&#34;: \&#34;PhD\&#34;, \&#34;sexual_orientation\&#34;: \&#34;Heterosexual\&#34;, \&#34;demographic_group\&#34;: \&#34;White\&#34;, \&#34;personality_characteristics\&#34;: [\&#34;strict\&#34;, \&#34;grumpy\&#34;]}}&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Gwx31&#34;,
+            &#34;text&#34;: &#34;User Gwx31 posted: Thanks, everyone! I really appreciate all the tips and encouragement. I&#39;m feeling more hopeful about finding a solution that works for me. I&#39;ll definitely reach out to my supervisor and maybe even visit a store to test out some chairs. It&#39;s nice to know there are options out there that can help with my discomfort. I&#39;m going to take it one step at a time and see where this leads.&#34;,
+            &#34;model&#34;: &#34;test_model&#34;,
+            &#34;prompt&#34;: &#34;{\&#34;context\&#34;: \&#34;You are taking part in an online conversation\&#34;, \&#34;instructions\&#34;: \&#34;Act like a human would\&#34;, \&#34;type\&#34;: \&#34;user\&#34;, \&#34;persona\&#34;: {\&#34;username\&#34;: \&#34;Gwx31\&#34;, \&#34;age\&#34;: 38, \&#34;sex\&#34;: \&#34;female\&#34;, \&#34;education_level\&#34;: \&#34;Bachelor&#39;s\&#34;, \&#34;sexual_orientation\&#34;: \&#34;Heterosexual\&#34;, \&#34;demographic_group\&#34;: \&#34;Latino\&#34;, \&#34;current_employment\&#34;: \&#34;Registered Nurse\&#34;, \&#34;personality_characteristics\&#34;: [\&#34;compassionate\&#34;, \&#34;patient\&#34;, \&#34;diligent\&#34;, \&#34;overwhelmed\&#34;]}}&#34;
+        }
+    ]
+}
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">logs2</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">Logs</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">logs2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{
+    &#34;timestamp&#34;: &#34;26-04-16-11-29&#34;,
+    &#34;logs&#34;: [
+        {
+            &#34;name&#34;: &#34;Gwx31&#34;,
+            &#34;text&#34;: &#34;I hate the concept of chairs.&#34;,
+            &#34;model&#34;: &#34;hardcoded&#34;,
+            &#34;prompt&#34;: &#34;&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Gwx31&#34;,
+            &#34;text&#34;: &#34;Oh, wow! That&#39;s quite a strong stance on chairs. I can understand how sitting for long periods could be uncomfortable, especially as a nurse who likely spends a lot of time on your feet. Sometimes, finding the right kind of chair that supports your posture can make a big difference. Have you tried any ergonomic chairs that might help with your discomfort?&#34;,
+            &#34;model&#34;: &#34;test_model&#34;,
+            &#34;prompt&#34;: &#34;&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Giannis&#34;,
+            &#34;text&#34;: &#34;I get where you&#39;re coming from, Gwx31. While chairs can be a pain to sit on for long periods, they serve a pretty important function. Personally, I&#39;ve been into gaming and development for a while now, so I don&#39;t spend much time sitting at all\u2014usually just coding or playing games. But if you&#39;re looking for ergonomic chairs, I&#39;d recommend checking out some of the adjustable ones with good lumbar support. They can really make a difference in reducing back pain&#34;,
+            &#34;model&#34;: &#34;test_model&#34;,
+            &#34;prompt&#34;: &#34;&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Kimya&#34;,
+            &#34;text&#34;: &#34;User Kimya posted: Well, Gwx31, if you truly hate chairs, perhaps you should consider standing more often. As someone who has spent decades in academia, I can attest to the importance of having a good chair, but also to the value of standing desks. They can be quite liberating once you get used to them. Plus, it&#39;s a great way to stay active throughout the day.&#34;,
+            &#34;model&#34;: &#34;test_model&#34;,
+            &#34;prompt&#34;: &#34;&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Gwx31&#34;,
+            &#34;text&#34;: &#34;User Gwx31 posted: Thanks for the suggestions, everyone! It&#39;s true that sitting for long periods can be tough, especially when you&#39;re on your feet a lot as a nurse. I do try to move around and stand when I can, but sometimes it feels like I&#39;m stuck in a chair for too long. Standing desks sound interesting, but I&#39;m not sure if my workplace would allow that. Do you think getting an ergonomic chair could be a better solution? Or maybe I should&#34;,
+            &#34;model&#34;: &#34;test_model&#34;,
+            &#34;prompt&#34;: &#34;&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Giannis&#34;,
+            &#34;text&#34;: &#34;User Giannis posted: Absolutely, Gwx31! If standing desks aren&#39;t an option, investing in an ergonomic chair could definitely be a better solution. Look for one that offers good lower back support and is adjustable for height and tilt. This can help reduce strain on your back and improve your posture. Plus, many companies offer some flexibility in allowing employees to choose their own seating options, so it might be worth talking to your supervisor about it.\n\nOn the other hand, if you decide to&#34;,
+            &#34;model&#34;: &#34;test_model&#34;,
+            &#34;prompt&#34;: &#34;&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Kimya&#34;,
+            &#34;text&#34;: &#34;User Kimya posted: I agree with Giannis, Gwx31. An ergonomic chair can indeed make a significant difference. Make sure to look for features like lumbar support, armrests that fit your body, and the ability to adjust the seat height and angle. These details can greatly enhance your comfort and reduce the strain on your back and neck. Additionally, you might want to check if your workplace has any policies regarding flexible seating options or if they offer reimbursement for such purchases. It&#34;,
+            &#34;model&#34;: &#34;test_model&#34;,
+            &#34;prompt&#34;: &#34;&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Gwx31&#34;,
+            &#34;text&#34;: &#34;User Gwx31 posted: Thanks again, both of you! I&#39;ll definitely look into getting an ergonomic chair. I appreciate the advice about checking with my supervisor and looking for features like lumbar support and adjustable height. I&#39;ll start doing some research online and see what options are available. Hopefully, I can find something that works well for me without causing too much of a hassle.&#34;,
+            &#34;model&#34;: &#34;test_model&#34;,
+            &#34;prompt&#34;: &#34;&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Giannis&#34;,
+            &#34;text&#34;: &#34;User Giannis posted: You&#39;re welcome, Gwx31! Taking the time to find the right chair is definitely worth it. Once you have a few options in mind, don&#39;t hesitate to discuss them with your supervisor. They might even have some recommendations or resources available. Also, consider checking out reviews and maybe even try out a chair before you buy one if possible. That way, you can ensure it\u2019s the best fit for your needs.\n\nAnd remember, small changes can make a big&#34;,
+            &#34;model&#34;: &#34;test_model&#34;,
+            &#34;prompt&#34;: &#34;&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Kimya&#34;,
+            &#34;text&#34;: &#34;User Kimya posted: Small changes indeed can make a big difference, Gwx31. I completely agree with Giannis about trying out chairs if possible. Sometimes, just sitting in a chair for a short test can give you a better idea of how comfortable it will be over longer periods. Also, consider asking for a trial period if your workplace allows it. This way, you can be sure the chair meets your needs before committing to a purchase. And remember, investing in your health now can&#34;,
+            &#34;model&#34;: &#34;test_model&#34;,
+            &#34;prompt&#34;: &#34;&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Gwx31&#34;,
+            &#34;text&#34;: &#34;User Gwx31 posted: Thanks, everyone! I really appreciate all the tips and encouragement. I&#39;m feeling more hopeful about finding a solution that works for me. I&#39;ll definitely reach out to my supervisor and maybe even visit a store to test out some chairs. It&#39;s nice to know there are options out there that can help with my discomfort. I&#39;m going to take it one step at a time and see where this leads.&#34;,
+            &#34;model&#34;: &#34;test_model&#34;,
+            &#34;prompt&#34;: &#34;&#34;
+        }
+    ]
+}
+</pre></div></div>
+</div>
+</section>
+<section id="Creating-hard-coded-logs">
+<h3>Creating hard-coded logs<a class="headerlink" href="#Creating-hard-coded-logs" title="Link to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">Logs</span></code> class also enables you to hardcode the data inside. This would be useful for example if you want to use <code class="docutils literal notranslate"><span class="pre">syndisco</span></code>’s annotation on data that were not generated by the <code class="docutils literal notranslate"><span class="pre">Discussion</span></code> API (see next guide).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Alice&quot;</span><span class="p">]</span>
+<span class="n">texts</span><span class="o">=</span><span class="p">[</span>
+    <span class="s2">&quot;What do you think about the new policy?&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Honestly, I think it goes too far.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;I can see that perspective, though I&#39;m not sure I agree.&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">handcrafted</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">Logs</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">text</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">texts</span><span class="p">):</span>
+    <span class="n">handcrafted</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">handcrafted</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{
+    &#34;timestamp&#34;: &#34;26-04-16-11-29&#34;,
+    &#34;logs&#34;: [
+        {
+            &#34;name&#34;: &#34;Alice&#34;,
+            &#34;text&#34;: &#34;What do you think about the new policy?&#34;,
+            &#34;model&#34;: &#34;hardcoded&#34;,
+            &#34;prompt&#34;: &#34;&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Bob&#34;,
+            &#34;text&#34;: &#34;Honestly, I think it goes too far.&#34;,
+            &#34;model&#34;: &#34;hardcoded&#34;,
+            &#34;prompt&#34;: &#34;&#34;
+        },
+        {
+            &#34;name&#34;: &#34;Alice&#34;,
+            &#34;text&#34;: &#34;I can see that perspective, though I&#39;m not sure I agree.&#34;,
+            &#34;model&#34;: &#34;hardcoded&#34;,
+            &#34;prompt&#34;: &#34;&#34;
+        }
+    ]
+}
+</pre></div></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Dimitris Tsirmpas.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+﻿syndisco.TurnManager
+====================
+
+.. autoclass:: syndisco.TurnManager
+   :members:
+   :undoc-members:
+   :show-inheritance:

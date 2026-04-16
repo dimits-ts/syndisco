@@ -1,0 +1,12 @@
+﻿syndisco.logging
+================
+
+.. automodule:: syndisco.logging
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      logging_setup
+   

@@ -1,0 +1,7 @@
+﻿syndisco.BaseModel
+==================
+
+.. autoclass:: syndisco.BaseModel
+   :members:
+   :undoc-members:
+   :show-inheritance:
