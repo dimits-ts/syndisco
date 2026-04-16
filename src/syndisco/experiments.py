@@ -21,7 +21,6 @@ in the syndisco.jobs module.
 
 # You may contact the author at dim.tsirmpas@aueb.gr
 
-import copy
 import random
 import typing
 import datetime
@@ -264,9 +263,7 @@ class AnnotationExperiment:
         """
         annotation_tasks = []
         for annotator in self.annotators:
-            annotation_task = self._create_annotation_task(
-                copy.deepcopy(annotator)
-            )
+            annotation_task = self._create_annotation_task(annotator)
             annotation_tasks.append(annotation_task)
         return annotation_tasks
 

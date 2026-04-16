@@ -409,7 +409,7 @@ class Annotation:
                 "(see Actor.__init__())."
             )
 
-        self._annotator = copy.deepcopy(annotator)
+        self._annotator = annotator
         self._history_ctx_len = history_ctx_len
         self._discussion_logs = copy.deepcopy(discussion_logs)
         self._annotation_logs = Logs()
