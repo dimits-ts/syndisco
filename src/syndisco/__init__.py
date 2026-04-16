@@ -1,23 +1,26 @@
+"""
+A lightweight framework for creating, managing, annotating, and analyzing
+synthetic discussions between Large Language Model (LLM) user-agents.
+"""
 from .experiments import DiscussionExperiment, AnnotationExperiment
-from .actors import Actor, Persona, ActorType
+from .actors import Actor
 from .jobs import Discussion, Annotation, Logs
-from .logging import logging_setup, timing
-from .model import TransformersModel, OpenAIModel
-from .turn_manager import RandomWeighted, RoundRobin
+from .logging import logging_setup
+from .model import TransformersModel, OpenAIModel, BaseModel
+from .turn_manager import RandomWeighted, RoundRobin, TurnManager
 
 __all__ = [
     "DiscussionExperiment",
     "AnnotationExperiment",
     "Actor",
-    "Persona",
     "Discussion",
     "Annotation",
     "Logs",
     "logging_setup",
-    "timing",
+    "BaseModel",
     "TransformersModel",
     "OpenAIModel",
+    "TurnManager",
     "RandomWeighted",
-    "RoundRobin",
-    "ActorType"
+    "RoundRobin"
 ]

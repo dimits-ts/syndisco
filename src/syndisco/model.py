@@ -1,7 +1,3 @@
-"""
-Module containing wrappers for local LLMs loaded with various Python libraries.
-"""
-
 # SynDisco: Automated experiment creation and execution using only LLM agents
 # Copyright (C) 2025 Dimitris Tsirmpas
 
@@ -19,6 +15,10 @@ Module containing wrappers for local LLMs loaded with various Python libraries.
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # You may contact the author at dim.tsirmpas@aueb.gr
+"""
+Module containing wrappers for local LLMs loaded with various Python libraries.
+"""
+
 import abc
 import typing
 import logging
@@ -111,13 +111,79 @@ class TransformersModel(BaseModel):
         name: str,
         max_out_tokens: int,
         remove_string_list: list[str] | None = None,
+        model_kwargs: dict | None = None,
+        tokenizer_kwargs: dict | None = None,
+        generation_kwargs: dict | None = None,
     ):
+        """
+        Initialize a HuggingFace Transformers-based language model wrapper.
+
+        This class loads a causal language model and tokenizer from a
+        HuggingFace-compatible checkpoint and configures them for inference.
+        It also supports optional customization of model loading, tokenizer
+        behavior, and generation parameters via keyword argument dictionaries.
+
+        :param model_path:
+            Path or HuggingFace model identifier used to load the 
+            model and tokenizer.
+        :type model_path: str | Path
+
+        :param name:
+            A human-readable name or alias for this model instance.
+        :type name: str
+
+        :param max_out_tokens:
+            Maximum number of tokens to generate per response.
+        :type max_out_tokens: int
+
+        :param remove_string_list:
+            Optional list of substrings to remove from generated outputs.
+        :type remove_string_list: list[str] | None
+
+        :param model_kwargs:
+            Additional keyword arguments forwarded to
+            ``transformers.AutoModelForCausalLM.from_pretrained``.
+            Examples include dtype configuration, quantization settings, etc.
+        :type model_kwargs: dict | None
+
+        :param tokenizer_kwargs:
+            Additional keyword arguments forwarded to
+            ``transformers.AutoTokenizer.from_pretrained``.
+            Examples include ``use_fast=True`` or special token configuration.
+        :type tokenizer_kwargs: dict | None
+
+        :param generation_kwargs:
+            Additional keyword arguments forwarded to
+            ``model.generate()`` during inference.
+            Examples include sampling parameters such as ``temperature``,
+            ``top_p``, or ``repetition_penalty``.
+        :type generation_kwargs: dict | None
+
+        :raises OSError:
+        If the model or tokenizer cannot be loaded from the given path.
+
+        :raises ValueError:
+        If the provided configuration is invalid / incompatible with the model.
+
+        :note:
+        The model is moved to the appropriate device automatically using
+        ``device_map="auto"`` and set to evaluation mode.
+        """
         super().__init__(name, max_out_tokens, remove_string_list)
 
+        model_kwargs = model_kwargs or {}
+        tokenizer_kwargs = tokenizer_kwargs or {}
+        self.generation_kwargs = generation_kwargs or {}
+
         self.model = transformers.AutoModelForCausalLM.from_pretrained(
-            model_path, device_map="auto"
+            model_path,
+            device_map="auto",
+            **model_kwargs,
         ).eval()
-        self.tokenizer = transformers.AutoTokenizer.from_pretrained(model_path)
+        self.tokenizer = transformers.AutoTokenizer.from_pretrained(
+            model_path,
+            **tokenizer_kwargs,
+        )
 
         model_size = self.model.get_memory_footprint() / 2**20
         logger.info(f"Model memory footprint: {model_size:.2f} MB")
@@ -147,14 +213,15 @@ class TransformersModel(BaseModel):
                 self.model.device
             )
 
-            output_ids = self.model.generate(
+            output_ids = self.model.generate(  # type: ignore
                 **inputs,
                 max_new_tokens=self.max_out_tokens,
                 do_sample=False,
                 pad_token_id=self.tokenizer.eos_token_id,
+                **self.generation_kwargs,
             )
 
-        # Remove the prompt portion → keep only generated part
+        # Remove the prompt portion, keep only generated part
         generated_ids = output_ids[0][inputs["input_ids"].shape[1]:]
         response = self.tokenizer.decode(
             generated_ids, skip_special_tokens=True
@@ -182,7 +249,7 @@ class OpenAIModel(BaseModel):
     ):
         """Initialize the OpenAI model wrapper.
 
-        :param model_name: 
+        :param model_name:
             The model identifier to use (e.g., "gpt-4", "gpt-3.5-turbo")
         :type model_name: str
         :param api_key: The API key for authentication
@@ -226,9 +293,56 @@ class OpenAIModel(BaseModel):
 
         response = self.client.chat.completions.create(
             model=self.model_name,
-            messages=messages,
+            messages=messages,  # type: ignore
             max_tokens=self.max_out_tokens,
             temperature=self.temperature,
         )
+        response = self._validate_response(response)
+        return response
 
-        return response.choices[0].message.content.strip()
+    def _validate_response(self, response: typing.Any) -> str:
+        # Validate response object
+        if response is None:
+            raise ValueError("Received empty response from OpenAI API")
+
+        if not hasattr(response, "choices") or not response.choices:
+            raise ValueError(
+                "Malformed response: missing or empty 'choices'."
+                f" Full response: {response}"
+            )
+
+        choice = response.choices[0]
+
+        if not hasattr(choice, "message") or choice.message is None:
+            raise ValueError(
+                "Malformed response: missing 'message' in first choice. "
+                f"Choice: {choice}"
+            )
+
+        message = choice.message
+
+        if not hasattr(message, "content"):
+            raise ValueError(
+                "Malformed response: missing 'content' field in message. "
+                f" Message: {message}"
+            )
+
+        content = message.content
+
+        if content is None:
+            raise ValueError(
+                "Model returned a response with null content "
+                "(possible tool call or empty output)"
+            )
+
+        if not isinstance(content, str):
+            raise TypeError(
+                f"Unexpected content type: expected str, got {type(content)}"
+            )
+
+        content = content.strip()
+
+        if not content:
+            raise ValueError("Model returned empty response")
+
+        return content

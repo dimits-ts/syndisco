@@ -1,9 +1,29 @@
+# SynDisco: Automated experiment creation and execution using only LLM agents
+# Copyright (C) 2025 Dimitris Tsirmpas
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# You may contact the author at dim.tsirmpas@aueb.gr
+"""
+Module creating discussions and annotations between LLM Actors.
+"""
+
 import collections
 import collections.abc
 import datetime
 import json
 import logging as pylog
-import hashlib
 import copy
 import textwrap
 import random
@@ -13,7 +33,6 @@ from pathlib import Path
 from tqdm.auto import tqdm
 
 from . import actors, turn_manager
-from . import _file_util
 
 
 logger = pylog.getLogger(Path(__file__).name)
@@ -21,7 +40,7 @@ logger = pylog.getLogger(Path(__file__).name)
 
 class Logs:
     """
-    Stores and serializes the log entries of a discussion.
+    A mutable container for comments made in a discussion.
 
     Each entry is a dict with keys ``name``, ``text``, and ``model``.
     The class can be constructed incrementally via :meth:`append`, or
@@ -102,6 +121,11 @@ class Logs:
     def __getitem__(self, index: int) -> dict[str, str]:
         return self._entries[index]
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Logs):
+            return NotImplemented
+        return self._entries == other._entries
+
     def to_list(self) -> list[dict[str, str]]:
         """Return a shallow copy of the raw entry list."""
         return list(self._entries)
@@ -123,9 +147,6 @@ class Logs:
             "timestamp": datetime.datetime.now().strftime(timestamp_format),
             "logs": self.to_list(),
         }
-        export_dict["id"] = hashlib.sha256(
-            json.dumps(self.to_list(), sort_keys=True).encode()
-        ).hexdigest()
 
         return export_dict
 
@@ -142,10 +163,13 @@ class Logs:
         :param timestamp_format: strftime format for the timestamp field.
         :type timestamp_format: str, optional
         """
-        _file_util.dict_to_json(
-            self.to_dict(timestamp_format=timestamp_format),
-            output_path,
-        )
+        output_path = Path(output_path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        dictionary = self.to_dict(timestamp_format=timestamp_format)
+
+        with open(output_path, "w", encoding="utf8") as fout:
+            json.dump(dictionary, fout, indent=4)
 
     def __str__(self) -> str:
         return json.dumps(self.to_dict(), indent=4)
@@ -154,7 +178,7 @@ class Logs:
 class Discussion(collections.abc.Iterator[dict[str, str]]):
     """
     A job conducting a discussion between different actors
-    (:class:`actors.Actor`).
+    (:class:`Actor`).
 
     ``Discussion`` implements the iterator protocol: each call to
     :func:`next` prompts the next speaker and returns the resulting log
@@ -181,11 +205,11 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
     def __init__(
         self,
         next_turn_manager: turn_manager.TurnManager,
-        users: list[actors.Actor],
+        users: typing.Sequence[actors.Actor],
         history_context_len: int = 5,
         conv_len: int = 5,
-        seed_opinions: list[str] | None = None,
-        seed_opinion_usernames: list[str] | None = None,
+        seed_opinions: typing.Sequence[str] | None = None,
+        seed_opinion_usernames: typing.Sequence[str] | None = None,
     ) -> None:
         """
         Construct the framework for a conversation to take place.
@@ -193,8 +217,8 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
         :param next_turn_manager: An object handling the speaker order of
             the participants.
         :type next_turn_manager: turn_manager.TurnManager
-        :param users: A list of discussion participants.
-        :type users: list[actors.Actor]
+        :param users: Any iterable containing the discussion participants.
+        :type users: Sequence[Actor]
         :param history_context_len: How many prior messages are included
             in the LLM's prompt as context, defaults to 5.
         :type history_context_len: int, optional
@@ -203,36 +227,74 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
         :type conv_len: int, optional
         :param seed_opinions: Hardcoded opening comments inserted before
             the first prompted turn, top-to-bottom in list order.
-        :type seed_opinions: list[str], optional
+        :type seed_opinions: Sequence[str], optional
         :param seed_opinion_usernames: The username for each seed opinion.
             Sampled randomly (without replacement) when *None*.
-        :type seed_opinion_usernames: list[str], optional
+        :type seed_opinion_usernames: Sequence[str], optional
         :raises ValueError: if the number of seed opinions and seed
             opinion usernames differ, or if there are more seed opinions
             than participants.
         """
         users = copy.copy(users)
-        self.username_user_map = {user.get_name(): user for user in users}
+        if any([actor.is_annotator for actor in users]):
+            raise ValueError(
+                "Annotator users can not participate in discussions."
+            )
+        self._users = list(users)
 
-        self.next_turn_manager = next_turn_manager
-        self.next_turn_manager.set_names([user.get_name() for user in users])
+        self._next_turn_manager = next_turn_manager
+        self._next_turn_manager.set_actors(users)
+        # iterator state
+        self._steps_taken: int = 0
 
         self.conv_len = conv_len
 
         # keep a limited context of the conversation to feed to the models
-        self.ctx_len = history_context_len
-        self.ctx_history: collections.deque[str] = collections.deque(
+        self._ctx_history: collections.deque[str] = collections.deque(
             maxlen=history_context_len
         )
 
         # all persistent log state is owned by DiscussionLogs
-        self.logs = Logs()
+        self._logs = Logs()
 
-        self.seed_opinions = seed_opinions or []
-        self.seed_opinion_usernames = seed_opinion_usernames
+        if (seed_opinions is None) ^ (seed_opinion_usernames is None):
+            raise ValueError(
+                "Seed opinions and their respective usernames should either "
+                "be both None, or both defined."
+            )
 
-        # iterator state
-        self._steps_taken: int = 0
+        if (
+            seed_opinions is not None
+            and seed_opinion_usernames is not None
+            and len(seed_opinions) != len(seed_opinion_usernames)
+        ):
+            raise ValueError(
+                f"Length of seed opinions ({len(seed_opinions)}) differs from "
+                f"length of seed usernames ({len(seed_opinion_usernames)})"
+            )
+
+        if (
+            seed_opinions is not None
+            and seed_opinion_usernames is not None
+            and any(
+                [
+                    entry is None
+                    for entry in list(seed_opinions)
+                    + list(seed_opinion_usernames)
+                ]
+            )
+        ):
+            raise ValueError("Seed opinions and usernames should be non-None.")
+
+        self._seed_opinions = seed_opinions or []
+        self._seed_opinion_usernames = seed_opinion_usernames or []
+
+        for opinion, name in zip(
+            self._seed_opinions, self._seed_opinion_usernames
+        ):
+            self._archive_response(
+                user=actors.Actor(name=name), comment=opinion
+            )
 
     def __next__(self) -> dict[str, str]:
         """
@@ -250,18 +312,17 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
         if self._steps_taken >= self.conv_len:
             raise StopIteration
 
-        speaker_name = self.next_turn_manager.next()
-        actor = self.username_user_map[speaker_name]
-        res = actor.speak(list(self.ctx_history))
+        actor = self._next_turn_manager.next()
+        res = actor.speak(list(self._ctx_history))
         self._steps_taken += 1
 
         if res.strip():
             self._archive_response(actor, res)
-            return self.logs[-1]
+            return self._logs[-1]
 
         # Whitespace response: return a placeholder entry so the caller
         # always receives one value per next() call.
-        return {"name": actor.get_name(), "text": "", "model": ""}
+        return {"name": actor.get_actor_name(), "text": "", "model": ""}
 
     # Convenience one-shot API
     def begin(self, verbose: bool = True) -> None:
@@ -289,29 +350,28 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
         :return: A copy of the discussion logs.
         :rtype: DiscussionLogs
         """
-        return copy.deepcopy(self.logs)
+        return copy.deepcopy(self._logs)
 
     def _add_seed_opinions(self) -> None:
-        if len(self.seed_opinions) > 0:
-            usernames = self.seed_opinion_usernames
+        if len(self._seed_opinions) > 0:
+            usernames = self._seed_opinion_usernames
             if usernames is None:
-                if len(self.seed_opinions) > len(self.username_user_map):
+                if len(self._seed_opinions) > len(self._users):
                     raise ValueError(
                         "Not enough users to assign unique usernames "
                         "for seed opinions."
                     )
                 usernames = random.sample(
-                    list(self.username_user_map.keys()),
-                    len(self.seed_opinions),
+                    list([user.get_actor_name() for user in self._users]),
+                    len(self._seed_opinions),
                 )
 
-            for username, comment in zip(usernames, self.seed_opinions):
+            for username, comment in zip(usernames, self._seed_opinions):
                 seed_user = actors.Actor(
                     model=None,  # type: ignore
-                    persona=actors.Persona(username=username),
+                    persona={"username": username},
                     context="",
                     instructions="",
-                    actor_type=actors.ActorType.USER,
                 )
                 if comment.strip() != "":
                     self._archive_response(seed_user, comment)
@@ -326,16 +386,16 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
         :type comment: str
         """
         model_name = (
-            user.model.get_name() if user.model is not None else "hardcoded"
+            user._model.get_name() if user._model is not None else "hardcoded"
         )
-        self.logs.append(
-            name=user.get_name(),
+        self._logs.append(
+            name=user.get_actor_name(),
             text=comment,
             model=model_name,
-            prompt=user.describe(),
+            prompt=user.get_system_prompt(),
         )
-        formatted = _format_chat_message(user.get_name(), comment)
-        self.ctx_history.append(formatted)
+        formatted = _format_chat_message(user.get_actor_name(), comment)
+        self._ctx_history.append(formatted)
 
 
 class Annotation:
@@ -364,28 +424,42 @@ class Annotation:
             will remember, defaults to 2.
         :type history_ctx_len: int, optional
         """
-        self.annotator = annotator
-        self.history_ctx_len = history_ctx_len
-        self.discussion_logs = copy.deepcopy(discussion_logs)
-        self.annotation_logs = Logs()
+        if not annotator.is_annotator:
+            raise ValueError(
+                "The actor used for annotation should be an annotator "
+                "(see Actor.__init__())."
+            )
+
+        self._annotator = annotator
+        self._history_ctx_len = history_ctx_len
+        self._discussion_logs = copy.deepcopy(discussion_logs)
+        self._annotation_logs = Logs()
 
     def begin(self, verbose: bool = True) -> None:
+        """
+        Run annotation on the entire discussion, printing each entry when
+        *verbose* is ``True``.
+
+        :param verbose: Whether to print each comment to stdout,
+            defaults to ``True``.
+        :type verbose: bool, optional
+        """
         ctx_history: collections.deque[str] = collections.deque(
-            maxlen=self.history_ctx_len
+            maxlen=self._history_ctx_len
         )
 
-        for message_data in tqdm(self.discussion_logs):
+        for message_data in tqdm(self._discussion_logs):
             username = message_data["name"]
             message = message_data["text"]
 
             formatted_message = _format_chat_message(username, message)
             ctx_history.append(formatted_message)
-            annotation = self.annotator.speak(list(ctx_history))
-            self.annotation_logs.append(
+            annotation = self._annotator.speak(list(ctx_history))
+            self._annotation_logs.append(
                 name=username,
                 text=annotation,
-                model=self.annotator.model.get_name(),
-                prompt=self.annotator.describe()
+                model=self._annotator.get_model_name(),
+                prompt=self._annotator.get_system_prompt(),
             )
 
             if verbose:
@@ -401,7 +475,7 @@ class Annotation:
             judgements for each comment in the provided discussion.
         :rtype: DiscussionLogs
         """
-        return copy.deepcopy(self.annotation_logs)
+        return copy.deepcopy(self._annotation_logs)
 
 
 def _format_chat_message(username: str, message: str) -> str:

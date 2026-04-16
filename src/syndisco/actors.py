@@ -1,7 +1,3 @@
-"""
-Module defining LLM users in discussions and their characteristics.
-"""
-
 # SynDisco: Automated experiment creation and execution using only LLM agents
 # Copyright (C) 2025 Dimitris Tsirmpas
 
@@ -19,86 +15,14 @@ Module defining LLM users in discussions and their characteristics.
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # You may contact the author at dim.tsirmpas@aueb.gr
-
+"""
+Module defining LLM users in discussions and their characteristics.
+"""
 
 import typing
-import dataclasses
-from pathlib import Path
 import json
-from enum import Enum, auto
 
 from . import model
-from . import _file_util
-
-
-class ActorType(str, Enum):
-    """
-    The purpose of the LLMActor, used to determine proper prompt structure
-    """
-
-    USER = auto()
-    ANNOTATOR = auto()
-
-
-@dataclasses.dataclass
-class Persona:
-    """
-    A dataclass holding information about the synthetic persona of a LLM actor.
-    Includes name, Sociodemographic Background, personality
-    and special instructions.
-    """
-
-    username: str = ""
-    age: int = -1
-    sex: str = ""
-    sexual_orientation: str = ""
-    demographic_group: str = ""
-    current_employment: str = ""
-    education_level: str = ""
-    special_instructions: str = ""
-    personality_characteristics: list[str] = dataclasses.field(
-        default_factory=list
-    )
-
-    @staticmethod
-    def from_json_file(file_path: Path) -> list:
-        """
-        Generate a list of personas from a properly formatted persona JSON
-        file.
-
-        :param file_path: the path to the JSON file containing the personas
-        :type file_path: Path
-        :return: a list of LlmPersona objects for each of the file entries
-        :rtype: list[LlmPersona]
-        """
-        all_personas = _file_util.read_json_file(file_path)
-
-        persona_objs = []
-        for data_dict in all_personas:
-            # code from https://stackoverflow.com/questions/68417319/initialize-python-dataclass-from-dictionary # noqa: E501
-            field_set = {f.name for f in dataclasses.fields(Persona) if f.init}
-            filtered_arg_dict = {
-                k: v for k, v in data_dict.items() if k in field_set
-            }
-            persona_obj = Persona(**filtered_arg_dict)
-            persona_objs.append(persona_obj)
-
-        return persona_objs
-
-    def to_dict(self):
-        return dataclasses.asdict(self)
-
-    def to_json_file(self, output_path: str) -> None:
-        """
-        Serialize the data to a .json file.
-
-        :param output_path: The path of the new file
-        :type output_path: str
-        """
-        _file_util.dict_to_json(self.to_dict(), output_path)
-
-    def __str__(self):
-        return json.dumps(self.to_dict())
 
 
 class Actor:
@@ -109,23 +33,26 @@ class Actor:
 
     def __init__(
         self,
-        model: model.BaseModel,
-        persona: Persona,
-        context: str,
-        instructions: str,
-        actor_type: ActorType,
+        model: model.BaseModel | None = None,
+        persona: dict[str, str] | None = None,
+        context: str = "",
+        instructions: str = "",
+        is_annotator: bool = False,
+        name: str = "<Unnamed>",
     ) -> None:
         """
         Create an Actor controlled by an LLM instance with a specific persona.
 
         :param model:
             A wrapper encapsulating a promptable LLM instance.
+            None if the actor does not use an LLM.
         :type model:
             model.BaseModel
         :param persona:
-            The actor's persona.
+            The actor's persona as a dictionary of `attribute: value`,
+            e.g., `age: 24`. None if no persona.
         :type persona:
-            persona.LLMPersona
+            dict[str, str]
         :param context:
             The context of the discussion.
         :type context:
@@ -134,84 +61,110 @@ class Actor:
             The actor instructions for the discussion.
         :type instructions:
             str
-        :param actor_type:
-            Whether the actor is an annotator or participant.
+        :param is_annotator:
+            Whether the actor is an annotator or discussion participant.
         :type actor_type:
-            ActorType
+            bool
         """
-        self.model = model
-        self.persona = persona
+        self._model = model
+        self.persona = persona if persona is not None else {}
         self.context = context
         self.instructions = instructions
-        self.actor_type = actor_type
+        self.is_annotator = is_annotator
+        self.name = name
 
-    def _system_prompt(self) -> str:
+    def get_system_prompt(self) -> str:
+        """
+        Get the system prompt provided to the agent.
+        :return: The system prompt provided to the agent.
+        :rtype: str
+        """
         prompt = {
             "context": self.context,
             "instructions": self.instructions,
-            "type": self.actor_type,
-            "persona": {
-                item[0]: item[1]
-                for item in self.persona.to_dict().items()
-                if item[1] != "" and item[1] != -1
-            },
+            "type": "annotator" if self.is_annotator else "user",
+            "persona": {item[0]: item[1] for item in self.persona.items()},
         }
         return json.dumps(prompt)
 
-    def _message_prompt(self, history: list[str]) -> str:
-        return _apply_template(self.actor_type, self.get_name(), history)
+    def get_user_prompt(self, history: list[str] | None = None) -> str:
+        """
+        Get the message prompt provided to the agent.
+        Changes depending on whether the agent is an annotator or a user.
+
+        :param history:
+            The history of previous messages. Each element in the list
+            corresponds to one message, including relevant information
+            (such as the name of the user who posted it).
+            None if no discussion history exists.
+        :type history: list[str] | None
+        :return: The message prompt provided to the agent.
+        :rtype: str
+        """
+        history_str = (
+            f"Conversation so far:\n{"\n".join(history)}"
+            if history is not None
+            else ""
+        )
+        if self.is_annotator:
+            # LLMActor asks the model to respond as its username
+            # we instead prompt it to write the annotation
+            json_input = {
+                "role": "user",  # do not confuse this with our own roles
+                "content": history_str + "\nOutput:",
+            }
+        else:
+            json_input = {
+                "role": "user",
+                "content": (
+                    history_str + f"\nUser {self.get_actor_name()} posted:"
+                ),
+            }
+
+        return json.dumps(json_input)
 
     @typing.final
-    def speak(self, history: list[str]) -> str:
+    def speak(self, history: list[str] | None = None) -> str:
         """
         Prompt the actor to speak, given a history of previous messages
-        in the conversation.
+        in the conversation (None if no history).
+
+        This method should not be modified. If you are subclassing Actor,
+        modify the :meth:get_user_prompt and :meth:get_system_prompt methods
+        instead.
 
         :param history: A list of previous messages.
         :type history: list[str]
         :return: The actor's new message
         :rtype: str
         """
-        system_prompt = self._system_prompt()
-        message_prompt = self._message_prompt(history)
-        response = self.model.prompt(system_prompt, message_prompt)
+        if self._model is None:
+            raise ValueError("No model provided for generation.")
+
+        system_prompt = self.get_system_prompt()
+        message_prompt = self.get_user_prompt(history)
+        response = self._model.prompt(system_prompt, message_prompt)
         return response
 
-    def describe(self) -> str:
-        """
-        Get a description of the actor's internals.
-
-        :return: A brief description of the actor
-        :rtype: dict
-        """
-        return self._system_prompt()
-
     @typing.final
-    def get_name(self) -> str:
+    def get_actor_name(self) -> str:
         """
         Get the actor's assigned name within the conversation.
 
         :return: The name of the actor.
         :rtype: str
         """
-        return self.persona.username
+        return self.name
 
+    @typing.final
+    def get_model_name(self) -> str:
+        """
+        Get the actor's assigned name within the conversation.
 
-def _apply_template(
-    actor_type: ActorType, username: str, history: list[str]
-) -> str:
+        :return: The name of the actor.
+        :rtype: str
+        """
+        if self._model is None:
+            raise ValueError("No model provided.")
 
-    if actor_type == ActorType.USER:
-        json_input = {
-            "role": "user",
-            "content": f"{"\n".join(history)}\nUser {username} posted:",
-        }
-    elif actor_type == ActorType.ANNOTATOR:
-        # LLMActor asks the model to respond as its username
-        # by modifying this protected method, we instead prompt
-        # it to write the annotation
-        json_input = {
-            "role": "user",
-            "content": f"Conversation so far:\n{"\n".join(history)}\nOutput:",
-        }
-    return json.dumps(json_input)
+        return self._model.name
