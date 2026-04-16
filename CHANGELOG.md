@@ -1,5 +1,35 @@
 # What's new
 
+## 2.1.1 (16/04/2026)
+
+### Features
+- Common classes and functions can now be directly called from the top-level module
+    - E.g., previously, users had to import `syndisco.actors.Actor` instead of `syndisco.Actor`.
+- All TurnManagers now directly manage actors (previously used strings for actor names)
+- The Actor API has been overhauled
+    - There is now a distinction between model name and actor name
+    - The `describe()` method is now split between returning system and user prompts
+    - The `ActorType` enum has been replaced by a constructor boolean for whether the actor is an annotator
+- The `Annotation` jobs now accept `Logs` objects instead of reading files from directories
+- The `TransformerModel` class now allows kwargs for model, tokenizer, and generation
+- Replaced the redundant `Persona` class with python dictionaries
+- Removed redundant timing logs
+- Updated documentation and guides
+
+### Development
+- Re-added test suite
+- Refactored old and clunky code
+- Removed redundant modules such as syndisco._file_util
+- Improved internal documentation
+
+### Fixes
+- Added correct equality comparisons to the `Logs` class using the `__eq__` operator instead of hashed ids.
+- Abstract classes are now included in the public documentation
+- Improved error handling for OpenAI models 
+- Fixed RandomWeighted logic
+- Fixed `Annotator` logs including the system instead of user prompts 
+
+
 ## 2.1.0 (03/04/2026)
 Version 2.1.0 simplifies the API even more. The library is exclusively focused on 
 general discussion generation (instead of facilitative discussions), 
