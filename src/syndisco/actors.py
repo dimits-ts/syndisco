@@ -25,6 +25,10 @@ import json
 from . import model
 
 
+USER_TEMPLATE = "Comments so far: {history}.\nYour comment:"
+ANNOTATOR_TEMPLATE = "Comments so far: {history}.\nYour annotation:"
+
+
 class Actor:
     """
     An abstract class representing an actor which responds according to an
@@ -101,25 +105,14 @@ class Actor:
         :return: The message prompt provided to the agent.
         :rtype: str
         """
-        history_str = (
-            f"Conversation so far:\n{"\n".join(history)}"
-            if history is not None
-            else ""
+        history_str = "\n".join(history) if history is not None else "<None>"
+        selected_template = (
+            ANNOTATOR_TEMPLATE if self.is_annotator else USER_TEMPLATE
         )
-        if self.is_annotator:
-            # LLMActor asks the model to respond as its username
-            # we instead prompt it to write the annotation
-            json_input = {
-                "role": "user",  # do not confuse this with our own roles
-                "content": history_str + "\nOutput:",
-            }
-        else:
-            json_input = {
-                "role": "user",
-                "content": (
-                    history_str + f"\nUser {self.get_actor_name()} posted:"
-                ),
-            }
+        json_input = {
+            "role": "user",
+            "content": selected_template.format(history=history_str),
+        }
 
         return json.dumps(json_input)
 
