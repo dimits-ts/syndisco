@@ -1,5 +1,14 @@
 # What's new
 
+## 2.1.2 (04/05/2026)
+
+### Features
+- `Discussions` and `Annotations` no longer output text wrapped to a set, hidden length. The output is by default unwrapped, but wrapping can be enabled by specifying the `textwrap_len` parameter in the constructor.
+
+### Fixes
+Fixed unstable prompting templates used internally in `Actor` and `Discussion`.
+
+
 ## 2.1.1 (16/04/2026)
 
 ### Features

@@ -210,6 +210,7 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
         conv_len: int = 5,
         seed_opinions: typing.Sequence[str] | None = None,
         seed_opinion_usernames: typing.Sequence[str] | None = None,
+        textwrap_len: int = 900000,
     ) -> None:
         """
         Construct the framework for a conversation to take place.
@@ -231,6 +232,10 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
         :param seed_opinion_usernames: The username for each seed opinion.
             Sampled randomly (without replacement) when *None*.
         :type seed_opinion_usernames: Sequence[str], optional
+        :param textwrap_len:
+            The maximum column width allowed for the message text. Lines
+            exceeding this width will be automatically wrapped.
+        :type textwrap_len: int
         :raises ValueError: if the number of seed opinions and seed
             opinion usernames differ, or if there are more seed opinions
             than participants.
@@ -248,6 +253,11 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
         self._steps_taken: int = 0
 
         self.conv_len = conv_len
+
+        assert (
+            textwrap_len > 0
+        ), f"Textwrap length must be positive but was {textwrap_len}"
+        self.textwrap_len = textwrap_len
 
         # keep a limited context of the conversation to feed to the models
         self._ctx_history: collections.deque[str] = collections.deque(
@@ -339,7 +349,11 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
         """
         for entry in tqdm(self, total=self.conv_len):
             if verbose and entry["text"]:
-                formatted = _format_chat_message(entry["name"], entry["text"])
+                formatted = _format_chat_message(
+                    entry["name"],
+                    entry["text"],
+                    textwrap_len=self.textwrap_len,
+                )
                 print(formatted, "\n")
 
     def get_logs(self) -> Logs:
@@ -394,7 +408,9 @@ class Discussion(collections.abc.Iterator[dict[str, str]]):
             model=model_name,
             prompt=user.get_system_prompt(),
         )
-        formatted = _format_chat_message(user.get_actor_name(), comment)
+        formatted = _format_chat_message(
+            user.get_actor_name(), comment, textwrap_len=self.textwrap_len
+        )
         self._ctx_history.append(formatted)
 
 
@@ -411,6 +427,7 @@ class Annotation:
         annotator: actors.Actor,
         discussion_logs: Logs,
         history_ctx_len: int = 2,
+        textwrap_len: int = 900000,
     ):
         """
         Create an annotation job.
@@ -423,6 +440,10 @@ class Annotation:
         :param history_ctx_len: How many previous comments the annotator
             will remember, defaults to 2.
         :type history_ctx_len: int, optional
+        :param textwrap_len:
+            The maximum column width allowed for the message text. Lines
+            exceeding this width will be automatically wrapped.
+        :type textwrap_len: int
         """
         if not annotator.is_annotator:
             raise ValueError(
@@ -434,6 +455,11 @@ class Annotation:
         self._history_ctx_len = history_ctx_len
         self._discussion_logs = copy.deepcopy(discussion_logs)
         self._annotation_logs = Logs()
+
+        assert (
+            textwrap_len > 0
+        ), f"Textwrap length must be positive but was {textwrap_len}"
+        self.textwrap_len = textwrap_len
 
     def begin(self, verbose: bool = True) -> None:
         """
@@ -452,7 +478,9 @@ class Annotation:
             username = message_data["name"]
             message = message_data["text"]
 
-            formatted_message = _format_chat_message(username, message)
+            formatted_message = _format_chat_message(
+                username, message, textwrap_len=self.textwrap_len
+            )
             ctx_history.append(formatted_message)
             annotation = self._annotator.speak(list(ctx_history))
             self._annotation_logs.append(
@@ -478,7 +506,9 @@ class Annotation:
         return copy.deepcopy(self._annotation_logs)
 
 
-def _format_chat_message(username: str, message: str) -> str:
+def _format_chat_message(
+    username: str, message: str, textwrap_len: int
+) -> str:
     """
     Create a prompt-friendly/console-friendly string representing a message
     made by a user.
@@ -487,14 +517,16 @@ def _format_chat_message(username: str, message: str) -> str:
     :type username: str
     :param message: the message that was posted.
     :type message: str
+    :param textwrap_len:
+        The maximum column width allowed for the message text. Lines exceeding
+        this width will be automatically wrapped.
+    :type textwrap_len: int
     :return: a formatted string containing both username and message.
     :rtype: str
     """
     if len(message.strip()) != 0:
-        # Prefix with "User X posted:" so the model doesn't confuse it
-        # with the instruction prompt.
-        wrapped_res = textwrap.fill(message, 70)
-        formatted_res = f"User {username} posted:\n{wrapped_res}"
+        wrapped_res = textwrap.fill(message, textwrap_len)
+        formatted_res = f'Comment by user {username}: "\n{wrapped_res}"'
     else:
         formatted_res = ""
 
