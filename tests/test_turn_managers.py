@@ -19,7 +19,7 @@ import pytest
 from typing import Iterable
 
 from .dummy import DummyActor
-from syndisco import TurnManager, RandomWeighted, RoundRobin, Actor
+from syndisco import TurnManager, RespondTurnManager, QueueTurnManager, Actor
 
 
 @pytest.fixture
@@ -110,7 +110,7 @@ class TestSuperclass:
 
 class TestRounRobin:
     def test_round_robin_cycles(self, actors):
-        rr = RoundRobin(actors)
+        rr = QueueTurnManager(actors)
         rr.set_actors(actors)
 
         seen = [rr.next() for _ in range(len(actors) * 2)]
@@ -119,14 +119,14 @@ class TestRounRobin:
         assert seen[: len(actors)] == seen[len(actors):]
 
     def test_round_robin_returns_valid_actor(self, actors):
-        rr = RoundRobin(actors)
+        rr = QueueTurnManager(actors)
         rr.set_actors(actors)
 
         for _ in range(10):
             assert rr.next() in actors
 
     def test_empty_actor_list(self):
-        rr = RoundRobin([])
+        rr = QueueTurnManager([])
         rr.set_actors([])
 
         with pytest.raises(ValueError):
@@ -135,14 +135,14 @@ class TestRounRobin:
     def test_single_actor(self, actors):
         single = [actors[0]]
 
-        rr = RoundRobin(single)
+        rr = QueueTurnManager(single)
         rr.set_actors(single)
 
         for _ in range(5):
             assert rr.next() == single[0]
 
     def test_no_consecutive_repetition(self, actors):
-        tm = RoundRobin(actors)
+        tm = QueueTurnManager(actors)
         tm.set_actors(actors)
 
         sequence = [tm.next() for _ in range(20)]
@@ -153,17 +153,17 @@ class TestRounRobin:
 class TestRandomWeighted:
     def test_random_weighted_invalid_probability(self, actors):
         with pytest.raises(AssertionError):
-            RandomWeighted(actors, p_respond=-0.1)
+            RespondTurnManager(actors, p_respond=-0.1)
 
         with pytest.raises(AssertionError):
-            RandomWeighted(actors, p_respond=1.1)
+            RespondTurnManager(actors, p_respond=1.1)
 
     def test_random_weighted_valid_probability(self, actors):
-        rw = RandomWeighted(actors, p_respond=0.5)
+        rw = RespondTurnManager(actors, p_respond=0.5)
         assert 0 <= rw.chance_to_respond <= 1
 
     def test_random_weighted_returns_valid_actor(self, actors):
-        rw = RandomWeighted(actors, p_respond=0.5)
+        rw = RespondTurnManager(actors, p_respond=0.5)
         rw.set_actors(actors)
 
         for _ in range(20):
@@ -171,13 +171,13 @@ class TestRandomWeighted:
             assert actor in actors
 
     def test_random_weighted_initial_state(self, actors):
-        rw = RandomWeighted(actors, p_respond=0.5)
+        rw = RespondTurnManager(actors, p_respond=0.5)
 
         assert rw._last_speaker is None
         assert rw._second_to_last_speaker is None
 
     def test_no_repetition_when_p_zero(self, actors):
-        tm = RandomWeighted(actors, p_respond=0.0)
+        tm = RespondTurnManager(actors, p_respond=0.0)
         tm.set_actors(actors)
 
         sequence = [tm.next() for _ in range(50)]

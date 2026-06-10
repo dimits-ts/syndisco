@@ -30,7 +30,7 @@ from pathlib import Path
 from datetime import datetime
 
 from .dummy import DummyActor
-from syndisco import Discussion, Logs, RandomWeighted, Annotation
+from syndisco import Discussion, Logs, RespondTurnManager, Annotation
 
 
 def make_logs(entries: list[tuple[str, str, str]] | None = None):
@@ -52,7 +52,7 @@ def make_discussion(
         DummyActor(name=f"User{i}", responses=[f"User{i} reply."])
         for i in range(num_actors)
     ]
-    tm = RandomWeighted(actors=actors, p_respond=0.4)
+    tm = RespondTurnManager(actors=actors, p_respond=0.4)
     return Discussion(
         next_turn_manager=tm,
         users=actors,
@@ -303,7 +303,7 @@ class TestDiscussionConstruction:
         user2 = DummyActor(name="Bob")
         annotator = DummyActor(name="Annotator", is_annotator=True)
         users = [user1, user2, annotator]
-        tm = RandomWeighted(users)
+        tm = RespondTurnManager(users)
         with pytest.raises(ValueError):
             Discussion(
                 next_turn_manager=tm,
@@ -321,7 +321,7 @@ class TestDiscussionConstruction:
 
     def test_mismatched_seed_counts_raise(self) -> None:
         actors = [DummyActor("A"), DummyActor("B")]
-        tm = RandomWeighted(actors, p_respond=0)
+        tm = RespondTurnManager(actors, p_respond=0)
         with pytest.raises(ValueError):
             Discussion(
                 next_turn_manager=tm,
@@ -333,7 +333,7 @@ class TestDiscussionConstruction:
 
     def test_too_many_seeds_raise(self) -> None:
         actors = [DummyActor("A")]
-        tm = RandomWeighted(actors, p_respond=0)
+        tm = RespondTurnManager(actors, p_respond=0)
         with pytest.raises(ValueError):
             Discussion(
                 next_turn_manager=tm,
@@ -345,7 +345,7 @@ class TestDiscussionConstruction:
 
     def test_none_seeds_raise(self) -> None:
         actors = [DummyActor("A")]
-        tm = RandomWeighted(actors, p_respond=0)
+        tm = RespondTurnManager(actors, p_respond=0)
         with pytest.raises(ValueError):
             Discussion(
                 next_turn_manager=tm,
@@ -357,7 +357,7 @@ class TestDiscussionConstruction:
 
     def test_none_seed_usernames_raise(self) -> None:
         actors = [DummyActor("A")]
-        tm = RandomWeighted(actors, p_respond=0)
+        tm = RespondTurnManager(actors, p_respond=0)
         with pytest.raises(ValueError):
             Discussion(
                 next_turn_manager=tm,
@@ -369,7 +369,7 @@ class TestDiscussionConstruction:
 
     def test_single_seed_does_not_raise(self) -> None:
         actors = [DummyActor("A")]
-        tm = RandomWeighted(actors, p_respond=0)
+        tm = RespondTurnManager(actors, p_respond=0)
         with pytest.raises(ValueError):
             Discussion(
                 next_turn_manager=tm,
@@ -381,7 +381,7 @@ class TestDiscussionConstruction:
 
     def test_weird_seed_config_raise(self) -> None:
         actors = [DummyActor("A")]
-        tm = RandomWeighted(actors, p_respond=0)
+        tm = RespondTurnManager(actors, p_respond=0)
         with pytest.raises(ValueError):
             Discussion(
                 next_turn_manager=tm,
@@ -440,7 +440,7 @@ class TestDiscussionIteratorProtocol:
 
     def test_entry_name_matches_an_actor(self) -> None:
         actors = [DummyActor("Alice"), DummyActor("Bob")]
-        tm = RandomWeighted(actors, p_respond=0.5)
+        tm = RespondTurnManager(actors, p_respond=0.5)
 
         d = Discussion(next_turn_manager=tm, users=actors, conv_len=4)
         for entry in d:

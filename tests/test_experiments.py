@@ -29,7 +29,7 @@ from pathlib import Path
 from syndisco import (
     DiscussionExperiment,
     AnnotationExperiment,
-    RandomWeighted,
+    RespondTurnManager,
     Logs,
 )
 from .dummy import DummyActor
@@ -83,7 +83,7 @@ class TestDiscussionExperimentConstruction:
 
     def test_constructs_with_all_args(self) -> None:
         seeds = [["Seed one.", "Seed two."], ["Seed three."]]
-        tm = RandomWeighted
+        tm = RespondTurnManager
         exp = DiscussionExperiment(
             users=make_users(4),
             seed_opinions=seeds,

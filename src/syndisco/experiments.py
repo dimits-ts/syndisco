@@ -48,7 +48,7 @@ class DiscussionExperiment:
         seed_opinions: typing.Sequence[typing.Sequence[str]] | None = None,
         turn_manager_factory: typing.Callable[
             [], tmanager.TurnManager
-        ] = tmanager.RoundRobin,
+        ] = tmanager.QueueTurnManager,
         history_ctx_len: int = 3,
         num_turns: int = 10,
         num_active_users: int = 2,

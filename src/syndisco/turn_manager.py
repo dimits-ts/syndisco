@@ -22,7 +22,9 @@ Module handling the turn order of LLM participants in discussions.
 import abc
 import random
 import typing
+import warnings
 from collections.abc import Iterable
+
 from .actors import Actor
 
 
@@ -85,7 +87,7 @@ class TurnManager(Iterable, abc.ABC):
         raise NotImplementedError("Abstract method called")
 
 
-class RoundRobin(TurnManager):
+class QueueTurnManager(TurnManager):
     """
     A simple turn manager which gives priority to the next user in the queue.
     """
@@ -100,7 +102,7 @@ class RoundRobin(TurnManager):
         return self._actors[new_speaker_index]
 
 
-class RandomWeighted(TurnManager):
+class RespondTurnManager(TurnManager):
     """
     Enable a participant to reply with a set probability, else randomly select
     another participant.
@@ -109,13 +111,20 @@ class RandomWeighted(TurnManager):
     def __init__(
         self,
         actors: Iterable[Actor] | None = None,
-        p_respond: float = 0,
+        p_respond: float = 0.5,
     ):
         super().__init__(actors)
 
         assert (
             0 <= p_respond <= 1
         ), f"p_respond must be between 0 and 1, but is {p_respond}"
+
+        if p_respond == 0:
+            warnings.warn(
+                "p_respond has been set to 0, which disables "
+                "responding altogether. In that case, it may better to use "
+                "the RandomTurnManager class instead."
+            )
 
         self._chance_to_respond = p_respond
 
@@ -175,3 +184,15 @@ class RandomWeighted(TurnManager):
             return exclude
 
         return random.choice(candidates)
+
+
+class RandomTurnManager(RespondTurnManager):
+    """
+    Randomly chooses the next participant, excluding the last speaker.
+    Functionally identical to `RespondTurnManager` with p_respond=0.
+    """
+    def __init__(
+        self,
+        actors: Iterable[Actor] | None = None,
+    ):
+        super().__init__(actors=actors, p_respond=0)
