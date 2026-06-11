@@ -17,14 +17,31 @@
 # You may contact the author at dim.tsirmpas@aueb.gr
 import pytest
 from typing import Iterable
+from collections import Counter
 
 from .dummy import DummyActor
-from syndisco import TurnManager, RespondTurnManager, QueueTurnManager, Actor
+from syndisco import (
+    TurnManager,
+    RespondTurnManager,
+    QueueTurnManager,
+    Actor,
+    DiscussionExperiment,
+)
 
 
 @pytest.fixture
 def actors():
-    return [DummyActor("A"), DummyActor("B"), DummyActor("C")]
+    return [DummyActor(f"User{i}") for i in range(5)]
+
+
+@pytest.fixture
+def minimal_experiment(actors):
+    return DiscussionExperiment(
+        users=actors,
+        num_active_users=3,
+        num_discussions=5,
+        num_turns=2,
+    )
 
 
 def assert_no_consecutive_repetition(sequence):
@@ -116,7 +133,7 @@ class TestRounRobin:
         seen = [rr.next() for _ in range(len(actors) * 2)]
 
         # Expect repetition of same order
-        assert seen[: len(actors)] == seen[len(actors):]
+        assert seen[: len(actors)] == seen[len(actors) :]
 
     def test_round_robin_returns_valid_actor(self, actors):
         rr = QueueTurnManager(actors)
@@ -183,3 +200,142 @@ class TestRandomWeighted:
         sequence = [tm.next() for _ in range(50)]
 
         assert_no_consecutive_repetition(sequence)
+
+
+class TestNoDuplicateActors:
+    """
+    Regression tests for the random.choices -> random.sample bug.
+    When random.choices was used, the same Actor object could appear
+    multiple times in a discussion's participant list, causing the
+    TurnManager to cycle through duplicate references.
+    """
+
+    def test_active_users_are_unique_objects(self, minimal_experiment):
+        """
+        Each Discussion created by _create_synthetic_discussion must
+        contain no duplicate Actor instances (by identity).
+        """
+        for _ in range(20):
+            discussion = minimal_experiment._create_synthetic_discussion()
+            user_ids = [id(u) for u in discussion._users]
+            assert len(user_ids) == len(set(user_ids)), (
+                "Duplicate Actor objects found in discussion._users. "
+                "Likely caused by random.choices instead of random.sample."
+            )
+
+    def test_turn_manager_has_no_duplicate_actors(self, minimal_experiment):
+        """
+        The TurnManager's internal actor list must not contain the same
+        Actor object more than once after _create_synthetic_discussion.
+        """
+        for _ in range(20):
+            discussion = minimal_experiment._create_synthetic_discussion()
+            tm_actor_ids = [
+                id(a) for a in discussion._next_turn_manager._actors
+            ]
+            assert len(tm_actor_ids) == len(
+                set(tm_actor_ids)
+            ), "Duplicate Actor objects found in TurnManager._actors."
+
+    def test_active_users_are_unique_by_name(self, minimal_experiment):
+        """
+        Since each fixture actor has a unique name, no name should repeat
+        within a single discussion's participant list.
+        """
+        for _ in range(20):
+            discussion = minimal_experiment._create_synthetic_discussion()
+            names = [u.get_actor_name() for u in discussion._users]
+            counts = Counter(names)
+            duplicates = {n: c for n, c in counts.items() if c > 1}
+            assert (
+                not duplicates
+            ), f"Duplicate actor names in discussion: {duplicates}"
+
+    def test_num_active_users_exactly_respected(self, actors):
+        """
+        The participant count must equal num_active_users exactly —
+        no more (from duplicates being counted as distinct) and no fewer.
+        """
+        num_active = 3
+        exp = DiscussionExperiment(
+            users=actors,
+            num_active_users=num_active,
+            num_discussions=10,
+            num_turns=2,
+        )
+        for _ in range(10):
+            discussion = exp._create_synthetic_discussion()
+            assert len(discussion._users) == num_active
+
+    def test_discussion_draws_from_provided_pool(self, actors):
+        """
+        Every participant in a generated discussion must come from the
+        original users pool — no phantom actors introduced.
+        """
+        exp = DiscussionExperiment(
+            users=actors,
+            num_active_users=3,
+            num_discussions=10,
+            num_turns=2,
+        )
+        actor_ids = {id(a) for a in actors}
+        for _ in range(10):
+            discussion = exp._create_synthetic_discussion()
+            for user in discussion._users:
+                assert (
+                    id(user) in actor_ids
+                ), f"Actor '{user.get_actor_name()}' not in original pool."
+
+
+class TestExperimentValidation:
+    """Guard-rail tests ensuring the constructor rejects impossible configs."""
+
+    def test_raises_when_pool_smaller_than_active_users(self):
+        small_pool = [DummyActor("A"), DummyActor("B")]
+        with pytest.raises(ValueError, match="inadequ"):
+            DiscussionExperiment(
+                users=small_pool,
+                num_active_users=3,
+                num_discussions=1,
+                num_turns=2,
+            )
+
+    def test_exact_pool_size_accepted(self):
+        """Pool size == num_active_users is a valid edge case."""
+        exact_pool = [DummyActor("A"), DummyActor("B"), DummyActor("C")]
+        exp = DiscussionExperiment(
+            users=exact_pool,
+            num_active_users=3,
+            num_discussions=1,
+            num_turns=2,
+        )
+        discussion = exp._create_synthetic_discussion()
+        user_ids = [id(u) for u in discussion._users]
+        assert len(user_ids) == len(set(user_ids))
+
+    def test_raises_on_zero_discussions(self, actors):
+        with pytest.raises(ValueError):
+            DiscussionExperiment(
+                users=actors,
+                num_active_users=2,
+                num_discussions=0,
+                num_turns=2,
+            )
+
+    def test_raises_on_single_turn(self, actors):
+        with pytest.raises(ValueError):
+            DiscussionExperiment(
+                users=actors,
+                num_active_users=2,
+                num_discussions=1,
+                num_turns=1,
+            )
+
+    def test_raises_on_single_active_user(self, actors):
+        with pytest.raises(ValueError):
+            DiscussionExperiment(
+                users=actors,
+                num_active_users=1,
+                num_discussions=1,
+                num_turns=2,
+            )

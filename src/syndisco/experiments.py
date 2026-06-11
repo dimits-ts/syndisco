@@ -145,7 +145,7 @@ class DiscussionExperiment:
         :rtype: Discussion
         """
         rand_topic = random.choice(self.seed_opinions)
-        rand_users = list(random.choices(self.users, k=self._num_active_users))
+        rand_users = list(random.sample(self.users, k=self._num_active_users))
         rand_seeds_users = (
             [actor.get_actor_name() for actor in rand_users[: len(rand_topic)]]
             if rand_topic is not None
