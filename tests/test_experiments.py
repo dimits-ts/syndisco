@@ -83,11 +83,11 @@ class TestDiscussionExperimentConstruction:
 
     def test_constructs_with_all_args(self) -> None:
         seeds = [["Seed one.", "Seed two."], ["Seed three."]]
-        tm = RespondTurnManager
+        tm = RespondTurnManager(p_respond=0.2)
         exp = DiscussionExperiment(
             users=make_users(4),
             seed_opinions=seeds,
-            turn_manager_factory=tm,
+            turn_manager=tm,
             history_ctx_len=5,
             num_turns=8,
             num_active_users=2,

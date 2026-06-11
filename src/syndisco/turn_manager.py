@@ -20,6 +20,7 @@ Module handling the turn order of LLM participants in discussions.
 """
 
 import abc
+import copy
 import random
 import typing
 import warnings
@@ -76,6 +77,20 @@ class TurnManager(Iterable, abc.ABC):
             )
         return self._next_impl()
 
+    def make_instance(self) -> typing.Self:
+        """
+        Return a fresh copy of this manager with static configuration
+        preserved and per-discussion state reset.
+
+        Called once per discussion by :class:`DiscussionExperiment`.
+        Subclasses with additional stateful attributes should override
+        this method and reset those attributes on the returned instance.
+        """
+        instance = copy.copy(self)
+        instance._actors = []
+        # subclasses with extra mutable state should override this
+        return instance
+
     def __iter__(self):
         return self
 
@@ -100,6 +115,11 @@ class QueueTurnManager(TurnManager):
         self.curr_turn += 1
         new_speaker_index = self.curr_turn % len(self._actors)
         return self._actors[new_speaker_index]
+    
+    def make_instance(self) -> typing.Self:
+        instance = super().make_instance()
+        instance.curr_turn = -1
+        return instance
 
 
 class RespondTurnManager(TurnManager):
@@ -131,6 +151,11 @@ class RespondTurnManager(TurnManager):
         # Track history
         self._last_speaker: Actor | None = None
         self._second_to_last_speaker: Actor | None = None
+
+    def make_instance(self) -> typing.Self:
+        instance = super().make_instance()
+        instance._last_speaker = None  # reset dynamic state
+        return instance
 
     @property
     def chance_to_respond(self) -> float:
@@ -191,6 +216,7 @@ class RandomTurnManager(RespondTurnManager):
     Randomly chooses the next participant, excluding the last speaker.
     Functionally identical to `RespondTurnManager` with p_respond=0.
     """
+
     def __init__(
         self,
         actors: Iterable[Actor] | None = None,

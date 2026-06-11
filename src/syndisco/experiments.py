@@ -46,9 +46,7 @@ class DiscussionExperiment:
         self,
         users: typing.Sequence[actors.Actor],
         seed_opinions: typing.Sequence[typing.Sequence[str]] | None = None,
-        turn_manager_factory: typing.Callable[
-            [], tmanager.TurnManager
-        ] = tmanager.QueueTurnManager,
+        turn_manager: tmanager.TurnManager = tmanager.QueueTurnManager(),
         history_ctx_len: int = 3,
         num_turns: int = 10,
         num_active_users: int = 2,
@@ -66,10 +64,13 @@ class DiscussionExperiment:
             discussion and will be uttered by random synthetic participants.
             None if no seed opinions are to be provided.
         :type seed_opinions: Sequence[Sequence[str]], optional
-        :param turn_manager_factory:
-            The class representing the strategy for selecting the next speaker.
-            Defaults to :class:RoundRobin.
-        :type turn_manager_factory: Callable[[], TurnManager]
+        :param turn_manager: A configured turn manager instance that determines
+            speaker order. One fresh copy is created per discussion via
+            :meth:`TurnManager.make_instance`, so static configuration
+            (e.g. ``p_respond=0.4``) is preserved while per-discussion state
+            (e.g. actor list, turn counter) is reset. Defaults to
+            :class:`~syndisco.turn_manager.QueueTurnManager`.
+        :type turn_manager: TurnManager
         :param history_ctx_len: Number of past comments visible as context.
         :type history_ctx_len: int
         :param num_turns: Number of turns per discussion.
@@ -98,7 +99,7 @@ class DiscussionExperiment:
         if num_active_users < 2:
             raise ValueError("num_active_users must be at least 2.")
 
-        self.turn_manager_factory = turn_manager_factory
+        self._turn_manager_template = turn_manager
         self._history_ctx_len = history_ctx_len
         self._num_active_users = num_active_users
         self._num_discussions = num_discussions
@@ -151,7 +152,8 @@ class DiscussionExperiment:
             if rand_topic is not None
             else None
         )
-        tm = self.turn_manager_factory()
+        tm = self._turn_manager_template.make_instance()
+        tm.set_actors(rand_users)
 
         return jobs.Discussion(
             users=rand_users,
