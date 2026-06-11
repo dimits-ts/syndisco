@@ -1,0 +1,702 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Creating and Managing Experiments &mdash; SynDisco 2.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=33f7ffd5" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+    <link rel="shortcut icon" href="../_static/logo.svg"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=20623aea"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SynDisco
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html#how-to-customize-your-discussion">How to Customize Your Discussion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SynDisco</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Creating and Managing Experiments</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/guides/creating_experiments.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Creating-and-Managing-Experiments">
+<h1>Creating and Managing Experiments<a class="headerlink" href="#Creating-and-Managing-Experiments" title="Link to this heading"></a></h1>
+<p>The last two guides showcased how you can create and run synthetic discussions, and synthetic annotations using LLMs. However, in order to produce robust results for a hypothesis, you may need to produce multiple annotated discussions.</p>
+<p>While this is certainly possible using the <code class="docutils literal notranslate"><span class="pre">Discussion</span></code> and <code class="docutils literal notranslate"><span class="pre">Annotation</span></code> APIs, SynDisco offers the <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> high-level API which automatically creates and manages multiple discussions with different configurations. An<code class="docutils literal notranslate"><span class="pre">Experiment</span></code> is an entity that generates and runs <code class="docutils literal notranslate"><span class="pre">jobs</span></code>. Thus, if we want to generate and run 100 <code class="docutils literal notranslate"><span class="pre">Discussion</span></code> jobs, we would use a <code class="docutils literal notranslate"><span class="pre">DiscussionExperiment</span></code>. Likewise, if we want to annotate those 100 discussions, we would use an <code class="docutils literal notranslate"><span class="pre">AnnotationExperiment</span></code>.</p>
+<p>This guide will showcase how you can leverage this API to automate your experiments. You will also learn how to utilize SynDisco’s built-in logging functions as well as how to export your datasets in CSV format for convenience.</p>
+<section id="Logging">
+<h2>Logging<a class="headerlink" href="#Logging" title="Link to this heading"></a></h2>
+<p>While running a single discussion or annotation job may take a few minutes, running experiments composed of dozens or hundreds of synthetic discussions may take up to days. Thus, we need a mechanism to keep track of our experiments while they are running.</p>
+<p>We will use SynDisco’s <code class="docutils literal notranslate"><span class="pre">logging</span></code> function to log information about our experiments. Specifically, this function performs the following functions:</p>
+<ul class="simple">
+<li><p>Provides details about the currently running jobs (e.g. selected configurations, participants, prompts etc.)</p></li>
+<li><p>Displays warnings and errors to the user</p></li>
+<li><p>Creates and continually updates log files</p></li>
+</ul>
+<p>Each object in SynDisco is internally assigned a Logger. You can use the <code class="docutils literal notranslate"><span class="pre">logging_setup</span></code> function to update all of the internal loggers to follow your configuration. An example of this can be seen below:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">syndisco</span>
+
+
+<span class="n">logs_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span>
+<span class="n">syndisco</span><span class="o">.</span><span class="n">logging_setup</span><span class="p">(</span>
+    <span class="n">print_to_terminal</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">write_to_file</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">logs_dir</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="n">logs_dir</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+    <span class="n">level</span><span class="o">=</span><span class="s2">&quot;info&quot;</span><span class="p">,</span>
+    <span class="n">use_colors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">log_warnings</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Discussion-Experiments">
+<h2>Discussion Experiments<a class="headerlink" href="#Discussion-Experiments" title="Link to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">CONTEXT</span> <span class="o">=</span> <span class="s2">&quot;You are taking part in an online conversation&quot;</span>
+<span class="n">INSTRUCTIONS</span> <span class="o">=</span> <span class="s2">&quot;Act as if you are a human user and your output is their posted comment&quot;</span>
+
+
+<span class="n">llm</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">TransformersModel</span><span class="p">(</span>
+    <span class="n">model_path</span><span class="o">=</span><span class="s2">&quot;unsloth/Qwen2.5-7B-Instruct-bnb-4bit&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test_model&quot;</span><span class="p">,</span>
+    <span class="n">max_out_tokens</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">personas</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;Gwx31&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="mi">38</span><span class="p">,</span>
+        <span class="s2">&quot;sex&quot;</span><span class="p">:</span> <span class="s2">&quot;female&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;education_level&quot;</span><span class="p">:</span> <span class="s2">&quot;Bachelor&#39;s&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sexual_orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;Heterosexual&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;demographic_group&quot;</span><span class="p">:</span> <span class="s2">&quot;Latino&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;current_employment&quot;</span><span class="p">:</span> <span class="s2">&quot;Registered Nurse&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;personality_characteristics&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;compassionate&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;patient&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;diligent&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;overwhelmed&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;Giannis&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="mi">21</span><span class="p">,</span>
+        <span class="s2">&quot;sex&quot;</span><span class="p">:</span> <span class="s2">&quot;male&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;education_level&quot;</span><span class="p">:</span> <span class="s2">&quot;College&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sexual_orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;Pansexual&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;demographic_group&quot;</span><span class="p">:</span> <span class="s2">&quot;White&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;current_employment&quot;</span><span class="p">:</span> <span class="s2">&quot;Game Developer&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;personality_characteristics&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;strategic&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;meticulous&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;nerdy&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;hyper-focused&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;Kimya&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="mi">67</span><span class="p">,</span>
+        <span class="s2">&quot;sex&quot;</span><span class="p">:</span> <span class="s2">&quot;female&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;education_level&quot;</span><span class="p">:</span> <span class="s2">&quot;PhD&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sexual_orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;Heterosexual&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;demographic_group&quot;</span><span class="p">:</span> <span class="s2">&quot;White&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;personality_characteristics&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;strict&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;grumpy&quot;</span>
+        <span class="p">],</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+<span class="n">actors</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">syndisco</span><span class="o">.</span><span class="n">Actor</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
+        <span class="n">persona</span><span class="o">=</span><span class="n">p</span><span class="p">,</span>
+        <span class="n">context</span><span class="o">=</span><span class="n">CONTEXT</span><span class="p">,</span>
+        <span class="n">instructions</span><span class="o">=</span><span class="n">INSTRUCTIONS</span><span class="p">,</span>
+        <span class="n">is_annotator</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;username&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">personas</span>
+<span class="p">]</span>
+<span class="n">turn_manager</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">QueueTurnManager</span><span class="p">(</span><span class="n">actors</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2026-06-11 13:38:35 CP-G482-Z52-00 accelerate.utils.modeling[723400] INFO We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+2026-06-11 13:38:38 CP-G482-Z52-00 model.py[723400] INFO Model memory footprint: 5191.14 MB
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">disc_exp</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">DiscussionExperiment</span><span class="p">(</span>
+    <span class="n">seed_opinions</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">[</span><span class="s2">&quot;Should programmers be allowed to analyze data?&quot;</span><span class="p">,</span> <span class="s2">&quot;Absolutely not&quot;</span><span class="p">],</span>
+        <span class="p">[</span><span class="s2">&quot;Should data analysts be allowed to code?&quot;</span><span class="p">,</span> <span class="s2">&quot;No they are nerds&quot;</span><span class="p">],</span>
+    <span class="p">],</span>
+    <span class="n">users</span><span class="o">=</span><span class="n">actors</span><span class="p">,</span>
+    <span class="n">turn_manager</span><span class="o">=</span><span class="n">syndisco</span><span class="o">.</span><span class="n">RespondTurnManager</span><span class="p">(</span><span class="n">p_respond</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
+    <span class="n">num_turns</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>
+    <span class="n">num_discussions</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">discussions_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="n">disc_exp</span><span class="o">.</span><span class="n">begin</span><span class="p">(</span><span class="n">discussions_output_dir</span><span class="o">=</span><span class="n">discussions_dir</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2026-06-11 13:38:38 CP-G482-Z52-00 experiments.py[723400] INFO Starting synthetic discussion generation.
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "f7d6610873ad4ababd2ca027f645a750", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2026-06-11 13:38:38 CP-G482-Z52-00 root[723400] INFO Running experiment 1/3...
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "d0980ec31363420ba71409c5aef1dea0", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+The following generation flags are not valid and may be ignored: [&#39;temperature&#39;, &#39;top_p&#39;, &#39;top_k&#39;]. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Comment by user Giannis: &#34;
+Haha, that&#39;s a funny take! I guess it depends on the context. Data analysts who can code are definitely more versatile, but not all of them need to code. It&#39;s more about knowing when and how to use coding to solve problems&#34;
+
+Comment by user Gwx31: &#34;
+As a registered nurse, I can relate to the importance of versatility and problem-solving skills, which are crucial in both fields. While I&#39;m not a data analyst or a coder myself, I do think that having some coding knowledge can be incredibly beneficial for&#34;
+
+Comment by user Giannis: &#34;
+Comment by user Giannis:  That’s a great point, Gwx31! Having some coding knowledge can really open up new possibilities in healthcare too. For example, being able to work with electronic health records or even develop simple tools to help&#34;
+
+Comment by user Gwx31: &#34;
+As a registered nurse, I completely agree with Giannis. The ability to work with electronic health records (EHR) and develop simple tools can indeed make a huge difference in patient care. For instance, creating a basic app to track medication schedules or&#34;
+
+Comment by user Giannis: &#34;
+That’s a fantastic idea, Gwx31! Creating apps to track medication schedules or even reminders for follow-up appointments could significantly improve patient compliance and overall care management. Plus, it could help reduce administrative burdens on healthcare providers. As someone who’s&#34;
+
+Comment by user Gwx31: &#34;
+I think you hit the nail on the head, Giannis! Creating apps to track medication schedules or reminders for follow-up appointments not only improves patient compliance but also ensures that patients stay on top of their treatment plans. This can lead to better health outcomes&#34;
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2026-06-11 13:39:01 CP-G482-Z52-00 root[723400] INFO Running experiment 2/3...
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Comment by user Giannis: &#34;
+As a game developer, I see the potential in this idea from a different angle. Developing these kinds of apps could be a great way to bridge the gap between technology and healthcare. With my background in programming and design, I could potentially contribute to creating&#34;
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "be54bc9552d6433ab301315c9e2a1aba", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Comment by user Gwx31: &#34;
+I think there might have been a mix-up in the comments! I didn&#39;t say &#34;No they are nerds.&#34; That wasn&#39;t me. Maybe I was being playful, but I don&#39;t remember saying that. What do you guys think about data&#34;
+
+Comment by user Giannis: &#34;
+Hey Gwx31, it looks like there was definitely a mix-up! 😄 I didn&#39;t mean to imply anything negative about data analysts or programmers. To answer the original question, I think data analysts should absolutely be able to code. In&#34;
+
+Comment by user Gwx31: &#34;
+It sounds like there was definitely a mix-up! 😅 I didn&#39;t mean to imply anything negative either. To answer the original question, I think data analysts should be able to code, but it really depends on the role and the specific needs of&#34;
+
+Comment by user Giannis: &#34;
+Hey Gwx31, it&#39;s great to see you chiming in! It definitely seems like there was some confusion earlier. To add to the discussion, I completely agree that data analysts should be able to code, especially when it comes to manipulating&#34;
+
+Comment by user Gwx31: &#34;
+Hey Giannis, it&#39;s great to see you chiming in too! It definitely seems like there was some confusion earlier. To add to the discussion, I completely agree that data analysts should be able to code, especially when it comes to manipulating data&#34;
+
+Comment by user Giannis: &#34;
+Hey Gwx31, it&#39;s great to see you chiming in again! It definitely seems like there was some confusion earlier. To add to the discussion, I completely agree that data analysts should be able to code, especially when it comes to&#34;
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2026-06-11 13:39:23 CP-G482-Z52-00 experiments.py[723400] INFO Finished synthetic discussion generation.
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Comment by user Gwx31: &#34;
+Hey Giannis, it&#39;s great to see you chiming in again! It definitely seems like there was some confusion earlier. To add to the discussion, I completely agree that data analysts should be able to code, especially when it comes to manipulating data&#34;
+
+</pre></div></div>
+</div>
+</section>
+<section id="Annotation-Experiments">
+<h2>Annotation Experiments<a class="headerlink" href="#Annotation-Experiments" title="Link to this heading"></a></h2>
+<p>Annotation experiments allow you to use multiple annotator-agents with different characteristics for each comment in a discussion. You could also use multiple annotators with the same characteristics, to obtain more robust results.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">annotator_persona1</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;annotator1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="mi">38</span><span class="p">,</span>
+    <span class="s2">&quot;sex&quot;</span><span class="p">:</span> <span class="s2">&quot;female&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;education_level&quot;</span><span class="p">:</span> <span class="s2">&quot;Bachelor&#39;s&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sexual_orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;Heterosexual&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;demographic_group&quot;</span><span class="p">:</span> <span class="s2">&quot;White&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;current_employment&quot;</span><span class="p">:</span> <span class="s2">&quot;Annotator&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;personality_characteristics&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;competent&quot;</span><span class="p">],</span>
+<span class="p">}</span>
+
+<span class="n">annotator_persona2</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;annotator2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
+    <span class="s2">&quot;sex&quot;</span><span class="p">:</span> <span class="s2">&quot;male&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;education_level&quot;</span><span class="p">:</span> <span class="s2">&quot;Baby&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;demographic_group&quot;</span><span class="p">:</span> <span class="s2">&quot;White&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;personality_characteristics&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;dumb&quot;</span><span class="p">],</span>
+<span class="p">}</span>
+
+
+<span class="n">annotator1</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">Actor</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
+    <span class="n">persona</span><span class="o">=</span><span class="n">annotator_persona1</span><span class="p">,</span>
+    <span class="n">context</span><span class="o">=</span><span class="s2">&quot;You are annotating an online discussion&quot;</span><span class="p">,</span>
+    <span class="n">instructions</span><span class="o">=</span><span class="s2">&quot;From a scale of 1 (not toxic) to 5 (very toxic) how toxic is the following comment? Reply only with a number.&quot;</span><span class="p">,</span>
+    <span class="n">is_annotator</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">annotator2</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">Actor</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
+    <span class="n">persona</span><span class="o">=</span><span class="n">annotator_persona2</span><span class="p">,</span>
+    <span class="n">context</span><span class="o">=</span><span class="s2">&quot;You are annotating an online discussion&quot;</span><span class="p">,</span>
+    <span class="n">instructions</span><span class="o">=</span><span class="s2">&quot;From a scale of 1 (not toxic) to 5 (very toxic) how toxic is the following comment? Reply only with a number.&quot;</span><span class="p">,</span>
+    <span class="n">is_annotator</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">discussions_dir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">():</span>
+    <span class="n">discussion_logs</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">Logs</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+    <span class="n">ann_exp</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">AnnotationExperiment</span><span class="p">(</span>
+        <span class="n">annotators</span><span class="o">=</span><span class="p">[</span><span class="n">annotator1</span><span class="p">,</span> <span class="n">annotator2</span><span class="p">],</span> <span class="n">discussion_logs</span><span class="o">=</span><span class="n">discussion_logs</span>
+    <span class="p">)</span>
+    <span class="n">annotations_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">ann_exp</span><span class="o">.</span><span class="n">begin</span><span class="p">(</span><span class="n">output_dir</span><span class="o">=</span><span class="n">annotations_dir</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "c85ac6cd281940a5af917fcd56a96ee1", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "7d50321d2beb43f0aa996a440ffdfdf9", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Comment by user Giannis: &#34; Should data analysts be allowed to code?&#34;
+1
+Comment by user Gwx31: &#34; No they are nerds&#34;
+4
+Comment by user Gwx31: &#34; I think there might have been a mix-up in the
+comments! I didn&#39;t say &#34;No they are nerds.&#34; That wasn&#39;t me. Maybe I
+was being playful, but I don&#39;t remember saying that. What do you guys
+think about data&#34;
+4
+Comment by user Giannis: &#34; Hey Gwx31, it looks like there was
+definitely a mix-up! 😄 I didn&#39;t mean to imply anything negative about
+data analysts or programmers. To answer the original question, I think
+data analysts should absolutely be able to code. In&#34;
+1
+Comment by user Gwx31: &#34; It sounds like there was definitely a mix-up!
+😅 I didn&#39;t mean to imply anything negative either. To answer the
+original question, I think data analysts should be able to code, but
+it really depends on the role and the specific needs of&#34;
+1
+Comment by user Giannis: &#34; Hey Gwx31, it&#39;s great to see you chiming
+in! It definitely seems like there was some confusion earlier. To add
+to the discussion, I completely agree that data analysts should be
+able to code, especially when it comes to manipulating&#34;
+1
+Comment by user Gwx31: &#34; Hey Giannis, it&#39;s great to see you chiming in
+too! It definitely seems like there was some confusion earlier. To add
+to the discussion, I completely agree that data analysts should be
+able to code, especially when it comes to manipulating data&#34;
+1
+Comment by user Giannis: &#34; Hey Gwx31, it&#39;s great to see you chiming in
+again! It definitely seems like there was some confusion earlier. To
+add to the discussion, I completely agree that data analysts should be
+able to code, especially when it comes to&#34;
+1
+Comment by user Gwx31: &#34; Hey Giannis, it&#39;s great to see you chiming in
+again! It definitely seems like there was some confusion earlier. To
+add to the discussion, I completely agree that data analysts should be
+able to code, especially when it comes to manipulating data&#34;
+1
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "106c968ad08347e8abb37922604f1dca", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Comment by user Giannis: &#34; Should data analysts be allowed to code?&#34;
+1
+Comment by user Gwx31: &#34; No they are nerds&#34;
+4
+Comment by user Gwx31: &#34; I think there might have been a mix-up in the
+comments! I didn&#39;t say &#34;No they are nerds.&#34; That wasn&#39;t me. Maybe I
+was being playful, but I don&#39;t remember saying that. What do you guys
+think about data&#34;
+4
+Comment by user Giannis: &#34; Hey Gwx31, it looks like there was
+definitely a mix-up! 😄 I didn&#39;t mean to imply anything negative about
+data analysts or programmers. To answer the original question, I think
+data analysts should absolutely be able to code. In&#34;
+1
+Comment by user Gwx31: &#34; It sounds like there was definitely a mix-up!
+😅 I didn&#39;t mean to imply anything negative either. To answer the
+original question, I think data analysts should be able to code, but
+it really depends on the role and the specific needs of&#34;
+1
+Comment by user Giannis: &#34; Hey Gwx31, it&#39;s great to see you chiming
+in! It definitely seems like there was some confusion earlier. To add
+to the discussion, I completely agree that data analysts should be
+able to code, especially when it comes to manipulating&#34;
+1
+Comment by user Gwx31: &#34; Hey Giannis, it&#39;s great to see you chiming in
+too! It definitely seems like there was some confusion earlier. To add
+to the discussion, I completely agree that data analysts should be
+able to code, especially when it comes to manipulating data&#34;
+1
+Comment by user Giannis: &#34; Hey Gwx31, it&#39;s great to see you chiming in
+again! It definitely seems like there was some confusion earlier. To
+add to the discussion, I completely agree that data analysts should be
+able to code, especially when it comes to&#34;
+1
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2026-06-11 13:39:35 CP-G482-Z52-00 experiments.py[723400] INFO Finished annotation generation.
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Comment by user Gwx31: &#34; Hey Giannis, it&#39;s great to see you chiming in
+again! It definitely seems like there was some confusion earlier. To
+add to the discussion, I completely agree that data analysts should be
+able to code, especially when it comes to manipulating data&#34;
+1
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "f93131f214864fd087cab45c24efc1c1", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "c8b5efdf35434068b06cb47a08495d5d", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Comment by user Gwx31: &#34; Should data analysts be allowed to code?&#34;
+1
+Comment by user Giannis: &#34; No they are nerds&#34;
+4
+Comment by user Giannis: &#34; Haha, that&#39;s a funny take! I guess it
+depends on the context. Data analysts who can code are definitely more
+versatile, but not all of them need to code. It&#39;s more about knowing
+when and how to use coding to solve problems&#34;
+2
+Comment by user Gwx31: &#34; As a registered nurse, I can relate to the
+importance of versatility and problem-solving skills, which are
+crucial in both fields. While I&#39;m not a data analyst or a coder
+myself, I do think that having some coding knowledge can be incredibly
+beneficial for&#34;
+1
+Comment by user Giannis: &#34; Comment by user Giannis:  That’s a great
+point, Gwx31! Having some coding knowledge can really open up new
+possibilities in healthcare too. For example, being able to work with
+electronic health records or even develop simple tools to help&#34;
+1
+Comment by user Gwx31: &#34; As a registered nurse, I completely agree
+with Giannis. The ability to work with electronic health records (EHR)
+and develop simple tools can indeed make a huge difference in patient
+care. For instance, creating a basic app to track medication schedules
+or&#34;
+1
+Comment by user Giannis: &#34; That’s a fantastic idea, Gwx31! Creating
+apps to track medication schedules or even reminders for follow-up
+appointments could significantly improve patient compliance and
+overall care management. Plus, it could help reduce administrative
+burdens on healthcare providers. As someone who’s&#34;
+1
+Comment by user Gwx31: &#34; I think you hit the nail on the head,
+Giannis! Creating apps to track medication schedules or reminders for
+follow-up appointments not only improves patient compliance but also
+ensures that patients stay on top of their treatment plans. This can
+lead to better health outcomes&#34;
+1
+Comment by user Giannis: &#34; As a game developer, I see the potential in
+this idea from a different angle. Developing these kinds of apps could
+be a great way to bridge the gap between technology and healthcare.
+With my background in programming and design, I could potentially
+contribute to creating&#34;
+1
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "214e7a74a2504b30ba72957ac52826e2", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Comment by user Gwx31: &#34; Should data analysts be allowed to code?&#34;
+1
+Comment by user Giannis: &#34; No they are nerds&#34;
+4
+Comment by user Giannis: &#34; Haha, that&#39;s a funny take! I guess it
+depends on the context. Data analysts who can code are definitely more
+versatile, but not all of them need to code. It&#39;s more about knowing
+when and how to use coding to solve problems&#34;
+4
+Comment by user Gwx31: &#34; As a registered nurse, I can relate to the
+importance of versatility and problem-solving skills, which are
+crucial in both fields. While I&#39;m not a data analyst or a coder
+myself, I do think that having some coding knowledge can be incredibly
+beneficial for&#34;
+1
+Comment by user Giannis: &#34; Comment by user Giannis:  That’s a great
+point, Gwx31! Having some coding knowledge can really open up new
+possibilities in healthcare too. For example, being able to work with
+electronic health records or even develop simple tools to help&#34;
+1
+Comment by user Gwx31: &#34; As a registered nurse, I completely agree
+with Giannis. The ability to work with electronic health records (EHR)
+and develop simple tools can indeed make a huge difference in patient
+care. For instance, creating a basic app to track medication schedules
+or&#34;
+1
+Comment by user Giannis: &#34; That’s a fantastic idea, Gwx31! Creating
+apps to track medication schedules or even reminders for follow-up
+appointments could significantly improve patient compliance and
+overall care management. Plus, it could help reduce administrative
+burdens on healthcare providers. As someone who’s&#34;
+1
+Comment by user Gwx31: &#34; I think you hit the nail on the head,
+Giannis! Creating apps to track medication schedules or reminders for
+follow-up appointments not only improves patient compliance but also
+ensures that patients stay on top of their treatment plans. This can
+lead to better health outcomes&#34;
+1
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+2026-06-11 13:39:47 CP-G482-Z52-00 experiments.py[723400] INFO Finished annotation generation.
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Comment by user Giannis: &#34; As a game developer, I see the potential in
+this idea from a different angle. Developing these kinds of apps could
+be a great way to bridge the gap between technology and healthcare.
+With my background in programming and design, I could potentially
+contribute to creating&#34;
+1
+</pre></div></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Dimitris Tsirmpas.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

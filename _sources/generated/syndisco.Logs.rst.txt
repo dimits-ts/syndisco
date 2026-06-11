@@ -1,0 +1,7 @@
+﻿syndisco.Logs
+=============
+
+.. autoclass:: syndisco.Logs
+   :members:
+   :undoc-members:
+   :show-inheritance:

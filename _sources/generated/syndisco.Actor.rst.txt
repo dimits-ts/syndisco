@@ -1,0 +1,7 @@
+﻿syndisco.Actor
+==============
+
+.. autoclass:: syndisco.Actor
+   :members:
+   :undoc-members:
+   :show-inheritance:

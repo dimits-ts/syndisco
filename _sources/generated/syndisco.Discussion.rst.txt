@@ -1,0 +1,7 @@
+﻿syndisco.Discussion
+===================
+
+.. autoclass:: syndisco.Discussion
+   :members:
+   :undoc-members:
+   :show-inheritance:

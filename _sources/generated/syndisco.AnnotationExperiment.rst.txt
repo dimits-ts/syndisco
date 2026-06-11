@@ -1,0 +1,7 @@
+﻿syndisco.AnnotationExperiment
+=============================
+
+.. autoclass:: syndisco.AnnotationExperiment
+   :members:
+   :undoc-members:
+   :show-inheritance:
