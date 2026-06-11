@@ -45,10 +45,10 @@ class DiscussionExperiment:
     def __init__(
         self,
         users: typing.Sequence[actors.Actor],
-        seed_opinions: typing.Sequence[typing.Sequence[str]] | None = None,
-        turn_manager_factory: typing.Callable[
-            [], tmanager.TurnManager
-        ] = tmanager.RoundRobin,
+        seed_opinions: (
+            typing.Sequence[typing.Sequence[str] | str] | None
+        ) = None,
+        turn_manager: tmanager.TurnManager = tmanager.QueueTurnManager(),
         history_ctx_len: int = 3,
         num_turns: int = 10,
         num_active_users: int = 2,
@@ -59,17 +59,30 @@ class DiscussionExperiment:
 
         :param users: List of all possible participants (LLM agents).
         :type users: list[Actor]
-        :param seed_opinions: Hardcoded seed discussion
-            segments to initiate synthetic discussions.
-            Each segment is a sequence of comments (strings).
-            One segment will be selected randomly for each new synthetic
-            discussion and will be uttered by random synthetic participants.
-            None if no seed opinions are to be provided.
-        :type seed_opinions: Sequence[Sequence[str]], optional
-        :param turn_manager_factory:
-            The class representing the strategy for selecting the next speaker.
-            Defaults to :class:RoundRobin.
-        :type turn_manager_factory: Callable[[], TurnManager]
+        :param seed_opinions:
+            Seed discussion segments used to open each
+            synthetic discussion. Accepts either a nested sequence where each
+            element is a sequence of comment strings (one segment per
+            discussion), or a flat sequence of strings where each string is
+            treated as a single-comment segment. One segment is selected
+            randomly per discussion and uttered by random participants.
+            ``None`` if no seed opinions are to be provided.
+
+            Examples::
+
+                # Nested — each discussion opens with 1–N hardcoded comments
+                seed_opinions=[["First comment.", "Second comment."],
+                ["Opener."]]
+
+                # Flat shorthand — each string becomes a single-comment segment
+                seed_opinions=["Opener A.", "Opener B."]
+        :param turn_manager: A configured turn manager instance that determines
+            speaker order. One fresh copy is created per discussion via
+            :meth:`TurnManager.make_instance`, so static configuration
+            (e.g. ``p_respond=0.4``) is preserved while per-discussion state
+            (e.g. actor list, turn counter) is reset. Defaults to
+            :class:`~syndisco.turn_manager.QueueTurnManager`.
+        :type turn_manager: TurnManager
         :param history_ctx_len: Number of past comments visible as context.
         :type history_ctx_len: int
         :param num_turns: Number of turns per discussion.
@@ -79,14 +92,18 @@ class DiscussionExperiment:
         :param num_discussions: Total number of synthetic discussions to run.
         :type num_discussions: int
         """
-        self.seed_opinions = (
-            seed_opinions if seed_opinions is not None else [[]]
-        )
-        self.users = users
+        if seed_opinions is None:
+            self._seed_opinions = [[]]
+        else:
+            self._seed_opinions = [
+                [s] if isinstance(s, str) else list(s)
+                for s in seed_opinions
+            ]
+        self._users = users
 
-        if len(self.users) < num_active_users:
+        if len(self._users) < num_active_users:
             raise ValueError(
-                f"Number of given users ({len(self.users)}) "
+                f"Number of given users ({len(self._users)}) "
                 "is inadequeate for number of requested users per discussion"
                 f"({num_active_users})."
             )
@@ -98,7 +115,7 @@ class DiscussionExperiment:
         if num_active_users < 2:
             raise ValueError("num_active_users must be at least 2.")
 
-        self.turn_manager_factory = turn_manager_factory
+        self._turn_manager_template = turn_manager
         self._history_ctx_len = history_ctx_len
         self._num_active_users = num_active_users
         self._num_discussions = num_discussions
@@ -144,14 +161,14 @@ class DiscussionExperiment:
         :return: A synthetic Discussion object.
         :rtype: Discussion
         """
-        rand_topic = random.choice(self.seed_opinions)
-        rand_users = list(random.choices(self.users, k=self._num_active_users))
+        rand_topic = random.choice(self._seed_opinions)
+        rand_users = list(random.sample(self._users, k=self._num_active_users))
         rand_seeds_users = (
             [actor.get_actor_name() for actor in rand_users[: len(rand_topic)]]
             if rand_topic is not None
             else None
         )
-        tm = self.turn_manager_factory()
+        tm = self._turn_manager_template.make_instance()
         tm.set_actors(rand_users)
 
         return jobs.Discussion(

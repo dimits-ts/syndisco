@@ -29,7 +29,7 @@ from pathlib import Path
 from syndisco import (
     DiscussionExperiment,
     AnnotationExperiment,
-    RandomWeighted,
+    RespondTurnManager,
     Logs,
 )
 from .dummy import DummyActor
@@ -83,11 +83,11 @@ class TestDiscussionExperimentConstruction:
 
     def test_constructs_with_all_args(self) -> None:
         seeds = [["Seed one.", "Seed two."], ["Seed three."]]
-        tm = RandomWeighted
+        tm = RespondTurnManager(p_respond=0.2)
         exp = DiscussionExperiment(
             users=make_users(4),
             seed_opinions=seeds,
-            turn_manager_factory=tm,
+            turn_manager=tm,
             history_ctx_len=5,
             num_turns=8,
             num_active_users=2,
@@ -128,6 +128,65 @@ class TestDiscussionExperimentConstruction:
 
     def test_none_seed_opinions_accepted(self) -> None:
         DiscussionExperiment(users=make_users(), seed_opinions=None)
+
+    def test_flat_strings_accepted(self) -> None:
+        exp = DiscussionExperiment(
+            users=make_users(),
+            seed_opinions=["Opinion A.", "Opinion B."],
+        )
+        assert exp is not None
+
+    def test_flat_strings_normalised_to_single_element_lists(self) -> None:
+        exp = DiscussionExperiment(
+            users=make_users(),
+            seed_opinions=["Opinion A.", "Opinion B."],
+        )
+        assert exp._seed_opinions == [["Opinion A."], ["Opinion B."]]
+
+    def test_nested_lists_unchanged(self) -> None:
+        seeds = [["First.", "Second."], ["Third."]]
+        exp = DiscussionExperiment(users=make_users(), seed_opinions=seeds)
+        assert exp._seed_opinions == seeds
+
+    def test_mixed_flat_and_nested_normalised(self) -> None:
+        exp = DiscussionExperiment(
+            users=make_users(),
+            seed_opinions=["Flat.", ["Nested A.", "Nested B."]],
+        )
+        assert exp._seed_opinions == [["Flat."], ["Nested A.", "Nested B."]]
+
+    def test_single_flat_string_normalised(self) -> None:
+        exp = DiscussionExperiment(
+            users=make_users(),
+            seed_opinions=["Only one."],
+        )
+        assert exp._seed_opinions == [["Only one."]]
+
+    def test_flat_string_appears_in_output(self, tmp_path: Path) -> None:
+        exp = DiscussionExperiment(
+            users=make_users(3),
+            seed_opinions=["Flat seed opinion."],
+            num_discussions=1,
+            num_turns=2,
+            num_active_users=2,
+        )
+        exp.begin(discussions_output_dir=tmp_path, verbose=False)
+        data = json.loads(next(tmp_path.glob("*.json")).read_text())
+        entries = next(v for v in data.values() if isinstance(v, list))
+        texts = [e["text"] for e in entries]
+        assert "Flat seed opinion." in texts
+
+    def test_empty_flat_list_accepted(self) -> None:
+        exp = DiscussionExperiment(users=make_users(), seed_opinions=[])
+        assert exp is not None
+
+    def test_none_seed_opinions_normalised_to_empty_segment(self) -> None:
+        exp = DiscussionExperiment(users=make_users(), seed_opinions=None)
+        assert exp._seed_opinions == [[]]
+
+    def test_empty_list_seed_opinions_normalised_to_empty(self) -> None:
+        exp = DiscussionExperiment(users=make_users(), seed_opinions=[])
+        assert exp._seed_opinions == []
 
 
 class TestDiscussionExperimentBegin:

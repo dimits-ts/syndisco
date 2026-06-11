@@ -1,5 +1,18 @@
 # What's new
 
+## 2.1.3 (11/06/2026)
+
+### Features
+
+- Added RandomTurnManager
+- Renamed TurnManagers with more intuitive names
+- TurnManagers are now supplied in DiscussionExperiments in a much more straight-forward way.
+- Seed opinions for experiments accept more flexible formats
+
+### Fixes
+- Fixed a bug where actors would randomly undergo mitosis during discussion creation.
+
+
 ## 2.1.2 (04/05/2026)
 
 ### Features
