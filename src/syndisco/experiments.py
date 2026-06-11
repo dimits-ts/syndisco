@@ -152,7 +152,6 @@ class DiscussionExperiment:
             else None
         )
         tm = self.turn_manager_factory()
-        tm.set_actors(rand_users)
 
         return jobs.Discussion(
             users=rand_users,
