@@ -115,7 +115,7 @@ class QueueTurnManager(TurnManager):
         self.curr_turn += 1
         new_speaker_index = self.curr_turn % len(self._actors)
         return self._actors[new_speaker_index]
-    
+
     def make_instance(self) -> typing.Self:
         instance = super().make_instance()
         instance.curr_turn = -1
@@ -132,29 +132,30 @@ class RespondTurnManager(TurnManager):
         self,
         actors: Iterable[Actor] | None = None,
         p_respond: float = 0.5,
+        random_seed: int | None = None,
     ):
         super().__init__(actors)
-
         assert (
             0 <= p_respond <= 1
         ), f"p_respond must be between 0 and 1, but is {p_respond}"
-
         if p_respond == 0:
             warnings.warn(
                 "p_respond has been set to 0, which disables "
-                "responding altogether. In that case, it may better to use "
+                "responding altogether. In that case, it may be better to use "
                 "the RandomTurnManager class instead."
             )
-
         self._chance_to_respond = p_respond
+        self._random_seed = random_seed
+        self._rng = random.Random(random_seed)
 
-        # Track history
         self._last_speaker: Actor | None = None
         self._second_to_last_speaker: Actor | None = None
 
     def make_instance(self) -> typing.Self:
         instance = super().make_instance()
-        instance._last_speaker = None  # reset dynamic state
+        instance._last_speaker = None
+        instance._second_to_last_speaker = None
+        instance._rng = random.Random(self._random_seed)
         return instance
 
     @property
@@ -176,7 +177,6 @@ class RespondTurnManager(TurnManager):
         self._chance_to_respond = p_respond
 
     def _next_impl(self) -> Actor:
-        # First turn: no history yet, pick random
         if self._last_speaker is None:
             next_speaker = self._random_actor()
         elif self._second_to_last_speaker is None:
@@ -187,38 +187,33 @@ class RespondTurnManager(TurnManager):
             else:
                 next_speaker = self._random_actor(exclude=self._last_speaker)
 
-        # Update history
         self._second_to_last_speaker = self._last_speaker
         self._last_speaker = next_speaker
-
         return next_speaker
 
     def _should_repeat_last_speaker(self) -> bool:
         """Return True if the last speaker should respond again."""
-        return random.random() < self.chance_to_respond
+        return self._rng.random() < self.chance_to_respond
 
     def _random_actor(self, exclude: Actor | None = None) -> Actor:
         """Select a random actor, optionally excluding one."""
         if exclude is None:
-            return random.choice(self._actors)
-
+            return self._rng.choice(self._actors)
         candidates = [actor for actor in self._actors if actor != exclude]
-
-        # Fallback: if only one actor exists
         if not candidates:
             return exclude
-
-        return random.choice(candidates)
+        return self._rng.choice(candidates)
 
 
 class RandomTurnManager(RespondTurnManager):
     """
     Randomly chooses the next participant, excluding the last speaker.
-    Functionally identical to `RespondTurnManager` with p_respond=0.
+    Functionally identical to :class:`RespondTurnManager` with ``p_respond=0``.
     """
 
     def __init__(
         self,
         actors: Iterable[Actor] | None = None,
+        random_seed: int | None = None,
     ):
-        super().__init__(actors=actors, p_respond=0)
+        super().__init__(actors=actors, p_respond=0, random_seed=random_seed)
