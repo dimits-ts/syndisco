@@ -166,6 +166,92 @@ class TestRounRobin:
         sequence = [tm.next() for _ in range(20)]
 
         assert_no_consecutive_repetition(sequence)
+    
+    def test_make_instance_preserves_randomize_first_speaker(self, actors):
+        tm = QueueTurnManager(
+            actors,
+            randomize_first_speaker=True,
+        )
+
+        clone = tm.make_instance()
+
+        assert clone._randomize_first_speaker is True
+        assert clone.curr_turn is None
+
+    def test_make_instance_resets_state(self, actors):
+        tm = QueueTurnManager(
+            actors,
+            randomize_first_speaker=True,
+        )
+
+        _ = [tm.next() for _ in range(5)]
+
+        clone = tm.make_instance()
+
+        assert clone.curr_turn is None
+
+    def test_randomized_first_speaker_not_always_first_actor(self, actors):
+        """
+        Across many fresh instances, the first speaker should not always
+        be actors[0].
+        """
+        first_speakers = []
+
+        for _ in range(100):
+            tm = QueueTurnManager(
+                actors,
+                randomize_first_speaker=True,
+            )
+            first_speakers.append(tm.next())
+
+        assert len(set(first_speakers)) > 1
+
+    def test_randomized_first_turn_still_visits_every_actor(self, actors):
+        """
+        Regardless of the random starting point, one complete cycle should
+        visit every actor exactly once.
+        """
+        tm = QueueTurnManager(
+            actors,
+            randomize_first_speaker=True,
+        )
+
+        seen = [tm.next() for _ in range(len(actors))]
+
+        assert set(seen) == set(actors)
+        assert len(seen) == len(set(seen))
+
+    def test_randomized_first_turn_continues_round_robin(self, actors):
+        """
+        After the randomized starting point, the manager should continue
+        deterministically through the queue.
+        """
+        tm = QueueTurnManager(
+            actors,
+            randomize_first_speaker=True,
+        )
+
+        first_cycle = [tm.next() for _ in range(len(actors))]
+        second_cycle = [tm.next() for _ in range(len(actors))]
+
+        assert first_cycle == second_cycle
+
+    def test_clone_randomizes_again(self, actors):
+        """
+        A cloned manager should not inherit the already-chosen first
+        speaker. It should perform a fresh randomization.
+        """
+        tm = QueueTurnManager(
+            actors,
+            randomize_first_speaker=True,
+        )
+
+        _ = tm.next()          # forces initialization
+
+        clone = tm.make_instance()
+        clone.set_actors(actors)
+
+        assert clone.curr_turn is None
 
 
 class TestRandomWeighted:

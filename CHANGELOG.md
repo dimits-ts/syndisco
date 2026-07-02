@@ -1,11 +1,12 @@
 # What's new
 
-## 2.1.3 (11/06/2026)
+## 2.2.0 (2/07/2026)
 
 ### Features
 
 - Added RandomTurnManager
 - Renamed TurnManagers with more intuitive names
+- QueueTurnManager (previously `RoundRobin`) now accepts random starts.
 - TurnManagers are now supplied in DiscussionExperiments in a much more straight-forward way.
 - Seed opinions for experiments accept more flexible formats
 
