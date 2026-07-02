@@ -107,18 +107,29 @@ class QueueTurnManager(TurnManager):
     A simple turn manager which gives priority to the next user in the queue.
     """
 
-    def __init__(self, actors: Iterable[Actor] | None = None):
+    def __init__(
+        self,
+        actors: Iterable[Actor] | None = None,
+        randomize_first_speaker: bool = False,
+    ):
         super().__init__(actors)
-        self.curr_turn = -1
 
-    def _next_impl(self) -> Actor:
+        self._randomize_first_speaker = randomize_first_speaker
+        self.curr_turn = None
+
+    def _next_impl(self):
+        if self.curr_turn is None:
+            if self._randomize_first_speaker:
+                self.curr_turn = random.randrange(-1, len(self._actors))
+            else:
+                self.curr_turn = -1
+
         self.curr_turn += 1
-        new_speaker_index = self.curr_turn % len(self._actors)
-        return self._actors[new_speaker_index]
+        return self._actors[self.curr_turn % len(self._actors)]
 
-    def make_instance(self) -> typing.Self:
+    def make_instance(self):
         instance = super().make_instance()
-        instance.curr_turn = -1
+        instance.curr_turn = None
         return instance
 
 
