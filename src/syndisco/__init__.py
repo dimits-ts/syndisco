@@ -2,7 +2,6 @@
 A lightweight framework for creating, managing, annotating, and analyzing
 synthetic discussions between Large Language Model (LLM) user-agents.
 """
-
 from .experiments import DiscussionExperiment, AnnotationExperiment
 from .actors import Actor
 from .jobs import Discussion, Annotation, Logs
@@ -29,5 +28,7 @@ __all__ = [
     "TurnManager",
     "RespondTurnManager",
     "RandomTurnManager",
-    "QueueTurnManager"
+    "QueueTurnManager",
 ]
+
+__version__ = "2.2.1"

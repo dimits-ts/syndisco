@@ -13,6 +13,8 @@
 import os
 import sys
 
+import syndisco
+
 sys.path.insert(0, os.path.abspath("../src"))
 
 
@@ -23,7 +25,8 @@ copyright = "2026, Dimitris Tsirmpas"
 author = "Dimitris Tsirmpas"
 
 # The full version, including alpha/beta/rc tags
-release = "2.2.1"
+version = syndisco.__version__
+release = version
 
 
 # -- General configuration ---------------------------------------------------
