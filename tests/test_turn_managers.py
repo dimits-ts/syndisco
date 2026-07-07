@@ -19,6 +19,8 @@ import pytest
 from typing import Iterable
 from collections import Counter
 
+import numpy as np
+
 from .dummy import DummyActor
 from syndisco import (
     TurnManager,
@@ -166,7 +168,7 @@ class TestRounRobin:
         sequence = [tm.next() for _ in range(20)]
 
         assert_no_consecutive_repetition(sequence)
-    
+
     def test_make_instance_preserves_randomize_first_speaker(self, actors):
         tm = QueueTurnManager(
             actors,
@@ -176,7 +178,7 @@ class TestRounRobin:
         clone = tm.make_instance()
 
         assert clone._randomize_first_speaker is True
-        assert clone.curr_turn is None
+        assert clone._curr_turn is None
 
     def test_make_instance_resets_state(self, actors):
         tm = QueueTurnManager(
@@ -188,7 +190,7 @@ class TestRounRobin:
 
         clone = tm.make_instance()
 
-        assert clone.curr_turn is None
+        assert clone._curr_turn is None
 
     def test_randomized_first_speaker_not_always_first_actor(self, actors):
         """
@@ -246,12 +248,12 @@ class TestRounRobin:
             randomize_first_speaker=True,
         )
 
-        _ = tm.next()          # forces initialization
+        _ = tm.next()  # forces initialization
 
         clone = tm.make_instance()
         clone.set_actors(actors)
 
-        assert clone.curr_turn is None
+        assert clone._curr_turn is None
 
 
 class TestRandomWeighted:
@@ -438,101 +440,102 @@ class TestRandomTurnManager:
 
     def test_returns_valid_actor(self, actors):
         tm = RandomTurnManager(actors)
+
         for _ in range(20):
             assert tm.next() in actors
 
     def test_no_consecutive_repetition(self, actors):
         tm = RandomTurnManager(actors)
+
         sequence = [tm.next() for _ in range(50)]
-        for i in range(1, len(sequence)):
-            assert sequence[i] != sequence[i - 1]
+
+        for prev, curr in zip(sequence, sequence[1:]):
+            assert prev != curr
 
     def test_single_actor_falls_back_to_self(self):
-        """
-        With one actor and p_respond=0, there are no other candidates.
-        The fallback in _random_actor returns the excluded actor itself,
-        so next() should return it rather than raise.
-        """
         only = DummyActor("A")
         tm = RandomTurnManager([only])
+
         for _ in range(5):
             assert tm.next() == only
 
     def test_make_instance_preserves_p_respond(self, actors):
         tm = RandomTurnManager(actors)
+
         clone = tm.make_instance()
+
         assert clone.chance_to_respond == 0.0
 
     def test_make_instance_resets_speaker_state(self, actors):
         tm = RandomTurnManager(actors)
-        _ = [tm.next() for _ in range(5)]
+
+        for _ in range(5):
+            tm.next()
+
         clone = tm.make_instance()
+
         assert clone._last_speaker is None
         assert clone._second_to_last_speaker is None
 
-    def test_make_instance_resets_rng(self, actors):
-        """
-        A clone with the same seed should produce the same sequence
-        as a fresh instance with that seed.
-        """
-        tm = RandomTurnManager(actors, random_seed=99)
-        _ = [tm.next() for _ in range(10)]  # advance rng state
-        clone = tm.make_instance()
-        clone.set_actors(actors)
-
-        fresh = RandomTurnManager(actors, random_seed=99)
-
-        assert [clone.next() for _ in range(20)] == [
-            fresh.next() for _ in range(20)
-        ]
-
     def test_make_instance_returns_random_turn_manager(self, actors):
         tm = RandomTurnManager(actors)
-        clone = tm.make_instance()
-        assert type(clone) is RandomTurnManager
 
-    def test_make_instance_preserves_seed(self, actors):
-        tm = RandomTurnManager(actors, random_seed=7)
-        clone = tm.make_instance()
-        assert clone._random_seed == 7
+        assert type(tm.make_instance()) is RandomTurnManager
 
-    def test_functionally_identical_to_respond_with_p_zero(self, actors):
-        """
-        RandomTurnManager and RespondTurnManager(p_respond=0) share the
-        same seed and should produce identical sequences.
-        """
-        tm_random = RandomTurnManager(actors, random_seed=42)
-        tm_respond = RespondTurnManager(actors, p_respond=0.0, random_seed=42)
+    def test_same_seeded_generators_are_deterministic(self, actors):
+        tm1 = RandomTurnManager(
+            actors,
+            random_state=np.random.default_rng(42),
+        )
+        tm2 = RandomTurnManager(
+            actors,
+            random_state=np.random.default_rng(42),
+        )
 
-        seq_random = [tm_random.next() for _ in range(60)]
-        seq_respond = [tm_respond.next() for _ in range(60)]
-
-        assert seq_random == seq_respond
-
-    def test_seeded_instance_is_deterministic(self, actors):
-        """Same seed produces identical sequences across two instances."""
-        tm1 = RandomTurnManager(actors, random_seed=0)
-        tm2 = RandomTurnManager(actors, random_seed=0)
         assert [tm1.next() for _ in range(30)] == [
             tm2.next() for _ in range(30)
         ]
 
-    def test_different_seeds_produce_different_sequences(self, actors):
-        tm1 = RandomTurnManager(actors, random_seed=1)
-        tm2 = RandomTurnManager(actors, random_seed=2)
-        seq1 = [tm1.next() for _ in range(30)]
-        seq2 = [tm2.next() for _ in range(30)]
-        assert seq1 != seq2
+    def test_different_seeded_generators_produce_different_sequences(
+        self, actors
+    ):
+        tm1 = RandomTurnManager(
+            actors,
+            random_state=np.random.default_rng(1),
+        )
+        tm2 = RandomTurnManager(
+            actors,
+            random_state=np.random.default_rng(2),
+        )
 
-    def test_unseeded_instance_uses_independent_rng(self, actors):
-        """
-        Two unseeded instances should not share global random state —
-        mutating one must not affect the other.
-        """
+        assert [tm1.next() for _ in range(30)] != [
+            tm2.next() for _ in range(30)
+        ]
+
+    def test_functionally_identical_to_respond_with_p_zero(self, actors):
+        rng1 = np.random.default_rng(123)
+        rng2 = np.random.default_rng(123)
+
+        tm_random = RandomTurnManager(
+            actors,
+            random_state=rng1,
+        )
+        tm_respond = RespondTurnManager(
+            actors,
+            p_respond=0.0,
+            random_state=rng2,
+        )
+
+        assert [tm_random.next() for _ in range(60)] == [
+            tm_respond.next() for _ in range(60)
+        ]
+
+    def test_unseeded_instances_use_independent_rng(self, actors):
         tm1 = RandomTurnManager(actors)
         tm2 = RandomTurnManager(actors)
-        # Advance tm1's rng heavily
-        _ = [tm1.next() for _ in range(100)]
-        # tm2 should still produce valid, non-repeating output
+
+        for _ in range(100):
+            tm1.next()
+
         for _ in range(20):
             assert tm2.next() in actors
