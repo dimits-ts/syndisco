@@ -54,7 +54,8 @@ class BaseModel(abc.ABC):
         system_prompt: str,
         user_prompt: str,
     ) -> str:
-        """Generate the model's response based on a prompt.
+        """
+        Generate the model's response based on a prompt.
 
         :param system_prompt: The system prompt.
         :type system_prompt: str
@@ -117,7 +118,6 @@ class TransformersModel(BaseModel):
     ):
         """
         Initialize a HuggingFace Transformers-based language model wrapper.
-
         This class loads a causal language model and tokenizer from a
         HuggingFace-compatible checkpoint and configures them for inference.
         It also supports optional customization of model loading, tokenizer
@@ -160,14 +160,15 @@ class TransformersModel(BaseModel):
         :type generation_kwargs: dict | None
 
         :raises OSError:
-        If the model or tokenizer cannot be loaded from the given path.
+            If the model or tokenizer cannot be loaded from the given path.
 
         :raises ValueError:
-        If the provided configuration is invalid / incompatible with the model.
+            If the provided configuration is invalid / incompatible with the 
+            model.
 
         :note:
-        The model is moved to the appropriate device automatically using
-        ``device_map="auto"`` and set to evaluation mode.
+            The model is moved to the appropriate device automatically using
+            ``device_map="auto"`` and set to evaluation mode.
         """
         super().__init__(name, max_out_tokens, remove_string_list)
 

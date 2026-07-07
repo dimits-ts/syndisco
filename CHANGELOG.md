@@ -1,6 +1,18 @@
 # What's new
 
-## 2.2.0 (2/07/2026)
+## 2.2.1 (07/07/2026)
+
+### Features
+- Reworked online documentation.
+
+### Fixes
+- Constructors are now visible in the online documentation.
+- All turn managers now hold generators instead of seeds to ensure different
+outcomes between experiments of the same seed.
+- General code cleanup.
+
+
+## 2.2.0 (02/07/2026)
 
 ### Features
 

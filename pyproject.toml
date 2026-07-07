@@ -1,6 +1,6 @@
 [project]
 name = "syndisco"
-version = "2.2.0"
+version = "2.2.1"
 description = "Automated experiment creation and execution using LLM agents"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -42,7 +42,8 @@ dependencies = [
   "torch",
   "tqdm",
   "transformers",
-  "openai"
+  "openai",
+  "setuptools_scm"
 ]
 
 [project.urls]
@@ -52,10 +53,10 @@ Issues = "https://github.com/dimits-ts/synthetic_discussion_framework/issues"
 [project.optional-dependencies]
 dev = [
   "sphinx",
-  "myst-parser",
+  "myst-nb",
   "nbsphinx",
   "sphinx-autobuild",
-  "sphinx-rtd-theme",
+  "sphinx-book-theme",
   "ipykernel",
   "ipywidgets",
   "pandoc",

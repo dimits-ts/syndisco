@@ -14,6 +14,8 @@ devenv
 sphinx/source/
 docs/doctrees/
 docs/html/_sources
+jupyter_execute/
+.jupyter_cache/
 
 .idea/
 
