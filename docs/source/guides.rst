@@ -12,13 +12,8 @@ The code for each of these guides can also be found in the
 `How to Create a Synthetic Discussion <guides/creating_discussions.ipynb>`_
 ---------------------------------------------------------------------------
 
-Basic setup including setting up models, actors, and turn-taking strategies.
-
 `How to Annotate your Synthetic Discussions <guides/creating_annotations.ipynb>`_
 ---------------------------------------------------------------------------------
 
 `How to Use the Experiment API to Manage Large-Scale Studies <guides/creating_experiments.ipynb>`_
 --------------------------------------------------------------------------------------------------
-
-Also includes features such as logging and exporting synthetic datasets to CSV
-format.

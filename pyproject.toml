@@ -52,10 +52,10 @@ Issues = "https://github.com/dimits-ts/synthetic_discussion_framework/issues"
 [project.optional-dependencies]
 dev = [
   "sphinx",
-  "myst-parser",
+  "myst-nb",
   "nbsphinx",
   "sphinx-autobuild",
-  "sphinx-rtd-theme",
+  "sphinx-book-theme",
   "ipykernel",
   "ipywidgets",
   "pandoc",

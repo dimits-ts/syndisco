@@ -23,7 +23,7 @@ copyright = "2026, Dimitris Tsirmpas"
 author = "Dimitris Tsirmpas"
 
 # The full version, including alpha/beta/rc tags
-release = "2.1.0"
+release = "2.2.1"
 
 
 # -- General configuration ---------------------------------------------------
@@ -41,7 +41,8 @@ templates_path = ["_templates"]
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
-# source_suffix = {".md": "markdown"}
+nb_execution_mode = "cache"
+nb_execution_timeout = -1
 
 
 autodoc_default_options = {
