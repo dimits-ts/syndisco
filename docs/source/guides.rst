@@ -6,14 +6,9 @@ tutorials, you will understand how to set up and execute a synthetic
 discussion, annotate it, as well as how to generate and manage up to hundreds
 of discussions.
 
-The code for each of these guides can also be found in the
-`project's repository <https://github.com/dimits-ts/syndisco/tree/master/docs/guides>`_.
+.. toctree::
+   :maxdepth: 1
 
-`How to Create a Synthetic Discussion <guides/creating_discussions.ipynb>`_
----------------------------------------------------------------------------
-
-`How to Annotate your Synthetic Discussions <guides/creating_annotations.ipynb>`_
----------------------------------------------------------------------------------
-
-`How to Use the Experiment API to Manage Large-Scale Studies <guides/creating_experiments.ipynb>`_
---------------------------------------------------------------------------------------------------
+   guides/creating_discussions
+   guides/creating_annotations
+   guides/creating_experiments
