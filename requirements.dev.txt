@@ -8,13 +8,12 @@ tqdm
 openai
 
 sphinx
-myst-parser
-nbsphinx
 sphinx-autobuild
-sphinx-rtd-theme
+sphinx-book-theme
 notebook
 ipywidgets
 pandoc
+myst-nb
 
 build 
 twine

@@ -3,7 +3,7 @@ API Reference
 
 
 Generation
-------
+----------
 
 .. autosummary::
    :toctree: generated/
@@ -46,8 +46,9 @@ Turn Management
    :nosignatures:
 
    syndisco.TurnManager
-   syndisco.RandomWeighted
-   syndisco.RoundRobin
+   syndisco.QueueTurnManager
+   syndisco.RespondTurnManager
+   syndisco.RandomTurnManager
 
 
 Utilities
@@ -57,4 +58,4 @@ Utilities
    :toctree: generated/
    :nosignatures:
 
-   syndisco.logging
+   syndisco.logging_setup

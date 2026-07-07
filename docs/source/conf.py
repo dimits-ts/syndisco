@@ -31,7 +31,7 @@ release = "2.1.0"
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ["sphinx.ext.autodoc", "nbsphinx", "sphinx.ext.autosummary"]
+extensions = ["sphinx.ext.autodoc", "myst_nb", "sphinx.ext.autosummary"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -49,6 +49,10 @@ autodoc_default_options = {
     "undoc-members": False,
     "inherited-members": True,
 }
+autodoc_typehints = "description"
+
+# Don't show class signature with the class' name.
+autodoc_class_signature = "separated"
 autosummary_generate = True
 add_module_names = False
 
@@ -57,15 +61,22 @@ add_module_names = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "sphinx_rtd_theme"
+html_theme = "sphinx_book_theme"
+html_theme_options = {
+    "repository_url": "https://github.com/dimits-ts/syndisco",
+    "use_repository_button": True,
+    "use_source_button": True,
+    "repository_branch": "master",
+    "use_edit_page_button": True,
+    "use_issues_button": True,
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
 html_favicon = "logo.svg"
+html_logo = "logo.svg"
+html_title = "SynDisco"
 
 autoclass_content = 'both'
-
-def setup(app):
-    app.add_css_file("custom.css")

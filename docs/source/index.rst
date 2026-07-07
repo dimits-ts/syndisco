@@ -7,8 +7,6 @@ Welcome to SynDisco's documentation!
 ====================================
 
 
-.. image:: logo.svg
-
 Welcome to the official documentation of SynDisco! 
 This project provides a lightweight framework for creating, managing, annotating, and analyzing synthetic discussions between Large Language Model (LLM) user-agents.
  
