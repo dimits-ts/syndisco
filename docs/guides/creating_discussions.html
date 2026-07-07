@@ -1,0 +1,1198 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Creating a Discussion &#8212; SynDisco</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=5700ab10"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script type="application/vnd.jupyter.widget-state+json">{"state": {"3b1e81cf455941f192e46a273197a7d6": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}, "457822cc54ed4c6685f188c8d5912805": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_aebd2a11e6d3420a8c07152269b799dc", "placeholder": "\u200b", "style": "IPY_MODEL_951e2ace51c04c1ba2aff94526d99fec", "tabbable": null, "tooltip": null, "value": "100%"}}, "6b1e4e8525664d32a2311d17864003f7": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HTMLView", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_8978aded614e48a082c0016f0b5d8bbb", "placeholder": "\u200b", "style": "IPY_MODEL_3b1e81cf455941f192e46a273197a7d6", "tabbable": null, "tooltip": null, "value": "\u20075/5\u2007[00:34&lt;00:00,\u2007\u20077.02s/it]"}}, "8978aded614e48a082c0016f0b5d8bbb": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "9099015386f446d5942a57938ebaedc9": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "951e2ace51c04c1ba2aff94526d99fec": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HTMLStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HTMLStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "background": null, "description_width": "", "font_size": null, "text_color": null}}, "aebd2a11e6d3420a8c07152269b799dc": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "aef3d2ab723b490287a9c337886e042f": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "HBoxModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "HBoxModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "HBoxView", "box_style": "", "children": ["IPY_MODEL_457822cc54ed4c6685f188c8d5912805", "IPY_MODEL_e04b2955f4f747b9b44ad3e9247cd886", "IPY_MODEL_6b1e4e8525664d32a2311d17864003f7"], "layout": "IPY_MODEL_9099015386f446d5942a57938ebaedc9", "tabbable": null, "tooltip": null}}, "d418aeb45b724b3c84ada6799bccb720": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "ProgressStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "ProgressStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "StyleView", "bar_color": null, "description_width": ""}}, "e04b2955f4f747b9b44ad3e9247cd886": {"model_module": "@jupyter-widgets/controls", "model_module_version": "2.0.0", "model_name": "FloatProgressModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "2.0.0", "_model_name": "FloatProgressModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "2.0.0", "_view_name": "ProgressView", "bar_style": "success", "description": "", "description_allow_html": false, "layout": "IPY_MODEL_ec8e91aa4c354ef8859e6a16a145f0ed", "max": 5.0, "min": 0.0, "orientation": "horizontal", "style": "IPY_MODEL_d418aeb45b724b3c84ada6799bccb720", "tabbable": null, "tooltip": null, "value": 5.0}}, "ec8e91aa4c354ef8859e6a16a145f0ed": {"model_module": "@jupyter-widgets/base", "model_module_version": "2.0.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "2.0.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "2.0.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border_bottom": null, "border_left": null, "border_right": null, "border_top": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}}, "version_major": 2, "version_minor": 0}</script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script crossorigin="anonymous" data-jupyter-widgets-cdn="https://cdn.jsdelivr.net/npm/" src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@1.0.6/dist/embed-amd.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'guides/creating_discussions';</script>
+    <link rel="icon" href="../_static/logo.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Generating Synthetic Annotations" href="creating_annotations.html" />
+    <link rel="prev" title="Guides" href="../guides.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.2.1" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.svg" class="logo__image only-light" alt="SynDisco - Home"/>
+    <img src="../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="SynDisco - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../guides.html">Guides</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Creating a Discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="creating_annotations.html">Generating Synthetic Annotations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="creating_experiments.html">Creating and Managing Experiments</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api.html">API Reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../generated/syndisco.Actor.html">syndisco.Actor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generated/syndisco.BaseModel.html">syndisco.BaseModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generated/syndisco.TransformersModel.html">syndisco.TransformersModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generated/syndisco.OpenAIModel.html">syndisco.OpenAIModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generated/syndisco.Discussion.html">syndisco.Discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generated/syndisco.Annotation.html">syndisco.Annotation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generated/syndisco.Logs.html">syndisco.Logs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generated/syndisco.DiscussionExperiment.html">syndisco.DiscussionExperiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generated/syndisco.AnnotationExperiment.html">syndisco.AnnotationExperiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generated/syndisco.TurnManager.html">syndisco.TurnManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generated/syndisco.QueueTurnManager.html">syndisco.QueueTurnManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generated/syndisco.RespondTurnManager.html">syndisco.RespondTurnManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generated/syndisco.RandomTurnManager.html">syndisco.RandomTurnManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generated/syndisco.logging_setup.html">syndisco.logging_setup</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/dimits-ts/syndisco" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/dimits-ts/syndisco/blob/master/guides/creating_discussions.ipynb?plain=1" target="_blank"
+   class="btn btn-sm btn-source-file-button dropdown-item"
+   title="Show source"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-code"></i>
+  </span>
+<span class="btn__text-container">Show source</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/dimits-ts/syndisco/edit/master/guides/creating_discussions.ipynb" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/dimits-ts/syndisco/issues/new?title=Issue%20on%20page%20%2Fguides/creating_discussions.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/guides/creating_discussions.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Creating a Discussion</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#basics">Basics</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-model">The Model</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-personas">Creating personas</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-the-user-agents">Creating the user-agents</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#managing-turn-taking">Managing turn-taking</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generating-a-discussion">Generating a discussion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#driving-a-discussion-step-by-step">Driving a discussion step by step</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#calling-next-manually">Calling <code class="docutils literal notranslate"><span class="pre">next()</span></code> manually</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#using-a-for-loop">Using a <code class="docutils literal notranslate"><span class="pre">for</span></code> loop</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#working-with-logs">Working with <code class="docutils literal notranslate"><span class="pre">Logs</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exporting-and-importing-discussions-with-logs">Exporting and importing discussions with <code class="docutils literal notranslate"><span class="pre">Logs</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-hard-coded-logs">Creating hard-coded logs</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="creating-a-discussion">
+<h1>Creating a Discussion<a class="headerlink" href="#creating-a-discussion" title="Link to this heading">#</a></h1>
+<p>The simplest task you can accomplish with this library is to create a small discussion between LLMs.</p>
+<p>This guide will teach you the basic setup of the library. You will understand how to setup models, user-agents and how to coordinate them in a discussion. By the end of htis guide, you will be able to run a small discussion with a moderator and save it to the disk for persistence.</p>
+<section id="basics">
+<h2>Basics<a class="headerlink" href="#basics" title="Link to this heading">#</a></h2>
+<section id="the-model">
+<h3>The Model<a class="headerlink" href="#the-model" title="Link to this heading">#</a></h3>
+<p>SynDisco can theoretically support any LLM, as long as it is wrapped in a <code class="docutils literal notranslate"><span class="pre">BaseModel</span></code> wrapper. The <code class="docutils literal notranslate"><span class="pre">BaseModel</span></code> class is a very simple interface with one method. This method gives the underlying LLM input, and returns its output to the library.</p>
+<p>There already exists a <code class="docutils literal notranslate"><span class="pre">TransformersModel</span></code> class which handles models from the <code class="docutils literal notranslate"><span class="pre">transformers</span></code> python library. In 90% of your applications, this will be enough. We can load a TransformersModel using the following code:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">syndisco</span>
+
+<span class="n">llm</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">TransformersModel</span><span class="p">(</span>
+    <span class="n">model_path</span><span class="o">=</span><span class="s2">&quot;unsloth/Qwen2.5-7B-Instruct-bnb-4bit&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test_model&quot;</span><span class="p">,</span>
+    <span class="n">max_out_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>This will download a small LLM from huggingface. You can substitute the model_path for any similar model in <a class="reference external" href="https://huggingface.co/">HuggingFace</a> supporting the Transformers library.</p>
+</section>
+<section id="creating-personas">
+<h3>Creating personas<a class="headerlink" href="#creating-personas" title="Link to this heading">#</a></h3>
+<p>All <code class="docutils literal notranslate"><span class="pre">actors</span></code> can be defined by a <code class="docutils literal notranslate"><span class="pre">persona</span></code>, aka a set of attributes that define them. These attributes can be age, ethnicity, and even include special instructions on how they should behave.</p>
+<p>Syndisco uses any python dictionary for defining personas. These dictionaries are given as-is to the underlying prompt, and saved as JSON in the exported discussion logs.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">personas</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;Gwx31&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="mi">38</span><span class="p">,</span>
+        <span class="s2">&quot;sex&quot;</span><span class="p">:</span> <span class="s2">&quot;female&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;education_level&quot;</span><span class="p">:</span> <span class="s2">&quot;Bachelor&#39;s&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sexual_orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;Heterosexual&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;demographic_group&quot;</span><span class="p">:</span> <span class="s2">&quot;Latino&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;current_employment&quot;</span><span class="p">:</span> <span class="s2">&quot;Registered Nurse&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;personality_characteristics&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;compassionate&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;patient&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;diligent&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;overwhelmed&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;Giannis&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="mi">21</span><span class="p">,</span>
+        <span class="s2">&quot;sex&quot;</span><span class="p">:</span> <span class="s2">&quot;male&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;education_level&quot;</span><span class="p">:</span> <span class="s2">&quot;College&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sexual_orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;Pansexual&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;demographic_group&quot;</span><span class="p">:</span> <span class="s2">&quot;White&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;current_employment&quot;</span><span class="p">:</span> <span class="s2">&quot;Game Developer&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;personality_characteristics&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;strategic&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;meticulous&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;nerdy&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;hyper-focused&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;Kimya&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="mi">67</span><span class="p">,</span>
+        <span class="s2">&quot;sex&quot;</span><span class="p">:</span> <span class="s2">&quot;female&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;education_level&quot;</span><span class="p">:</span> <span class="s2">&quot;PhD&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sexual_orientation&quot;</span><span class="p">:</span> <span class="s2">&quot;Heterosexual&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;demographic_group&quot;</span><span class="p">:</span> <span class="s2">&quot;White&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;personality_characteristics&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;strict&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;grumpy&quot;</span>
+        <span class="p">],</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Since creating a lot of distinct users is essential in running large-scale experiments, users are usually defined in JSON format. That way, you can change anything without touching your code!</p>
+<p><a class="reference external" href="https://github.com/dimits-ts/synthetic_moderation_experiments/blob/master/data/discussions_input/personas/personas.json">Here</a> is an applied example of how to mass-define user personas through JSON files.</p>
+</section>
+<section id="creating-the-user-agents">
+<h3>Creating the user-agents<a class="headerlink" href="#creating-the-user-agents" title="Link to this heading">#</a></h3>
+<p>Having a <code class="docutils literal notranslate"><span class="pre">persona</span></code> and a <code class="docutils literal notranslate"><span class="pre">model</span></code> we can finally create an <code class="docutils literal notranslate"><span class="pre">actor</span></code>. The actor will personify the selected persona using the model to talk.</p>
+<p>Besides a persona and a model, the actors will also need instructions and a context. By convention, all actors share the same context, and all user-agents share the same instructions. Personalized instructions are defined in the actor’s persona.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">CONTEXT</span> <span class="o">=</span> <span class="s2">&quot;You are taking part in an online conversation&quot;</span>
+<span class="n">INSTRUCTIONS</span> <span class="o">=</span> <span class="s2">&quot;Act like a human would&quot;</span>
+
+<span class="n">actors</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">syndisco</span><span class="o">.</span><span class="n">Actor</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
+        <span class="n">persona</span><span class="o">=</span><span class="n">p</span><span class="p">,</span>
+        <span class="n">context</span><span class="o">=</span><span class="n">CONTEXT</span><span class="p">,</span>
+        <span class="n">instructions</span><span class="o">=</span><span class="n">INSTRUCTIONS</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;username&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">personas</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="managing-turn-taking">
+<h3>Managing turn-taking<a class="headerlink" href="#managing-turn-taking" title="Link to this heading">#</a></h3>
+<p>In real-life discussions, who gets to speak at each point in time is determined by complex social dynamics, which are difficult to realistically model.
+However, there are ways with which we can simulate these dynamics.</p>
+<p>SynDisco uses the <code class="docutils literal notranslate"><span class="pre">TurnManager</span></code> class to model turn taking. Three implementations are available by default:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">QueueTurnManager</span></code> is the simplest, most intuitive way to model turn-taking; everyone gets to talk once per round. Once everyone talks once, they get to talk again in the same sequence</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rrobin_turn_manager</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">QueueTurnManager</span><span class="p">(</span><span class="n">actors</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="n">speaker</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">rrobin_turn_manager</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">speaker</span><span class="o">.</span><span class="n">get_actor_name</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Gwx31
+Giannis
+Kimya
+Gwx31
+Giannis
+Kimya
+Gwx31
+Giannis
+Kimya
+Gwx31
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">RandomTurnManager</span></code> selects a random speaker each time (excluding the last speaker):</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rrobin_turn_manager</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">RandomTurnManager</span><span class="p">(</span><span class="n">actors</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="n">speaker</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">rrobin_turn_manager</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">speaker</span><span class="o">.</span><span class="n">get_actor_name</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Giannis
+Gwx31
+Kimya
+Gwx31
+Giannis
+Kimya
+Giannis
+Kimya
+Gwx31
+Giannis
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/media/SSD_4TB_2/dtsirmpas/projects/syndisco/src/syndisco/turn_manager.py:163: UserWarning: 
+                p_respond has been set to 0, which disables responding
+                altogether. In that case, it may be better to use the
+                RandomTurnManager class instead.
+                
+  warnings.warn(
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">RespondTurnManager</span></code> on the other hand throws a weighted coin on each round. If the coin flip succedes, the previous user gets to respond. If not, another user is selected at random</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">res_turn_manager</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">RespondTurnManager</span><span class="p">(</span><span class="n">actors</span><span class="p">,</span> <span class="n">p_respond</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="n">speaker</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">res_turn_manager</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">speaker</span><span class="o">.</span><span class="n">get_actor_name</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Gwx31
+Giannis
+Gwx31
+Giannis
+Kimya
+Giannis
+Kimya
+Giannis
+Kimya
+Giannis
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="generating-a-discussion">
+<h2>Generating a discussion<a class="headerlink" href="#generating-a-discussion" title="Link to this heading">#</a></h2>
+<p>Let’s start with the most basic task; a single discussion between two users. Let’s also add a few starting comments, supposedly made by the first user, to get the ball rolling.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">turn_manager</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">QueueTurnManager</span><span class="p">(</span><span class="n">actors</span><span class="p">)</span>
+<span class="n">conv</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">Discussion</span><span class="p">(</span>
+    <span class="n">next_turn_manager</span><span class="o">=</span><span class="n">turn_manager</span><span class="p">,</span>
+    <span class="n">users</span><span class="o">=</span><span class="n">actors</span><span class="p">,</span>
+    <span class="n">seed_opinions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;I hate the concept of chairs.&quot;</span><span class="p">],</span>
+    <span class="n">seed_opinion_usernames</span><span class="o">=</span><span class="p">[</span><span class="n">personas</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;username&quot;</span><span class="p">]]</span>
+<span class="p">)</span>
+<span class="n">conv</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "aef3d2ab723b490287a9c337886e042f", "version_major": 2, "version_minor": 0}</script><div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The following generation flags are not valid and may be ignored: [&#39;temperature&#39;, &#39;top_p&#39;, &#39;top_k&#39;]. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Comment by user Gwx31: &quot;
+Oh, wow, that&#39;s quite a statement! I can understand where you&#39;re coming from. Sometimes sitting for long periods can be really uncomfortable, especially if you have a job that requires a lot of sitting. As a nurse, I can relate to the physical strain it can put on your body. Maybe finding ways to move around more or using ergonomic chairs could help make things a bit better? What inspired your dislike of chairs specifically?&quot; 
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Comment by user Giannis: &quot;
+As a game developer who spends most of my day in front of a screen, I can definitely relate to the discomfort that comes with prolonged sitting. However, my issue with chairs isn&#39;t necessarily about the physical discomfort—it&#39;s more about the idea of them as a societal norm and the expectations they impose. Chairs often symbolize a certain level of formality and permanence in our workspaces, which can feel restrictive. Plus, there&#39;s something about the fluidity of movement that just feels more natural to&quot; 
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Comment by user Kimya: &quot;
+As Kimya, I might respond with something like this:  &quot;Interesting perspectives here! While I can see how sitting for long periods can be physically taxing, I must admit that I share some of Giannis&#39;s sentiments about chairs. They do seem to represent a certain rigidity in our work environments. For me, though, it&#39;s more about the strict adherence to traditional office norms. It feels like we&#39;re expected to sit still and be productive, even if it&#39;s not the most comfortable or effective&quot; 
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Comment by user Gwx31: &quot;
+Wow, those are some really interesting points! As a registered nurse, I can definitely see how the idea of chairs can be seen as restrictive and formal, especially when you&#39;re used to moving around a lot. It&#39;s funny how something as simple as a chair can have such a big impact on how we perceive our work environment. For me, it&#39;s all about finding balance between comfort and productivity. Sometimes, I find myself wishing for a bit more flexibility in my workspace, but at the same time&quot; 
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Comment by user Giannis: &quot;
+Thanks for the insightful comments, everyone! It’s great to hear different perspectives on this topic. As a game developer, I often find myself in a similar mindset—chairs can feel like a symbol of a rigid structure that doesn’t always align with the creative and dynamic nature of our work. On one hand, they provide a sense of stability and focus, but on the other hand, they can also feel confining.  For me, it’s about finding that balance between the need for comfort and&quot; 
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="driving-a-discussion-step-by-step">
+<h2>Driving a discussion step by step<a class="headerlink" href="#driving-a-discussion-step-by-step" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">Discussion</span></code> implements Python’s iterator protocol, so you are not limited
+to running the whole conversation at once with <code class="docutils literal notranslate"><span class="pre">begin()</span></code>. You can drive it
+one turn at a time, which is useful when you want to inspect or react to
+each entry before the next speaker is prompted — for example to apply
+early stopping, live logging, or conditional branching.</p>
+<p>Because <code class="docutils literal notranslate"><span class="pre">Discussion</span></code> is its own iterator (<code class="docutils literal notranslate"><span class="pre">__iter__</span></code> returns <code class="docutils literal notranslate"><span class="pre">self</span></code>), it
+is <strong>single-pass</strong>: once <code class="docutils literal notranslate"><span class="pre">StopIteration</span></code> is raised the instance is
+exhausted and should not be reused.</p>
+<section id="calling-next-manually">
+<h3>Calling <code class="docutils literal notranslate"><span class="pre">next()</span></code> manually<a class="headerlink" href="#calling-next-manually" title="Link to this heading">#</a></h3>
+<p>Calling <code class="docutils literal notranslate"><span class="pre">iter()</span></code> on a <code class="docutils literal notranslate"><span class="pre">Discussion</span></code> performs the one-time setup (registering
+participant names and inserting any seed opinions). Each subsequent <code class="docutils literal notranslate"><span class="pre">next()</span></code>
+prompts one speaker and returns the new log entry as a plain dict.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">turn_manager</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">QueueTurnManager</span><span class="p">(</span><span class="n">actors</span><span class="p">)</span>
+<span class="n">conv</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">Discussion</span><span class="p">(</span>
+    <span class="n">next_turn_manager</span><span class="o">=</span><span class="n">turn_manager</span><span class="p">,</span>
+    <span class="n">users</span><span class="o">=</span><span class="n">actors</span><span class="p">,</span>
+    <span class="n">conv_len</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">seed_opinions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;I hate the concept of chairs.&quot;</span><span class="p">],</span>
+    <span class="n">seed_opinion_usernames</span><span class="o">=</span><span class="p">[</span><span class="n">personas</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;username&quot;</span><span class="p">]],</span>
+<span class="p">)</span>
+
+<span class="n">it</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">conv</span><span class="p">)</span>  <span class="c1"># one-time setup happens here</span>
+
+<span class="n">first_entry</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;First speaker: &quot;</span><span class="p">,</span> <span class="n">first_entry</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Their message: &quot;</span><span class="p">,</span> <span class="n">first_entry</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">],</span> <span class="s2">&quot;...&quot;</span><span class="p">)</span>
+
+<span class="n">second_entry</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Second speaker:&quot;</span><span class="p">,</span> <span class="n">second_entry</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Their message: &quot;</span><span class="p">,</span> <span class="n">second_entry</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">],</span> <span class="s2">&quot;...&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>First speaker:  Gwx31
+Their message:  Oh, wow, that&#39;s quite a statement! I can understand where you&#39;re coming from. Sometimes sitting for long periods can be really uncomfortable, especially if you have a job that requires a lot of sitting. As a nurse, I can relate to the physical strain it can put on your body. Maybe finding ways to move around more or using ergonomic chairs could help make things a bit better? What inspired your dislike of chairs specifically? ...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Second speaker: Giannis
+Their message:  As a game developer who spends most of my day in front of a screen, I can definitely relate to the discomfort that comes with prolonged sitting. However, my issue with chairs isn&#39;t necessarily about the physical discomfort—it&#39;s more about the idea of them as a societal norm and the expectations they impose. Chairs often symbolize a certain level of formality and permanence in our workspaces, which can feel restrictive. Plus, there&#39;s something about the fluidity of movement that just feels more natural to ...
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="using-a-for-loop">
+<h3>Using a <code class="docutils literal notranslate"><span class="pre">for</span></code> loop<a class="headerlink" href="#using-a-for-loop" title="Link to this heading">#</a></h3>
+<p>The same iterator works directly in a <code class="docutils literal notranslate"><span class="pre">for</span></code> loop. Here we stop early if
+a particular word appears in an entry - something that is impossible with
+<code class="docutils literal notranslate"><span class="pre">begin()</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">turn_manager</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">QueueTurnManager</span><span class="p">(</span><span class="n">actors</span><span class="p">)</span>
+<span class="n">conv</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">Discussion</span><span class="p">(</span>
+    <span class="n">next_turn_manager</span><span class="o">=</span><span class="n">turn_manager</span><span class="p">,</span>
+    <span class="n">users</span><span class="o">=</span><span class="n">actors</span><span class="p">,</span>
+    <span class="n">conv_len</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">seed_opinions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;I hate the concept of chairs.&quot;</span><span class="p">],</span>
+    <span class="n">seed_opinion_usernames</span><span class="o">=</span><span class="p">[</span><span class="n">personas</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;username&quot;</span><span class="p">]],</span>
+<span class="p">)</span>
+
+<span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">conv</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Turns completed so far: </span><span class="si">{</span><span class="n">conv</span><span class="o">.</span><span class="n">_steps_taken</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Oh, wow, that&#39;s quite a statement! I can understand where you&#39;re coming from. Sometimes sitting for long periods can be really uncomfortable, especially if you have a job that requires a lot of sitting. As a nurse, I can relate to the physical strain it can put on your body. Maybe finding ways to move around more or using ergonomic chairs could help make things a bit better? What inspired your dislike of chairs specifically?
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>As a game developer who spends most of my day in front of a screen, I can definitely relate to the discomfort that comes with prolonged sitting. However, my issue with chairs isn&#39;t necessarily about the physical discomfort—it&#39;s more about the idea of them as a societal norm and the expectations they impose. Chairs often symbolize a certain level of formality and permanence in our workspaces, which can feel restrictive. Plus, there&#39;s something about the fluidity of movement that just feels more natural to
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>As Kimya, I might respond with something like this:
+
+&quot;Interesting perspectives here! While I can see how sitting for long periods can be physically taxing, I must admit that I share some of Giannis&#39;s sentiments about chairs. They do seem to represent a certain rigidity in our work environments. For me, though, it&#39;s more about the strict adherence to traditional office norms. It feels like we&#39;re expected to sit still and be productive, even if it&#39;s not the most comfortable or effective
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Wow, those are some really interesting points! As a registered nurse, I can definitely see how the idea of chairs can be seen as restrictive and formal, especially when you&#39;re used to moving around a lot. It&#39;s funny how something as simple as a chair can have such a big impact on how we perceive our work environment. For me, it&#39;s all about finding balance between comfort and productivity. Sometimes, I find myself wishing for a bit more flexibility in my workspace, but at the same time
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Thanks for the insightful comments, everyone! It’s great to hear different perspectives on this topic. As a game developer, I often find myself in a similar mindset—chairs can feel like a symbol of a rigid structure that doesn’t always align with the creative and dynamic nature of our work. On one hand, they provide a sense of stability and focus, but on the other hand, they can also feel confining.
+
+For me, it’s about finding that balance between the need for comfort and
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>As Kimya, I might respond with something like this:
+
+&quot;Thank you for the thoughtful responses, everyone! It’s fascinating to hear how different professions can bring unique insights into the role of chairs in our daily lives. Gwx31, your experience as a nurse certainly sheds light on the physical aspects of prolonged sitting, and I appreciate your suggestions about moving around more or using ergonomic chairs. 
+
+Giannis, your perspective as a game developer is spot-on. The idea of chairs as symbols of
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Thank you, Giannis, for sharing your thoughts! It’s interesting to see how different roles can influence our perceptions of the workplace environment. As a registered nurse, I often find myself moving from patient to patient, so the idea of being tied to a single chair for extended periods can be challenging. It’s great to hear that others are also looking for ways to balance comfort and productivity. Kimya, your response resonated with me too; it’s not just about the physical aspect but also the
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Thanks for the kind words, everyone! It’s always interesting to see how different professions approach the same concept from various angles. Kimya, I completely agree with you about the physical aspect and the importance of ergonomics. For me, as a game developer, it’s not just about the physical comfort but also about maintaining a focused and creative state. Gwx31, your experience as a nurse really highlights the need for movement and flexibility in the workplace. It’s great to see that even
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Thank you for the kind words, everyone! It&#39;s indeed fascinating to see how different professions can bring unique insights into the role of chairs in our daily lives. Gwx31, your experience as a nurse truly highlights the physical demands of the job and the importance of finding ways to move around and stay comfortable throughout the day. Giannis, your perspective as a game developer is spot-on—chairs do serve as a symbol of structure, but they also play a crucial role in helping us maintain
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Thank you all for the kind words and for sharing such insightful perspectives! It’s amazing how different professions can offer such varied insights into the role of chairs in our daily lives. As a registered nurse, I can definitely relate to both the physical and mental aspects of working in a chair for long periods. It’s great to see that others are also thinking about how to balance comfort and productivity.
+
+For me, as a nurse, the physical demands of the job mean that finding ways to move around and stay
+
+Turns completed so far: 10
+</pre></div>
+</div>
+</div>
+</div>
+<p>Congratulations, you can now run fully synthetic discussions! You may want to experiment with adding more than 2 users or testing more realistic turn taking procedures (for example, check out the <code class="docutils literal notranslate"><span class="pre">RandomWeighted</span></code> turn manager).</p>
+</section>
+</section>
+<section id="working-with-logs">
+<h2>Working with <code class="docutils literal notranslate"><span class="pre">Logs</span></code><a class="headerlink" href="#working-with-logs" title="Link to this heading">#</a></h2>
+<p>All log state is held in <code class="docutils literal notranslate"><span class="pre">Discussion.logs</span></code>, an instance of <code class="docutils literal notranslate"><span class="pre">Logs</span></code>.
+This object supports the standard sequence interface, so you can index,
+slice, and iterate over it directly - no need to call <code class="docutils literal notranslate"><span class="pre">to_dict()</span></code> just to
+inspect entries.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">logs</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_logs</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total entries : </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">logs</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;First entry   : </span><span class="si">{</span><span class="n">logs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Last entry    : </span><span class="si">{</span><span class="n">logs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="c1"># Iterate directly — each item is a dict with &#39;name&#39;, &#39;text&#39;, &#39;model&#39;</span>
+<span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">logs</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">][:</span><span class="mi">60</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total entries : 11
+First entry   : {&#39;name&#39;: &#39;Gwx31&#39;, &#39;text&#39;: &#39;I hate the concept of chairs.&#39;, &#39;model&#39;: &#39;hardcoded&#39;, &#39;prompt&#39;: &#39;{&quot;context&quot;: &quot;&quot;, &quot;instructions&quot;: &quot;&quot;, &quot;type&quot;: &quot;user&quot;, &quot;persona&quot;: {}}&#39;}
+Last entry    : {&#39;name&#39;: &#39;Gwx31&#39;, &#39;text&#39;: &#39;Thank you all for the kind words and for sharing such insightful perspectives! It’s amazing how different professions can offer such varied insights into the role of chairs in our daily lives. As a registered nurse, I can definitely relate to both the physical and mental aspects of working in a chair for long periods. It’s great to see that others are also thinking about how to balance comfort and productivity.\n\nFor me, as a nurse, the physical demands of the job mean that finding ways to move around and stay&#39;, &#39;model&#39;: &#39;test_model&#39;, &#39;prompt&#39;: &#39;{&quot;context&quot;: &quot;You are taking part in an online conversation&quot;, &quot;instructions&quot;: &quot;Act like a human would&quot;, &quot;type&quot;: &quot;user&quot;, &quot;persona&quot;: {&quot;username&quot;: &quot;Gwx31&quot;, &quot;age&quot;: 38, &quot;sex&quot;: &quot;female&quot;, &quot;education_level&quot;: &quot;Bachelor\&#39;s&quot;, &quot;sexual_orientation&quot;: &quot;Heterosexual&quot;, &quot;demographic_group&quot;: &quot;Latino&quot;, &quot;current_employment&quot;: &quot;Registered Nurse&quot;, &quot;personality_characteristics&quot;: [&quot;compassionate&quot;, &quot;patient&quot;, &quot;diligent&quot;, &quot;overwhelmed&quot;]}}&#39;}
+
+[Gwx31] I hate the concept of chairs....
+[Gwx31] Oh, wow, that&#39;s quite a statement! I can understand where yo...
+[Giannis] As a game developer who spends most of my day in front of a ...
+[Kimya] As Kimya, I might respond with something like this:
+
+&quot;Intere...
+[Gwx31] Wow, those are some really interesting points! As a register...
+[Giannis] Thanks for the insightful comments, everyone! It’s great to ...
+[Kimya] As Kimya, I might respond with something like this:
+
+&quot;Thank ...
+[Gwx31] Thank you, Giannis, for sharing your thoughts! It’s interest...
+[Giannis] Thanks for the kind words, everyone! It’s always interesting...
+[Kimya] Thank you for the kind words, everyone! It&#39;s indeed fascinat...
+[Gwx31] Thank you all for the kind words and for sharing such insigh...
+</pre></div>
+</div>
+</div>
+</div>
+<section id="exporting-and-importing-discussions-with-logs">
+<h3>Exporting and importing discussions with <code class="docutils literal notranslate"><span class="pre">Logs</span></code><a class="headerlink" href="#exporting-and-importing-discussions-with-logs" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+
+
+<span class="n">tp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;.json&quot;</span><span class="p">,</span> <span class="n">delete</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">logs</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_logs</span><span class="p">()</span>
+<span class="n">logs</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{
+    &quot;timestamp&quot;: &quot;26-07-07-16-37&quot;,
+    &quot;logs&quot;: [
+        {
+            &quot;name&quot;: &quot;Gwx31&quot;,
+            &quot;text&quot;: &quot;I hate the concept of chairs.&quot;,
+            &quot;model&quot;: &quot;hardcoded&quot;,
+            &quot;prompt&quot;: &quot;{\&quot;context\&quot;: \&quot;\&quot;, \&quot;instructions\&quot;: \&quot;\&quot;, \&quot;type\&quot;: \&quot;user\&quot;, \&quot;persona\&quot;: {}}&quot;
+        },
+        {
+            &quot;name&quot;: &quot;Gwx31&quot;,
+            &quot;text&quot;: &quot;Oh, wow, that&#39;s quite a statement! I can understand where you&#39;re coming from. Sometimes sitting for long periods can be really uncomfortable, especially if you have a job that requires a lot of sitting. As a nurse, I can relate to the physical strain it can put on your body. Maybe finding ways to move around more or using ergonomic chairs could help make things a bit better? What inspired your dislike of chairs specifically?&quot;,
+            &quot;model&quot;: &quot;test_model&quot;,
+            &quot;prompt&quot;: &quot;{\&quot;context\&quot;: \&quot;You are taking part in an online conversation\&quot;, \&quot;instructions\&quot;: \&quot;Act like a human would\&quot;, \&quot;type\&quot;: \&quot;user\&quot;, \&quot;persona\&quot;: {\&quot;username\&quot;: \&quot;Gwx31\&quot;, \&quot;age\&quot;: 38, \&quot;sex\&quot;: \&quot;female\&quot;, \&quot;education_level\&quot;: \&quot;Bachelor&#39;s\&quot;, \&quot;sexual_orientation\&quot;: \&quot;Heterosexual\&quot;, \&quot;demographic_group\&quot;: \&quot;Latino\&quot;, \&quot;current_employment\&quot;: \&quot;Registered Nurse\&quot;, \&quot;personality_characteristics\&quot;: [\&quot;compassionate\&quot;, \&quot;patient\&quot;, \&quot;diligent\&quot;, \&quot;overwhelmed\&quot;]}}&quot;
+        },
+        {
+            &quot;name&quot;: &quot;Giannis&quot;,
+            &quot;text&quot;: &quot;As a game developer who spends most of my day in front of a screen, I can definitely relate to the discomfort that comes with prolonged sitting. However, my issue with chairs isn&#39;t necessarily about the physical discomfort\u2014it&#39;s more about the idea of them as a societal norm and the expectations they impose. Chairs often symbolize a certain level of formality and permanence in our workspaces, which can feel restrictive. Plus, there&#39;s something about the fluidity of movement that just feels more natural to&quot;,
+            &quot;model&quot;: &quot;test_model&quot;,
+            &quot;prompt&quot;: &quot;{\&quot;context\&quot;: \&quot;You are taking part in an online conversation\&quot;, \&quot;instructions\&quot;: \&quot;Act like a human would\&quot;, \&quot;type\&quot;: \&quot;user\&quot;, \&quot;persona\&quot;: {\&quot;username\&quot;: \&quot;Giannis\&quot;, \&quot;age\&quot;: 21, \&quot;sex\&quot;: \&quot;male\&quot;, \&quot;education_level\&quot;: \&quot;College\&quot;, \&quot;sexual_orientation\&quot;: \&quot;Pansexual\&quot;, \&quot;demographic_group\&quot;: \&quot;White\&quot;, \&quot;current_employment\&quot;: \&quot;Game Developer\&quot;, \&quot;personality_characteristics\&quot;: [\&quot;strategic\&quot;, \&quot;meticulous\&quot;, \&quot;nerdy\&quot;, \&quot;hyper-focused\&quot;]}}&quot;
+        },
+        {
+            &quot;name&quot;: &quot;Kimya&quot;,
+            &quot;text&quot;: &quot;As Kimya, I might respond with something like this:\n\n\&quot;Interesting perspectives here! While I can see how sitting for long periods can be physically taxing, I must admit that I share some of Giannis&#39;s sentiments about chairs. They do seem to represent a certain rigidity in our work environments. For me, though, it&#39;s more about the strict adherence to traditional office norms. It feels like we&#39;re expected to sit still and be productive, even if it&#39;s not the most comfortable or effective&quot;,
+            &quot;model&quot;: &quot;test_model&quot;,
+            &quot;prompt&quot;: &quot;{\&quot;context\&quot;: \&quot;You are taking part in an online conversation\&quot;, \&quot;instructions\&quot;: \&quot;Act like a human would\&quot;, \&quot;type\&quot;: \&quot;user\&quot;, \&quot;persona\&quot;: {\&quot;username\&quot;: \&quot;Kimya\&quot;, \&quot;age\&quot;: 67, \&quot;sex\&quot;: \&quot;female\&quot;, \&quot;education_level\&quot;: \&quot;PhD\&quot;, \&quot;sexual_orientation\&quot;: \&quot;Heterosexual\&quot;, \&quot;demographic_group\&quot;: \&quot;White\&quot;, \&quot;personality_characteristics\&quot;: [\&quot;strict\&quot;, \&quot;grumpy\&quot;]}}&quot;
+        },
+        {
+            &quot;name&quot;: &quot;Gwx31&quot;,
+            &quot;text&quot;: &quot;Wow, those are some really interesting points! As a registered nurse, I can definitely see how the idea of chairs can be seen as restrictive and formal, especially when you&#39;re used to moving around a lot. It&#39;s funny how something as simple as a chair can have such a big impact on how we perceive our work environment. For me, it&#39;s all about finding balance between comfort and productivity. Sometimes, I find myself wishing for a bit more flexibility in my workspace, but at the same time&quot;,
+            &quot;model&quot;: &quot;test_model&quot;,
+            &quot;prompt&quot;: &quot;{\&quot;context\&quot;: \&quot;You are taking part in an online conversation\&quot;, \&quot;instructions\&quot;: \&quot;Act like a human would\&quot;, \&quot;type\&quot;: \&quot;user\&quot;, \&quot;persona\&quot;: {\&quot;username\&quot;: \&quot;Gwx31\&quot;, \&quot;age\&quot;: 38, \&quot;sex\&quot;: \&quot;female\&quot;, \&quot;education_level\&quot;: \&quot;Bachelor&#39;s\&quot;, \&quot;sexual_orientation\&quot;: \&quot;Heterosexual\&quot;, \&quot;demographic_group\&quot;: \&quot;Latino\&quot;, \&quot;current_employment\&quot;: \&quot;Registered Nurse\&quot;, \&quot;personality_characteristics\&quot;: [\&quot;compassionate\&quot;, \&quot;patient\&quot;, \&quot;diligent\&quot;, \&quot;overwhelmed\&quot;]}}&quot;
+        },
+        {
+            &quot;name&quot;: &quot;Giannis&quot;,
+            &quot;text&quot;: &quot;Thanks for the insightful comments, everyone! It\u2019s great to hear different perspectives on this topic. As a game developer, I often find myself in a similar mindset\u2014chairs can feel like a symbol of a rigid structure that doesn\u2019t always align with the creative and dynamic nature of our work. On one hand, they provide a sense of stability and focus, but on the other hand, they can also feel confining.\n\nFor me, it\u2019s about finding that balance between the need for comfort and&quot;,
+            &quot;model&quot;: &quot;test_model&quot;,
+            &quot;prompt&quot;: &quot;{\&quot;context\&quot;: \&quot;You are taking part in an online conversation\&quot;, \&quot;instructions\&quot;: \&quot;Act like a human would\&quot;, \&quot;type\&quot;: \&quot;user\&quot;, \&quot;persona\&quot;: {\&quot;username\&quot;: \&quot;Giannis\&quot;, \&quot;age\&quot;: 21, \&quot;sex\&quot;: \&quot;male\&quot;, \&quot;education_level\&quot;: \&quot;College\&quot;, \&quot;sexual_orientation\&quot;: \&quot;Pansexual\&quot;, \&quot;demographic_group\&quot;: \&quot;White\&quot;, \&quot;current_employment\&quot;: \&quot;Game Developer\&quot;, \&quot;personality_characteristics\&quot;: [\&quot;strategic\&quot;, \&quot;meticulous\&quot;, \&quot;nerdy\&quot;, \&quot;hyper-focused\&quot;]}}&quot;
+        },
+        {
+            &quot;name&quot;: &quot;Kimya&quot;,
+            &quot;text&quot;: &quot;As Kimya, I might respond with something like this:\n\n\&quot;Thank you for the thoughtful responses, everyone! It\u2019s fascinating to hear how different professions can bring unique insights into the role of chairs in our daily lives. Gwx31, your experience as a nurse certainly sheds light on the physical aspects of prolonged sitting, and I appreciate your suggestions about moving around more or using ergonomic chairs. \n\nGiannis, your perspective as a game developer is spot-on. The idea of chairs as symbols of&quot;,
+            &quot;model&quot;: &quot;test_model&quot;,
+            &quot;prompt&quot;: &quot;{\&quot;context\&quot;: \&quot;You are taking part in an online conversation\&quot;, \&quot;instructions\&quot;: \&quot;Act like a human would\&quot;, \&quot;type\&quot;: \&quot;user\&quot;, \&quot;persona\&quot;: {\&quot;username\&quot;: \&quot;Kimya\&quot;, \&quot;age\&quot;: 67, \&quot;sex\&quot;: \&quot;female\&quot;, \&quot;education_level\&quot;: \&quot;PhD\&quot;, \&quot;sexual_orientation\&quot;: \&quot;Heterosexual\&quot;, \&quot;demographic_group\&quot;: \&quot;White\&quot;, \&quot;personality_characteristics\&quot;: [\&quot;strict\&quot;, \&quot;grumpy\&quot;]}}&quot;
+        },
+        {
+            &quot;name&quot;: &quot;Gwx31&quot;,
+            &quot;text&quot;: &quot;Thank you, Giannis, for sharing your thoughts! It\u2019s interesting to see how different roles can influence our perceptions of the workplace environment. As a registered nurse, I often find myself moving from patient to patient, so the idea of being tied to a single chair for extended periods can be challenging. It\u2019s great to hear that others are also looking for ways to balance comfort and productivity. Kimya, your response resonated with me too; it\u2019s not just about the physical aspect but also the&quot;,
+            &quot;model&quot;: &quot;test_model&quot;,
+            &quot;prompt&quot;: &quot;{\&quot;context\&quot;: \&quot;You are taking part in an online conversation\&quot;, \&quot;instructions\&quot;: \&quot;Act like a human would\&quot;, \&quot;type\&quot;: \&quot;user\&quot;, \&quot;persona\&quot;: {\&quot;username\&quot;: \&quot;Gwx31\&quot;, \&quot;age\&quot;: 38, \&quot;sex\&quot;: \&quot;female\&quot;, \&quot;education_level\&quot;: \&quot;Bachelor&#39;s\&quot;, \&quot;sexual_orientation\&quot;: \&quot;Heterosexual\&quot;, \&quot;demographic_group\&quot;: \&quot;Latino\&quot;, \&quot;current_employment\&quot;: \&quot;Registered Nurse\&quot;, \&quot;personality_characteristics\&quot;: [\&quot;compassionate\&quot;, \&quot;patient\&quot;, \&quot;diligent\&quot;, \&quot;overwhelmed\&quot;]}}&quot;
+        },
+        {
+            &quot;name&quot;: &quot;Giannis&quot;,
+            &quot;text&quot;: &quot;Thanks for the kind words, everyone! It\u2019s always interesting to see how different professions approach the same concept from various angles. Kimya, I completely agree with you about the physical aspect and the importance of ergonomics. For me, as a game developer, it\u2019s not just about the physical comfort but also about maintaining a focused and creative state. Gwx31, your experience as a nurse really highlights the need for movement and flexibility in the workplace. It\u2019s great to see that even&quot;,
+            &quot;model&quot;: &quot;test_model&quot;,
+            &quot;prompt&quot;: &quot;{\&quot;context\&quot;: \&quot;You are taking part in an online conversation\&quot;, \&quot;instructions\&quot;: \&quot;Act like a human would\&quot;, \&quot;type\&quot;: \&quot;user\&quot;, \&quot;persona\&quot;: {\&quot;username\&quot;: \&quot;Giannis\&quot;, \&quot;age\&quot;: 21, \&quot;sex\&quot;: \&quot;male\&quot;, \&quot;education_level\&quot;: \&quot;College\&quot;, \&quot;sexual_orientation\&quot;: \&quot;Pansexual\&quot;, \&quot;demographic_group\&quot;: \&quot;White\&quot;, \&quot;current_employment\&quot;: \&quot;Game Developer\&quot;, \&quot;personality_characteristics\&quot;: [\&quot;strategic\&quot;, \&quot;meticulous\&quot;, \&quot;nerdy\&quot;, \&quot;hyper-focused\&quot;]}}&quot;
+        },
+        {
+            &quot;name&quot;: &quot;Kimya&quot;,
+            &quot;text&quot;: &quot;Thank you for the kind words, everyone! It&#39;s indeed fascinating to see how different professions can bring unique insights into the role of chairs in our daily lives. Gwx31, your experience as a nurse truly highlights the physical demands of the job and the importance of finding ways to move around and stay comfortable throughout the day. Giannis, your perspective as a game developer is spot-on\u2014chairs do serve as a symbol of structure, but they also play a crucial role in helping us maintain&quot;,
+            &quot;model&quot;: &quot;test_model&quot;,
+            &quot;prompt&quot;: &quot;{\&quot;context\&quot;: \&quot;You are taking part in an online conversation\&quot;, \&quot;instructions\&quot;: \&quot;Act like a human would\&quot;, \&quot;type\&quot;: \&quot;user\&quot;, \&quot;persona\&quot;: {\&quot;username\&quot;: \&quot;Kimya\&quot;, \&quot;age\&quot;: 67, \&quot;sex\&quot;: \&quot;female\&quot;, \&quot;education_level\&quot;: \&quot;PhD\&quot;, \&quot;sexual_orientation\&quot;: \&quot;Heterosexual\&quot;, \&quot;demographic_group\&quot;: \&quot;White\&quot;, \&quot;personality_characteristics\&quot;: [\&quot;strict\&quot;, \&quot;grumpy\&quot;]}}&quot;
+        },
+        {
+            &quot;name&quot;: &quot;Gwx31&quot;,
+            &quot;text&quot;: &quot;Thank you all for the kind words and for sharing such insightful perspectives! It\u2019s amazing how different professions can offer such varied insights into the role of chairs in our daily lives. As a registered nurse, I can definitely relate to both the physical and mental aspects of working in a chair for long periods. It\u2019s great to see that others are also thinking about how to balance comfort and productivity.\n\nFor me, as a nurse, the physical demands of the job mean that finding ways to move around and stay&quot;,
+            &quot;model&quot;: &quot;test_model&quot;,
+            &quot;prompt&quot;: &quot;{\&quot;context\&quot;: \&quot;You are taking part in an online conversation\&quot;, \&quot;instructions\&quot;: \&quot;Act like a human would\&quot;, \&quot;type\&quot;: \&quot;user\&quot;, \&quot;persona\&quot;: {\&quot;username\&quot;: \&quot;Gwx31\&quot;, \&quot;age\&quot;: 38, \&quot;sex\&quot;: \&quot;female\&quot;, \&quot;education_level\&quot;: \&quot;Bachelor&#39;s\&quot;, \&quot;sexual_orientation\&quot;: \&quot;Heterosexual\&quot;, \&quot;demographic_group\&quot;: \&quot;Latino\&quot;, \&quot;current_employment\&quot;: \&quot;Registered Nurse\&quot;, \&quot;personality_characteristics\&quot;: [\&quot;compassionate\&quot;, \&quot;patient\&quot;, \&quot;diligent\&quot;, \&quot;overwhelmed\&quot;]}}&quot;
+        }
+    ]
+}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">logs2</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">Logs</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">logs2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{
+    &quot;timestamp&quot;: &quot;26-07-07-16-37&quot;,
+    &quot;logs&quot;: [
+        {
+            &quot;name&quot;: &quot;Gwx31&quot;,
+            &quot;text&quot;: &quot;I hate the concept of chairs.&quot;,
+            &quot;model&quot;: &quot;hardcoded&quot;,
+            &quot;prompt&quot;: &quot;&quot;
+        },
+        {
+            &quot;name&quot;: &quot;Gwx31&quot;,
+            &quot;text&quot;: &quot;Oh, wow, that&#39;s quite a statement! I can understand where you&#39;re coming from. Sometimes sitting for long periods can be really uncomfortable, especially if you have a job that requires a lot of sitting. As a nurse, I can relate to the physical strain it can put on your body. Maybe finding ways to move around more or using ergonomic chairs could help make things a bit better? What inspired your dislike of chairs specifically?&quot;,
+            &quot;model&quot;: &quot;test_model&quot;,
+            &quot;prompt&quot;: &quot;&quot;
+        },
+        {
+            &quot;name&quot;: &quot;Giannis&quot;,
+            &quot;text&quot;: &quot;As a game developer who spends most of my day in front of a screen, I can definitely relate to the discomfort that comes with prolonged sitting. However, my issue with chairs isn&#39;t necessarily about the physical discomfort\u2014it&#39;s more about the idea of them as a societal norm and the expectations they impose. Chairs often symbolize a certain level of formality and permanence in our workspaces, which can feel restrictive. Plus, there&#39;s something about the fluidity of movement that just feels more natural to&quot;,
+            &quot;model&quot;: &quot;test_model&quot;,
+            &quot;prompt&quot;: &quot;&quot;
+        },
+        {
+            &quot;name&quot;: &quot;Kimya&quot;,
+            &quot;text&quot;: &quot;As Kimya, I might respond with something like this:\n\n\&quot;Interesting perspectives here! While I can see how sitting for long periods can be physically taxing, I must admit that I share some of Giannis&#39;s sentiments about chairs. They do seem to represent a certain rigidity in our work environments. For me, though, it&#39;s more about the strict adherence to traditional office norms. It feels like we&#39;re expected to sit still and be productive, even if it&#39;s not the most comfortable or effective&quot;,
+            &quot;model&quot;: &quot;test_model&quot;,
+            &quot;prompt&quot;: &quot;&quot;
+        },
+        {
+            &quot;name&quot;: &quot;Gwx31&quot;,
+            &quot;text&quot;: &quot;Wow, those are some really interesting points! As a registered nurse, I can definitely see how the idea of chairs can be seen as restrictive and formal, especially when you&#39;re used to moving around a lot. It&#39;s funny how something as simple as a chair can have such a big impact on how we perceive our work environment. For me, it&#39;s all about finding balance between comfort and productivity. Sometimes, I find myself wishing for a bit more flexibility in my workspace, but at the same time&quot;,
+            &quot;model&quot;: &quot;test_model&quot;,
+            &quot;prompt&quot;: &quot;&quot;
+        },
+        {
+            &quot;name&quot;: &quot;Giannis&quot;,
+            &quot;text&quot;: &quot;Thanks for the insightful comments, everyone! It\u2019s great to hear different perspectives on this topic. As a game developer, I often find myself in a similar mindset\u2014chairs can feel like a symbol of a rigid structure that doesn\u2019t always align with the creative and dynamic nature of our work. On one hand, they provide a sense of stability and focus, but on the other hand, they can also feel confining.\n\nFor me, it\u2019s about finding that balance between the need for comfort and&quot;,
+            &quot;model&quot;: &quot;test_model&quot;,
+            &quot;prompt&quot;: &quot;&quot;
+        },
+        {
+            &quot;name&quot;: &quot;Kimya&quot;,
+            &quot;text&quot;: &quot;As Kimya, I might respond with something like this:\n\n\&quot;Thank you for the thoughtful responses, everyone! It\u2019s fascinating to hear how different professions can bring unique insights into the role of chairs in our daily lives. Gwx31, your experience as a nurse certainly sheds light on the physical aspects of prolonged sitting, and I appreciate your suggestions about moving around more or using ergonomic chairs. \n\nGiannis, your perspective as a game developer is spot-on. The idea of chairs as symbols of&quot;,
+            &quot;model&quot;: &quot;test_model&quot;,
+            &quot;prompt&quot;: &quot;&quot;
+        },
+        {
+            &quot;name&quot;: &quot;Gwx31&quot;,
+            &quot;text&quot;: &quot;Thank you, Giannis, for sharing your thoughts! It\u2019s interesting to see how different roles can influence our perceptions of the workplace environment. As a registered nurse, I often find myself moving from patient to patient, so the idea of being tied to a single chair for extended periods can be challenging. It\u2019s great to hear that others are also looking for ways to balance comfort and productivity. Kimya, your response resonated with me too; it\u2019s not just about the physical aspect but also the&quot;,
+            &quot;model&quot;: &quot;test_model&quot;,
+            &quot;prompt&quot;: &quot;&quot;
+        },
+        {
+            &quot;name&quot;: &quot;Giannis&quot;,
+            &quot;text&quot;: &quot;Thanks for the kind words, everyone! It\u2019s always interesting to see how different professions approach the same concept from various angles. Kimya, I completely agree with you about the physical aspect and the importance of ergonomics. For me, as a game developer, it\u2019s not just about the physical comfort but also about maintaining a focused and creative state. Gwx31, your experience as a nurse really highlights the need for movement and flexibility in the workplace. It\u2019s great to see that even&quot;,
+            &quot;model&quot;: &quot;test_model&quot;,
+            &quot;prompt&quot;: &quot;&quot;
+        },
+        {
+            &quot;name&quot;: &quot;Kimya&quot;,
+            &quot;text&quot;: &quot;Thank you for the kind words, everyone! It&#39;s indeed fascinating to see how different professions can bring unique insights into the role of chairs in our daily lives. Gwx31, your experience as a nurse truly highlights the physical demands of the job and the importance of finding ways to move around and stay comfortable throughout the day. Giannis, your perspective as a game developer is spot-on\u2014chairs do serve as a symbol of structure, but they also play a crucial role in helping us maintain&quot;,
+            &quot;model&quot;: &quot;test_model&quot;,
+            &quot;prompt&quot;: &quot;&quot;
+        },
+        {
+            &quot;name&quot;: &quot;Gwx31&quot;,
+            &quot;text&quot;: &quot;Thank you all for the kind words and for sharing such insightful perspectives! It\u2019s amazing how different professions can offer such varied insights into the role of chairs in our daily lives. As a registered nurse, I can definitely relate to both the physical and mental aspects of working in a chair for long periods. It\u2019s great to see that others are also thinking about how to balance comfort and productivity.\n\nFor me, as a nurse, the physical demands of the job mean that finding ways to move around and stay&quot;,
+            &quot;model&quot;: &quot;test_model&quot;,
+            &quot;prompt&quot;: &quot;&quot;
+        }
+    ]
+}
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="creating-hard-coded-logs">
+<h3>Creating hard-coded logs<a class="headerlink" href="#creating-hard-coded-logs" title="Link to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">Logs</span></code> class also enables you to hardcode the data inside. This would be useful for example if you want to use <code class="docutils literal notranslate"><span class="pre">syndisco</span></code>’s annotation on data that were not generated by the <code class="docutils literal notranslate"><span class="pre">Discussion</span></code> API (see next guide).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Alice&quot;</span><span class="p">]</span>
+<span class="n">texts</span><span class="o">=</span><span class="p">[</span>
+    <span class="s2">&quot;What do you think about the new policy?&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Honestly, I think it goes too far.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;I can see that perspective, though I&#39;m not sure I agree.&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">handcrafted</span> <span class="o">=</span> <span class="n">syndisco</span><span class="o">.</span><span class="n">Logs</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">text</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">texts</span><span class="p">):</span>
+    <span class="n">handcrafted</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">handcrafted</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{
+    &quot;timestamp&quot;: &quot;26-07-07-16-37&quot;,
+    &quot;logs&quot;: [
+        {
+            &quot;name&quot;: &quot;Alice&quot;,
+            &quot;text&quot;: &quot;What do you think about the new policy?&quot;,
+            &quot;model&quot;: &quot;hardcoded&quot;,
+            &quot;prompt&quot;: &quot;&quot;
+        },
+        {
+            &quot;name&quot;: &quot;Bob&quot;,
+            &quot;text&quot;: &quot;Honestly, I think it goes too far.&quot;,
+            &quot;model&quot;: &quot;hardcoded&quot;,
+            &quot;prompt&quot;: &quot;&quot;
+        },
+        {
+            &quot;name&quot;: &quot;Alice&quot;,
+            &quot;text&quot;: &quot;I can see that perspective, though I&#39;m not sure I agree.&quot;,
+            &quot;model&quot;: &quot;hardcoded&quot;,
+            &quot;prompt&quot;: &quot;&quot;
+        }
+    ]
+}
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../guides.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Guides</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="creating_annotations.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Generating Synthetic Annotations</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#basics">Basics</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-model">The Model</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-personas">Creating personas</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-the-user-agents">Creating the user-agents</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#managing-turn-taking">Managing turn-taking</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generating-a-discussion">Generating a discussion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#driving-a-discussion-step-by-step">Driving a discussion step by step</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#calling-next-manually">Calling <code class="docutils literal notranslate"><span class="pre">next()</span></code> manually</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#using-a-for-loop">Using a <code class="docutils literal notranslate"><span class="pre">for</span></code> loop</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#working-with-logs">Working with <code class="docutils literal notranslate"><span class="pre">Logs</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exporting-and-importing-discussions-with-logs">Exporting and importing discussions with <code class="docutils literal notranslate"><span class="pre">Logs</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-hard-coded-logs">Creating hard-coded logs</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Dimitris Tsirmpas
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026, Dimitris Tsirmpas.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

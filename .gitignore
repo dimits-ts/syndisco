@@ -1,5 +1,3 @@
-# don't include generated conversation input files
-generated/
 # don't include output from script invocations
 logs/
 # don't include LLM weights
@@ -11,9 +9,13 @@ models/
 devenv
 
 # sphinx
-sphinx/source/
-docs/doctrees/
-docs/html/_sources
+jupyter_execute/
+.jupyter_cache/
+_sources/
+.doctrees/
+generated/
+reports/
+.buildinfo
 
 .idea/
 
@@ -30,7 +32,6 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-build/
 develop-eggs/
 dist/
 downloads/
