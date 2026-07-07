@@ -19,11 +19,9 @@
 Module handling logging for LLM discussion and annotation tasks.
 """
 
-import time
 import logging as pylog
 import typing
 import warnings
-import functools
 from pathlib import Path
 from logging.handlers import TimedRotatingFileHandler
 
