@@ -14,6 +14,7 @@
     version: "",
     showPrompts: false,
     stripPromptsOnDownload: false,
+    highlightMentions: false,
     defaultGroupBy: "auto",
     defaultSort: "newest",
     rememberData: true,
@@ -43,6 +44,7 @@
     selectedId: null,
     showPrompts: false,
     strip: false,
+    highlightMentions: false,
     remember: true,
     timelineIndex: 0,
     importing: false,
@@ -129,6 +131,57 @@
 
   function messageColor(record, m) {
     return m.isSeed ? "var(--seed)" : speakerColors(record)[m.speaker];
+  }
+
+  // -------------------------------------------------------- mentions
+
+  /**
+   * A matcher that finds any participant's name written out in message
+   * text (no "@" or other marker required) and reports which speaker it
+   * belongs to, so it can be coloured to match. Built once per record
+   * and cached on it, since the set of names doesn't change.
+   *
+   * Matching is case-insensitive and requires a non-letter/digit
+   * boundary on both sides, so a short name doesn't light up inside an
+   * unrelated word. When several names could match at the same
+   * position (one name contains another), the longest wins.
+   */
+  function mentionMatcher(record) {
+    if (record._mentions !== undefined) return record._mentions;
+    var names = record.speakers.filter(function (n) { return n; });
+    if (!names.length) return (record._mentions = null);
+    var byLower = {};
+    names.forEach(function (n, i) { byLower[n.toLowerCase()] = i; });
+    var sorted = names.slice().sort(function (a, b) { return b.length - a.length; });
+    var pattern = sorted.map(escapeRegExp).join("|");
+    try {
+      var re = new RegExp("(?<![^\\W_])(?:" + pattern + ")(?![^\\W_])", "gi");
+      return (record._mentions = { re: re, indexOf: byLower });
+    } catch (e) {
+      // lookbehind not supported in this engine; skip the feature quietly
+      return (record._mentions = null);
+    }
+  }
+
+  /** Append text to parent, colouring any participant name found in it
+   * (if enabled) and highlighting search terms inside and outside of it. */
+  function appendMessageText(parent, text, record, terms) {
+    var matcher = state.highlightMentions ? mentionMatcher(record) : null;
+    if (!matcher) return appendHighlighted(parent, text, terms);
+    var re = matcher.re;
+    re.lastIndex = 0;
+    var last = 0, m;
+    while ((m = re.exec(text)) !== null) {
+      if (!m[0].length) { re.lastIndex++; continue; }
+      if (m.index > last) appendHighlighted(parent, text.slice(last, m.index), terms);
+      var idx = matcher.indexOf[m[0].toLowerCase()];
+      var span = h("span", { class: "mention", "--speaker": speakerColors(record)[idx] });
+      appendHighlighted(span, m[0], terms);
+      parent.appendChild(span);
+      last = m.index + m[0].length;
+    }
+    if (last < text.length) appendHighlighted(parent, text.slice(last), terms);
+    return parent;
   }
 
   /** The turn-order strip: one segment per message, merged when consecutive. */
@@ -877,7 +930,7 @@
         m.isSeed ? h("span", { class: "seed-badge", text: T.seedComment }) : (m.model ? h("span", { class: "message-model", text: m.model }) : null),
         h("span", { class: "message-index", text: String(i + 1), "aria-label": T.messageOf(i + 1, n) }),
       ]);
-      var text = appendHighlighted(h("div", { class: "message-text" }), m.text, state.terms);
+      var text = appendMessageText(h("div", { class: "message-text" }), m.text, r, state.terms);
       ol.appendChild(h("li", {
         id: "msg-" + i, class: "message" + (m.isSeed ? " is-seed" : ""), "--speaker": messageColor(r, m),
       }, [head, text, m.extra ? h("div", { class: "message-extra" }, [renderDl(m.extra)]) : null]));
@@ -1074,7 +1127,8 @@
     $("app-version").textContent = c.version || "";
     var text = {
       "btn-add-files": T.addFiles, "btn-add-folder": T.addFolder, "btn-options": T.options, "btn-clear": T.clearData,
-      "opt-prompts-label": T.showPrompts, "opt-strip-label": T.stripPrompts, "opt-strip-hint": T.stripPromptsHint,
+      "opt-prompts-label": T.showPrompts, "opt-mentions-label": T.highlightMentions,
+      "opt-strip-label": T.stripPrompts, "opt-strip-hint": T.stripPromptsHint,
       "opt-remember-label": T.rememberData, "search-label": T.searchLabel, "search-help": T.searchHelp,
       "group-label": T.groupBy, "sort-label": T.sortBy, "btn-download-results": T.downloadResults,
       "empty-title": T.emptyTitle, "empty-body": T.emptyBody, "empty-privacy": T.emptyPrivacy,
@@ -1086,6 +1140,7 @@
     var sort = clear($("sort-by"));
     Object.keys(T.sortOptions).forEach(function (k) { sort.appendChild(h("option", { value: k, text: T.sortOptions[k] })); });
     $("opt-prompts").checked = state.showPrompts;
+    $("opt-mentions").checked = state.highlightMentions;
     $("opt-strip").checked = state.strip;
     $("opt-remember").checked = state.remember;
     $("opt-remember").closest("label").hidden = !c.rememberData;
@@ -1115,6 +1170,7 @@
       if (e.key === "Escape" && !panel.hidden) { setOptions(false); optionsBtn.focus(); }
     });
     $("opt-prompts").addEventListener("change", function (e) { state.showPrompts = e.target.checked; renderDetail(); });
+    $("opt-mentions").addEventListener("change", function (e) { state.highlightMentions = e.target.checked; renderDetail(); });
     $("opt-strip").addEventListener("change", function (e) { state.strip = e.target.checked; });
     $("opt-remember").addEventListener("change", function (e) {
       state.remember = e.target.checked;
@@ -1201,6 +1257,16 @@
     return Promise.resolve();
   }
 
+  /** A yes/no URL query parameter: true/false, or undefined if absent or unrecognised. */
+  function boolParam(name) {
+    var raw = new URLSearchParams(location.search).get(name);
+    if (raw === null) return undefined;
+    raw = raw.toLowerCase();
+    if (["1", "true", "on", "yes"].indexOf(raw) >= 0) return true;
+    if (["0", "false", "off", "no"].indexOf(raw) >= 0) return false;
+    return undefined;
+  }
+
   function init() {
     bindEvents();
     searcher.start();
@@ -1208,6 +1274,9 @@
       state.config = Object.assign({}, DEFAULT_CONFIG, cfg || {});
       state.showPrompts = !!state.config.showPrompts;
       state.strip = !!state.config.stripPromptsOnDownload;
+      // "?mentions=" overrides config.json's default for this page only.
+      var mentionsParam = boolParam("mentions");
+      state.highlightMentions = mentionsParam !== undefined ? mentionsParam : !!state.config.highlightMentions;
       state.groupBy = state.config.defaultGroupBy || "auto";
       state.sort = SORTERS[state.config.defaultSort] ? state.config.defaultSort : "newest";
       applyStaticText();

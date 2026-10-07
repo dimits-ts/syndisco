@@ -32,6 +32,7 @@
     clearConfirm: "Close all discussions? Files on your computer are not affected.",
     options: "Options",
     showPrompts: "Show system prompts",
+    highlightMentions: "Highlight participant names mentioned in messages",
     stripPrompts: "Remove system prompts from downloads",
     stripPromptsHint: "Downloads keep the prompt field, left empty, so files still load in SynDisco.",
     rememberData: "Reopen these discussions next time",
