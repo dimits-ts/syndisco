@@ -24,6 +24,14 @@ import typing
 
 from . import __version__
 
+VERSION_STRING = """
+Syndisco {version}
+Copyright (C) 2026 Dimitris Tsirmpas
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+"""
+
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -31,7 +39,9 @@ def _build_parser() -> argparse.ArgumentParser:
         description="SynDisco command-line tools.",
     )
     parser.add_argument(
-        "--version", action="version", version=f"syndisco {__version__}"
+        "--version",
+        action="version",
+        version=VERSION_STRING.format(version=__version__),
     )
     commands = parser.add_subparsers(dest="command", metavar="command")
 
