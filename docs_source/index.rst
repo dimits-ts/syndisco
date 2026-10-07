@@ -44,6 +44,7 @@ Introduction
    overview
    installation
    guides
+   viewer
    api
 
 

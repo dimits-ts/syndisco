@@ -1,0 +1,10 @@
+{
+    "title": "SynDisco Viewer",
+    "showPrompts": false,
+    "stripPromptsOnDownload": false,
+    "defaultGroupBy": "auto",
+    "defaultSort": "newest",
+    "rememberData": true,
+    "pageSize": 100,
+    "datasetsIndex": "datasets/index.json"
+}

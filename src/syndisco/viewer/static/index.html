@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>SynDisco Viewer</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/viewer.css">
+  <script src="js/vendor/fflate.min.js" defer></script>
+  <script src="js/strings.js" defer></script>
+  <script src="js/search-core.js" defer></script>
+  <script src="js/data.js" defer></script>
+  <script src="js/app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#detail">Skip to discussion</a>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+      <h1 id="app-title">SynDisco Viewer</h1>
+      <span id="app-version" class="app-version"></span>
+    </div>
+    <p id="dataset-label" class="dataset-label" hidden></p>
+    <div class="topbar-actions">
+      <button type="button" id="btn-add-files" class="btn"></button>
+      <button type="button" id="btn-add-folder" class="btn"></button>
+      <div class="popover-wrap">
+        <button type="button" id="btn-options" class="btn" aria-expanded="false" aria-controls="options-panel"></button>
+        <div id="options-panel" class="popover" hidden>
+          <label class="switch-row">
+            <input type="checkbox" id="opt-prompts" role="switch">
+            <span id="opt-prompts-label"></span>
+          </label>
+          <label class="switch-row">
+            <input type="checkbox" id="opt-strip" role="switch">
+            <span>
+              <span id="opt-strip-label"></span>
+              <small id="opt-strip-hint" class="hint"></small>
+            </span>
+          </label>
+          <label class="switch-row">
+            <input type="checkbox" id="opt-remember" role="switch">
+            <span id="opt-remember-label"></span>
+          </label>
+        </div>
+      </div>
+      <button type="button" id="btn-clear" class="btn btn-quiet"></button>
+    </div>
+    <input type="file" id="input-files" multiple accept=".json,.zip,application/json,application/zip" hidden>
+    <input type="file" id="input-folder" webkitdirectory multiple hidden>
+  </header>
+
+  <div id="status" class="status" role="status" aria-live="polite" hidden></div>
+
+  <main id="layout" class="layout" hidden>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-controls">
+        <label for="search" id="search-label" class="visually-hidden"></label>
+        <input type="search" id="search" class="search" autocomplete="off" spellcheck="false" aria-describedby="search-help">
+        <p id="search-help" class="hint"></p>
+        <div class="control-row">
+          <label class="select-field">
+            <span id="group-label"></span>
+            <select id="group-by"></select>
+          </label>
+          <label class="select-field">
+            <span id="sort-label"></span>
+            <select id="sort-by"></select>
+          </label>
+        </div>
+        <details id="filters" class="filters">
+          <summary id="filters-summary"></summary>
+          <div id="filters-body" class="filters-body"></div>
+        </details>
+        <div class="results-bar">
+          <p id="results-count" class="results-count"></p>
+          <button type="button" id="btn-download-results" class="btn btn-small"></button>
+        </div>
+      </div>
+      <nav id="catalogue" class="catalogue" aria-labelledby="results-count"></nav>
+    </aside>
+
+    <section id="detail" class="detail" tabindex="-1" aria-live="off"></section>
+  </main>
+
+  <section id="empty" class="empty" hidden>
+    <div class="empty-inner">
+      <div class="empty-strip" aria-hidden="true"></div>
+      <h2 id="empty-title"></h2>
+      <p id="empty-body"></p>
+      <div class="empty-actions">
+        <button type="button" id="btn-empty-files" class="btn btn-primary"></button>
+        <button type="button" id="btn-empty-folder" class="btn"></button>
+      </div>
+      <p id="empty-privacy" class="hint"></p>
+      <div id="datasets" class="datasets" hidden>
+        <h3 id="datasets-title"></h3>
+        <ul id="datasets-list"></ul>
+      </div>
+    </div>
+  </section>
+
+  <div id="drop-overlay" class="drop-overlay" hidden><p id="drop-text"></p></div>
+</body>
+</html>
