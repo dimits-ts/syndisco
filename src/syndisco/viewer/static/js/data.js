@@ -15,6 +15,13 @@
   var CORE_TOP_KEYS = { logs: 1, timestamp: 1 };
   var SEED_MODEL = "hardcoded";
 
+  // Top-level keys seen in older, pre-Logs syndisco exports (sometimes
+  // called DiscussionLogs), which kept prompts separately instead of
+  // inline per message. The viewer doesn't read them; it only warns, so
+  // the person knows to convert the file instead of silently seeing no
+  // prompts. See scripts/migrate_legacy_logs.py.
+  var LEGACY_KEYS = ["user_prompts", "moderator_prompt", "users", "moderator"];
+
   // ---------------------------------------------------------------- dates
 
   function pad(n) { return (n < 10 ? "0" : "") + n; }
@@ -124,6 +131,11 @@
       });
     }
     if (missingModel) warnings.push(T.errNoModel);
+
+    var foundLegacyKeys = LEGACY_KEYS.filter(function (k) { return k in obj; });
+    if (foundLegacyKeys.length && !Object.keys(prompts).length) {
+      warnings.push(T.errLegacyFormat(foundLegacyKeys));
+    }
 
     var meta = {};
     for (var key in obj) {

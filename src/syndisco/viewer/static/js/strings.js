@@ -133,6 +133,11 @@
     errLogsNotList: '"logs" is not a list',
     errBadEntry: function (i) { return "message " + (i + 1) + " needs text fields \"name\" and \"text\""; },
     errNoModel: 'some messages have no "model" field, so SynDisco cannot reload this file',
+    errLegacyFormat: function (keys) {
+      return "This looks like an older SynDisco export (" + keys.join(", ") +
+        "), not today's format. Participants are shown, but system prompts are not. " +
+        "Convert it first with scripts/migrate_legacy_logs.py.";
+    },
     errDuplicate: "a file with the same path was already open; this one was renamed",
   };
 })(typeof self !== "undefined" ? self : this);
