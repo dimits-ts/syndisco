@@ -1,0 +1,99 @@
+# Publishes the documentation and SynDisco Viewer to GitHub Pages.
+#
+# The site is assembled from:
+#   docs/                         the pre-built Sphinx documentation (site root)
+#   src/syndisco/viewer/static/   the viewer (at /viewer/)
+#   viewer_datasets/              published datasets (at /viewer/datasets/)
+#
+# One-time setup: in the repository settings, under Pages, set "Source" to
+# "GitHub Actions". The documentation is not rebuilt here, because its
+# notebooks need models to execute; build it locally as before.
+name: Publish documentation and viewer
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "docs/**"
+      - "src/syndisco/viewer/static/**"
+      - "viewer_datasets/**"
+      - "pyproject.toml"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check that the viewer is packaged in the wheel
+        run: |
+          python -m pip install --quiet build
+          python -m build --wheel --outdir dist .
+          python - <<'PY'
+          import glob, zipfile
+          names = set(zipfile.ZipFile(glob.glob("dist/*.whl")[0]).namelist())
+          required = [
+              "syndisco/viewer/static/index.html",
+              "syndisco/viewer/static/js/app.js",
+              "syndisco/viewer/static/js/vendor/fflate.min.js",
+          ]
+          missing = [n for n in required if n not in names]
+          assert not missing, f"missing from wheel: {missing}"
+          print("Viewer files are in the wheel.")
+          PY
+
+      - name: Assemble site
+        run: |
+          mkdir -p _site
+          cp -r docs/. _site/
+          rm -rf _site/source _site/build _site/Makefile _site/make.bat
+          mkdir -p _site/viewer
+          cp -r src/syndisco/viewer/static/. _site/viewer/
+          if [ -d viewer_datasets ]; then
+            cp -r viewer_datasets/. _site/viewer/datasets/
+            rm -f _site/viewer/datasets/README.md
+          fi
+          touch _site/.nojekyll
+
+      - name: Stamp the package version into the viewer config
+        run: |
+          python - <<'PY'
+          import json, tomllib
+          version = tomllib.load(open("pyproject.toml", "rb"))["project"]["version"]
+          path = "_site/viewer/config.json"
+          config = json.load(open(path))
+          config["version"] = version
+          json.dump(config, open(path, "w"), indent=4)
+          print("Viewer version:", version)
+          PY
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

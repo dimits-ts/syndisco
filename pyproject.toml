@@ -1,6 +1,6 @@
 [project]
 name = "syndisco"
-version = "2.2.1"
+version = "2.3.0"
 description = "Automated experiment creation and execution using LLM agents"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -45,6 +45,9 @@ dependencies = [
   "openai",
   "setuptools_scm"
 ]
+
+[project.scripts]
+syndisco = "syndisco.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/dimits-ts/synthetic_discussion_framework"

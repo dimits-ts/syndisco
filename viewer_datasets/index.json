@@ -1,0 +1,9 @@
+{
+    "datasets": [
+        {
+            "name": "Example discussions",
+            "description": "12 short illustrative discussions in three experiments, written for this demo.",
+            "url": "datasets/example.zip"
+        }
+    ]
+}
