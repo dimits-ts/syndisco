@@ -6,7 +6,7 @@ synthetic discussions between Large Language Model (LLM) user-agents.
 import importlib
 import typing
 
-__version__ = "2.2.1"
+__version__ = "2.3.0"
 
 
 # Public names are imported lazily: ``import syndisco`` is cheap, and heavy

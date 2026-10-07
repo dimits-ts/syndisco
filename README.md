@@ -38,3 +38,16 @@ git clone https://github.com/dimits-ts/syndisco.git
 cd syndisco
 pip install -e .[dev]
 ```
+
+
+## Viewing discussions
+
+SynDisco Viewer lets you browse, search and filter the discussions you
+generate in a web browser. Open a folder of results on your computer with:
+
+```bash
+syndisco view path/to/output_dir
+```
+
+or drop your files onto the [online viewer](https://dimits-ts.github.io/syndisco/viewer/).
+Files are read in your browser and never uploaded.

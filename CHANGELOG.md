@@ -1,5 +1,16 @@
 # What's new
 
+## 2.3.0 (07/10/2026)
+
+### Features
+- Added `SynDisco Viewer`, a web viewer for discussion logs with search, filters, grouping and JSON/zip downloads. It is published with the online documentation at `/viewer/`.
+- Added the `syndisco view` command (also `python -m syndisco view`), which opens the viewer locally with a folder, JSON file or zip of results.
+- Added a GitHub Actions workflow that publishes the documentation, the viewer and some sample datasets in `viewer_datasets/` to GitHub Pages.
+
+### Changes
+- `import syndisco` now imports torch, transformers or openai lazily.
+
+
 ## 2.2.1 (07/07/2026)
 
 ### Features
