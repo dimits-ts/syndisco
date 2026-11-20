@@ -24,9 +24,6 @@ import typing
 import logging
 from pathlib import Path
 
-import transformers
-import torch
-from openai import OpenAI
 
 
 logger = logging.getLogger(Path(__file__).name)
@@ -156,7 +153,10 @@ class TransformersModel(BaseModel):
             Additional keyword arguments forwarded to
             ``model.generate()`` during inference.
             Examples include sampling parameters such as ``temperature``,
-            ``top_p``, or ``repetition_penalty``.
+            ``top_p``, or ``repetition_penalty``. Keys given here take
+            precedence over the defaults (``max_new_tokens``,
+            ``do_sample=False`` and ``pad_token_id``), e.g.
+            ``{"do_sample": True}`` enables sampling.
         :type generation_kwargs: dict | None
 
         :raises OSError:
@@ -170,6 +170,8 @@ class TransformersModel(BaseModel):
             The model is moved to the appropriate device automatically using
             ``device_map="auto"`` and set to evaluation mode.
         """
+        import transformers
+
         super().__init__(name, max_out_tokens, remove_string_list)
 
         model_kwargs = model_kwargs or {}
@@ -196,8 +198,10 @@ class TransformersModel(BaseModel):
             {"role": "user", "content": user_prompt},
         ]
 
-        # Prefer chat template if available
-        if hasattr(self.tokenizer, "apply_chat_template"):
+        # Prefer the chat template if the tokenizer actually has one.
+        # Checking for the apply_chat_template method is not enough: every
+        # modern tokenizer has it, but it raises if chat_template is unset.
+        if getattr(self.tokenizer, "chat_template", None):
             prompt_text = self.tokenizer.apply_chat_template(
                 messages,
                 tokenize=False,
@@ -209,17 +213,24 @@ class TransformersModel(BaseModel):
                 f"System: {system_prompt}\nUser: {user_prompt}\nAssistant:"
             )
 
+        import torch
+
         with torch.inference_mode():
             inputs = self.tokenizer(prompt_text, return_tensors="pt").to(
                 self.model.device
             )
 
+            # User-supplied generation kwargs override the defaults instead
+            # of clashing with them as duplicate keyword arguments
+            generate_kwargs = {
+                "max_new_tokens": self.max_out_tokens,
+                "do_sample": False,
+                "pad_token_id": self.tokenizer.eos_token_id,
+                **self.generation_kwargs,
+            }
             output_ids = self.model.generate(  # type: ignore
                 **inputs,
-                max_new_tokens=self.max_out_tokens,
-                do_sample=False,
-                pad_token_id=self.tokenizer.eos_token_id,
-                **self.generation_kwargs,
+                **generate_kwargs,
             )
 
         # Remove the prompt portion, keep only generated part
@@ -266,6 +277,8 @@ class OpenAIModel(BaseModel):
         :param remove_string_list: Strings to remove from responses
         :type remove_string_list: list[str] | None
         """
+        from openai import OpenAI
+
         super().__init__(name, max_out_tokens, remove_string_list)
 
         self.model_name = model_name

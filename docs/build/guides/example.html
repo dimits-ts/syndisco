@@ -1,0 +1,1203 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>A Practical Example &#8212; SynDisco</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=4418a689" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css?v=8cd3d715" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=33f7ffd5" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/documentation_options.js?v=10261ce1"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'guides/example';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="icon" href="../_static/logo.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Creating a Discussion" href="creating_discussions.html" />
+    <link rel="prev" title="Guides" href="../guides.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.3.0" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="SynDisco - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="SynDisco - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../guides.html">Guides</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">A Practical Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="creating_discussions.html">Creating a Discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="creating_annotations.html">Generating Synthetic Annotations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="creating_experiments.html">Creating and Managing Experiments</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../viewer.html">SynDisco Viewer</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api.html">API Reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../generated/syndisco.Actor.html">syndisco.Actor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generated/syndisco.BaseModel.html">syndisco.BaseModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generated/syndisco.TransformersModel.html">syndisco.TransformersModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generated/syndisco.OpenAIModel.html">syndisco.OpenAIModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generated/syndisco.Discussion.html">syndisco.Discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generated/syndisco.Annotation.html">syndisco.Annotation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generated/syndisco.Logs.html">syndisco.Logs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generated/syndisco.DiscussionExperiment.html">syndisco.DiscussionExperiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generated/syndisco.AnnotationExperiment.html">syndisco.AnnotationExperiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generated/syndisco.TurnManager.html">syndisco.TurnManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generated/syndisco.QueueTurnManager.html">syndisco.QueueTurnManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generated/syndisco.RespondTurnManager.html">syndisco.RespondTurnManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generated/syndisco.RandomTurnManager.html">syndisco.RandomTurnManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../generated/syndisco.logging_setup.html">syndisco.logging_setup</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/dimits-ts/syndisco" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/dimits-ts/syndisco/blob/master/guides/example.ipynb?plain=1" target="_blank"
+   class="btn btn-sm btn-source-file-button dropdown-item"
+   title="Show source"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-code"></i>
+  </span>
+<span class="btn__text-container">Show source</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/dimits-ts/syndisco/edit/master/guides/example.ipynb" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/dimits-ts/syndisco/issues/new?title=Issue%20on%20page%20%2Fguides/example.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/guides/example.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>A Practical Example</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#disclaimer">Disclaimer</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-simple-baseline">A Simple Baseline</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#first-round-reviews">First-round reviews</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#round-2-3-discussion-and-meta-review">Round 2-3 discussion and meta-review</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#was-it-worth-it">Was it worth it?</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="a-practical-example">
+<h1>A Practical Example<a class="headerlink" href="#a-practical-example" title="Link to this heading">#</a></h1>
+<p>You wake up. The deadline for the paper submission is tomorrow. You have gone over the manuscript again and again, but a lingering fear remains. What if you missed something? What if something gets misinterpreted?</p>
+<p>You get out of bed and open ChatGPT. You upload the manuscript and ask for its opinion. Is it enough? Will it catch what the reviewers would? What if one of the reviewers is from a different domain? Will they misunderstand something that the LLM doesn’t?</p>
+<p>…Is there a better way to do this?</p>
+<hr class="docutils" />
+<p>This notebook shows a use-case where LLM discussions can be applied for self-reviewing one’s work. We use peer-review since it is a structured, well-known and tested form of discussion.</p>
+<section id="disclaimer">
+<h2>Disclaimer<a class="headerlink" href="#disclaimer" title="Link to this heading">#</a></h2>
+<p>The peer-review scenario in this example is presented solely as an example of how multiple Points of View (POVs) can be applied to real-world problems and does not reflect the opinions of the volunteering team or the organizers.</p>
+<p>The code provided in this notebook should not be blindly used in any formal review workflow. Before applying LLM agents to peer review, please consult the authorship and review policies of the relevant publisher or organization.</p>
+<p>The code in this notebook is licensed under the <a class="reference external" href="https://www.gnu.org/licenses/agpl-3.0.txt">AGPL (GNU Affero Public License) version 3-or-later</a>.</p>
+</section>
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">syndisco</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">syndisco</span><span class="w"> </span><span class="kn">import</span> <span class="n">TransformersModel</span>
+
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">TransformersModel</span><span class="p">(</span>
+    <span class="n">model_path</span><span class="o">=</span><span class="s2">"unsloth/Qwen2.5-3B-Instruct-bnb-4bit"</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"base_model"</span><span class="p">,</span>
+    <span class="n">max_out_tokens</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">syndisco</span><span class="o">.</span><span class="n">logging_setup</span><span class="p">(</span>
+    <span class="n">print_to_terminal</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">write_to_file</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">level</span><span class="o">=</span><span class="s2">"warning"</span><span class="p">,</span>
+    <span class="n">use_colors</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># If enough VRAM is available, you can change this to include the whole paper</span>
+<span class="c1"># e.g., via pymupdf. By using a popular paper, we can bypass the need to load</span>
+<span class="c1"># paper details, since the models are already pretrained with its contents.</span>
+<span class="n">ABSTRACT</span> <span class="o">=</span> <span class="s2">"""</span>
+<span class="s2">Title: Attention Is All You Need</span>
+
+<span class="s2">Abstract:</span>
+<span class="s2">The dominant sequence transduction models are based on complex recurrent or</span>
+<span class="s2">convolutional neural networks that include an encoder and a decoder. The best</span>
+<span class="s2">performing models also connect the encoder and decoder through an attention</span>
+<span class="s2">mechanism. We propose a new simple network architecture, the Transformer,</span>
+<span class="s2">based solely on attention mechanisms, dispensing with recurrence and</span>
+<span class="s2">convolutions entirely. Experiments on two machine translation tasks show these</span>
+<span class="s2">models to be superior in quality while being more parallelizable and requiring</span>
+<span class="s2">significantly less time to train.</span>
+<span class="s2">"""</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="a-simple-baseline">
+<h2>A Simple Baseline<a class="headerlink" href="#a-simple-baseline" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">BASELINE_SYSTEM</span> <span class="o">=</span> <span class="s2">"You are an expert academic reviewer. Review the paper excerpt provided."</span>
+<span class="n">BASELINE_USER</span>   <span class="o">=</span> <span class="sa">f</span><span class="s2">"Please review the following paper abstract:</span><span class="se">\n\n</span><span class="si">{</span><span class="n">ABSTRACT</span><span class="si">}</span><span class="s2">"</span>
+
+<span class="n">baseline_review</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">prompt</span><span class="p">(</span><span class="n">BASELINE_SYSTEM</span><span class="p">,</span> <span class="n">BASELINE_USER</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"BASELINE — single-prompt review"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">baseline_review</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The following generation flags are not valid and may be ignored: ['temperature', 'top_p', 'top_k']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>============================================================
+BASELINE — single-prompt review
+============================================================
+The provided abstract for the paper titled "Attention Is All You Need" is quite concise and effectively captures the key points of the research. Here is a detailed review:
+
+### Strengths:
+1. **Clarity and Conciseness**: The abstract is clear and to the point, which is ideal for a conference or journal submission. It succinctly communicates the main idea and findings without unnecessary details.
+
+2. **Relevance and Impact**: The abstract highlights the importance of the proposed model by comparing it favorably to existing methods (recurrent and convolutional neural networks). This comparison sets the context and emphasizes the novelty and potential impact of the Transformer architecture.
+
+3. **Key Contributions**: The abstract clearly states the contributions of the Transformer architecture, including its simplicity, improved performance, and enhanced parallelizability. These points are crucial for understanding the significance of the work.
+
+4. **Specificity**: The abstract mentions specific tasks (machine translation) and provides experimental results, which adds credibility and practical value to the research.
+
+### Suggestions for Improvement:
+1. **Additional Details**: While the abstract is effective, adding a bit more detail could make it even stronger. For instance, mentioning the exact number of parameters or computational resources used could provide more insight into the efficiency of the Transformer.
+
+2. **Comparative Analysis**: A brief comparative analysis with other state-of-the-art models could further strengthen the argument about the superiority of the Transformer. This would help readers understand how the Transformer stands out among existing approaches.
+
+3. **Methodological Justification**: Including a brief explanation of why the attention mechanism alone is sufficient and why recurrence and convolutions are not necessary could add depth to the abstract.
+
+### Revised Abstract:
+"The dominant sequence transduction models rely on complex recurrent or convolutional neural networks that incorporate an encoder and a decoder. The best performing models also integrate the encoder and decoder through an attention mechanism. We propose a novel network architecture, the Transformer, which relies solely on attention mechanisms, eliminating the need for recurrence and convolutions. Our experiments on two machine translation tasks demonstrate that this approach significantly improves quality, is more parallelizable, and requires substantially less training time compared to existing methods."
+
+This revised version maintains the clarity and impact of the original but adds a bit more detail and context, making it even more compelling.
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco</span><span class="w"> </span><span class="kn">import</span> <span class="n">Actor</span>
+
+
+<span class="n">REVIEW_CONTEXT</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="sa">f</span><span class="s2">"You are participating in a structured academic peer-review discussion. "</span>
+    <span class="sa">f</span><span class="s2">"The paper under review is:</span><span class="se">\n\n</span><span class="si">{</span><span class="n">ABSTRACT</span><span class="si">}</span><span class="s2">"</span>
+<span class="p">)</span>
+
+<span class="n">REVIEW_INSTRUCTIONS</span> <span class="o">=</span> <span class="s2">"Write a full, professional review of the article for a prestigious journal."</span>
+
+<span class="n">skeptical_reviewer</span> <span class="o">=</span> <span class="n">Actor</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+    <span class="n">persona</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"role"</span><span class="p">:</span> <span class="s2">"Skeptical Reviewer"</span><span class="p">,</span>
+        <span class="s2">"expertise"</span><span class="p">:</span> <span class="s2">"critical analysis, assumption-testing, identifying gaps"</span><span class="p">,</span>
+        <span class="s2">"style"</span><span class="p">:</span> <span class="s2">"challenging, rigorous, devil's advocate"</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="n">context</span><span class="o">=</span><span class="n">REVIEW_CONTEXT</span><span class="p">,</span>
+    <span class="n">instructions</span><span class="o">=</span><span class="n">REVIEW_INSTRUCTIONS</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"SkepticalReviewer"</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">skeptical_review</span> <span class="o">=</span> <span class="n">skeptical_reviewer</span><span class="o">.</span><span class="n">speak</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"SKEPTICAL — single-prompt review"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">skeptical_review</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>============================================================
+SKEPTICAL — single-prompt review
+============================================================
+Given the abstract provided, it is clear that the Transformer model stands out as a significant advancement in sequence transduction models. However, as a skeptical reviewer, I will critically analyze the paper, focusing on its assumptions, experimental robustness, and broader implications.
+
+### Abstract Analysis
+
+The Transformer model is presented as a novel approach that leverages attention mechanisms without the need for recurrent or convolutional layers. This simplification is claimed to lead to superior performance, increased parallelizability, and reduced training times. 
+
+#### Strengths:
+1. **Simplicity**: The Transformer model is described as simpler and more straightforward compared to traditional models.
+2. **Performance**: It is highlighted that the Transformer performs better than existing models on various tasks.
+3. **Parallelizability**: The model is noted to be more parallelizable, which could lead to faster training times.
+4. **Training Efficiency**: The Transformer is said to require significantly less time to train, which could be advantageous in practical applications.
+
+#### Potential Concerns:
+1. **Complexity Comparison**: While the Transformer is simpler, it is not explicitly compared to other models in terms of complexity. What constitutes "simpler" and how does this simplicity translate into performance gains?
+2. **Generalization**: The superiority of the Transformer is based on experiments on two specific tasks. Are these results generalizable to other domains and tasks? 
+3. **Overfitting Risk**: Given the simplicity of the model, there might be a higher risk of overfitting, especially if the data is not sufficiently large or diverse.
+4. **Scalability**: How scalable is the Transformer model? Will it perform well on very large datasets or tasks that require extensive memory and computational resources?
+
+### Experimental Robustness
+
+- **Task-Specificity**: The experiments are conducted on only two tasks (machine translation). While these results are promising, it would be beneficial to see performance on a wider range of benchmarks, including but not limited to natural language processing, speech recognition, and computer vision tasks.
+  
+- **Controlled Experiments**: It would be valuable to conduct controlled experiments where the Transformer model is compared directly against state-of-the-art models using the same dataset and settings. This would provide a clearer picture of the Transformer’s relative performance.
+
+### Implications and Future Directions
+
+- **Impact on Research**: The Transformer model represents a paradigm shift in sequence transduction models. It opens up new avenues for research in areas such as natural language processing, speech recognition, and computer vision.
+- **Practical Applications**: The potential benefits of the Transformer model, such as improved parallelizability and reduced training times, make it a compelling candidate for real-world applications.
+- **Challenges Ahead**: Addressing the concerns raised above will be crucial for the Transformer model to become widely adopted. Ensuring robustness across different tasks and datasets will be key.
+
+### Conclusion
+
+In summary, the Transformer model presents a promising advance in sequence transduction models. Its simplicity, superior performance, and enhanced parallelizability make it a compelling candidate for future research and applications. However, further validation through controlled experiments and broader benchmarking is necessary to fully assess its potential impact. Additionally, addressing the risks of overfitting and ensuring scalability will be critical for its widespread adoption.
+
+This review highlights the need for rigorous testing and validation beyond the initial claims, ensuring that the Transformer model is thoroughly understood and validated before it becomes a standard tool in the field.
+</pre></div>
+</div>
+</div>
+</div>
+<p>What have we gained by creating a different persona? Generally speaking, we have a whole other Point of View, which we would have otherwised missed. This is the main motivation of using different agents.</p>
+</section>
+<section id="first-round-reviews">
+<h2>First-round reviews<a class="headerlink" href="#first-round-reviews" title="Link to this heading">#</a></h2>
+<p>A normal peer-review takes anywhere from two to four reviewers. We should also add a <strong>meta-reviewer</strong> as a participant here. They should join at the end of the review cycle, when all other reviews have been posted.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># --- Statistical Reviewer ---------------------------------------------------</span>
+<span class="n">statistical_reviewer</span> <span class="o">=</span> <span class="n">Actor</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+    <span class="n">persona</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"role"</span><span class="p">:</span> <span class="s2">"Statistical Reviewer"</span><span class="p">,</span>
+        <span class="s2">"expertise"</span><span class="p">:</span> <span class="s2">"statistics, experimental design, causal inference, reproducibility"</span><span class="p">,</span>
+        <span class="s2">"style"</span><span class="p">:</span> <span class="s2">"rigorous, detail-oriented, critical but constructive"</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="n">context</span><span class="o">=</span><span class="n">REVIEW_CONTEXT</span><span class="p">,</span>
+    <span class="n">instructions</span><span class="o">=</span><span class="n">REVIEW_INSTRUCTIONS</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"StatisticalReviewer"</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># --- NLP Expert Reviewer ----------------------------------------------------</span>
+<span class="n">nlp_reviewer</span> <span class="o">=</span> <span class="n">Actor</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+    <span class="n">persona</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"role"</span><span class="p">:</span> <span class="s2">"NLP Expert Reviewer"</span><span class="p">,</span>
+        <span class="s2">"expertise"</span><span class="p">:</span> <span class="s2">"natural language processing, deep learning, LLMs, benchmarking"</span><span class="p">,</span>
+        <span class="s2">"style"</span><span class="p">:</span> <span class="s2">"scholarly, literature-aware, technically grounded"</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="n">context</span><span class="o">=</span><span class="n">REVIEW_CONTEXT</span><span class="p">,</span>
+    <span class="n">instructions</span><span class="o">=</span><span class="n">REVIEW_INSTRUCTIONS</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"NLPReviewer"</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># --- Author -----------------------------------------------------------------</span>
+<span class="n">author</span> <span class="o">=</span> <span class="n">Actor</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+    <span class="n">persona</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"role"</span><span class="p">:</span> <span class="s2">"Author"</span><span class="p">,</span>
+        <span class="s2">"expertise"</span><span class="p">:</span> <span class="s2">"the submitted paper and its contributions"</span><span class="p">,</span>
+        <span class="s2">"style"</span><span class="p">:</span> <span class="s2">"defensive but professional, transparent, evidence-based"</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="n">context</span><span class="o">=</span><span class="n">REVIEW_CONTEXT</span><span class="p">,</span>
+    <span class="n">instructions</span><span class="o">=</span><span class="p">(</span>
+        <span class="s2">"You are the author of the submitted paper. Respond to reviewer comments by:</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"  * Addressing each critique directly and respectfully</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"  * Providing clarifications, additional justification, or acknowledging limitations</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"  * Proposing concrete revisions where appropriate</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"  * Avoiding defensiveness; aim to improve the paper</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="p">),</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"Authors"</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># --- Meta-Reviewer ----------------------------------------------------------</span>
+<span class="n">meta_reviewer</span> <span class="o">=</span> <span class="n">Actor</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+    <span class="n">persona</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"role"</span><span class="p">:</span> <span class="s2">"Meta-Reviewer"</span><span class="p">,</span>
+        <span class="s2">"expertise"</span><span class="p">:</span> <span class="s2">"synthesis, editorial judgment, final recommendations"</span><span class="p">,</span>
+        <span class="s2">"style"</span><span class="p">:</span> <span class="s2">"balanced, decisive, structured"</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="n">context</span><span class="o">=</span><span class="n">REVIEW_CONTEXT</span><span class="p">,</span>
+    <span class="n">instructions</span><span class="o">=</span><span class="p">(</span>
+        <span class="s2">"You have read all previous reviewer comments. Synthesise the discussion "</span>
+        <span class="s2">"into a final structured judgment. Your output must contain:</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"  * Summary of main strengths</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"  * Summary of main weaknesses</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"  * Overall recommendation (Accept / Major Revision / Reject) with a one-sentence rationale."</span>
+    <span class="p">),</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"MetaReviewer"</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Agents created:"</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">agent</span> <span class="ow">in</span> <span class="p">[</span>
+    <span class="n">statistical_reviewer</span><span class="p">,</span>
+    <span class="n">nlp_reviewer</span><span class="p">,</span>
+    <span class="n">skeptical_reviewer</span><span class="p">,</span>
+    <span class="n">author</span><span class="p">,</span>
+    <span class="n">meta_reviewer</span><span class="p">,</span>
+<span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\t</span><span class="s2">* </span><span class="si">{</span><span class="n">agent</span><span class="o">.</span><span class="n">get_actor_name</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Agents created:
+	* StatisticalReviewer
+	* NLPReviewer
+	* SkepticalReviewer
+	* Authors
+	* MetaReviewer
+</pre></div>
+</div>
+</div>
+</div>
+<p>In round 1 each of the three reviewers should read the abstract with no prior discussion context.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">"Generating round 1 independent reviews...</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="n">round1_reviewers</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">statistical_reviewer</span><span class="p">,</span>
+    <span class="n">nlp_reviewer</span><span class="p">,</span>
+    <span class="n">skeptical_reviewer</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="c1"># Each reviewer speaks independently — no history yet</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Round 1 starting...</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="n">opinions</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">agent_names</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">reviewer</span> <span class="ow">in</span> <span class="n">round1_reviewers</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">'─'</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">60</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[</span><span class="si">{</span><span class="n">reviewer</span><span class="o">.</span><span class="n">get_actor_name</span><span class="p">()</span><span class="si">}</span><span class="s2">]"</span><span class="p">)</span>
+
+    <span class="n">opinion</span> <span class="o">=</span> <span class="n">reviewer</span><span class="o">.</span><span class="n">speak</span><span class="p">()</span>  <span class="c1"># runs + returns</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">opinion</span><span class="p">)</span>
+
+    <span class="n">opinions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">opinion</span><span class="p">)</span>
+    <span class="n">agent_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reviewer</span><span class="o">.</span><span class="n">get_actor_name</span><span class="p">())</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"─"</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Round 1 complete."</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generating round 1 independent reviews...
+
+Round 1 starting...
+
+────────────────────────────────────────────────────────────
+[StatisticalReviewer]
+Given the abstract provided, it is clear that the paper introduces a novel neural network architecture called the Transformer, which significantly departs from traditional sequence-to-sequence models by eliminating recurrent and convolutional layers. Instead, the Transformer relies solely on attention mechanisms to process and generate sequences. This approach promises improvements in model simplicity, efficiency, and performance.
+
+### Statistical Review
+
+#### 1. **Model Architecture**
+The Transformer architecture is fundamentally different from traditional RNNs (Recurrent Neural Networks) and CNNs (Convolutional Neural Networks). It consists of an encoder and a decoder, both of which operate independently and interact via attention mechanisms. This separation allows for a more modular and potentially easier-to-understand model structure compared to its predecessors.
+
+#### 2. **Attention Mechanism**
+The use of attention mechanisms is a key feature of the Transformer. These mechanisms allow the model to focus on specific parts of the input sequence when generating output sequences. This capability is crucial for tasks like machine translation, where understanding the context of words is essential. However, the effectiveness of attention mechanisms can vary depending on the task and dataset.
+
+#### 3. **Performance Comparison**
+The authors claim that the Transformer outperforms existing models on two machine translation tasks. To substantiate this claim, it would be beneficial to provide detailed performance metrics such as BLEU scores, ROUGE scores, or other relevant evaluation metrics. Additionally, it would be useful to compare the Transformer's performance against state-of-the-art models using a consistent benchmark.
+
+#### 4. **Parallelizability and Training Time**
+The Transformer is described as more parallelizable and requiring significantly less training time. Parallelization refers to the ability to process multiple data points simultaneously, which can lead to faster training times. However, the actual benefits of parallelization should be quantified and compared with traditional models. Furthermore, the training time savings could be influenced by various factors, including the size of the model and the hardware used for training.
+
+#### 5. **Reproducibility**
+The paper mentions that the Transformer is simpler and more parallelizable, which suggests potential advantages in terms of reproducibility. However, reproducibility in deep learning often depends on several factors, including the availability of code, the exact version of libraries used, and the configuration of the computational environment. Therefore, it would be important to ensure that the results can be replicated by other researchers.
+
+### Suggestions for Improvement
+
+- **Detailed Performance Metrics:** Provide more comprehensive performance metrics, such as BLEU scores, ROUGE scores, and other relevant evaluation metrics.
+- **Comparison Against State-of-the-Art Models:** Compare the Transformer's performance against state-of-the-art models using a consistent benchmark.
+- **Reproducibility:** Ensure that the code and configurations are made available to facilitate replication by other researchers.
+- **Experimental Design:** Discuss the experimental design, including the choice of datasets, hyperparameters, and training procedures.
+
+By addressing these suggestions, the paper will provide a more robust and comprehensive evaluation of the Transformer architecture.
+────────────────────────────────────────────────────────────
+[NLPReviewer]
+Given the abstract provided, it is clear that the paper titled "Attention Is All You Need" introduces a novel neural network architecture called the Transformer, which significantly departs from traditional sequence-to-sequence models by eliminating recurrent and convolutional layers. Instead, the Transformer relies solely on attention mechanisms to process and generate sequences. This approach promises improvements in model simplicity, efficiency, and performance.
+
+### Review of "Attention Is All You Need"
+
+#### Introduction
+
+The paper presents a groundbreaking contribution to the field of natural language processing (NLP) and machine translation. By proposing the Transformer architecture, the authors aim to simplify the underlying neural network models, thereby enhancing their performance and scalability. The Transformer's reliance on attention mechanisms rather than recurrent or convolutional layers represents a significant shift in the design of sequence-to-sequence models.
+
+#### Methodology
+
+The Transformer architecture is fundamentally different from traditional models such as LSTM and GRU, which are known for their ability to handle sequential data through memory cells. Instead, the Transformer employs self-attention mechanisms to weigh the importance of different elements within a sequence. This mechanism allows the model to focus on relevant parts of the input sequence during the encoding phase, and similarly, on the output sequence during the decoding phase. 
+
+The key innovation lies in the use of multi-head attention, which enables the model to consider multiple perspectives simultaneously. This feature is crucial for handling long-range dependencies and improving the model's ability to capture context information. Additionally, the Transformer uses a feed-forward neural network (FFNN) as a position-wise feed-forward layer, which helps in capturing global dependencies across the entire sequence.
+
+#### Results and Experiments
+
+The authors conducted experiments on two machine translation tasks, demonstrating the effectiveness of the Transformer architecture. They compared the Transformer against state-of-the-art models, including those using recurrent and convolutional layers. The results showed that the Transformer achieved superior performance in terms of translation quality, indicating its potential as a powerful tool for NLP tasks.
+
+#### Advantages and Limitations
+
+One of the primary advantages of the Transformer is its simplicity and parallelizability. Unlike traditional models, the Transformer does not require explicit parallelization, making it easier to scale up to larger datasets and more complex tasks. Furthermore, the use of self-attention mechanisms allows the model to handle long-range dependencies more effectively, which is particularly beneficial for tasks involving large amounts of text.
+
+However, there are some limitations worth noting. The Transformer's performance may degrade when dealing with very short sequences, as the self-attention mechanism becomes less effective in capturing meaningful context. Additionally, the model requires more parameters compared to traditional models, which could lead to increased computational costs and longer training times.
+
+#### Conclusion
+
+In summary, the Transformer architecture proposed in this paper represents a significant advancement in the field of NLP and machine translation. By leveraging attention mechanisms, the Transformer simplifies the model architecture while maintaining or improving upon the performance of more complex models. Future work should explore ways to address the limitations identified, such as adapting the model for shorter sequences and optimizing its performance on specific tasks. Overall, the Transformer holds promise as a foundational component for developing more efficient and scalable NLP systems.
+────────────────────────────────────────────────────────────
+[SkepticalReviewer]
+Given the abstract provided, it is clear that the Transformer model stands out as a significant advancement in sequence transduction models. However, as a skeptical reviewer, I will critically analyze the paper, focusing on its assumptions, experimental robustness, and broader implications.
+
+### Abstract Analysis
+
+The Transformer model is presented as a novel approach that leverages attention mechanisms without the need for recurrent or convolutional layers. This simplification is claimed to lead to superior performance, increased parallelizability, and reduced training times. 
+
+#### Strengths:
+1. **Simplicity**: The Transformer model is described as simpler and more straightforward compared to traditional models.
+2. **Performance**: It is highlighted that the Transformer performs better than existing models on various tasks.
+3. **Parallelizability**: The model is noted to be more parallelizable, which could lead to faster training times.
+4. **Training Efficiency**: The Transformer is said to require significantly less time to train, which could be advantageous in practical applications.
+
+#### Potential Concerns:
+1. **Complexity Comparison**: While the Transformer is simpler, it is not explicitly compared to other models in terms of complexity. What constitutes "simpler" and how does this simplicity translate into performance gains?
+2. **Generalization**: The superiority of the Transformer is based on experiments on two specific tasks. Are these results generalizable to other domains and tasks? 
+3. **Overfitting Risk**: Given the simplicity of the model, there might be a higher risk of overfitting, especially if the data is not sufficiently large or diverse.
+4. **Scalability**: How scalable is the Transformer model? Will it perform well on very large datasets or tasks that require extensive memory and computational resources?
+
+### Experimental Robustness
+
+- **Task-Specificity**: The experiments are conducted on only two tasks (machine translation). While these results are promising, it would be beneficial to see performance on a wider range of benchmarks, including but not limited to natural language processing, speech recognition, and computer vision tasks.
+  
+- **Controlled Experiments**: It would be valuable to conduct controlled experiments where the Transformer model is compared directly against state-of-the-art models using the same dataset and settings. This would provide a clearer picture of the Transformer’s relative performance.
+
+### Implications and Future Directions
+
+- **Impact on Research**: The Transformer model represents a paradigm shift in sequence transduction models. It opens up new avenues for research in areas such as natural language processing, speech recognition, and computer vision.
+- **Practical Applications**: The potential benefits of the Transformer model, such as improved parallelizability and reduced training times, make it a compelling candidate for real-world applications.
+- **Challenges Ahead**: Addressing the concerns raised above will be crucial for the Transformer model to become widely adopted. Ensuring robustness across different tasks and datasets will be key.
+
+### Conclusion
+
+In summary, the Transformer model presents a promising advance in sequence transduction models. Its simplicity, superior performance, and enhanced parallelizability make it a compelling candidate for future research and applications. However, further validation through controlled experiments and broader benchmarking is necessary to fully assess its potential impact. Additionally, addressing the risks of overfitting and ensuring scalability will be critical for its widespread adoption.
+
+This review highlights the need for rigorous testing and validation beyond the initial claims, ensuring that the Transformer model is thoroughly understood and validated before it becomes a standard tool in the field.
+────────────────────────────────────────────────────────────
+Round 1 complete.
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="round-2-3-discussion-and-meta-review">
+<h2>Round 2-3 discussion and meta-review<a class="headerlink" href="#round-2-3-discussion-and-meta-review" title="Link to this heading">#</a></h2>
+<p>You have perhaps identified a limitation in our approach so far; the agents respond in isolation, and can not take into account what the other agents have highlighted. This limitation is important for two reasons:</p>
+<ol class="arabic simple">
+<li><p>The review process after this point will not be <strong>realistic</strong>. In reality, after the first round of reviewing, the authors engage with the reviewers in order to respond to their questions.</p>
+<ul class="simple">
+<li><p>One of the reasons for building this reviewing pipeline is to simulate what could (not <em>would</em>!) happen in the real world. In this case, our setup is a special case of Agent-Based Modeling (ABM). ABM concerns itself with building simulated agents with simple rules, then allowing them to interact with each other to simulate complex human behavior. In our case, since our agents don’t need explicit rules, but rather instructions, we are talking abouut Generative Agent-Based Modeling (GABM).</p></li>
+<li><p>A motivation for using synthetic discussions then is to simulate what could have happened in a peer-review process. If you want to explore this part of the discussion, try it out by <em>adding your own paper to the top of the notebook</em> and re-running it.</p></li>
+</ul>
+</li>
+<li><p>The review process will not be <strong>informative</strong>. We can already see that agents may focus on different aspects of the work. Why shouldn’t a critical reviewer take into consideration points the strengths mentioned by other reviewers?</p>
+<ul class="simple">
+<li><p>Going back-and-forth would allow agents to iteratively bring up, discard, and fight over specific points raised in the paper. This process is dynamic, and requires no input from us.</p></li>
+<li><p>If you want to explore what <em>information</em> you can extract using synthetic discussions, an abstract may not be enough. Why don’t we try loading a whole paper? This will raise some issues, since we are using a local model. How would you circumvent them?</p></li>
+</ul>
+</li>
+</ol>
+<hr class="docutils" />
+<p>We will create a discussion between the reviewers defined above. You could also add an author; an agent that will attempt to defend the paper. How would you defend your paper?</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">syndisco</span><span class="w"> </span><span class="kn">import</span> <span class="n">Discussion</span><span class="p">,</span> <span class="n">QueueTurnManager</span>
+
+<span class="n">all_agents</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">statistical_reviewer</span><span class="p">,</span>
+    <span class="n">nlp_reviewer</span><span class="p">,</span>
+    <span class="n">skeptical_reviewer</span><span class="p">,</span>
+    <span class="n">author</span><span class="p">,</span>
+    <span class="n">meta_reviewer</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="c1"># QueueTurnManager cycles through actors in the order they are given.</span>
+<span class="n">turn_manager</span> <span class="o">=</span> <span class="n">QueueTurnManager</span><span class="p">(</span><span class="n">actors</span><span class="o">=</span><span class="n">all_agents</span><span class="p">)</span>
+
+<span class="n">discussion</span> <span class="o">=</span> <span class="n">Discussion</span><span class="p">(</span>
+    <span class="n">next_turn_manager</span><span class="o">=</span><span class="n">turn_manager</span><span class="p">,</span>
+    <span class="n">users</span><span class="o">=</span><span class="n">all_agents</span><span class="p">,</span>
+    <span class="c1"># Round-1 reviews are injected as seeds since the reviewers should</span>
+    <span class="c1"># now know the results of the first round of reviewing</span>
+    <span class="n">seed_opinions</span><span class="o">=</span><span class="n">opinions</span><span class="p">,</span>
+    <span class="n">seed_opinion_usernames</span><span class="o">=</span><span class="n">agent_names</span><span class="p">,</span>
+    <span class="c1"># Each agent sees the last 6 messages as context (enough for all seeds + some turns)</span>
+    <span class="c1"># You may need to turn this down if you are running this notebook in a machine</span>
+    <span class="c1"># with relatively low VRAM, or if you decide to load a large document.</span>
+    <span class="n">history_context_len</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+    <span class="c1"># 3 updated critiques (round 2) + 1 meta-review (round 3)</span>
+    <span class="n">conv_len</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Running peer-review rounds 2 and 3..."</span><span class="p">)</span>
+<span class="n">discussion</span><span class="o">.</span><span class="n">begin</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Running peer-review rounds 2 and 3...
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "5912f844070d45b8b8e688ddd5421066", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Comment by user StatisticalReviewer: "
+{"role": "user", "content": "Given the abstract provided, the paper titled "Attention Is All You Need" introduces a novel neural network architecture called the Transformer, which significantly departs from traditional sequence-to-sequence models by eliminating recurrent and convolutional layers. Instead, the Transformer relies solely on attention mechanisms to process and generate sequences. This approach promises improvements in model simplicity, efficiency, and performance.  ### Statistical Review  #### 1. **Model Architecture** The Transformer architecture is fundamentally different from traditional RNNs (Recurrent Neural Networks) and CNNs (Convolutional Neural Networks). It consists of an encoder and a decoder, both of which operate independently and interact via attention mechanisms. This separation allows for a more modular and potentially easier-to-understand model structure compared to its predecessors.  #### 2. **Attention Mechanism** The use of attention mechanisms is a key feature of the Transformer. These mechanisms allow the model to focus on specific parts of the input sequence when generating output sequences. This capability is crucial for tasks like machine translation, where understanding the context of words is essential. However, the effectiveness of attention mechanisms can vary depending on the task and dataset.  #### 3. **Performance Comparison** The authors claim that the Transformer outperforms existing models on two machine translation tasks. To substantiate this claim, it would be beneficial to provide detailed performance metrics such as BLEU scores, ROUGE scores, or other relevant evaluation metrics. Additionally, it would be useful to compare the Transformer's performance against state-of-the-art models using a consistent benchmark.  #### 4. **Parallelizability and Training Time** The Transformer is described as more parallelizable and requiring significantly less training time. Parallelization refers to the ability to process multiple data points simultaneously, which can lead to faster training times. However, the actual benefits of parallelization should be quantified and compared with traditional models. Furthermore, the training time savings could be influenced by various factors, including the size of the model and the hardware used for training.  #### 5. **Reproducibility** The paper mentions that the Transformer is simpler and more parallelizable, which suggests potential advantages in terms of reproducibility. However, reproducibility in deep learning often depends on several factors, including the availability of code, the exact version of libraries used, and the configuration of the computational environment. Therefore, it would be important to ensure that the results can be replicated by other researchers.  ### Suggestions for Improvement  - **Detailed Performance Metrics:** Provide more comprehensive performance metrics, such as BLEU scores, ROUGE scores, and other relevant evaluation metrics. - **Comparison Against State-of-the-Art Models:** Compare the Transformer's performance against state-of-the-art models using a consistent benchmark. - **Reproducibility:** Ensure that the code and configurations are made available to facilitate replication by other researchers. - **Experimental Design:** Discuss the experimental design, including the choice of datasets, hyperparameters, and training procedures.  By addressing these suggestions, the paper will provide a more robust and comprehensive evaluation of the Transformer architecture."}" 
+
+Comment by user NLPReviewer: "
+Based on the provided comments, the paper titled "Attention Is All You Need" makes a significant contribution to the field of natural language processing (NLP) by introducing the Transformer architecture. This architecture is designed to simplify and improve upon traditional sequence-to-sequence models by eliminating recurrent and convolutional layers, instead relying solely on attention mechanisms.  ### Comments Summary  1. **Model Architecture**    - The Transformer architecture is fundamentally different from traditional RNNs and CNNs. It consists of an encoder and a decoder, both operating independently and interacting via attention mechanisms. This separation allows for a more modular and potentially easier-to-understand model structure compared to its predecessors.  2. **Attention Mechanism**    - The use of attention mechanisms is a key feature of the Transformer. These mechanisms allow the model to focus on specific parts of the input sequence when generating output sequences. This capability is crucial for tasks like machine translation, where understanding the context of words is essential. However, the effectiveness of attention mechanisms can vary depending on the task and dataset.  3. **Performance Comparison**    - The authors claim that the Transformer outperforms existing models on two machine translation tasks. To substantiate this claim, it would be beneficial to provide detailed performance metrics such as BLEU scores, ROUGE scores, or other relevant evaluation metrics. Additionally, it would be useful to compare the Transformer’s performance against state-of-the-art models using a consistent benchmark.  4. **Parallelizability and Training Time**    - The Transformer is described as more parallelizable and requiring significantly less training time. Parallelization refers to the ability to process multiple data points simultaneously, which can lead to faster training times. However, the actual benefits of parallelization should be quantified and compared with traditional models. Furthermore, the training time savings could be influenced by various factors, including the size of the model and the hardware used for training.  5. **Reproducibility**    - The paper mentions that the Transformer is simpler and more parallelizable, which suggests potential advantages in terms of reproducibility. However, reproducibility in deep learning often depends on several factors, including the availability of code, the exact version of libraries used, and the configuration of the computational environment. Therefore, it would be important to ensure that the results can be replicated by other researchers.  ### Suggestions for Improvement  1. **Detailed Performance Metrics**    - Provide more comprehensive performance metrics, such as BLEU scores, ROUGE scores, and other relevant evaluation metrics.  2. **Comparison Against State-of-the-Art Models**    - Compare the Transformer’s performance against state-of-the-art models using a consistent benchmark.  3. **Reproducibility**    - Ensure that the code and configurations are made available to facilitate replication by other researchers.  4. **Experimental Design**    - Discuss the experimental design, including the choice of datasets, hyperparameters, and training procedures.  ### Conclusion  The Transformer architecture introduced in this paper represents a significant advancement in the field of NLP. By leveraging attention mechanisms, the Transformer simplifies the model architecture while maintaining or improving upon the performance of more complex models. The paper provides a solid foundation for further research and development in this area. However, the claims about performance and parallelizability need to be supported with more detailed metrics and comparisons. Ensuring reproducibility will be crucial for the wider acceptance and application of this model." 
+
+Comment by user SkepticalReviewer: "
+Based on the comments and feedback received, the Transformer architecture indeed presents a significant advancement in the field of natural language processing (NLP). Here are some additional insights and refinements that could strengthen the review:  ### Additional Insights  1. **Theoretical Underpinnings**:    - The Transformer's reliance on self-attention mechanisms offers a theoretical advantage over traditional models. Self-attention allows the model to dynamically focus on different parts of the input sequence, which can be particularly beneficial for tasks where understanding context is crucial.  2. **Practical Considerations**:    - While the Transformer is simpler and more parallelizable, it still faces practical challenges. For instance, the model's performance can degrade on very short sequences due to the way self-attention works. Additionally, the increased number of parameters can lead to higher computational costs and longer training times.  3. **Comparative Analysis**:    - The paper should include a more detailed comparison with state-of-the-art models. This includes not just BLEU and ROUGE scores but also qualitative analyses and comparisons across different tasks and datasets. This will help establish a more comprehensive understanding of the Transformer's performance.  4. **Scalability and Overfitting**:    - The Transformer's scalability is a topic of interest. While it performs well on certain tasks, it may struggle with very large datasets or tasks that require extensive memory and computational resources. Addressing these aspects will be crucial for broad applicability.  ### Suggestions for Improvement  1. **Detailed Performance Metrics**:    - Provide a more comprehensive set of performance metrics, including BLEU scores, ROUGE scores, and other relevant evaluation metrics. This will give readers a clearer picture of the Transformer's performance across different tasks.  2. **Comparison Against State-of-the-Art Models**:    - Conduct a thorough comparison with state-of-the-art models using a consistent benchmark. This will help validate the Transformer's performance and demonstrate its superiority.  3. **Reproducibility**:    - Ensure that all code and configurations are made available to facilitate replication by other researchers. This will enhance the paper's credibility and encourage further research.  4. **Experimental Design**:    - Discuss the experimental design, including the choice of datasets, hyperparameters, and training procedures. This will provide transparency and allow readers to replicate the results.  ### Conclusion  In summary, the Transformer architecture introduced in this paper is a significant advancement in the field of NLP. By leveraging attention mechanisms, the Transformer simplifies the model architecture while maintaining or improving upon the performance of more complex models. However, the paper needs to provide more detailed performance metrics, conduct a thorough comparison with state-of-the-art models, ensure reproducibility, and discuss the experimental design in greater detail. These improvements will help solidify the Transformer's place as a foundational component in the development of more efficient and scalable NLP systems." 
+
+Comment by user Authors: "
+Thank you for providing the detailed feedback from the reviewers. Here’s my response addressing each critique directly and respectfully:  ---  ### Response to Reviewer Comments  #### **StatisticalReviewer** Thank you for your insightful comments. Your suggestions are helpful and will guide me in refining the paper. Here are my responses:  1. **Model Architecture**    - I appreciate the clarity you provided regarding the Transformer's architecture. The Transformer indeed consists of an encoder and a decoder, both operating independently and interacting via attention mechanisms. This separation allows for a more modular and potentially easier-to-understand model structure compared to traditional models.  2. **Attention Mechanism**    - You are correct that the use of attention mechanisms is a key feature of the Transformer. These mechanisms allow the model to focus on specific parts of the input sequence when generating output sequences. This capability is crucial for tasks like machine translation, where understanding the context of words is essential. However, the effectiveness of attention mechanisms can indeed vary depending on the task and dataset. I will ensure to highlight this variability in the final version.  3. **Performance Comparison**    - I agree that providing detailed performance metrics such as BLEU scores, ROUGE scores, and other relevant evaluation metrics is crucial. I will add these metrics to the paper to provide a more comprehensive evaluation of the Transformer's performance. Additionally, I will compare the Transformer's performance against state-of-the-art models using a consistent benchmark.  4. **Parallelizability and Training Time**    - You are right that parallelization refers to the ability to process multiple data points simultaneously, which can lead to faster training times. I will quantify and compare the actual benefits of parallelization with traditional models. The training time savings can indeed be influenced by various factors, including the size of the model and the hardware used for training. I will address these aspects in the paper.  5. **Reproducibility**    - Ensuring reproducibility is indeed important. I will make sure that the code and configurations are made available to facilitate replication by other researchers. This will enhance the paper's credibility and encourage further research.  #### **NLPReviewer** Thank you for your detailed comments. Here are my responses:  1. **Model Architecture**    - Your analysis of the Transformer's architecture is accurate. The Transformer consists of an encoder and a decoder, both operating independently and interacting via attention mechanisms. This separation allows for a more modular and potentially easier-to-understand model structure compared to traditional models.  2. **Attention Mechanism**    - You are correct that the use of attention mechanisms is a key feature of the Transformer. These mechanisms allow the model to focus on specific parts of the input sequence when generating output sequences. This capability is crucial for tasks like machine translation, where understanding the context of words is essential. However, the effectiveness of attention mechanisms can indeed vary depending on the task and dataset. I will ensure to highlight this variability in the final version.  3. **Performance Comparison**    - You are right that providing detailed performance metrics such as BLEU scores, ROUGE scores, and other relevant evaluation metrics is crucial. I will add these metrics to the paper to provide a more comprehensive evaluation of the Transformer's performance. Additionally, I will compare the Transformer's performance against state-of-the-art models using a consistent benchmark.  4. **Parallelizability and Training Time**    - You are correct that parallelization refers to the ability to process multiple data points simultaneously, which can lead to faster training times. I will quantify and compare the actual benefits of parallelization with traditional models. The training time savings can indeed be influenced by various factors, including the size of the model and the hardware used for training. I will address these aspects in the paper.  5. **Reproducibility**    - Ensuring reproducibility is indeed important. I will make sure that the code and configurations are made available to facilitate replication by other researchers. This will enhance the paper's credibility and encourage further research.  #### **SkepticalReviewer** Thank you for your thoughtful comments. Here are my responses:  1. **Model Architecture**    - Your analysis of the Transformer's architecture is accurate. The Transformer consists of an encoder and a decoder, both operating independently and interacting via attention mechanisms. This separation allows for a more modular and potentially easier-to-understand model structure compared to traditional models.  2. **Attention Mechanism**    - You are correct that the use of attention mechanisms is a key feature of the Transformer. These mechanisms allow the model to focus on specific parts of the input sequence when generating output sequences. This capability is crucial for tasks like machine translation, where understanding the context of words is essential. However, the effectiveness of attention mechanisms can indeed vary depending on the task and dataset. I will ensure to highlight this variability in the final version.  3. **Performance Comparison**    - You are correct that providing detailed performance metrics such as BLEU scores, ROUGE scores, and other relevant evaluation metrics is crucial. I will add these metrics to the paper to provide a more comprehensive evaluation of the Transformer's performance. Additionally, I will compare the Transformer's performance against state-of-the-art models using a consistent benchmark.  4. **Parallelizability and Training Time**    - You are correct that parallelization refers to the ability to process multiple data points simultaneously, which can lead to faster training times. I will quantify and compare the actual benefits of parallelization with traditional models. The training time savings can indeed be influenced by various factors, including the size of the model and the hardware used for training. I will address these aspects in the paper.  5. **Reproducibility**    - Ensuring reproducibility is indeed important. I will make sure that the code and configurations are made available to facilitate replication by other researchers. This will enhance the paper's credibility and encourage further research.  ---  I will ensure to incorporate these suggestions into the final version of the paper to provide a more robust and comprehensive evaluation of the Transformer architecture. Thank you for your constructive feedback!  Best regards, [Your Name]" 
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="was-it-worth-it">
+<h2>Was it worth it?<a class="headerlink" href="#was-it-worth-it" title="Link to this heading">#</a></h2>
+<p>Let’s print the baseline single-prompt review alongside the meta-reviewer’s final judgment.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># The meta-reviewer is always the last entry in the log</span>
+<span class="n">meta_review_entry</span> <span class="o">=</span> <span class="n">discussion</span><span class="o">.</span><span class="n">get_logs</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">divider</span> <span class="o">=</span> <span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">divider</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"BASELINE — single-prompt review"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">divider</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">baseline_review</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">divider</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"MULTI-AGENT — </span><span class="si">{</span><span class="n">meta_review_entry</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span><span class="si">}</span><span class="s2"> final judgment"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">divider</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">meta_review_entry</span><span class="p">[</span><span class="s1">'text'</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>============================================================
+BASELINE — single-prompt review
+============================================================
+The provided abstract for the paper titled "Attention Is All You Need" is quite concise and effectively captures the key points of the research. Here is a detailed review:
+
+### Strengths:
+1. **Clarity and Conciseness**: The abstract is clear and to the point, which is ideal for a conference or journal submission. It succinctly communicates the main idea and findings without unnecessary details.
+
+2. **Relevance and Impact**: The abstract highlights the importance of the proposed model by comparing it favorably to existing methods (recurrent and convolutional neural networks). This comparison sets the context and emphasizes the novelty and potential impact of the Transformer architecture.
+
+3. **Key Contributions**: The abstract clearly states the contributions of the Transformer architecture, including its simplicity, improved performance, and enhanced parallelizability. These points are crucial for understanding the significance of the work.
+
+4. **Specificity**: The abstract mentions specific tasks (machine translation) and provides experimental results, which adds credibility and practical value to the research.
+
+### Suggestions for Improvement:
+1. **Additional Details**: While the abstract is effective, adding a bit more detail could make it even stronger. For instance, mentioning the exact number of parameters or computational resources used could provide more insight into the efficiency of the Transformer.
+
+2. **Comparative Analysis**: A brief comparative analysis with other state-of-the-art models could further strengthen the argument about the superiority of the Transformer. This would help readers understand how the Transformer stands out among existing approaches.
+
+3. **Methodological Justification**: Including a brief explanation of why the attention mechanism alone is sufficient and why recurrence and convolutions are not necessary could add depth to the abstract.
+
+### Revised Abstract:
+"The dominant sequence transduction models rely on complex recurrent or convolutional neural networks that incorporate an encoder and a decoder. The best performing models also integrate the encoder and decoder through an attention mechanism. We propose a novel network architecture, the Transformer, which relies solely on attention mechanisms, eliminating the need for recurrence and convolutions. Our experiments on two machine translation tasks demonstrate that this approach significantly improves quality, is more parallelizable, and requires substantially less training time compared to existing methods."
+
+This revised version maintains the clarity and impact of the original but adds a bit more detail and context, making it even more compelling.
+
+============================================================
+MULTI-AGENT — Authors final judgment
+============================================================
+Thank you for providing the detailed feedback from the reviewers. Here’s my response addressing each critique directly and respectfully:
+
+---
+
+### Response to Reviewer Comments
+
+#### **StatisticalReviewer**
+Thank you for your insightful comments. Your suggestions are helpful and will guide me in refining the paper. Here are my responses:
+
+1. **Model Architecture**
+   - I appreciate the clarity you provided regarding the Transformer's architecture. The Transformer indeed consists of an encoder and a decoder, both operating independently and interacting via attention mechanisms. This separation allows for a more modular and potentially easier-to-understand model structure compared to traditional models.
+
+2. **Attention Mechanism**
+   - You are correct that the use of attention mechanisms is a key feature of the Transformer. These mechanisms allow the model to focus on specific parts of the input sequence when generating output sequences. This capability is crucial for tasks like machine translation, where understanding the context of words is essential. However, the effectiveness of attention mechanisms can indeed vary depending on the task and dataset. I will ensure to highlight this variability in the final version.
+
+3. **Performance Comparison**
+   - I agree that providing detailed performance metrics such as BLEU scores, ROUGE scores, and other relevant evaluation metrics is crucial. I will add these metrics to the paper to provide a more comprehensive evaluation of the Transformer's performance. Additionally, I will compare the Transformer's performance against state-of-the-art models using a consistent benchmark.
+
+4. **Parallelizability and Training Time**
+   - You are right that parallelization refers to the ability to process multiple data points simultaneously, which can lead to faster training times. I will quantify and compare the actual benefits of parallelization with traditional models. The training time savings can indeed be influenced by various factors, including the size of the model and the hardware used for training. I will address these aspects in the paper.
+
+5. **Reproducibility**
+   - Ensuring reproducibility is indeed important. I will make sure that the code and configurations are made available to facilitate replication by other researchers. This will enhance the paper's credibility and encourage further research.
+
+#### **NLPReviewer**
+Thank you for your detailed comments. Here are my responses:
+
+1. **Model Architecture**
+   - Your analysis of the Transformer's architecture is accurate. The Transformer consists of an encoder and a decoder, both operating independently and interacting via attention mechanisms. This separation allows for a more modular and potentially easier-to-understand model structure compared to traditional models.
+
+2. **Attention Mechanism**
+   - You are correct that the use of attention mechanisms is a key feature of the Transformer. These mechanisms allow the model to focus on specific parts of the input sequence when generating output sequences. This capability is crucial for tasks like machine translation, where understanding the context of words is essential. However, the effectiveness of attention mechanisms can indeed vary depending on the task and dataset. I will ensure to highlight this variability in the final version.
+
+3. **Performance Comparison**
+   - You are right that providing detailed performance metrics such as BLEU scores, ROUGE scores, and other relevant evaluation metrics is crucial. I will add these metrics to the paper to provide a more comprehensive evaluation of the Transformer's performance. Additionally, I will compare the Transformer's performance against state-of-the-art models using a consistent benchmark.
+
+4. **Parallelizability and Training Time**
+   - You are correct that parallelization refers to the ability to process multiple data points simultaneously, which can lead to faster training times. I will quantify and compare the actual benefits of parallelization with traditional models. The training time savings can indeed be influenced by various factors, including the size of the model and the hardware used for training. I will address these aspects in the paper.
+
+5. **Reproducibility**
+   - Ensuring reproducibility is indeed important. I will make sure that the code and configurations are made available to facilitate replication by other researchers. This will enhance the paper's credibility and encourage further research.
+
+#### **SkepticalReviewer**
+Thank you for your thoughtful comments. Here are my responses:
+
+1. **Model Architecture**
+   - Your analysis of the Transformer's architecture is accurate. The Transformer consists of an encoder and a decoder, both operating independently and interacting via attention mechanisms. This separation allows for a more modular and potentially easier-to-understand model structure compared to traditional models.
+
+2. **Attention Mechanism**
+   - You are correct that the use of attention mechanisms is a key feature of the Transformer. These mechanisms allow the model to focus on specific parts of the input sequence when generating output sequences. This capability is crucial for tasks like machine translation, where understanding the context of words is essential. However, the effectiveness of attention mechanisms can indeed vary depending on the task and dataset. I will ensure to highlight this variability in the final version.
+
+3. **Performance Comparison**
+   - You are correct that providing detailed performance metrics such as BLEU scores, ROUGE scores, and other relevant evaluation metrics is crucial. I will add these metrics to the paper to provide a more comprehensive evaluation of the Transformer's performance. Additionally, I will compare the Transformer's performance against state-of-the-art models using a consistent benchmark.
+
+4. **Parallelizability and Training Time**
+   - You are correct that parallelization refers to the ability to process multiple data points simultaneously, which can lead to faster training times. I will quantify and compare the actual benefits of parallelization with traditional models. The training time savings can indeed be influenced by various factors, including the size of the model and the hardware used for training. I will address these aspects in the paper.
+
+5. **Reproducibility**
+   - Ensuring reproducibility is indeed important. I will make sure that the code and configurations are made available to facilitate replication by other researchers. This will enhance the paper's credibility and encourage further research.
+
+---
+
+I will ensure to incorporate these suggestions into the final version of the paper to provide a more robust and comprehensive evaluation of the Transformer architecture. Thank you for your constructive feedback!
+
+Best regards,
+[Your Name]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../guides.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Guides</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="creating_discussions.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Creating a Discussion</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#disclaimer">Disclaimer</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-simple-baseline">A Simple Baseline</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#first-round-reviews">First-round reviews</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#round-2-3-discussion-and-meta-review">Round 2-3 discussion and meta-review</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#was-it-worth-it">Was it worth it?</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Dimitris Tsirmpas
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026, Dimitris Tsirmpas.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

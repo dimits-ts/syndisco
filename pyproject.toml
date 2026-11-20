@@ -65,9 +65,14 @@ dev = [
   "pandoc",
   "build",
   "twine",
-  "pytest"
+  "pytest",
+  "black"
 ]
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+markers = ["slow: builds/loads a tiny real model", "live: hits a real API endpoint"]
+addopts = "-m 'not slow and not live'"

@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light dark">
   <title>SynDisco Viewer</title>
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon.svg">
   <link rel="stylesheet" href="css/viewer.css">
   <script src="js/vendor/fflate.min.js" defer></script>
   <script src="js/strings.js" defer></script>
@@ -13,12 +14,12 @@
   <script src="js/data.js" defer></script>
   <script src="js/app.js" defer></script>
 </head>
+
 <body>
   <a class="skip-link" href="#detail">Skip to discussion</a>
 
   <header class="topbar">
     <div class="brand">
-      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
       <h1 id="app-title">SynDisco Viewer</h1>
       <span id="app-version" class="app-version"></span>
     </div>
@@ -29,6 +30,10 @@
       <div class="popover-wrap">
         <button type="button" id="btn-options" class="btn" aria-expanded="false" aria-controls="options-panel"></button>
         <div id="options-panel" class="popover" hidden>
+          <label class="switch-row">
+            <input type="checkbox" id="opt-dark" role="switch">
+            <span id="opt-dark-label"></span>
+          </label>
           <label class="switch-row">
             <input type="checkbox" id="opt-prompts" role="switch">
             <span id="opt-prompts-label"></span>
@@ -62,7 +67,8 @@
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-controls">
         <label for="search" id="search-label" class="visually-hidden"></label>
-        <input type="search" id="search" class="search" autocomplete="off" spellcheck="false" aria-describedby="search-help">
+        <input type="search" id="search" class="search" autocomplete="off" spellcheck="false"
+          aria-describedby="search-help">
         <p id="search-help" class="hint"></p>
         <div class="control-row">
           <label class="select-field">
@@ -106,6 +112,9 @@
     </div>
   </section>
 
-  <div id="drop-overlay" class="drop-overlay" hidden><p id="drop-text"></p></div>
+  <div id="drop-overlay" class="drop-overlay" hidden>
+    <p id="drop-text"></p>
+  </div>
 </body>
+
 </html>
