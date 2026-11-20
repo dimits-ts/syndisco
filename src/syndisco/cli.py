@@ -16,7 +16,7 @@
 
 # You may contact the author at dim.tsirmpas@aueb.gr
 """
-Command-line interface for SynDisco.
+Command-line interface for SynDisco, currently only used for the viewer.
 """
 import argparse
 import sys
