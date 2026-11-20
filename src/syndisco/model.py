@@ -11,7 +11,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-# You should have received a copy of the GNU General Publ   ic License
+# You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # You may contact the author at dim.tsirmpas@aueb.gr
@@ -23,6 +23,7 @@ import abc
 import typing
 import logging
 from pathlib import Path
+
 
 
 logger = logging.getLogger(Path(__file__).name)
@@ -111,7 +112,7 @@ class TransformersModel(BaseModel):
         model_kwargs: dict | None = None,
         tokenizer_kwargs: dict | None = None,
         generation_kwargs: dict | None = None,
-    ):  
+    ):
         """
         Initialize a HuggingFace Transformers-based language model wrapper.
         This class loads a causal language model and tokenizer from a
@@ -152,7 +153,10 @@ class TransformersModel(BaseModel):
             Additional keyword arguments forwarded to
             ``model.generate()`` during inference.
             Examples include sampling parameters such as ``temperature``,
-            ``top_p``, or ``repetition_penalty``.
+            ``top_p``, or ``repetition_penalty``. Keys given here take
+            precedence over the defaults (``max_new_tokens``,
+            ``do_sample=False`` and ``pad_token_id``), e.g.
+            ``{"do_sample": True}`` enables sampling.
         :type generation_kwargs: dict | None
 
         :raises OSError:
@@ -166,9 +170,8 @@ class TransformersModel(BaseModel):
             The model is moved to the appropriate device automatically using
             ``device_map="auto"`` and set to evaluation mode.
         """
-        # lazy import
         import transformers
-        
+
         super().__init__(name, max_out_tokens, remove_string_list)
 
         model_kwargs = model_kwargs or {}
@@ -189,17 +192,16 @@ class TransformersModel(BaseModel):
         logger.info(f"Model memory footprint: {model_size:.2f} MB")
 
     def _generate_response(self, system_prompt: str, user_prompt: str) -> str:
-        # lazy import
-        import torch
-
         # Construct proper message list for chat template
         messages = [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
         ]
 
-        # Prefer chat template if available
-        if hasattr(self.tokenizer, "apply_chat_template"):
+        # Prefer the chat template if the tokenizer actually has one.
+        # Checking for the apply_chat_template method is not enough: every
+        # modern tokenizer has it, but it raises if chat_template is unset.
+        if getattr(self.tokenizer, "chat_template", None):
             prompt_text = self.tokenizer.apply_chat_template(
                 messages,
                 tokenize=False,
@@ -211,17 +213,24 @@ class TransformersModel(BaseModel):
                 f"System: {system_prompt}\nUser: {user_prompt}\nAssistant:"
             )
 
+        import torch
+
         with torch.inference_mode():
             inputs = self.tokenizer(prompt_text, return_tensors="pt").to(
                 self.model.device
             )
 
+            # User-supplied generation kwargs override the defaults instead
+            # of clashing with them as duplicate keyword arguments
+            generate_kwargs = {
+                "max_new_tokens": self.max_out_tokens,
+                "do_sample": False,
+                "pad_token_id": self.tokenizer.eos_token_id,
+                **self.generation_kwargs,
+            }
             output_ids = self.model.generate(  # type: ignore
                 **inputs,
-                max_new_tokens=self.max_out_tokens,
-                do_sample=False,
-                pad_token_id=self.tokenizer.eos_token_id,
-                **self.generation_kwargs,
+                **generate_kwargs,
             )
 
         # Remove the prompt portion, keep only generated part
@@ -250,7 +259,6 @@ class OpenAIModel(BaseModel):
         temperature: float = 0.0,
         remove_string_list: list[str] | None = None,
     ):
-        from openai import OpenAI
         """Initialize the OpenAI model wrapper.
 
         :param model_name:
@@ -269,6 +277,8 @@ class OpenAIModel(BaseModel):
         :param remove_string_list: Strings to remove from responses
         :type remove_string_list: list[str] | None
         """
+        from openai import OpenAI
+
         super().__init__(name, max_out_tokens, remove_string_list)
 
         self.model_name = model_name

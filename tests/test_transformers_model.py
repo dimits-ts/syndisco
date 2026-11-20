@@ -51,6 +51,7 @@ def fake_model():
 @pytest.fixture
 def fake_tokenizer():
     tokenizer = MagicMock(name="tokenizer")
+    tokenizer.chat_template = "{{ messages }}"
     tokenizer.apply_chat_template.return_value = "<templated prompt>"
     tokenizer.eos_token_id = EOS_ID
     # A real BatchEncoding: supports .to(device) and ** unpacking
@@ -171,14 +172,23 @@ def test_chat_template_is_used_when_available(make_model, fake_tokenizer):
     fake_tokenizer.assert_called_once_with("<templated prompt>", return_tensors="pt")
 
 
-def test_fallback_prompt_without_apply_chat_template(
-    make_model, fake_tokenizer, caplog
+@pytest.mark.parametrize(
+    "remove_template",
+    [
+        pytest.param(lambda tok: setattr(tok, "chat_template", None), id="none"),
+        pytest.param(lambda tok: setattr(tok, "chat_template", ""), id="empty"),
+        pytest.param(lambda tok: delattr(tok, "chat_template"), id="missing-attr"),
+    ],
+)
+def test_fallback_prompt_without_chat_template(
+    make_model, fake_tokenizer, caplog, remove_template
 ):
-    del fake_tokenizer.apply_chat_template  # hasattr() now returns False
+    remove_template(fake_tokenizer)
     caplog.set_level(logging.WARNING)
 
     make_model().prompt("sys", "usr")
 
+    fake_tokenizer.apply_chat_template.assert_not_called()
     fake_tokenizer.assert_called_once_with(
         "System: sys\nUser: usr\nAssistant:", return_tensors="pt"
     )
@@ -265,18 +275,6 @@ def test_one_generate_call_per_prompt(make_model, fake_model):
     assert fake_model.generate.call_count == 2
 
 
-# ---------------------------------------------------------------------------
-# Known issues (strict xfail: they start failing loudly once fixed)
-# ---------------------------------------------------------------------------
-
-
-@pytest.mark.xfail(
-    raises=TypeError,
-    strict=True,
-    reason="generation_kwargs cannot override the hard-coded generate() "
-    "arguments (do_sample, max_new_tokens, pad_token_id): Python raises "
-    "'got multiple values for keyword argument'.",
-)
 @pytest.mark.parametrize(
     "override",
     [{"do_sample": True}, {"max_new_tokens": 4}, {"pad_token_id": 0}],
@@ -288,6 +286,26 @@ def test_generation_kwargs_can_override_defaults(make_model, fake_model, overrid
     kwargs = fake_model.generate.call_args.kwargs
     for key, value in override.items():
         assert kwargs[key] == value
+
+
+def test_overriding_one_default_keeps_the_others(make_model, fake_model):
+    make_model(max_out_tokens=32, generation_kwargs={"do_sample": True}).prompt(
+        "s", "u"
+    )
+
+    kwargs = fake_model.generate.call_args.kwargs
+    assert kwargs["do_sample"] is True
+    assert kwargs["max_new_tokens"] == 32
+    assert kwargs["pad_token_id"] == EOS_ID
+
+
+def test_generation_kwargs_are_not_mutated(make_model):
+    generation_kwargs = {"do_sample": True}
+    model = make_model(generation_kwargs=generation_kwargs)
+    model.prompt("s", "u")
+
+    assert generation_kwargs == {"do_sample": True}
+    assert model.generation_kwargs == {"do_sample": True}
 
 
 # ---------------------------------------------------------------------------
@@ -419,16 +437,24 @@ def test_tiny_model_applies_stop_list(tiny_checkpoint):
 
 
 @pytest.mark.slow
-@pytest.mark.xfail(
-    raises=ValueError,
-    strict=True,
-    reason="Tokenizers always have apply_chat_template(), so the hasattr() "
-    "check never triggers the fallback; a tokenizer whose chat_template "
-    "is None raises ValueError instead. Checking "
-    "getattr(tokenizer, 'chat_template', None) would fix this.",
-)
-def test_tiny_model_falls_back_without_chat_template(tiny_checkpoint_no_template):
+def test_tiny_model_falls_back_without_chat_template(
+    tiny_checkpoint_no_template, caplog
+):
+    caplog.set_level(logging.WARNING)
     model = TransformersModel(
         tiny_checkpoint_no_template, name="tiny", max_out_tokens=5
+    )
+
+    assert isinstance(model.prompt("the cat", "the dog"), str)
+    assert "no chat template" in caplog.text
+
+
+@pytest.mark.slow
+def test_tiny_model_sampling_can_be_enabled(tiny_checkpoint):
+    model = TransformersModel(
+        tiny_checkpoint,
+        name="tiny",
+        max_out_tokens=5,
+        generation_kwargs={"do_sample": True, "top_k": 5},
     )
     assert isinstance(model.prompt("the cat", "the dog"), str)
