@@ -1,0 +1,72 @@
+:root {
+  --navy: #0E3859;
+  --indigo: #4A5384;
+  --lavender: #8D7CB5;
+  --orchid: #CB9DD4;
+  --blush: #FFC4D5;
+}
+
+/* Light mode (also the default before the theme script runs). */
+html:not([data-theme]),
+html[data-theme="light"] {
+  --pst-color-primary: var(--navy);
+  --pst-color-primary-text: #ffffff;
+  --pst-color-primary-highlight: var(--indigo);
+  --pst-color-primary-bg: #e9e2f3;
+  --pst-color-secondary: var(--indigo);
+  --pst-color-secondary-text: #ffffff;
+  --pst-color-secondary-highlight: var(--lavender);
+  --pst-color-secondary-bg: #ece7f3;
+  --pst-color-accent: var(--lavender);
+  --pst-color-accent-bg: #ece7f3;
+
+  --pst-color-link: var(--navy);
+  --pst-color-link-hover: var(--indigo);
+  --pst-color-link-higher-contrast: var(--navy);
+  --pst-color-heading: var(--navy);
+  --pst-color-text-base: #1b2a44;
+  --pst-color-text-muted: var(--indigo);
+  --pst-color-inline-code: var(--indigo);
+  --pst-color-target: var(--blush);
+
+  --pst-color-background: #ffffff;
+  --pst-color-on-background: #ffffff;
+  --pst-color-surface: #f4f1f8;
+  --pst-color-on-surface: #ece7f3;
+  --pst-color-border: #d9cfe6;
+  --pst-color-shadow: rgba(14, 56, 89, 0.12);
+}
+
+html[data-theme="dark"] {
+  --pst-color-primary: var(--orchid);
+  --pst-color-primary-text: var(--navy);
+  --pst-color-primary-highlight: var(--blush);
+  --pst-color-primary-bg: #232a50;
+  --pst-color-secondary: var(--lavender);
+  --pst-color-secondary-text: #0a1828;
+  --pst-color-secondary-highlight: var(--orchid);
+  --pst-color-secondary-bg: #1b2546;
+  --pst-color-accent: var(--lavender);
+  --pst-color-accent-bg: #1b2546;
+
+  --pst-color-link: var(--orchid);
+  --pst-color-link-hover: var(--blush);
+  --pst-color-link-higher-contrast: var(--blush);
+  --pst-color-heading: var(--orchid);
+  --pst-color-text-base: #f1ecf6;
+  --pst-color-text-muted: #b8b0d8;
+  --pst-color-inline-code: var(--blush);
+  --pst-color-target: #4a3550;
+
+  --pst-color-background: #0a1828;
+  --pst-color-on-background: #10243a;
+  --pst-color-surface: #10243a;
+  --pst-color-on-surface: #0d1f33;
+  --pst-color-border: #2b3b5e;
+  --pst-color-shadow: rgba(0, 0, 0, 0.45);
+}
+
+/* Like the site header: a navy rule under the top bar. */
+.bd-header-article {
+  border-bottom: 2px solid var(--pst-color-accent);
+}

@@ -21,6 +21,8 @@ Command-line interface for SynDisco, currently only used for the viewer.
 import argparse
 import sys
 import typing
+import webbrowser
+import zipfile
 
 from . import __version__
 
@@ -31,6 +33,9 @@ License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>
 This is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 """
+
+
+SOURCE_HELP = "folder, JSON file or .zip with discussion logs"
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -47,46 +52,27 @@ def _build_parser() -> argparse.ArgumentParser:
 
     view = commands.add_parser(
         "view",
-        help="open SynDisco Viewer in your browser",
+        help="open discussion logs in SynDisco Viewer",
         description=(
-            "Start a local web server for SynDisco Viewer and open it in "
-            "your browser. If PATH is given (a folder of discussion JSON "
-            "files, a single JSON file, or a .zip), it is loaded "
-            "automatically. Files are served read-only."
+            "Write a SynDisco Viewer page with the discussions in SOURCE to "
+            "a temporary file and open it in your browser. Use 'syndisco "
+            "export' to keep the page."
         ),
     )
-    view.add_argument(
-        "path",
-        nargs="?",
-        default=None,
-        help="folder, JSON file or .zip with discussion logs to load",
+    view.add_argument("source", help=SOURCE_HELP)
+
+    export_cmd = commands.add_parser(
+        "export",
+        help="save discussion logs as a SynDisco Viewer page",
+        description=(
+            "Write a self-contained SynDisco Viewer page with the "
+            "discussions in SOURCE to TARGET. The page works offline and "
+            "can be shared as a single file."
+        ),
     )
-    view.add_argument(
-        "--host",
-        default="127.0.0.1",
-        help="address to bind to (default: 127.0.0.1, this computer only)",
-    )
-    view.add_argument(
-        "--port",
-        type=int,
-        default=8765,
-        help="port to use; the next free port is used if it is taken "
-        "(default: 8765)",
-    )
-    view.add_argument(
-        "--no-browser",
-        action="store_true",
-        help="do not open a browser window",
-    )
-    view.add_argument(
-        "--show-prompts",
-        action="store_true",
-        help="show system prompts by default",
-    )
-    view.add_argument(
-        "--verbose",
-        action="store_true",
-        help="log every request to the terminal",
+    export_cmd.add_argument("source", help=SOURCE_HELP)
+    export_cmd.add_argument(
+        "target", help="HTML file to write; an existing file is overwritten"
     )
     return parser
 
@@ -103,21 +89,22 @@ def main(argv: typing.Sequence[str] | None = None) -> int:
     parser = _build_parser()
     args = parser.parse_args(argv)
 
-    if args.command == "view":
-        from .viewer import server
+    if args.command in ("view", "export"):
+        from .viewer import export
 
         try:
-            return server.run(
-                path=args.path,
-                host=args.host,
-                port=args.port,
-                open_browser=not args.no_browser,
-                show_prompts=args.show_prompts,
-                verbose=args.verbose,
-            )
-        except (FileNotFoundError, ValueError, OSError) as e:
-            print(f"syndisco view: {e}", file=sys.stderr)
+            if args.command == "view":
+                page = export.export_temporary(args.source)
+            else:
+                page = export.export(args.source, args.target)
+        except (OSError, ValueError, zipfile.BadZipFile) as e:
+            print(f"syndisco {args.command}: {e}", file=sys.stderr)
             return 2
+
+        print(f"Wrote {page}")
+        if args.command == "view":
+            webbrowser.open(page.resolve().as_uri())
+        return 0
 
     parser.print_help()
     return 0

@@ -31,6 +31,7 @@
     clearData: "Close all",
     clearConfirm: "Close all discussions? Files on your computer are not affected.",
     options: "Options",
+    darkMode: "Dark mode",
     showPrompts: "Show system prompts",
     highlightMentions: "Highlight participant names mentioned in messages",
     stripPrompts: "Remove system prompts from downloads",

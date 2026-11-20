@@ -1,23 +1,22 @@
-# SynDisco Viewer: developer notes
+# SynDisco Viewer
 
-A static web app for browsing discussion logs. It has no build step: edit
-the files in `static/` and reload the page.
+HTML page export for browsing discussion logs.
 
 ## Layout
 
 | Path | Purpose |
 |---|---|
-| `static/index.html` | Page structure. Scripts are plain `<script>` tags. |
-| `static/css/viewer.css` | All styles; light and dark colour tokens at the top. |
+| `static/index.html` | :) |
+| `static/css/viewer.css` | Styles; light and dark colour tokens at the top. |
 | `static/js/strings.js` | All user-facing text. |
-| `static/js/data.js` | Reading files, zips, URLs and manifests; validation; export; remembered data (IndexedDB). |
+| `static/js/data.js` | Reading files, zips, URL, IndexedDB. |
 | `static/js/search-core.js` | Full-text search, shared by the worker and the page. |
 | `static/js/search-worker.js` | Runs searches off the main thread. Falls back to the page when workers are unavailable (e.g. `file://`). |
-| `static/js/app.js` | The interface. |
-| `static/js/vendor/` | Third-party libraries, vendored with their licences. |
-| `static/config.json` | Default settings for a deployment. |
+| `static/js/app.js` | UI. |
+| `static/js/vendor/` | Third-party libraries. |
+| `static/config.json` | Default settings for the page (see `config` section below). |
 | `static/datasets/index.json` | Datasets listed on the start page (empty in the package; the Pages workflow replaces it with `viewer_datasets/`). |
-| `server.py` | The local server behind `syndisco view`. Standard library only. |
+| `export.py` | Builds the self-contained pages written by `syndisco view` and `syndisco export`. Standard library only. |
 
 ## Data the viewer accepts
 
@@ -37,25 +36,38 @@ a single discussion `.json`, or a manifest:
 Manifest URLs are relative to the manifest. Zips are faster for large
 datasets because they need one request and should be preferred when viewing a multi-discussion experiment.
 
+## Exported pages
+
+`syndisco view SOURCE` and `syndisco export SOURCE TARGET` write the viewer
+and a set of discussions into one HTML file (`view` to a temporary folder,
+then opens it). `export.py` inlines the stylesheet, scripts and favicon
+referenced by `index.html`, and adds a script before them that sets
+`window.SYNDISCO_EMBEDDED = {config, label, files}`, where `files` is a
+list of `{path, text}`.
+
+When that object exists, `app.js` uses its config and files instead of
+fetching `config.json`, the datasets index or a dataset, and searches
+without a worker, since pages opened from disk can use neither. Without it,
+the viewer behaves as a normal hosted page.
+
+`export.py` only inlines tags written exactly as
+`<link rel="stylesheet" href="...">` and `<script src="..." defer></script>`,
+so keep new stylesheets and scripts in `index.html` in that form.
+
 ## `config.json`
 
 | Key | Default | Meaning |
 |---|---|---|
 | `title` | `"SynDisco Viewer"` | Page title. |
-| `showPrompts` | `false` | Show system prompts initially. `syndisco view --show-prompts` overrides it. |
+| `showPrompts` | `true` | Show system prompts initially. |
 | `stripPromptsOnDownload` | `false` | Empty prompts in downloads initially. |
 | `defaultGroupBy` | `"auto"` | `auto`, `none`, `folder`, `model`, `speaker`, `day`, `month` or `meta:<key>`. |
 | `defaultSort` | `"newest"` | `newest`, `oldest`, `path`, `most` or `fewest`. |
-| `rememberData` | `true` | Allow reopening imported files on the next visit (stored in the browser only). |
+| `rememberData` | `true` | Allow reopening imported files on the next visit (stored in the browser only). Always off in exported pages. |
 | `pageSize` | `100` | Discussions shown per group before "Show more". |
 | `datasetsIndex` | `"datasets/index.json"` | Where to find the published datasets list. |
-| `version` | | Shown next to the title; filled in by `syndisco view` and the Pages workflow. |
+| `version` | | Shown next to the title; filled in by exported pages and the Pages workflow. |
 
 ## Testing
-
-`tests/test_viewer_server.py` covers the server, and
-`tests/test_viewer_roundtrip.py` runs `data.js` under Node.js (skipped when
-Node.js is missing) to check that downloads reload with `Logs.from_file`.
-For the interface, run `syndisco view <folder>` and check in a browser.
 
 Currently untested on Node!

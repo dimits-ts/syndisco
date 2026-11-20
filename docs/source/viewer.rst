@@ -14,31 +14,32 @@ Files are read in your browser and are never uploaded.
 Viewing your own results
 ------------------------
 
-Run the viewer on your computer and point it at a folder of results:
+Open a folder of results in the viewer:
 
 .. code-block:: bash
 
    syndisco view path/to/output_dir
 
-This opens the viewer in your browser with every discussion in the folder
-loaded, including those in subfolders. You can also pass a single JSON file
-or a ``.zip``. Without a path, the viewer opens empty and you can add files
-yourself. The same command is available as ``python -m syndisco view``.
+Writes a temporary page with every discussion in the folder,
+including subfolders, and opens it in a browser. You can also pass a
+single JSON file or a ``.zip``. The page stays in your system's temporary
+folder until the system clears it.
 
-Options:
+To keep the page or share it, save it to a file instead:
 
-``--port PORT``
-   Port to use (default 8765). If it is taken, the next free port is used.
-``--no-browser``
-   Start the server without opening a browser window.
-``--show-prompts``
-   Show participants' system prompts by default.
-``--host HOST``
-   Address to listen on (default ``127.0.0.1``, this computer only). Other
-   addresses let other devices on your network read the served files.
+.. code-block:: bash
 
-The server only serves ``.json`` files inside the folder you give it, and
-only to this computer by default. Stop it with Ctrl+C.
+   syndisco export path/to/output_dir results.html
+
+An existing file with that name is overwritten. The page is a single,
+self-contained file that works offline, so it can be sent to others or
+attached to a paper. It shows the discussions as they were when you ran
+the command; run it again to include new results. It contains the full
+logs, including system prompts, even when they are hidden on screen, so
+check them before sharing the file.
+
+Both commands are also available as ``python -m syndisco view`` and
+``python -m syndisco export``.
 
 You can also open the online viewer and drag a results folder, JSON files
 or a zip onto the page.

@@ -30,7 +30,7 @@ import subprocess
 import pytest
 
 from syndisco import Logs
-from syndisco.viewer.server import static_dir
+from syndisco.viewer.export import static_dir
 
 NODE = shutil.which("node")
 

@@ -49,5 +49,12 @@ generate in a web browser. Open a folder of results on your computer with:
 syndisco view path/to/output_dir
 ```
 
-or drop your files onto the [online viewer](https://dimits-ts.github.io/syndisco/viewer/).
+To keep the page or share it, save it as a single, self-contained HTML
+file that works offline:
+
+```bash
+syndisco export path/to/output_dir results.html
+```
+
+You can also drop your files onto the [online viewer](https://dimits-ts.github.io/syndisco/viewer/).
 Files are read in your browser and never uploaded.
