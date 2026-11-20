@@ -22,6 +22,8 @@
     datasetsIndex: "datasets/index.json",
   };
   var OPEN_GROUPS_BY_DEFAULT = 10;
+  // Set by pages written by "syndisco view" and "syndisco export".
+  var EMBEDDED = window.SYNDISCO_EMBEDDED || null;
   var SPEAKER_COLORS = 8;
 
   var state = {
@@ -408,6 +410,11 @@
     });
   }
 
+  /** Update the address bar; some browsers refuse this for pages opened from disk. */
+  function replaceUrl(url) {
+    try { history.replaceState(null, "", url); } catch (e) { /* keep the old URL */ }
+  }
+
   function persist() {
     if (!state.config.rememberData || !state.remember) return;
     D.cache.save(state.records.map(function (r) { return { path: r.path, text: r.raw }; }), state.label);
@@ -427,7 +434,7 @@
     var url = new URL(location.href);
     url.search = "";
     url.hash = "";
-    history.replaceState(null, "", url.href);
+    replaceUrl(url.href);
     setStatus(null);
     afterDataChanged();
   }
@@ -1090,7 +1097,7 @@
     if (Object.keys(fo).length) p.set("f", JSON.stringify(fo));
     var hash = p.toString();
     var url = location.pathname + location.search + (hash ? "#" + hash : "");
-    if (url !== location.pathname + location.search + location.hash) history.replaceState(null, "", url);
+    if (url !== location.pathname + location.search + location.hash) replaceUrl(url);
   }
 
   /** Restore view state from the URL hash. Rendering happens afterwards. */
@@ -1234,6 +1241,9 @@
   }
 
   function startup() {
+    if (EMBEDDED) {
+      return ingest({ files: EMBEDDED.files, errors: [] }, { replace: true, label: EMBEDDED.label, persist: false, restoreHash: true });
+    }
     var params = new URLSearchParams(location.search);
     var dataUrl = params.get("data");
     if (dataUrl) {
@@ -1269,8 +1279,10 @@
 
   function init() {
     bindEvents();
-    searcher.start();
-    fetchJson("config.json").catch(function () { return {}; }).then(function (cfg) {
+    // An exported page opens from disk, where workers and fetch() don't work.
+    if (!EMBEDDED) searcher.start();
+    var config = EMBEDDED ? Promise.resolve(EMBEDDED.config) : fetchJson("config.json");
+    config.catch(function () { return {}; }).then(function (cfg) {
       state.config = Object.assign({}, DEFAULT_CONFIG, cfg || {});
       state.showPrompts = !!state.config.showPrompts;
       state.strip = !!state.config.stripPromptsOnDownload;
@@ -1280,6 +1292,7 @@
       state.groupBy = state.config.defaultGroupBy || "auto";
       state.sort = SORTERS[state.config.defaultSort] ? state.config.defaultSort : "newest";
       applyStaticText();
+      if (EMBEDDED) return {};
       return fetchJson(state.config.datasetsIndex).catch(function () { return {}; });
     }).then(function (index) {
       state.datasets = Array.isArray(index && index.datasets) ? index.datasets.filter(function (d) { return d && d.url; }) : [];
