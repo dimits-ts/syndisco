@@ -3,12 +3,21 @@
 ## 2.3.0 (07/10/2026)
 
 ### Features
-- Added `SynDisco Viewer`, a web viewer for discussion logs with search, filters, grouping and JSON/zip downloads. It is published with the online documentation at `/viewer/`.
+- Added `SynDisco Viewer` which exports discussion logs with search, filters, grouping and JSON/zip downloads. It is published with the online documentation at `/viewer/`.
 - Added the `syndisco view` command (also `python -m syndisco view`), which opens the viewer locally with a folder, JSON file or zip of results.
 - Added a GitHub Actions workflow that publishes the documentation, the viewer and some sample datasets in `viewer_datasets/` to GitHub Pages.
+- Added new real-world use-case example in guides.
 
 ### Changes
 - `import syndisco` now imports torch, transformers or openai lazily.
+- Added custom css for project webpages.
+
+### Development
+- Added tests for `Model` and subclasses.
+
+### Fixes
+- `TransformerModel` now accepts attributes already defined by other parts of the library, such as `max_new_tokens`.
+- `TransformerModel` now correctly checks for chat templates without crashing.
 
 
 ## 2.2.1 (07/07/2026)

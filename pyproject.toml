@@ -65,7 +65,8 @@ dev = [
   "pandoc",
   "build",
   "twine",
-  "pytest"
+  "pytest",
+  "black"
 ]
 
 [build-system]
