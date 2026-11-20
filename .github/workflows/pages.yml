@@ -1,7 +1,7 @@
 # Publishes the documentation and SynDisco Viewer to GitHub Pages.
 #
 # The site is assembled from:
-#   docs/                         the pre-built Sphinx documentation (site root)
+#   docs/build                         the pre-built Sphinx documentation (site root)
 #   src/syndisco/viewer/static/   the viewer (at /viewer/)
 #   viewer_datasets/              published datasets (at /viewer/datasets/)
 #
@@ -66,8 +66,7 @@ jobs:
       - name: Assemble site
         run: |
           mkdir -p _site
-          cp -r docs/. _site/
-          rm -rf _site/source _site/build _site/Makefile _site/make.bat
+          cp -r docs/build/. _site/
           mkdir -p _site/viewer
           cp -r src/syndisco/viewer/static/. _site/viewer/
           if [ -d viewer_datasets ]; then
