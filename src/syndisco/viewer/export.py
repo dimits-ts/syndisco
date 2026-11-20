@@ -25,6 +25,7 @@ one file.
 import base64
 import importlib.resources
 import json
+import mimetypes
 import re
 import tempfile
 import typing
@@ -121,9 +122,17 @@ def build_html(path: str | Path) -> str:
         js = (static / match[1]).read_text(encoding="utf8")
         return f"<script>\n{js}\n</script>"
 
-    favicon = base64.b64encode((static / "favicon.svg").read_bytes()).decode()
-    html = html.replace(
-        'href="favicon.svg"', f'href="data:image/svg+xml;base64,{favicon}"'
+    def inline_image(match: re.Match) -> str:
+        attr, rel = match[1], match[2]
+        kind = mimetypes.guess_type(rel)[0] or "application/octet-stream"
+        data = base64.b64encode((static / rel).read_bytes()).decode()
+        return f'{attr}="data:{kind};base64,{data}"'
+
+    # local images (the favicon, <img src>) become data URIs
+    html = re.sub(
+        r'(src|href)="([^":#?]+\.(?:png|svg|jpe?g|gif|webp|ico))"',
+        inline_image,
+        html,
     )
     html = re.sub(r'<link rel="stylesheet" href="([^"]+)">', inline_css, html)
     html = re.sub(r'<script src="([^"]+)" defer></script>', inline_js, html)

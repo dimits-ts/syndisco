@@ -49,8 +49,14 @@ jobs:
           names = set(zipfile.ZipFile(glob.glob("dist/*.whl")[0]).namelist())
           required = [
               "syndisco/viewer/static/index.html",
-              "syndisco/viewer/static/js/app.js",
+              "syndisco/viewer/static/config.json",
+              "syndisco/viewer/static/favicon.svg",
+              "syndisco/viewer/static/css/viewer.css",
               "syndisco/viewer/static/js/vendor/fflate.min.js",
+              "syndisco/viewer/static/js/strings.js",
+              "syndisco/viewer/static/js/search-core.js",
+              "syndisco/viewer/static/js/data.js",
+              "syndisco/viewer/static/js/app.js",
           ]
           missing = [n for n in required if n not in names]
           assert not missing, f"missing from wheel: {missing}"

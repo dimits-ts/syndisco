@@ -52,6 +52,37 @@
     importing: false,
   };
 
+  // ------------------------------------------------------------- theme
+
+  // The page follows the system's light or dark setting until the person
+  // picks one in Options; that choice is remembered in this browser.
+  var THEME_KEY = "syndisco-viewer-theme";
+  var systemDark = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+  var themeChoice = null; // "light", "dark", or null to follow the system
+  try { themeChoice = localStorage.getItem(THEME_KEY); } catch (e) { /* storage unavailable */ }
+
+  function isDark() {
+    if (themeChoice === "light" || themeChoice === "dark") return themeChoice === "dark";
+    return !!(systemDark && systemDark.matches);
+  }
+
+  function applyTheme() {
+    var root = document.documentElement;
+    if (themeChoice === "light" || themeChoice === "dark") root.setAttribute("data-theme", themeChoice);
+    else root.removeAttribute("data-theme");
+    var box = document.getElementById("opt-dark");
+    if (box) box.checked = isDark();
+  }
+
+  function setDark(dark) {
+    themeChoice = dark ? "dark" : "light";
+    try { localStorage.setItem(THEME_KEY, themeChoice); } catch (e) { /* kept for this visit only */ }
+    applyTheme();
+  }
+
+  applyTheme();
+  if (systemDark && systemDark.addEventListener) systemDark.addEventListener("change", applyTheme);
+
   function emptyFilters() {
     return { models: new Set(), speakers: new Set(), from: "", to: "", min: "", max: "", meta: {}, speakerQuery: "" };
   }
@@ -1134,6 +1165,7 @@
     $("app-version").textContent = c.version || "";
     var text = {
       "btn-add-files": T.addFiles, "btn-add-folder": T.addFolder, "btn-options": T.options, "btn-clear": T.clearData,
+      "opt-dark-label": T.darkMode,
       "opt-prompts-label": T.showPrompts, "opt-mentions-label": T.highlightMentions,
       "opt-strip-label": T.stripPrompts, "opt-strip-hint": T.stripPromptsHint,
       "opt-remember-label": T.rememberData, "search-label": T.searchLabel, "search-help": T.searchHelp,
@@ -1146,6 +1178,7 @@
     $("search").placeholder = T.searchPlaceholder;
     var sort = clear($("sort-by"));
     Object.keys(T.sortOptions).forEach(function (k) { sort.appendChild(h("option", { value: k, text: T.sortOptions[k] })); });
+    $("opt-dark").checked = isDark();
     $("opt-prompts").checked = state.showPrompts;
     $("opt-mentions").checked = state.highlightMentions;
     $("opt-strip").checked = state.strip;
@@ -1177,6 +1210,7 @@
       if (e.key === "Escape" && !panel.hidden) { setOptions(false); optionsBtn.focus(); }
     });
     $("opt-prompts").addEventListener("change", function (e) { state.showPrompts = e.target.checked; renderDetail(); });
+    $("opt-dark").addEventListener("change", function (e) { setDark(e.target.checked); });
     $("opt-mentions").addEventListener("change", function (e) { state.highlightMentions = e.target.checked; renderDetail(); });
     $("opt-strip").addEventListener("change", function (e) { state.strip = e.target.checked; });
     $("opt-remember").addEventListener("change", function (e) {
