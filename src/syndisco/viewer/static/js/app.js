@@ -12,7 +12,7 @@
   var DEFAULT_CONFIG = {
     title: T.appName,
     version: "",
-    showPrompts: false,
+    showPrompts: true,
     stripPromptsOnDownload: false,
     highlightMentions: false,
     defaultGroupBy: "auto",
@@ -44,7 +44,7 @@
     limits: new Map(),
     order: [],
     selectedId: null,
-    showPrompts: false,
+    showPrompts: true,
     strip: false,
     highlightMentions: false,
     remember: true,

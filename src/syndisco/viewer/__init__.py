@@ -19,6 +19,7 @@
 SynDisco Viewer: a browser-based viewer for discussion logs.
 
 The viewer itself is a static web app located in the ``static`` directory of
-this package. It can be hosted on any static web host, or served locally
-with ``syndisco view``.
+this package. It can be hosted on any static web host. ``syndisco view``
+and ``syndisco export`` write it, together with a set of discussions, into
+a single self-contained HTML file.
 """
