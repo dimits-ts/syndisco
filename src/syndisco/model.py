@@ -11,7 +11,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU General Publ   ic License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # You may contact the author at dim.tsirmpas@aueb.gr
@@ -23,10 +23,6 @@ import abc
 import typing
 import logging
 from pathlib import Path
-
-import transformers
-import torch
-from openai import OpenAI
 
 
 logger = logging.getLogger(Path(__file__).name)
@@ -115,7 +111,7 @@ class TransformersModel(BaseModel):
         model_kwargs: dict | None = None,
         tokenizer_kwargs: dict | None = None,
         generation_kwargs: dict | None = None,
-    ):
+    ):  
         """
         Initialize a HuggingFace Transformers-based language model wrapper.
         This class loads a causal language model and tokenizer from a
@@ -170,6 +166,9 @@ class TransformersModel(BaseModel):
             The model is moved to the appropriate device automatically using
             ``device_map="auto"`` and set to evaluation mode.
         """
+        # lazy import
+        import transformers
+        
         super().__init__(name, max_out_tokens, remove_string_list)
 
         model_kwargs = model_kwargs or {}
@@ -190,6 +189,9 @@ class TransformersModel(BaseModel):
         logger.info(f"Model memory footprint: {model_size:.2f} MB")
 
     def _generate_response(self, system_prompt: str, user_prompt: str) -> str:
+        # lazy import
+        import torch
+
         # Construct proper message list for chat template
         messages = [
             {"role": "system", "content": system_prompt},
@@ -248,6 +250,7 @@ class OpenAIModel(BaseModel):
         temperature: float = 0.0,
         remove_string_list: list[str] | None = None,
     ):
+        from openai import OpenAI
         """Initialize the OpenAI model wrapper.
 
         :param model_name:
